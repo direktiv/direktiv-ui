@@ -28,7 +28,8 @@
     "react-virtualized": "^9.22.3",
     "react-virtualized-auto-sizer": "^1.0.6",
     "use-react-router-breadcrumbs": "^3.0.1",
-    "web-vitals": "^1.0.1"
+    "web-vitals": "^1.0.1",
+    "yup": "^0.32.11"
   },
   "scripts": {
     "start": "REACT_APP_API=$DIREKTIV_API react-scripts start",

@@ -8,6 +8,7 @@ import Modal, { ButtonDefinition, KeyDownDefinition } from "../../components/mod
 import AddValueButton from "../../components/add-button";
 import { IoPlay } from "react-icons/io5";
 import HelpIcon from "../../components/help"
+import * as yup from "yup";
 
 export default function GlobalServicesPanel(props) {
     const {data, err, config, createGlobalService, getConfig, getGlobalServices, deleteGlobalService} = useGlobalServices(Config.url, true, localStorage.getItem("apikey"))
@@ -18,6 +19,20 @@ export default function GlobalServicesPanel(props) {
     const [scale, setScale] = useState(0)
     const [size, setSize] = useState(0)
     const [cmd, setCmd] = useState("")
+    const [isButtonDisabled, setIsButtonDisabled] = useState(false)
+
+    const serviceValidationSchema = yup.object().shape({
+        serviceName: yup.string().required("Name field is required"),
+        image: yup.string().required("Image field is required")
+    })
+    let formData = {
+        serviceName: serviceName,
+        image: image
+    }
+
+    useEffect(async () => {
+        await serviceValidationSchema.isValid(formData).then((result) => setIsButtonDisabled(!result));
+    })
 
     useEffect(()=>{
         async function getcfg() {
@@ -75,9 +90,17 @@ export default function GlobalServicesPanel(props) {
                         ]}
                         actionButtons={[
                             ButtonDefinition("Add", async () => {
-                                let err = await createGlobalService(serviceName, image, parseInt(scale), parseInt(size), cmd)
-                                if(err) return err
-                            }, "small blue", true, false),
+                                if (!isButtonDisabled) {
+                                    return serviceValidationSchema.validate(formData, { abortEarly: false })
+                                        .then(function() {
+                                            createGlobalService(serviceName, image, parseInt(scale), parseInt(size), cmd)
+                                        }).catch(function (err) {
+                                            if (err.inner.length > 0) {
+                                                return err.inner[0].message
+                                            }
+                                        });
+                                }
+                            }, `small ${isButtonDisabled ? "disabled": "blue"}`, true, false),
                             ButtonDefinition("Cancel", () => {
                             }, "small light", true, false)
                         ]}
