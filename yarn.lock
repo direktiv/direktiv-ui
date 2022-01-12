@@ -4755,13 +4755,14 @@ dir-glob@^3.0.1:
   dependencies:
     path-type "^4.0.0"
 
-direktiv-react-hooks@^0.0.83:
-  version "0.0.83"
-  resolved "https://registry.yarnpkg.com/direktiv-react-hooks/-/direktiv-react-hooks-0.0.83.tgz#51c3535c362ba8f37b921b7082de7d56885cc774"
-  integrity sha512-PzW37hHfsFpCYzcEtXK83oknUMy/tqI9gcqycZcFLt+lzFwwWyxIR/SdjLpDExIZ9VHJZUBxk0hVp1Jsx6mADw==
+direktiv-react-hooks@^0.0.108:
+  version "0.0.108"
+  resolved "https://registry.yarnpkg.com/direktiv-react-hooks/-/direktiv-react-hooks-0.0.108.tgz#d708bde44b9f5e2ddd1f630cca7f1d4a841e1746"
+  integrity sha512-oCIUr7rf9zzL0pV4cwzKPBo8x4PKQVTJxz8lwDgGAb6BAKyN0QMLAO6WTXPwnAojkLtH5ScsuAVehu74yBJ2lQ==
   dependencies:
     "@types/event-source-polyfill" "^1.0.0"
     cross-fetch "^3.1.4"
+    direktiv-react-hooks "^0.0.83"
     event-source-polyfill "^1.0.25"
     http "^0.0.1-security"
     https "^1.0.0"
@@ -4770,14 +4771,13 @@ direktiv-react-hooks@^0.0.83:
     url "^0.11.0"
     zlib "^1.0.5"
 
-direktiv-react-hooks@^0.0.93:
-  version "0.0.93"
-  resolved "https://registry.yarnpkg.com/direktiv-react-hooks/-/direktiv-react-hooks-0.0.93.tgz#6c360d3391a40ef06f2035dc95aab9125777ac25"
-  integrity sha512-Qu2C/UvaEUqgKDo040j6DnaCjPqRIU5pC+rJZOmvOjiMkxyGe8A3TqQOj2EITpjCUx2tYOmIr6hni3NYzssgvA==
+direktiv-react-hooks@^0.0.83:
+  version "0.0.83"
+  resolved "https://registry.yarnpkg.com/direktiv-react-hooks/-/direktiv-react-hooks-0.0.83.tgz#51c3535c362ba8f37b921b7082de7d56885cc774"
+  integrity sha512-PzW37hHfsFpCYzcEtXK83oknUMy/tqI9gcqycZcFLt+lzFwwWyxIR/SdjLpDExIZ9VHJZUBxk0hVp1Jsx6mADw==
   dependencies:
     "@types/event-source-polyfill" "^1.0.0"
     cross-fetch "^3.1.4"
-    direktiv-react-hooks "^0.0.83"
     event-source-polyfill "^1.0.25"
     http "^0.0.1-security"
     https "^1.0.0"

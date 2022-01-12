@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import './style.css';
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
 import FlexBox from '../../components/flexbox';
@@ -34,9 +34,24 @@ export default InstancesPage;
 function InstancesTable(props) {
     const {namespace} = props
     const [load, setLoad] = useState(true)
+    const [ page, setPage ] = useState(1)
 
-    const {data, err} = useInstances(Config.url, true, namespace, localStorage.getItem("apikey"))
+    const {data, err, getInstances} = useInstances(Config.url, true, namespace, localStorage.getItem("apikey"))
+    
+    const pageSize = 5
 
+    useEffect(()=>{
+        getInstances(
+            `first=${pageSize}`,
+        ).then((resp)=>{
+            console.log("==get instances==",resp)
+        }).catch((e)=>{
+            console.log("===catched get instances===", e)
+        })
+        console.log(data)
+    }, [ page ])
+        
+    // console.log("====get instances====", paginatedData())
     useEffect(()=>{
         if(data !== null || err !== null) {
             setLoad(false)
@@ -61,52 +76,59 @@ function InstancesTable(props) {
         <ContentPanelBody>
         <>
         {
-            data !== null && data.length === 0 ? <div style={{paddingLeft:"10px", fontSize:"10pt"}}>No instances have been recently executed. Recent instances will appear here.</div>:
-            <table className="instances-table" style={{width: "100%"}}>
-            <thead>
-                <tr>
-                    <th className="center-align" style={{maxWidth: "120px", minWidth: "120px", width: "120px"}}>
-                        State
-                    </th>
-                    <th className="center-align">
-                        Name
-                    </th>
-                    <th className="center-align">
-                        Revision ID
-                    </th>
-                    <th className="center-align">
-                        Started <span className="hide-on-med">at</span>
-                    </th>
-                    <th className="center-align">
-                        <span className="hide-on-med">Last</span> Updated
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                {data !== null ? 
-                <>
-                    <>
-                    {data.map((obj)=>{
-                    return(
-                        <InstanceRow 
-                            key={GenerateRandomKey()}
-                            namespace={namespace}
-                            state={obj.node.status} 
-                            name={obj.node.as} 
-                            id={obj.node.id}
-                            started={dayjs.utc(obj.node.createdAt).local().format("HH:mm a")} 
-                            startedFrom={dayjs.utc(obj.node.createdAt).local().fromNow()}
-                            finished={dayjs.utc(obj.node.updatedAt).local().format("HH:mm a")}
-                            finishedFrom={dayjs.utc(obj.node.updatedAt).local().fromNow()}
-                        />
-                    )
-                    })}</>
-                </>
-                :""}
-            </tbody>
-        </table>}</>
+            data !== null && data.length === 0 ? 
+                <div style={{paddingLeft:"10px", fontSize:"10pt"}}>No instances have been recently executed. Recent instances will appear here.</div>
+            :
+                <table className="instances-table" style={{width: "100%"}}>
+                    <thead>
+                        <tr>
+                            <th className="center-align" style={{maxWidth: "120px", minWidth: "120px", width: "120px"}}>
+                                State
+                            </th>
+                            <th className="center-align">
+                                Name
+                            </th>
+                            <th className="center-align">
+                                Revision ID
+                            </th>
+                            <th className="center-align">
+                                Started <span className="hide-on-med">at</span>
+                            </th>
+                            <th className="center-align">
+                                <span className="hide-on-med">Last</span> Updated
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {data !== null ? 
+                        <>
+                            <>
+                            {data.map((obj)=>{
+                            return(
+                                <InstanceRow 
+                                    key={GenerateRandomKey()}
+                                    namespace={namespace}
+                                    state={obj.node.status} 
+                                    name={obj.node.as} 
+                                    id={obj.node.id}
+                                    started={dayjs.utc(obj.node.createdAt).local().format("HH:mm a")} 
+                                    startedFrom={dayjs.utc(obj.node.createdAt).local().fromNow()}
+                                    finished={dayjs.utc(obj.node.updatedAt).local().format("HH:mm a")}
+                                    finishedFrom={dayjs.utc(obj.node.updatedAt).local().fromNow()}
+                                />
+                            )
+                            })}</>
+                        </>
+                        :""}
+                    </tbody>
+                </table>
+        }
+        </>
         </ContentPanelBody>
     </ContentPanel>
+    <FlexBox>
+        <Pagination max={10} currentIndex={pageNo} pageNoSetter={setPageNo} />
+    </FlexBox>
     </Loader>
         
     );
