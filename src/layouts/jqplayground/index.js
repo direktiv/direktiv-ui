@@ -7,6 +7,7 @@ import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIco
 import DirektivEditor from '../../components/editor';
 import FlexBox from '../../components/flexbox';
 import HelpIcon from '../../components/help';
+import Alert from '../../components/alert';
 import { Config } from '../../util';
 import './style.css';
 
@@ -276,7 +277,7 @@ function JQFilter(props) {
                     </FlexBox>
                 </ContentPanelBody>
                 <FlexBox>
-                    {error ? <div className='error-message'>{error.replace("execute jq: ", "")}</div> : null}
+                    {error ? <Alert className="error-message"><div><span>error executing JQ command:</span>{error.replace("execute jq: error executing JQ command:", "")}</div></Alert> : null}
                 </FlexBox>
             </ContentPanel>
         </FlexBox>
