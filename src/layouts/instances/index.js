@@ -34,17 +34,16 @@ export default InstancesPage;
 function InstancesTable(props) {
     const {namespace} = props
     const [load, setLoad] = useState(true)
-
-    const {data, err} = useInstances(Config.url, true, namespace, localStorage.getItem("apikey"))
+    const [iQueryParams, ] = useState([])
+    const {data, err} = useInstances(Config.url, true, namespace, localStorage.getItem("apikey"), ...iQueryParams)
 
     useEffect(()=>{
         if(data !== null || err !== null) {
             setLoad(false)
         }
     },[data, err])
-
     return(
-        <Loader load={load} timer={1000}>
+        <Loader load={load} timer={3000}>
 
         <ContentPanel>
         <ContentPanelTitle>
@@ -94,9 +93,9 @@ function InstancesTable(props) {
                             state={obj.node.status} 
                             name={obj.node.as} 
                             id={obj.node.id}
-                            started={dayjs.utc(obj.node.createdAt).local().format("HH:mm a")} 
+                            started={dayjs.utc(obj.node.createdAt).local().format("HH:mm:ss a")} 
                             startedFrom={dayjs.utc(obj.node.createdAt).local().fromNow()}
-                            finished={dayjs.utc(obj.node.updatedAt).local().format("HH:mm a")}
+                            finished={dayjs.utc(obj.node.updatedAt).local().format("HH:mm:ss a")}
                             finishedFrom={dayjs.utc(obj.node.updatedAt).local().fromNow()}
                         />
                     )
@@ -107,6 +106,7 @@ function InstancesTable(props) {
         </table>}</>
         </ContentPanelBody>
     </ContentPanel>
+
     </Loader>
         
     );
@@ -120,7 +120,7 @@ const cancelled = "cancelled";
 const running = "pending";
 
 export function InstanceRow(props) {
-    let {state, name, wf, started, startedFrom, finished, finishedFrom, id, namespace} = props;
+    let {state, name, wf, started,  finished,  id, namespace} = props;
     const navigate = useNavigate()
 
     let label;
@@ -137,6 +137,10 @@ export function InstanceRow(props) {
     let wfStr = name.split(':')[0]
     let revStr = name.split(':')[1]
 
+    let pathwf = wfStr.split("/")
+    let wfname = pathwf[pathwf.length-1]
+    pathwf.splice(pathwf.length-1, pathwf.length-1)
+    
     return(
     
     <tr onClick={()=>{
@@ -146,10 +150,16 @@ export function InstanceRow(props) {
             {label}
         </td>
         {!wf ? 
-        <td className="center-align" style={{fontSize: "12px", lineHeight: "20px"}}>
-            {wfStr}
+        <td title={wfStr} className="center-align" style={{ fontSize: "12px", lineHeight: "20px", display:"flex", justifyContent:"center", marginTop:"12px"}}>
+            <div style={{marginLeft:"10px", textOverflow:"ellipsis", overflow:"hidden"}}>
+                /{pathwf.join("/")}
+            </div>
+            {pathwf.length !== 1 ?
+            <div>
+                /{wfname}
+            </div>:""}
         </td>: ""}
-        <td style={{ fontSize: "12px", lineHeight: "20px" }} className="center-align">
+        <td title={revStr} style={{ fontSize: "12px", lineHeight: "20px", textOverflow:"ellipsis", overflow:"hidden" }} className="center-align">
             {revStr}
         </td>
         <td className="center-align">

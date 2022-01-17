@@ -269,11 +269,17 @@ export function Service(props) {
                         actionButtons={[
                             ButtonDefinition("Delete", async () => {
                                 if(revision !== undefined) {
-                                    let err = await deleteService(revision)
-                                    if (err) return err
+                                    try { 
+                                        await deleteService(revision)
+                                    } catch(err) {
+                                        return err
+                                    }
                                 }else {
-                                    let err = await deleteService(name)
-                                    if (err) return err
+                                    try { 
+                                        await deleteService(name)
+                                    } catch(err) {
+                                        return err
+                                    }
                                 }
                              
                             }, "small red", true, false),

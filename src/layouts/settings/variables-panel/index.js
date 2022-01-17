@@ -9,9 +9,7 @@ import { Config } from '../../../util';
 import DirektivEditor from '../../../components/editor';
 import Button from '../../../components/button';
 import {useDropzone} from 'react-dropzone'
-import {BsUpload} from 'react-icons/bs';
 import Tabs from '../../../components/tabs';
-import { RiDeleteBin2Line } from 'react-icons/ri';
 import HelpIcon from '../../../components/help';
 import { VscCloudDownload, VscCloudUpload, VscEye, VscLoading, VscTrash, VscVariableGroup } from 'react-icons/vsc';
 import { AutoSizer } from 'react-virtualized';
@@ -383,8 +381,9 @@ function Variable(props) {
                     actionButtons={
                         [
                             ButtonDefinition("Save", async () => {
-                                let err = await setNamespaceVariable(obj.node.name, val , mimeType)
-                                if (err) {
+                                try { 
+                                    await setNamespaceVariable(obj.node.name, val , mimeType)
+                                } catch(err) {
                                     return err
                                 }
                             }, "small blue", true, false),
@@ -515,8 +514,11 @@ function Variable(props) {
                     actionButtons={
                         [
                             ButtonDefinition("Delete", async () => {
-                                let err = await deleteNamespaceVariable(obj.node.name)
-                                if (err) return err
+                                try { 
+                                    await deleteNamespaceVariable(obj.node.name)
+                                } catch(err) {
+                                    return err
+                                }
                             }, "small red", true, false),
                             ButtonDefinition("Cancel", () => {
                             }, "small light", true, false)
@@ -551,7 +553,7 @@ function Variable(props) {
                     actionButtons={
                         [
                             ButtonDefinition("Upload", async () => {
-                                let err = await setNamespaceVariable(obj.node.name, file, mimeType)
+                                try { await setNamespaceVariable(obj.node.name, file, mimeType)
                                 if (err) return err
                             }, "small blue", true, false),
                             ButtonDefinition("Cancel", () => {
@@ -575,7 +577,7 @@ function Variable(props) {
                     actionButtons={
                         [
                             ButtonDefinition("Delete", async () => {
-                                let err = await deleteNamespaceVariable(obj.node.name)
+                                try { await deleteNamespaceVariable(obj.node.name)
                                 if (err) return err
                             }, "small red", true, false),
                             ButtonDefinition("Cancel", () => {

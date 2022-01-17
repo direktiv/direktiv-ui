@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { Config } from '../../util';
 import {  VscCloud, VscRedo, VscSymbolEvent } from 'react-icons/vsc';
 import Button from '../../components/button';
-import ContentPanel, { ContentPanelBody, ContentPanelHeaderButton, ContentPanelHeaderButtonIcon, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
+import ContentPanel, { ContentPanelBody, ContentPanelHeaderButton, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
 import FlexBox from '../../components/flexbox';
 import {useEvents} from 'direktiv-react-hooks'
 import Modal, { ButtonDefinition } from '../../components/modal';
 import DirektivEditor from '../../components/editor';
 import { AutoSizer } from 'react-virtualized';
+import HelpIcon from "../../components/help";
 
 import * as dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -38,7 +39,8 @@ function EventsPage(props) {
 
     let {namespace} = props;
 
-    let {errHistory, errListeners, eventHistory, eventListeners, sendEvent, replayEvent} = useEvents(Config.url, true, namespace, localStorage.getItem("apikey"))
+    // errHistory and errListeners TODO show error if one
+    let {eventHistory, eventListeners, sendEvent, replayEvent} = useEvents(Config.url, true, namespace, localStorage.getItem("apikey"))
 
     return(
         <>
@@ -49,9 +51,12 @@ function EventsPage(props) {
                             <ContentPanelTitleIcon>
                                 <VscCloud/>
                             </ContentPanelTitleIcon>
-                            <div>
-                                Cloud Events History
-                            </div>
+                            <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
+                                <div>
+                                    Cloud Events History
+                                </div>
+                                <HelpIcon msg={"A history of events that have hit this specific namespace."} />
+                            </FlexBox>
                             <SendEventModal sendEvent={sendEvent}/>
                         </ContentPanelTitle>
                         <ContentPanelBody>
@@ -109,7 +114,12 @@ function EventsPage(props) {
                             <ContentPanelTitleIcon>
                                 <VscSymbolEvent/>
                             </ContentPanelTitleIcon>
-                            <div>Active Event Listeners</div>
+                            <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
+                                <div>
+                                    Active Event Listeners
+                                </div>
+                                <HelpIcon msg={"Current listeners in a namespace that are listening for a cloud a event."} />
+                            </FlexBox>
                         </ContentPanelTitle>
                         <ContentPanelBody>
                             <div style={{maxHeight: "40vh", overflowY: "auto", fontSize: "12px"}}>
@@ -193,8 +203,11 @@ function SendEventModal(props) {
             )}
             actionButtons={[
                 ButtonDefinition("Send", async () => {
-                    let err = await sendEvent(eventData)
-                    if (err) return err
+                    try { 
+                      await sendEvent(eventData)
+                    } catch(err) {
+                      return err
+                    }
                 }, "small", true, false),
                 ButtonDefinition("Cancel", () => {}, "small light", true, false)
             ]}

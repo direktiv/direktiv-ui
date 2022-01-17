@@ -17,6 +17,8 @@ import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import { useNavigate } from 'react-router';
 import * as yup from "yup";
+import HelpIcon from "../../../components/help";
+
 function RevisionTab(props) {
 
     const navigate = useNavigate()
@@ -243,9 +245,12 @@ export function RevisionSelectorTab(props) {
                         <ContentPanelTitleIcon>
                             <BsCodeSquare/>
                         </ContentPanelTitleIcon>
-                        <div>
-                            All Revisions
-                        </div>
+                        <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
+                            <div>
+                                All Revisions
+                            </div>
+                            <HelpIcon msg={"A list of all revisions for that workflow."} />
+                        </FlexBox>
                     </ContentPanelTitle>
                     <ContentPanelBody style={{flexDirection: "column"}}>
                         {revisions.map((obj) => {
@@ -424,9 +429,12 @@ export function RevisionSelectorTab(props) {
                                                     actionButtons={
                                                         [
                                                             ButtonDefinition("Delete", async () => {
-                                                                let err = await deleteRevision(obj.node.name)
-                                                                if (err) return err
-                                                                setRevisions(await getRevisions())
+                                                                try { 
+                                                                    await deleteRevision(obj.node.name)
+                                                                    setRevisions(await getRevisions())
+                                                                } catch(err) {
+                                                                    return err
+                                                                }
                                                             }, "small red", true, false),
                                                             ButtonDefinition("Cancel", () => {
                                                             }, "small light", true, false)
@@ -442,18 +450,34 @@ export function RevisionSelectorTab(props) {
                                                     </FlexBox>
                                                 </Modal>
                                             }
+                                            {obj.node.name !== "latest" ? 
+                                            <>
                                             <Button className="small light bold" onClick={async()=>{
                                                 let data = await getWorkflowRevisionData(obj.node.name)
                                                 await updateWorkflow(atob(data.revision.source))
                                                 navigate(`/n/${namespace}/explorer/${filepath.substring(1)}?tab=2`)
                                             }}>
-                                                Use Revision
+                                                Revert To
                                             </Button>
                                             <Button className="small light bold" onClick={()=>{
                                                 setSearchParams({tab: 1, revision: obj.node.name})
                                             }}>
                                                 Open Revision
+                                            </Button></>: <><div style={{visibility:"hidden"}}>
+                                            <Button className="small light bold" onClick={async()=>{
+                                                let data = await getWorkflowRevisionData(obj.node.name)
+                                                await updateWorkflow(atob(data.revision.source))
+                                                navigate(`/n/${namespace}/explorer/${filepath.substring(1)}?tab=2`)
+                                            }}>
+                                                Revert To
                                             </Button>
+                                            </div>
+                                            <div style={{visibility:"hidden"}}>
+                                            <Button className="small light bold" onClick={()=>{
+                                                setSearchParams({tab: 1, revision: obj.node.name})
+                                            }}>
+                                                Open Revision
+                                            </Button></div></>}
                                         </FlexBox>
                                     </div>
                                 </FlexBox>
@@ -469,7 +493,7 @@ export function RevisionSelectorTab(props) {
 
 function TagRevisionBtn(props) {
 
-    let {tagWorkflow, obj, getRevisions, setRevisions, updateTags, getTags, isTag} = props;
+    let {tagWorkflow, obj, getRevisions, setRevisions, updateTags, getTags} = props;
     const [tag, setTag] = useState("")
     const [isButtonDisabled, setIsButtonDisabled] = useState(false)
 
@@ -579,9 +603,12 @@ export function RevisionTrafficShaper(props) {
                 <ContentPanelTitleIcon>
                     <IoSettings />
                 </ContentPanelTitleIcon>
-                <div>
-                    Traffic Shaping
-                </div>
+                <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
+                    <div>
+                        Traffic Shaping
+                    </div>
+                    <HelpIcon msg={"Change the way the traffic is distributed for revisions of this workflow."} />
+                </FlexBox>
             </ContentPanelTitle>
             <ContentPanelBody style={{flexDirection:"column"}}>
                 <FlexBox className="gap wrap" style={{justifyContent: "space-between"}}>

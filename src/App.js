@@ -16,6 +16,8 @@ function App() {
     const [akey, setAKey] = useState(localStorage.getItem('apikey'))
     const [login, setLogin] = useState(false)
     const [akeyReq, setAKeyReq] = useState(false)
+    // Todo find nice way to handle error
+    const [,setErr] = useState("")
 
     useEffect(()=>{
         async function fetchVersion() {
@@ -33,8 +35,6 @@ function App() {
                     // TODO if the akey is provided but not needed as authentication isn't required.
                     // Might need to make an api to check if apikeys are required.
                     if(akey !== "null") {
-                        console.log('set akeyreq to true')
-                        console.log(akey)
                         setAKeyReq(true)
                     }
                 } else {
@@ -44,7 +44,7 @@ function App() {
                     }
                 }
             } catch(e) {
-                console.log(e, "TODO handle err")
+                setErr(e)
             }
         }
         if(loadVersion){

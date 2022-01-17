@@ -21,14 +21,14 @@ import GlobalPodPanel from '../global-services/pod'
 import Loader from '../../components/loader';
 import Button from '../../components/button';
 import { IoMenu } from 'react-icons/io5';
-import Login from '../login';
 import InstancePageWrapper from '../instance';
 // import PermissionsPageWrapper from '../permissions';
 import EventsPageWrapper from '../events';
+import Monitoring from '../monitoring';
 
 
 function NamespaceNavigation(props){
-    const {namespaces, namespace, setNamespace, deleteNamespace, deleteErr, extraRoutes, akey} = props
+    const {namespaces, namespace, setNamespace, deleteNamespace, deleteErr, extraRoutes} = props
 
     const [load, setLoad] = useState(true)
     const navigate = useNavigate()
@@ -109,7 +109,7 @@ function NamespaceNavigation(props){
                    
                 
 
-                    <Route path="/n/:namespace/monitoring" element={<div>monitor</div>}/>
+                    <Route path="/n/:namespace/monitoring" element={<Monitoring namespace={namespace}/>}/>
                     {/* <Route path="/n/:namespace/builder" element={<WorkflowBuilder namespace={namespace}/>}/> */}
                     <Route path="/n/:namespace/instances" element={<InstancesPage namespace={namespace} />}/>
                     <Route path="/n/:namespace/instances/:id" element={<InstancePageWrapper namespace={namespace} />} />
@@ -186,7 +186,7 @@ function MainLayout(props) {
                     Left col: navigation
                     Right : page contents 
                 */}
-                <Loader load={load} timer={1000}>
+                <Loader load={load} timer={1000} >
                     <BrowserRouter>
                         <FlexBox className="navigation-col">
                         <NavBar akeyReq={akeyReq} footer={footer} extraNavigation={extraNavigation}  toggleResponsive={toggleResponsive} setToggleResponsive={setToggleResponsive} setNamespace={setNamespace} namespace={namespace} createNamespace={createNamespace} deleteNamespace={deleteNamespace} namespaces={data} />

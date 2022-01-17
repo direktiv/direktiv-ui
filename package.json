@@ -7,11 +7,12 @@
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
+    "@tippyjs/react": "^4.2.6",
     "d3": "^7.2.0",
     "d3-sankey-circular": "^0.34.0",
     "dagre": "^0.8.5",
     "dayjs": "^1.10.7",
-    "direktiv-react-hooks": "^0.0.102",
+    "direktiv-react-hooks": "^0.0.143",
     "js-yaml": "^4.1.0",
     "object-hash": "^2.2.0",
     "rc-slider": "^9.7.5",
@@ -55,5 +56,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "encoding": "^0.1.13"
   }
 }

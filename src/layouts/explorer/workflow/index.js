@@ -29,6 +29,8 @@ import Modal, { ButtonDefinition } from '../../../components/modal';
 
 
 import {PieChart} from 'react-minimal-pie-chart'
+import HelpIcon from "../../../components/help";
+import Loader from '../../../components/loader';
 
 dayjs.extend(utc)
 dayjs.extend(relativeTime);
@@ -38,18 +40,21 @@ function WorkflowPage(props) {
     const {namespace} = props
     const [searchParams, setSearchParams] = useSearchParams()
     const params = useParams()
+    const [load, setLoad] = useState(true);
 
     // set tab query param on load
     useEffect(()=>{
         if(searchParams.get('tab') === null) {
             setSearchParams({tab: 0}, {replace:true})
         }
-    },[searchParams, setSearchParams])
+
+        setLoad(false)
+    },[searchParams, setSearchParams, setLoad])
     
     let filepath = "/"
 
     if(!namespace) {
-        return <></>
+        return <> </>
     }
 
     if(params["*"] !== undefined){
@@ -57,7 +62,9 @@ function WorkflowPage(props) {
     }
 
     return(
-        <InitialWorkflowHook setSearchParams={setSearchParams} searchParams={searchParams} namespace={namespace} filepath={filepath}/>
+        <Loader load={load} timer={3000}>
+            <InitialWorkflowHook setSearchParams={setSearchParams} searchParams={searchParams} namespace={namespace} filepath={filepath}/>
+        </Loader>
     )
 }
 
@@ -66,12 +73,14 @@ function InitialWorkflowHook(props){
 
     const [activeTab, setActiveTab] = useState(searchParams.get("tab") !== null ? parseInt(searchParams.get('tab')): 0)
 
-    const {data, err, getSuccessFailedMetrics, tagWorkflow, addAttributes, deleteAttributes, setWorkflowLogToEvent, editWorkflowRouter, getWorkflowSankeyMetrics, getWorkflowRevisionData, getWorkflowRouter, toggleWorkflow, executeWorkflow, getInstancesForWorkflow, getRevisions, getTags, deleteRevision, saveWorkflow, updateWorkflow, discardWorkflow, removeTag} = useWorkflow(Config.url, true, namespace, filepath.substring(1), localStorage.getItem("apikey"))
+    // todo handle err from hook below
+    const {data,  getSuccessFailedMetrics, tagWorkflow, addAttributes, deleteAttributes, setWorkflowLogToEvent, editWorkflowRouter, getWorkflowSankeyMetrics, getWorkflowRevisionData, getWorkflowRouter, toggleWorkflow, executeWorkflow, getInstancesForWorkflow, getRevisions, getTags, deleteRevision, saveWorkflow, updateWorkflow, discardWorkflow, removeTag} = useWorkflow(Config.url, true, namespace, filepath.substring(1), localStorage.getItem("apikey"))
     const [router, setRouter] = useState(null)
 
-    // const [tags, setTags] = useState(null)
+
     const [revisions, setRevisions] = useState(null)
-    const [revsErr, setRevsErr] = useState("")
+    // todo handle revsErr
+    const [, setRevsErr] = useState("")
 
     // fetch revisions using the workflow hook from above
     useEffect(()=>{
@@ -111,7 +120,10 @@ function InitialWorkflowHook(props){
                     :<></>}
                     { activeTab === 1 ?
                         <>
-                        <RevisionSelectorTab tagWorkflow={tagWorkflow} namespace={namespace} filepath={filepath} updateWorkflow={updateWorkflow} setRouter={setRouter} editWorkflowRouter={editWorkflowRouter} getWorkflowRouter={getWorkflowRouter} setRevisions={setRevisions} revisions={revisions} router={router} getWorkflowSankeyMetrics={getWorkflowSankeyMetrics} executeWorkflow={executeWorkflow} getWorkflowRevisionData={getWorkflowRevisionData} searchParams={searchParams} setSearchParams={setSearchParams} deleteRevision={deleteRevision} namespace={namespace} getRevisions={getRevisions} getTags={getTags} removeTag={removeTag} filepath={filepath} />
+                        <RevisionSelectorTab 
+                        tagWorkflow={tagWorkflow}
+                         namespace={namespace}
+                          filepath={filepath} updateWorkflow={updateWorkflow} setRouter={setRouter} editWorkflowRouter={editWorkflowRouter} getWorkflowRouter={getWorkflowRouter} setRevisions={setRevisions} revisions={revisions} router={router} getWorkflowSankeyMetrics={getWorkflowSankeyMetrics} executeWorkflow={executeWorkflow} getWorkflowRevisionData={getWorkflowRevisionData} searchParams={searchParams} setSearchParams={setSearchParams} deleteRevision={deleteRevision}  getRevisions={getRevisions} getTags={getTags} removeTag={removeTag}  />
                         </>
                     :<></>}
                     { activeTab === 2 ?
@@ -171,9 +183,12 @@ function WorkflowDependencies(props) {
                     <ContentPanelTitleIcon>
                         <BsCodeSquare />
                     </ContentPanelTitleIcon>
-                    <div>
-                        Dependency Graph
-                    </div>
+                    <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
+                        <div>
+                            Dependency Graph
+                        </div>
+                        <HelpIcon msg={"Shows the dependencies the workflow requires in a graph format."} />
+                    </FlexBox>
                 </ContentPanelTitle>
                 <ContentPanelBody>
                     <DependencyDiagram dependencies={dependencies} workflow={workflow} type={"workflow"}/>
@@ -280,9 +295,12 @@ function WorkingRevision(props) {
                     <ContentPanelTitleIcon>
                         <BsCodeSquare />
                     </ContentPanelTitleIcon>
-                    <div>
-                        Active Revision
-                    </div>
+                    <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
+                        <div>
+                            Active Revision
+                        </div>
+                        <HelpIcon msg={"Latest revision where you can edit and create new revisions."} />
+                    </FlexBox>
                 </ContentPanelTitle>
                 <ContentPanelBody style={{padding: "0px"}}>
                     <FlexBox className="col" style={{ overflow: "hidden" }}>
@@ -472,9 +490,9 @@ function WorkflowInstances(props) {
                             state={obj.node.status} 
                             name={obj.node.as} 
                             id={obj.node.id}
-                            started={dayjs.utc(obj.node.createdAt).local().format("HH:mm a")} 
+                            started={dayjs.utc(obj.node.createdAt).local().format("HH:mm:ss a")} 
                             startedFrom={dayjs.utc(obj.node.createdAt).local().fromNow()}
-                            finished={dayjs.utc(obj.node.updatedAt).local().format("HH:mm a")}
+                            finished={dayjs.utc(obj.node.updatedAt).local().format("HH:mm:ss a")}
                             finishedFrom={dayjs.utc(obj.node.updatedAt).local().fromNow()}
                         />
                     )
@@ -526,9 +544,12 @@ function OverviewTab(props) {
                                 <ContentPanelTitleIcon>
                                     <BsCodeSquare />
                                 </ContentPanelTitleIcon>
-                                <div>
-                                    Instances
-                                </div>
+                                <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
+                                    <div>
+                                        Instances
+                                    </div>
+                                    <HelpIcon msg={"List of instances for this workflow."} />
+                                </FlexBox>
                             </ContentPanelTitle>
                             <WorkflowInstances instances={instances} namespace={namespace} />
                         </ContentPanel>
@@ -539,9 +560,12 @@ function OverviewTab(props) {
                                 <ContentPanelTitleIcon>
                                     <BsCodeSquare />
                                 </ContentPanelTitleIcon>
-                                <div>
-                                    Success/Failure Rate
-                                </div>
+                                <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
+                                    <div>
+                                        Success/Failure Rate
+                                    </div>
+                                    <HelpIcon msg={"Success and failure of the workflow being run."} />
+                                </FlexBox>
                             </ContentPanelTitle>
                             <ContentPanelBody>
                                 <SuccessFailureGraph getSuccessFailedMetrics={getSuccessFailedMetrics} />
@@ -556,9 +580,12 @@ function OverviewTab(props) {
                         <ContentPanelTitleIcon>
                             <BsCodeSquare />
                         </ContentPanelTitleIcon>
-                        <div>
-                            Traffic Distribution
-                        </div>
+                        <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
+                            <div>
+                                Traffic Distribution
+                            </div>
+                            <HelpIcon msg={"Distributed traffic between different workflow revisions."} />
+                        </FlexBox>
                     </ContentPanelTitle>
                     <TrafficDistribution routes={router.routes}/>
                 </ContentPanel>
@@ -569,9 +596,12 @@ function OverviewTab(props) {
                         <ContentPanelTitleIcon>
                             <BsCodeSquare />
                         </ContentPanelTitleIcon>
-                        <div>
-                            Workflow Services
-                        </div>
+                        <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
+                            <div>
+                                Workflow Services
+                            </div>
+                            <HelpIcon msg={"A List of services for this workflow."} />
+                        </FlexBox>
                     </ContentPanelTitle>
                     <WorkflowServices namespace={namespace} filepath={filepath} />
                 </ContentPanel>
@@ -593,37 +623,42 @@ function SuccessFailureGraph(props){
 
     useEffect(()=>{
         async function get() {
-            if(load){
-                let ms = metrics
-                let mets = await getSuccessFailedMetrics()
-                let t = 0
-                if(mets.success && mets.failure) {
-                    if(mets.success[0]){
-                        ms[0].value = mets.success[0].value[1]
-                        t = t + parseInt(mets.success[0].value[1])
-                    }
-                    if(mets.failure[0]){
-                        ms[1].value = mets.failure[0].value[1]
-                        t = t + parseInt(mets.failure[0].value[1])
-                    }
-
-                    if(mets.success[0]) {
-                        ms[0].percentage = (ms[0].value / t * 100).toFixed(2)
-                    }
-                    if(mets.failure[0]){
-                        ms[1].percentage = (ms[1].value / t * 100).toFixed(2)
-                    }
-
-                    if(t > 0) {
-                        setMetrics(ms)
-                        setTotal(t)
+            try {
+                if(load){
+                    let ms = metrics
+                    let mets = await getSuccessFailedMetrics()
+                    let t = 0
+                    if(mets.success && mets.failure) {
+                        if(mets.success[0]){
+                            ms[0].value = mets.success[0].value[1]
+                            t = t + parseInt(mets.success[0].value[1])
+                        }
+                        if(mets.failure[0]){
+                            ms[1].value = mets.failure[0].value[1]
+                            t = t + parseInt(mets.failure[0].value[1])
+                        }
+    
+                        if(mets.success[0]) {
+                            ms[0].percentage = (ms[0].value / t * 100).toFixed(2)
+                        }
+                        if(mets.failure[0]){
+                            ms[1].percentage = (ms[1].value / t * 100).toFixed(2)
+                        }
+    
+                        if(t > 0) {
+                            setMetrics(ms)
+                            setTotal(t)
+                        } else {
+                            setErr("No metrics have been found.")
+                        }
+                        
                     } else {
-                        setErr("No metrics have been found.")
+                        setErr(mets)
                     }
-                    
-                } else {
-                    setErr(mets)
+                    setLoad(false)
                 }
+            } catch(e){
+                setErr(e.message)
                 setLoad(false)
             }
         }
@@ -633,11 +668,10 @@ function SuccessFailureGraph(props){
     if(load){
         return ""
     }
-
     if(err !== "") {
         return(
-            <FlexBox style={{justifyContent:"center", alignItems:'center'}}>
-                {err}
+            <FlexBox style={{justifyContent:"center", alignItems:'center', color:"red", fontSize:"10pt"}}>
+                <div className="error-message-metrics">{err.replace("get failed metrics:", "")}</div>
             </FlexBox>
         )
     }
@@ -646,7 +680,7 @@ function SuccessFailureGraph(props){
         <FlexBox className="col" style={{maxHeight:"250px", marginTop:"20px"}}>
             <PieChart
                 totalValue={total}
-                label={({ dataEntry }) => dataEntry.value}
+                label=""
                 labelStyle={{
                     fontSize:"6pt",
                     fontWeight: "bold",
@@ -742,9 +776,7 @@ function TrafficDistribution(props) {
 
 function WorkflowServices(props) {
     const {namespace, filepath} = props
-
-    const {data, err} = useWorkflowServices(Config.url, true, namespace, filepath.substring(1))
-    console.log(data, "DATA")
+    const {data, err} = useWorkflowServices(Config.url, true, namespace, filepath.substring(1), localStorage.getItem("apikey"))
 
     if (data === null) {
         return     <div className="col">
@@ -837,7 +869,7 @@ function WorkflowAttributes(props) {
 
     return(
             // <FlexBox>
-                <div className="input-tag" style={{width: "100%", padding:"7px"}}>
+                <div className="input-tag" style={{width: "100%", padding:"2px"}}>
                     <ul className="input-tag__tags">
                         {attris.map((tag, i) => (
                             <li key={tag}>
@@ -872,7 +904,12 @@ function SettingsTab(props) {
                                     <ContentPanelTitleIcon>
                                         <IoMdLock/>
                                     </ContentPanelTitleIcon>
-                                    Log to Event
+                                    <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
+                                        <div>
+                                            Log to Event
+                                        </div>
+                                        <HelpIcon msg={"Ability to trigger cloud event logging for that workflow."} />
+                                    </FlexBox>
                                 </ContentPanelTitle>
                                 <ContentPanelBody className="col" style={{
                                     alignItems: "center"
@@ -884,9 +921,13 @@ function SettingsTab(props) {
                                         <div style={{width:"99.5%", margin:"auto", background: "#E9ECEF", height:"1px"}}/>
                                         <FlexBox style={{justifyContent:"flex-end", width:"100%"}}>
                                             <Button onClick={async()=>{
-                                                let err = await setWorkflowLogToEvent(logToEvent)
-                                                // todo err
-                                                console.log(err, "NOTIFY IF ERR")
+                                                try { 
+                                                    await setWorkflowLogToEvent(logToEvent)
+                                                } catch(err) {
+                                                    // todo err
+                                                    console.log(err, "NOTIFY IF ERR")
+                                                    return err
+                                                }
                                             }} className="small">
                                                 Save
                                             </Button>
@@ -904,7 +945,12 @@ function SettingsTab(props) {
                                     <ContentPanelTitleIcon>
                                         <IoMdLock/>
                                     </ContentPanelTitleIcon>
-                                    Add Attributes
+                                    <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
+                                        <div>
+                                            Add Attributes
+                                        </div>
+                                        <HelpIcon msg={"Attributes to define the workflow."} />
+                                    </FlexBox>
                                     {/* <ContentPanelHeaderButton>
                                         + Add
                                     </ContentPanelHeaderButton> */}

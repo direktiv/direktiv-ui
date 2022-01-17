@@ -3,9 +3,9 @@ import './style.css';
 
 import ContentPanel, { ContentPanelBody, ContentPanelHeaderButton, ContentPanelHeaderButtonIcon, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
 import FlexBox from '../../components/flexbox';
-import { VscTriangleDown, VscAdd, VscClose,  VscSearch, VscEdit, VscTrash, VscFolderOpened } from 'react-icons/vsc';
+import { VscAdd, VscClose,  VscSearch, VscEdit, VscTrash, VscFolderOpened } from 'react-icons/vsc';
 import { Config, GenerateRandomKey } from '../../util';
-import { FiEdit, FiFolder } from 'react-icons/fi';
+import { FiFolder } from 'react-icons/fi';
 import { FcWorkflow } from 'react-icons/fc';
 import { HiOutlineTrash } from 'react-icons/hi';
 import { useNodes } from 'direktiv-react-hooks';
@@ -137,7 +137,7 @@ function ExplorerList(props) {
     }
 
     return(
-        <FlexBox className="col gap" style={{paddingRight: "8px"}}>
+        <FlexBox className="col gap"  style={{paddingRight: "8px"}}>
         <Loader load={load} timer={1000}>
         <FlexBox className="gap" style={{maxHeight: "32px"}}>
             <FlexBox>
@@ -412,14 +412,14 @@ function DirListItem(props) {
                 {
                     rename ? 
                     <FlexBox className="explorer-item-name">
-                        <input type="text" value={renameValue} onKeyPress={async (e)=>{
+                        <input onClick={(ev)=>ev.stopPropagation()} type="text" value={renameValue} onKeyPress={async (e)=>{
                             if(e.key === "Enter"){
-                                let err = await renameNode("", path, renameValue)
-                                if(err){
-                                    setErr(err)
-                                    return
+                                try { 
+                                    await renameNode("/", path, renameValue)
+                                    setRename(!rename)
+                                } catch(err) {
+                                    setErr(err.message)
                                 }
-                                setRename(!rename)
                             }
                         }} onChange={(e)=>setRenameValue(e.target.value)} autoFocus style={{maxWidth:"300px", height:"38px"}}/>
                         {err !== "" ? 
@@ -468,8 +468,11 @@ function DirListItem(props) {
                                     ButtonDefinition("Delete", async () => {
                                         let p = path.split('/', -1);
                                         let pLast = p[p.length-1];
-                                        let err = await deleteNode(pLast)
-                                        if (err) return err
+                                        try { 
+                                            await deleteNode(pLast)
+                                        } catch(err) {
+                                            return err
+                                        }
                                     }, "small red", true, false),
                                     ButtonDefinition("Cancel", () => {
                                     }, "small light", true, false)
@@ -512,14 +515,14 @@ function WorkflowListItem(props) {
                 {
                     rename ? 
                     <FlexBox className="explorer-item-name">
-                        <input type="text" value={renameValue} onKeyPress={async (e)=>{
+                        <input onClick={(ev)=>ev.stopPropagation()} type="text" value={renameValue} onKeyPress={async (e)=>{
                             if(e.key === "Enter"){
-                                let err = await renameNode("", path, renameValue)
-                                if(err){
-                                    setErr(err)
-                                    return
+                                try { 
+                                    await renameNode("/", path, renameValue)
+                                    setRename(!rename)
+                                } catch(err) {
+                                    setErr(err.message)
                                 }
-                                setRename(!rename)
                             }
                         }} onChange={(e)=>setRenameValue(e.target.value)} autoFocus style={{maxWidth:"300px", height:"38px"}}/>
                         {err !== "" ? 
@@ -569,8 +572,11 @@ function WorkflowListItem(props) {
                                         let p = path.split('/', -1);
                                         let pLast = p[p.length-1];
 
-                                        let err = await deleteNode(pLast)
-                                            if (err) return err
+                                        try { 
+                                            await deleteNode(pLast)
+                                        } catch(err) {
+                                            return err
+                                        }
                                         }, "small red", true, false),
                                         ButtonDefinition("Cancel", () => {
                                         }, "small light", true, false)

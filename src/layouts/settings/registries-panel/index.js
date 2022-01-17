@@ -249,7 +249,7 @@ export function Registries(props) {
         <>
             <FlexBox className="col gap" style={{ maxHeight: "236px", overflowY: "auto" }}>
             {registries.length === 0 ? 
-                     <FlexBox className="secret-tuple">
+                     <FlexBox className="secret-tuple empty-content">
                      <FlexBox className="key">No registries are stored...</FlexBox>
                      <FlexBox className="val"></FlexBox>
                      <FlexBox className="val"></FlexBox>
@@ -280,9 +280,13 @@ export function Registries(props) {
                                         [
                                             // label, onClick, classList, closesModal, async
                                             ButtonDefinition("Delete", async () => {
-                                                let err = await deleteRegistry(obj.name)
-                                                if (err) return err
-                                                await getRegistries()
+                                                try { 
+                                                    await deleteRegistry(obj.name)
+                                                    await getRegistries()
+                                                } catch(err) {
+                                                    await getRegistries()
+                                                    return err
+                                                }
                                             }, "small red", true, false),
                                             ButtonDefinition("Cancel", () => {
                                             }, "small light", true, false)

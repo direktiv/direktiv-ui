@@ -3,14 +3,14 @@ import './style.css'
 import { Config, copyTextToClipboard } from '../../util';
 import Button from '../../components/button';
 import { useParams } from 'react-router';
-import ContentPanel, { ContentPanelBody, ContentPanelFooter, ContentPanelHeaderButton, ContentPanelHeaderButtonIcon, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
+import ContentPanel, { ContentPanelBody, ContentPanelHeaderButton, ContentPanelHeaderButtonIcon, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
 import FlexBox from '../../components/flexbox';
 import {AiFillCode} from 'react-icons/ai';
 import {useInstance, useInstanceLogs, useWorkflow} from 'direktiv-react-hooks';
 import { CancelledState, FailState, RunningState, SuccessState } from '../instances';
 
 import { Link } from 'react-router-dom';
-import { AutoSizer, List, CellMeasurer, CellMeasurerCache, WindowScroller } from 'react-virtualized';
+import { AutoSizer, List, CellMeasurer, CellMeasurerCache } from 'react-virtualized';
 import { IoCopy, IoEye, IoEyeOff } from 'react-icons/io5';
 import * as dayjs from "dayjs"
 import YAML from 'js-yaml'
@@ -40,14 +40,15 @@ function InstancePage(props) {
     const [wfpath, setWFPath] = useState("")
     const [rev, setRev] = useState("")
     const [follow, setFollow] = useState(true)
-    const [width, setWidth] = useState(window.innerWidth);
+    const [width,] = useState(window.innerWidth);
     const [clipData, setClipData] = useState(null)
     const params = useParams()
 
     let instanceID = params["id"];
 
-    let {data, err, cancelInstance, getInput, getOutput} = useInstance(Config.url, true, namespace, instanceID, localStorage.getItem("apikey"));
-    
+    // todo implement cancelInstance
+    let {data, err,  getInput, getOutput} = useInstance(Config.url, true, namespace, instanceID, localStorage.getItem("apikey"));
+
 
     useEffect(()=>{
         if(load && data !== null) {
@@ -134,12 +135,12 @@ function InstancePage(props) {
                                         ButtonDefinition("Close", () => {}, "small light", true, false)
                                     ]}
                                 >
-                                    <InstanceLogs noPadding namespace={namespace} instanceID={instanceID} follow={follow} setFollow={setFollow} width={width} clipData={clipData} />
+                                    <InstanceLogs setClipData={setClipData} clipData={clipData} noPadding namespace={namespace} instanceID={instanceID} follow={follow} setFollow={setFollow} width={width}/>
                                 </Modal>
                                 </FlexBox>
                             </FlexBox>
                         </ContentPanelTitle>
-                        <InstanceLogs namespace={namespace} instanceID={instanceID} follow={follow} setFollow={setFollow} width={width} clipData={clipData} />
+                        <InstanceLogs setClipData={setClipData} clipData={clipData} namespace={namespace} instanceID={instanceID} follow={follow} setFollow={setFollow} width={width} />
                     </ContentPanel>
                 </FlexBox>
                 <FlexBox className="gap wrap" style={{minHeight: "40%", minWidth: "300px", flex: "2", flexWrap: "wrap-reverse"}}>
@@ -257,8 +258,7 @@ function InstancePage(props) {
 
 function InstanceLogs(props) {
 
-    let {noPadding, namespace, instanceID, follow, setFollow, width, clipData} = props;
-
+    let {noPadding, namespace, setClipData, instanceID, follow, setFollow, width, clipData} = props;
     let paddingStyle = { padding: "12px" }
     if (noPadding) {
         paddingStyle = { padding: "0px" }
@@ -268,7 +268,7 @@ function InstanceLogs(props) {
         <>
             <FlexBox className="col" style={{...paddingStyle}}>
                 <FlexBox style={{ backgroundColor: "#002240", color: "white", borderRadius: "8px 8px 0px 0px", overflow: "hidden", padding: "8px" }}>
-                    <Logs namespace={namespace} instanceID={instanceID} follow={follow} setFollow={setFollow} />
+                    <Logs clipData={clipData} setClipData={setClipData} namespace={namespace} instanceID={instanceID} follow={follow} setFollow={setFollow} />
                 </FlexBox>
                 <div style={{ height: "40px", backgroundColor: "#223848", color: "white", maxHeight: "40px", minHeight: "40px", padding: "0px 10px 0px 10px", boxShadow: "0px 0px 3px 0px #fcfdfe", alignItems:'center', borderRadius: " 0px 0px 8px 8px", overflow: "hidden" }}>
                     <FlexBox className="gap" style={{width: "100%", flexDirection: "row-reverse", height: "100%", alignItems: "center"}}>
@@ -418,28 +418,6 @@ function Output(props){
     )
 }
 
-function InstanceTuple(props) {
-    
-    let {label, value, linkTo} = props;
-
-    let x = value;
-    if (linkTo) {
-        x = (
-            <Link to={linkTo}>{value}</Link>
-        )
-    }
-
-    return (<>
-        <FlexBox className="instance-details-tuple col" style={{minWidth: "150px", flex: "1"}}>
-            <div>
-                <b>{label}</b>
-            </div>
-            <div title={value} style={{fontSize: "12px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap"}}>
-                {x}
-            </div>
-        </FlexBox>
-    </>)
-}
 
 function Logs(props){ 
     const cache = new CellMeasurerCache({
@@ -447,11 +425,29 @@ function Logs(props){
         defaultHeight: 20
     })
 
-    let {namespace, instanceID, follow} = props;
+    let {namespace, instanceID, follow, setClipData, clipData} = props;
     // const [load, setLoad] = useState(true)
     // const [logs, setLogs] = useState([])
     let {data, err} = useInstanceLogs(Config.url, true, namespace, instanceID, localStorage.getItem("apikey"))
-    
+    useEffect(()=>{
+        if(data !== null) {
+            if(clipData === null) {
+                let cd = ""
+                for(let i=0; i < data.length; i++) {
+                    cd += `[${dayjs.utc(data[i].node.t).local().format("HH:mm:ss.SSS")}] ${data[i].node.msg}\n`
+                }
+                setClipData(cd)
+            }
+            if(clipData !== data){
+                let cd = ""
+                for(let i=0; i < data.length; i++) {
+                    cd += `[${dayjs.utc(data[i].node.t).local().format("HH:mm:ss.SSS")}] ${data[i].node.msg}\n`
+
+                }
+                setClipData(cd)
+            }
+        }
+    },[data, clipData, setClipData])
     // useEffect(()=>{
     //     if(load && data !== null){
     //         setLogs(data)

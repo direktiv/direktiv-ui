@@ -1,7 +1,7 @@
 import { useNamespaceService } from "direktiv-react-hooks"
 import React, { useEffect, useState } from "react"
 import { IoPlay } from "react-icons/io5"
-import { useParams } from "react-router"
+import { useNavigate, useParams } from "react-router"
 import { Service } from "."
 import AddValueButton from "../../components/add-button"
 import Alert from "../../components/alert"
@@ -72,8 +72,8 @@ export function RevisionCreatePanel(props){
 
 function NamespaceRevisions(props) {
     const {namespace, service} = props
-
-    const {revisions, config, traffic, setNamespaceServiceRevisionTraffic, deleteNamespaceServiceRevision, getNamespaceServiceConfig, createNamespaceServiceRevision} = useNamespaceService(Config.url, namespace, service,localStorage.getItem("apikey"))
+    const navigate = useNavigate()
+    const {revisions, config, traffic, setNamespaceServiceRevisionTraffic, deleteNamespaceServiceRevision, getNamespaceServiceConfig, createNamespaceServiceRevision} = useNamespaceService(Config.url, namespace, service, navigate, localStorage.getItem("apikey"))
 
     const [load, setLoad] = useState(true)
     const [image, setImage] = useState("")
@@ -95,7 +95,7 @@ function NamespaceRevisions(props) {
     },[revisionValidationSchema, image])
     
     useEffect(()=>{
-        if(revisions !== null) {
+        if(revisions !== null && revisions.length > 0) {
             setScale(revisions[0].minScale)
             setSize(revisions[0].size)
             setImage(revisions[0].image)
@@ -341,11 +341,11 @@ export function UpdateTraffic(props){
                         <ContentPanelFooter>
                             <FlexBox className="col" style={{alignItems:"flex-end"}}>
                                 <Button className="small" onClick={async ()=>{
-                                    let err = await setNamespaceServiceRevisionTraffic(revOne, parseInt(tpercent), revTwo, parseInt(100-tpercent))
-                                    if (err) {
-                                        setErrMsg(err)
-                                    } else {
+                                    try { 
+                                        await setNamespaceServiceRevisionTraffic(revOne, parseInt(tpercent), revTwo, parseInt(100-tpercent))
                                         setErrMsg("")
+                                    } catch(err) {
+                                        setErrMsg(err)
                                     }
                                 }}>
                                     Save

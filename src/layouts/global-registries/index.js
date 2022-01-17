@@ -63,16 +63,24 @@ export function GlobalRegistries(){
                         }}
                         keyDownActions={[
                             KeyDownDefinition("Enter", async () => {
-                                let err = await createRegistry(url, `${username}:${token}`)
-                                if(err) return err
-                                await getRegistries()
+                                try { 
+                                    await createRegistry(url, `${username}:${token}`)
+                                    await  getRegistries()
+                                } catch(err) {
+                                    await  getRegistries()
+                                    return err
+                                }
                             }, true)
                         ]}
                         actionButtons={[
                             ButtonDefinition("Add", async() => {
-                                let err = await createRegistry(url, `${username}:${token}`)
-                                if(err) return err
-                                await  getRegistries()
+                                try { 
+                                    await createRegistry(url, `${username}:${token}`)
+                                    await  getRegistries()
+                                } catch(err) {
+                                    await  getRegistries()
+                                    return err
+                                }
                             }, "small blue", true, false),
                             ButtonDefinition("Cancel", () => {
                             }, "small light", true, false)

@@ -15,6 +15,7 @@ import { Config } from '../../../util';
 import { VariableFilePicker } from '../../settings/variables-panel';
 import { AutoSizer } from 'react-virtualized';
 import * as yup from "yup";
+import HelpIcon from "../../../components/help";
 
 function AddWorkflowVariablePanel(props) {
 
@@ -123,7 +124,12 @@ function AddWorkflowVariablePanel(props) {
                 <ContentPanelTitleIcon>
                     <IoMdLock/>
                 </ContentPanelTitleIcon>
-                Variables
+                <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
+                    <div>
+                        Variables
+                    </div>
+                    <HelpIcon msg={"List of variables for that workflow."} />
+                </FlexBox>
                     <Modal title="New variable" 
                         escapeToCancel
                         button={(
@@ -341,8 +347,9 @@ function Variable(props) {
                     actionButtons={
                         [
                             ButtonDefinition("Save", async () => {
-                                let err = await setWorkflowVariable(obj.node.name, val , mimeType)
-                                if (err) {
+                                try { 
+                                    await setWorkflowVariable(obj.node.name, val , mimeType)
+                                } catch(err) {
                                     return err
                                 }
                             }, "small blue", true, false),
@@ -463,8 +470,11 @@ function Variable(props) {
                     actionButtons={
                         [
                             ButtonDefinition("Delete", async () => {
-                                let err = await deleteWorkflowVariable(obj.node.name)
-                                if (err) return err
+                                try { 
+                                    await deleteWorkflowVariable(obj.node.name)
+                                } catch(err) {
+                                    return err
+                                }
                             }, "small red", true, false),
                             ButtonDefinition("Cancel", () => {
                             }, "small light", true, false)
