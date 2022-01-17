@@ -1,7 +1,7 @@
 import { useNamespaceServices } from "direktiv-react-hooks";
 import { IoChevronDownOutline, IoChevronForwardOutline, IoPlay } from "react-icons/io5";
 import "./style.css"
-import {useEffect, useState} from "react"
+import React, {useEffect, useState} from "react"
 import { RiDeleteBin2Line } from "react-icons/ri";
 import { FaCircle} from "react-icons/fa"
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from "../../components/content-panel";
@@ -11,6 +11,7 @@ import Modal, { ButtonDefinition, KeyDownDefinition } from "../../components/mod
 import AddValueButton from "../../components/add-button";
 import {Link} from 'react-router-dom'
 import HelpIcon from "../../components/help"
+import * as yup from "yup";
 
 export default function ServicesPanel(props) {
     const {namespace} = props
@@ -30,33 +31,43 @@ export function ServiceCreatePanel(props) {
 
     return(
         <FlexBox className="col gap" style={{fontSize: "12px"}}>
-                <FlexBox className="col gap">
-                    <FlexBox className="col" style={{paddingRight:"10px"}}>
-                        Name
-                        <input value={name} onChange={(e)=>setName(e.target.value)} placeholder="Enter name for service" />
-                    </FlexBox>
-                    <FlexBox className="col" style={{paddingRight:"10px"}}>
-                        Image
-                        <input value={image} onChange={(e)=>setImage(e.target.value)} placeholder="Enter an image name" />
-                    </FlexBox>
-                    <FlexBox className="col" style={{paddingRight:"10px"}}>
-                        Scale
-                        <input type="range" style={{paddingLeft:"0px"}} min={"0"} max={maxscale.toString()} value={scale.toString()} onChange={(e)=>setScale(e.target.value)} />
-                    </FlexBox>
-                    <FlexBox className="col" style={{paddingRight:"10px"}}>
-                        Size
-                        <input list="sizeMarks" style={{paddingLeft:"0px"}} type="range" min={"0"} value={size.toString()}  max={"2"} onChange={(e)=>setSize(e.target.value)}/>
-                        <datalist style={{display:"flex", alignItems:'center'}} id="sizeMarks">
-                            <option style={{flex:"auto", textAlign:"left", lineHeight:"10px"}} value="0" label="small"/>
-                            <option style={{flex:"auto", textAlign:"center" , lineHeight:"10px"}} value="1" label="medium"/>
-                            <option style={{flex:"auto", textAlign:"right", lineHeight:"10px" }} value="2" label="large"/>
-                        </datalist>
-                    </FlexBox>
-                    <FlexBox className="col" style={{paddingRight:"10px"}}>
-                        CMD
-                        <input value={cmd} onChange={(e)=>setCmd(e.target.value)} placeholder="Enter the CMD for a service" />
-                    </FlexBox>
-                </FlexBox>
+            <FlexBox className="gap" style={{margin: "-11px 0 -9px 0"}}>
+                Name
+                <span className="required-label">*</span>
+            </FlexBox>
+            <FlexBox className="gap" style={{paddingRight:"10px"}}>
+                <input value={name} onChange={(e)=>setName(e.target.value)} placeholder="Enter name for service" />
+            </FlexBox>
+            <FlexBox className="gap" style={{margin: "-8px 0 -8px 0"}}>
+                Image
+                <span className="required-label">*</span>
+            </FlexBox>
+            <FlexBox className="gap" style={{paddingRight:"10px"}}>
+                <input value={image} onChange={(e)=>setImage(e.target.value)} placeholder="Enter an image name" />
+            </FlexBox>
+            <FlexBox className="gap" style={{margin: "-8px 0 -12px 0"}}>
+                Scale
+            </FlexBox>
+            <FlexBox className="gap" style={{paddingRight:"10px"}}>
+                <input type="range" style={{paddingLeft:"0px"}} min={"0"} max={maxscale.toString()} value={scale.toString()} onChange={(e)=>setScale(e.target.value)} />
+            </FlexBox>
+            <FlexBox className="gap" style={{margin: "-6px 0 -10px 0"}}>
+                Size
+            </FlexBox>
+            <div  style={{padding:"-5px 14px 0 0"}}>
+                <input list="sizeMarks" style={{paddingLeft:"0px"}} type="range" min={"0"} value={size.toString()}  max={"2"} onChange={(e)=>setSize(e.target.value)}/>
+                <datalist style={{display:"flex", marginTop: "-3px", alignItems:'center'}} id="sizeMarks">
+                    <option style={{flex:"auto", textAlign:"left", lineHeight:"10px"}} value="0" label="small"/>
+                    <option style={{flex:"auto", textAlign:"center" , lineHeight:"10px"}} value="1" label="medium"/>
+                    <option style={{flex:"auto", textAlign:"right", lineHeight:"10px" }} value="2" label="large"/>
+                </datalist>
+            </div>
+            <FlexBox className="gap" style={{margin: "-12px 0 -8px 0"}}>
+                CMD
+            </FlexBox>
+            <FlexBox className="gap" style={{paddingRight:"10px"}}>
+                <input value={cmd} onChange={(e)=>setCmd(e.target.value)} placeholder="Enter the CMD for a service" />
+            </FlexBox>
         </FlexBox>
     )
 }
@@ -70,6 +81,19 @@ function NamespaceServices(props) {
     const [scale, setScale] = useState(0)
     const [size, setSize] = useState(0)
     const [cmd, setCmd] = useState("")
+    const [isButtonDisabled, setIsButtonDisabled] = useState(false)
+
+    const serviceValidationSchema = yup.object().shape({
+        name: yup.string().required(),
+        image: yup.string().required()
+    })
+
+    useEffect(() => {
+
+        serviceValidationSchema.isValid({ name: serviceName, image: image })
+            .then((result) => setIsButtonDisabled(!result))
+
+    },[serviceValidationSchema, image, serviceName])
 
     const {data, err, config, getNamespaceConfig, getNamespaceServices, createNamespaceService, deleteNamespaceService} = useNamespaceServices(Config.url, true, namespace, localStorage.getItem("apikey"))
 
@@ -83,8 +107,6 @@ function NamespaceServices(props) {
             setLoad(false)
         }
     },[config, getNamespaceConfig, data, getNamespaceServices, load])
-
-
 
     if (err !== null) {
         // error happened with listing services
@@ -127,13 +149,37 @@ function NamespaceServices(props) {
                     )}  
                     keyDownActions={[
                         KeyDownDefinition("Enter", async () => {
-                        }, true)
+                            if (!isButtonDisabled) {
+                                return serviceValidationSchema
+                                    .validate({ name: serviceName, image: image }, { abortEarly: false })
+                                    .then(async function() {
+                                        let err = await createNamespaceService(serviceName, image, parseInt(scale), parseInt(size), cmd)
+                                        if(err) return err
+                                    }).catch(function (err) {
+                                        if (err.inner.length > 0) {
+                                            return err.inner[0].message
+                                        }
+                                    });
+
+                            }
+                        }, !isButtonDisabled)
                     ]}
                     actionButtons={[
                         ButtonDefinition("Add", async () => {
-                            let err = await createNamespaceService(serviceName, image, parseInt(scale), parseInt(size), cmd)
-                            if(err) return err
-                        }, "small blue", true, false),
+                            if (!isButtonDisabled) {
+                                return serviceValidationSchema
+                                    .validate({ name: serviceName, image: image }, { abortEarly: false })
+                                    .then(async function() {
+                                        let err = await createNamespaceService(serviceName, image, parseInt(scale), parseInt(size), cmd)
+                                        if(err) return err
+                                    }).catch(function (err) {
+                                        if (err.inner.length > 0) {
+                                            return err.inner[0].message
+                                        }
+                                    });
+
+                            }
+                        }, `small ${isButtonDisabled ? "disabled": "blue"}`, true, false),
                         ButtonDefinition("Cancel", () => {
                         }, "small light", true, false)
                     ]}

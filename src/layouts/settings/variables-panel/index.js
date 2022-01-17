@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import './style.css';
 import ContentPanel, {ContentPanelTitle, ContentPanelTitleIcon, ContentPanelBody } from '../../../components/content-panel';
 import FlexBox from '../../../components/flexbox';
@@ -15,6 +15,7 @@ import { RiDeleteBin2Line } from 'react-icons/ri';
 import HelpIcon from '../../../components/help';
 import { VscCloudDownload, VscCloudUpload, VscEye, VscLoading, VscTrash, VscVariableGroup } from 'react-icons/vsc';
 import { AutoSizer } from 'react-virtualized';
+import * as yup from "yup";
 
 
 
@@ -26,6 +27,36 @@ function VariablesPanel(props){
     const [file, setFile] = useState(null)
     const [uploading, setUploading] = useState(false)
     const [mimeType, setMimeType] = useState("application/json")
+    const [isManualButtonDisabled, setIsManualButtonDisabled] = useState(false)
+    const [isUploadButtonDisabled, setIsUploadButtonDisabled] = useState(false)
+    const [currentTab, setCurrentTab] = useState("")
+
+    const manualValidationSchema = yup.object().shape({
+        manualVariableName: yup.string().required(),
+        data: yup.string().required()
+    })
+
+    const uploadValidationSchema = yup.object().shape({
+        uploadVariableName: yup.string().required(),
+        file: yup.mixed().required(),
+    })
+
+    const onTabChanged = (tab) => {
+        setCurrentTab(tab)
+    }
+
+    useEffect(() => {
+
+        if (currentTab === "Manual") {
+            manualValidationSchema.isValid({ manualVariableName: keyValue, data: dValue })
+                .then((result) => setIsManualButtonDisabled(!result))
+        }
+
+        if (currentTab === "Upload") {
+            uploadValidationSchema.isValid({ uploadVariableName: keyValue, file: file })
+                .then((result) => setIsUploadButtonDisabled(!result))
+        }
+    },[manualValidationSchema, uploadValidationSchema, keyValue, dValue, file, currentTab])
 
     const {data, err, setNamespaceVariable, getNamespaceVariable, deleteNamespaceVariable} = useNamespaceVariables(Config.url, true, namespace, localStorage.getItem("apikey"))
 
@@ -37,6 +68,55 @@ function VariablesPanel(props){
     let uploadingBtn = "small green"
     if (uploading) {
         uploadingBtn += " btn-loading"
+    }
+
+    const manualActionButtons = [
+        ButtonDefinition("Add", async () => {
+            if (!isManualButtonDisabled) {
+                return manualValidationSchema.validate({ manualVariableName: keyValue, data: dValue }, { abortEarly: false })
+                    .then(async function() {
+                        setUploading(true)
+                        let err = await setNamespaceVariable(keyValue, file, mimeType)
+                        if (err) {
+                            setUploading(false)
+                            return err
+                        }
+                    }).catch(function (err) {
+                        if (err.inner.length > 0) {
+                            return err.inner[0].message
+                        }
+                    });
+            }
+        }, `small ${isManualButtonDisabled ? "disabled" : uploadingBtn}`, true, false),
+        ButtonDefinition("Cancel", () => {
+        }, "small light", true, false)
+    ];
+
+    const uploadActionButtons = [
+        ButtonDefinition("Add", async () => {
+            if (!isUploadButtonDisabled) {
+                return uploadValidationSchema.validate({ uploadVariableName: keyValue, file: file }, { abortEarly: false })
+                    .then(async function() {
+                        let err = await setNamespaceVariable(keyValue, dValue, mimeType)
+                        if (err) return err
+                    }).catch(function (err) {
+                        if (err.inner.length > 0) {
+                            return err.inner[0].message
+                        }
+                    });
+            }
+        }, `small ${isUploadButtonDisabled ? "disabled" : uploadingBtn}`, true, false),
+        ButtonDefinition("Cancel", () => {
+        }, "small light", true, false)
+    ];
+
+    const chooseSubmitButton = (currentTab) => {
+        console.log(currentTab);
+        if (currentTab === "Upload") {
+            return uploadActionButtons
+        } else if (currentTab === "Manual") {
+            return manualActionButtons
+        }
     }
 
     return (
@@ -65,33 +145,9 @@ function VariablesPanel(props){
                             setUploading(false)
                             setMimeType("application/json")
                         }}
-                        actionButtons={[
-                            ButtonDefinition("Add", async () => {
-                                if(document.getElementById("file-picker")){
-                                    setUploading(true)
-                                    if(keyValue === "") {
-                                        setUploading(false)
-                                        return "Variable key name needs to be provided."
-                                    }
-                                    let err = await setNamespaceVariable(keyValue, file, mimeType)
-                                    if (err) {
-                                        setUploading(false)
-                                        return err
-                                    }
-                                } else {
-                                    if(keyValue === "") {
-                                        setUploading(false)
-                                        return "Variable key name needs to be provided."
-                                    }
-                                    let err = await setNamespaceVariable(keyValue, dValue, mimeType)
-                                    if (err) return err
-                                }
-                            }, uploadingBtn, true, false),
-                            ButtonDefinition("Cancel", () => {
-                            }, "small light", true, false)
-                        ]}
+                        actionButtons={chooseSubmitButton(currentTab)}
                     >
-                        <AddVariablePanel mimeType={mimeType} setMimeType={setMimeType} file={file} setFile={setFile} setKeyValue={setKeyValue} keyValue={keyValue} dValue={dValue} setDValue={setDValue}/>
+                        <AddVariablePanel onTabChanged={onTabChanged} mimeType={mimeType} setMimeType={setMimeType} file={file} setFile={setFile} setKeyValue={setKeyValue} keyValue={keyValue} dValue={dValue} setDValue={setDValue}/>
                     </Modal>
                 </div>
             </ContentPanelTitle>
@@ -134,9 +190,8 @@ export function VariableFilePicker(props) {
     )
 }
 
-
 function AddVariablePanel(props) {
-    const {keyValue, setKeyValue, dValue, setDValue, file, setFile, mimeType, setMimeType} = props
+    const {keyValue, setKeyValue, dValue, setDValue, file, setFile, mimeType, setMimeType, onTabChanged} = props
 
     let lang = ""
 
@@ -164,11 +219,19 @@ function AddVariablePanel(props) {
         <Tabs 
             style={{minHeight: "500px", minWidth: "90%"}}
             headers={["Manual", "Upload"]}
+            onTabChanged={onTabChanged}
             tabs={[(
                 <FlexBox id="written" className="col gap" style={{fontSize: "12px", width: "35vw"}}>
+                    <FlexBox className="gap" style={{margin: "-9px 0 5px 0", maxHeight: 30}}>
+                        Name
+                        <span className="required-label">*</span>
+                    </FlexBox>
                     <div style={{width: "100%", paddingRight: "12px", display: "flex"}}>
                         <input value={keyValue} onChange={(e)=>setKeyValue(e.target.value)} autoFocus placeholder="Enter variable key name" />
                     </div>
+                    <FlexBox className="gap" style={{margin: "-8px 0 5px 0", maxHeight: 30}}>
+                        Mimetype
+                    </FlexBox>
                     <div style={{width: "100%", paddingRight: "12px", display: "flex"}}>
                         <select style={{width:"100%"}} defaultValue={mimeType} onChange={(e)=>setMimeType(e.target.value)}>
                             <option value="">Choose a mimetype</option>
@@ -180,6 +243,10 @@ function AddVariablePanel(props) {
                             <option value="text/css">css</option>
                         </select>
                     </div>
+                    <FlexBox className="gap" style={{margin: "-9px 0 5px 0", maxHeight: 30}}>
+                        Data
+                        <span className="required-label">*</span>
+                    </FlexBox>
                     <FlexBox className="gap" style={{maxHeight: "600px"}}>
                         <FlexBox style={{overflow:"hidden"}}>
                         <AutoSizer>
@@ -192,9 +259,17 @@ function AddVariablePanel(props) {
                 </FlexBox>
             ),(
                 <FlexBox id="file-picker" className="col gap" style={{fontSize: "12px"}}>
+                    <FlexBox className="gap" style={{display: "flex", alignItems: "center", margin: "0 0 5px 0", fontSize: "12px", fontWeight: "bold", maxHeight: "20px"}}>
+                        Name
+                        <span className="required-label">*</span>
+                    </FlexBox>
                     <div style={{width: "100%", paddingRight: "12px", display: "flex"}}>
                         <input value={keyValue} onChange={(e)=>setKeyValue(e.target.value)} autoFocus placeholder="Enter variable key name" />
                     </div>
+                    <FlexBox className="gap" style={{display: "flex", alignItems: "center", margin: "3px 0 3px 0", fontSize: "12px", fontWeight: "bold", maxHeight: "20px"}}>
+                        Data
+                        <span className="required-label">*</span>
+                    </FlexBox>
                     <FlexBox className="gap">
                         <VariableFilePicker setKeyValue={setKeyValue} setMimeType={setMimeType} mimeType={mimeType} file={file} setFile={setFile} id="add-variable-panel" />
                     </FlexBox>
@@ -235,6 +310,19 @@ function Variable(props) {
     const [file, setFile] = useState(null)
     const [downloading, setDownloading] = useState(false)
     const [uploading, setUploading] = useState(false)
+    const [isButtonDisabled, setIsButtonDisabled] = useState(false)
+
+    const variableValidationSchema = yup.object().shape({
+        variableData: yup.mixed().required()
+    })
+
+    useEffect(() => {
+
+        variableValidationSchema.isValid({ variableData: file })
+            .then((result) => setIsButtonDisabled(!result))
+
+    },[variableValidationSchema, file])
+
     let uploadingBtn = "small green"
     if (uploading) {
         uploadingBtn += " btn-loading"
@@ -382,20 +470,36 @@ function Variable(props) {
                     actionButtons={
                         [
                             ButtonDefinition("Upload", async () => {
-                                setUploading(true)
-                                let err = await setNamespaceVariable(obj.node.name, file, mimeType)
-                                if (err) {
-                                    setUploading(false)
-                                    return err
+                                if (!isButtonDisabled) {
+                                    return variableValidationSchema
+                                        .validate({ variableData: file }, { abortEarly: false })
+                                        .then(async function() {
+
+                                            setUploading(true)
+                                            let err = await setNamespaceVariable(obj.node.name, file, mimeType)
+                                            if (err) {
+                                                setUploading(false)
+                                                return err
+                                            }
+                                            setUploading(false)
+                                        }).catch(function (err) {
+                                            if (err.inner.length > 0) {
+                                                return err.inner[0].message
+                                            }
+                                        });
+
                                 }
-                                setUploading(false)
-                            }, uploadingBtn, true, false),
+                            }, `small ${isButtonDisabled ? "disabled": uploadingBtn}`, true, false),
                             ButtonDefinition("Cancel", () => {
                             }, "small light", true, false)
                         ]
                     } 
                 >
                     <FlexBox className="col gap">
+                        <FlexBox className="gap" style={{margin: "-8px 0 -4px 0", fontWeight: "bold"}}>
+                            Data
+                            <span className="required-label">*</span>
+                        </FlexBox>
                         <VariableFilePicker setMimeType={setType} id="modal-file-picker" file={file} setFile={setFile} />
                     </FlexBox>
                 </Modal>

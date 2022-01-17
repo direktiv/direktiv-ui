@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import './style.css';
 import Logo from '../../assets/nav-logo.png'
 import FlexBox from '../flexbox';
@@ -10,6 +10,7 @@ import {VscAdd,  VscFolderOpened, VscGraph, VscLayers, VscLock, VscServer, VscSe
 
 import {IoExtensionPuzzleOutline} from 'react-icons/io5';
 import { Link, matchPath, useLocation, useNavigate } from 'react-router-dom';
+import * as yup from "yup";
 
 function NavBar(props) {
 
@@ -66,9 +67,20 @@ function NewNamespaceBtn(props) {
 
     // createErr is filled when someone tries to create namespace but proceeded to error out
 
-
     const [ns, setNs] = useState("")
     const navigate = useNavigate()
+    const [isButtonDisabled, setIsButtonDisabled] = useState(false)
+
+    const namespaceValidationSchema = yup.object().shape({
+        namespace: yup.string().required()
+    })
+
+    useEffect(() => {
+
+        namespaceValidationSchema.isValid({ namespace: ns })
+            .then((result) => setIsButtonDisabled(!result))
+
+    },[namespaceValidationSchema, ns])
 
     return (
         <Modal title="New namespace"
@@ -94,30 +106,50 @@ function NewNamespaceBtn(props) {
 
                keyDownActions={[
                    KeyDownDefinition("Enter", async () => {
-                       let err = await createNamespace(ns)
-                       if(err) return err
-                       setTimeout(()=>{
-                           navigate(`/n/${ns}`)
-                       },200)
-                       setNs("")
-                   }, true)
+                       if (!isButtonDisabled) {
+                           return namespaceValidationSchema.validate({namespace: ns}, { abortEarly: false })
+                               .then(function() {
+                                   createNamespace(ns)
+                                   setTimeout(()=>{
+                                       navigate(`/n/${ns}`)
+                                   },200)
+                                   setNs("")
+                               }).catch(function (err) {
+                                   if (err.inner.length > 0) {
+                                       return err.inner[0].message
+                                   }
+                               });
+                       }
+                   }, !isButtonDisabled)
                ]}
 
                actionButtons={[
                    ButtonDefinition("Add", async () => {
-                       let err = await createNamespace(ns)
-                       if(err) return err
-                       setTimeout(()=>{
-                           navigate(`/n/${ns}`)
-                       },200)
-                       setNs("")
-                   }, "small blue", true, false),
+                       if (!isButtonDisabled) {
+                           return namespaceValidationSchema.validate({namespace: ns}, { abortEarly: false })
+                               .then(function() {
+                                   createNamespace(ns)
+                                   setTimeout(()=>{
+                                       navigate(`/n/${ns}`)
+                                   },200)
+                                   setNs("")
+                               }).catch(function (err) {
+                                   if (err.inner.length > 0) {
+                                       return err.inner[0].message
+                                   }
+                               });
+                       }
+                   }, `small ${isButtonDisabled ? "disabled": "blue"}`, true, false),
                    ButtonDefinition("Cancel", () => {
                        setNs("")
                    }, "small light", true, false)
                ]}
         >
-            <FlexBox>
+            <FlexBox className="col gap" style={{paddingRight:"10px"}}>
+                <FlexBox className="gap" style={{margin: "-2px 0 12px 0", fontSize: "12px", fontWeight: "bold"}}>
+                    Name
+                    <span className="required-label">*</span>
+                </FlexBox>
                 <input autoFocus value={ns} onChange={(e)=>setNs(e.target.value)} placeholder="Enter namespace name" />
             </FlexBox>
         </Modal>

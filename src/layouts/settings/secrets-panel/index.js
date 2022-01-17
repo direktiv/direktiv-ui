@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import './style.css';
 import AddValueButton from '../../../components/add-button';
 import ContentPanel, {ContentPanelTitle, ContentPanelTitleIcon, ContentPanelBody } from '../../../components/content-panel';
@@ -10,17 +10,30 @@ import {useSecrets} from 'direktiv-react-hooks'
 import {Config, GenerateRandomKey} from '../../../util'
 import HelpIcon from '../../../components/help';
 import DirektivEditor from '../../../components/editor';
-
+import * as yup from "yup";
 
 function SecretsPanel(props){
     const {namespace} = props
 
-
     const [keyValue, setKeyValue] = useState("")
     const [vValue, setVValue] = useState("")
     const {data, createSecret, deleteSecret, getSecrets} = useSecrets(Config.url, namespace, localStorage.getItem("apikey"))
-   
+
     // createErr is the error when creating a secret
+
+    const [isButtonDisabled, setIsButtonDisabled] = useState(false)
+
+    const secretValidationSchema = yup.object().shape({
+        secretKey: yup.string().required(),
+        secretValue: yup.string().required()
+    })
+
+    useEffect(() => {
+
+        secretValidationSchema.isValid({secretKey: keyValue, secretValue: vValue})
+            .then((result) => setIsButtonDisabled(!result))
+
+    },[secretValidationSchema, keyValue, vValue])
 
     return (
         <ContentPanel style={{ height: "100%", minHeight: "180px", width: "100%" }}>
@@ -53,18 +66,40 @@ function SecretsPanel(props){
                         
                         keyDownActions={[
                             KeyDownDefinition("Enter", async () => {
-                                let err = await createSecret(keyValue, vValue)
-                                if(err) return err
-                                await getSecrets()
-                            }, true)
+                                if (!isButtonDisabled) {
+                                    return secretValidationSchema.validate({secretKey: keyValue, secretValue: vValue}, { abortEarly: false })
+                                        .then(function() {
+                                            const err = createSecret(keyValue, vValue)
+                                            if (err) {
+                                                return err
+                                            }
+                                            getSecrets()
+                                        }).catch(function (err) {
+                                            if (err.inner.length > 0) {
+                                                return err.inner[0].message
+                                            }
+                                        });
+                                }
+                            }, !isButtonDisabled)
                         ]}
                         
                         actionButtons={[
                             ButtonDefinition("Add", async () => {
-                                let err = await createSecret(keyValue, vValue)
-                                if(err) return err
-                                await  getSecrets()
-                            }, "small blue", true, false),
+                                if (!isButtonDisabled) {
+                                    return secretValidationSchema.validate({secretKey: keyValue, secretValue: vValue}, { abortEarly: false })
+                                        .then(function() {
+                                            const err = createSecret(keyValue, vValue)
+                                            if (err) {
+                                                return err
+                                            }
+                                            getSecrets()
+                                        }).catch(function (err) {
+                                            if (err.inner.length > 0) {
+                                                return err.inner[0].message
+                                            }
+                                        });
+                                }
+                            }, `small ${isButtonDisabled ? "disabled": "blue"}`, true, false),
                             ButtonDefinition("Cancel", () => {
                             }, "small light", true, false)
                         ]}
@@ -168,10 +203,18 @@ function AddSecretPanel(props) {
 
     return (
         <FlexBox className="col gap" style={{fontSize: "12px"}}>
+            <FlexBox className="gap" style={{margin: "-12px 0 -9px 0"}}>
+                Secret Key
+                <span className="required-label">*</span>
+            </FlexBox>
             <FlexBox className="gap">
                 <FlexBox>
                     <input value={keyValue} onChange={(e)=>setKeyValue(e.target.value)} autoFocus placeholder="Enter key" />
                 </FlexBox>
+            </FlexBox>
+            <FlexBox className="gap" style={{margin: "-8px 0 -8px 0"}}>
+                Secret Value
+                <span className="required-label">*</span>
             </FlexBox>
             <FlexBox className="gap">
                 <FlexBox style={{overflow:"hidden"}}>

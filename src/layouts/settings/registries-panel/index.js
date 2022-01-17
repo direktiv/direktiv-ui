@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import ContentPanel, {ContentPanelTitle, ContentPanelTitleIcon, ContentPanelBody } from '../../../components/content-panel';
 import Modal, { ButtonDefinition, KeyDownDefinition } from '../../../components/modal';
 import AddValueButton from '../../../components/add-button';
@@ -9,6 +9,7 @@ import { useRegistries } from 'direktiv-react-hooks';
 import { Config } from '../../../util';
 import HelpIcon from '../../../components/help';
 import { VscServer, VscTrash } from 'react-icons/vsc';
+import * as yup from "yup";
 
 function RegistriesPanel(props){
 
@@ -21,11 +22,20 @@ function RegistriesPanel(props){
     const [url, setURL] = useState("")
     const [username, setUsername] = useState("")
     const [token, setToken] = useState("")
+    const [isButtonDisabled, setIsButtonDisabled] = useState(false)
 
-    // err handling
-    const [urlErr, setURLErr] = useState("")
-    const [userErr, setUserErr] = useState("")
-    const [tokenErr, setTokenErr] = useState("")
+    const registriesValidationSchema = yup.object().shape({
+        url: yup.string().required(),
+        username: yup.string().required(),
+        token: yup.string().required()
+    })
+
+    useEffect(() => {
+
+        registriesValidationSchema.isValid({url: url, username: username, token: token})
+            .then((result) => setIsButtonDisabled(!result))
+
+    },[registriesValidationSchema, url, username, token])
 
     let testConnBtnClasses = "small green"
     if (testConnLoading) {
@@ -58,92 +68,60 @@ function RegistriesPanel(props){
                             setURL("")
                             setToken("")
                             setUsername("")
-                            setURLErr("")
-                            setTokenErr("")
-                            setUserErr("")
                             setSuccessFeedback(false)
                             setTestConnLoading(false)
                         }}
                         keyDownActions={[
                             KeyDownDefinition("Enter", async () => {
-                                setURLErr("")
-                                setTokenErr("")
-                                setUserErr("")
-                                let filledOut = true
-                                if(url === ""){
-                                    setURLErr("url must be filled out")
-                                    filledOut = false
+                                if (!isButtonDisabled) {
+                                    return registriesValidationSchema.validate({url: url, username: username, token: token}, { abortEarly: false })
+                                        .then(async function() {
+                                            let err = await createRegistry(url, `${username}:${token}`)
+                                            if(err) return err
+                                            await getRegistries()
+                                        }).catch(function (err) {
+                                            if (err.inner.length > 0) {
+                                                return err.inner[0].message
+                                            }
+                                        });
                                 }
-                                if(username === "") {
-                                    setUserErr("username must be filled out")
-                                    filledOut = false
-                                }
-                                if(token === "") {
-                                    setTokenErr("token must be filled out")
-                                    filledOut = false
-                                }
-                                if(!filledOut) return "all fields must be filled out"
-                                let err = await createRegistry(url, `${username}:${token}`)
-                                if(err) return err
-                                await getRegistries()
-                            }, true)
+                            }, !isButtonDisabled)
                         ]}
                         actionButtons={[
                             ButtonDefinition("Add", async() => {
-                                setURLErr("")
-                                setTokenErr("")
-                                setUserErr("")
-                                let filledOut = true
-                                if(url === ""){
-                                    setURLErr("Please enter a URL...")
-                                    filledOut = false
+                                if (!isButtonDisabled) {
+                                    return registriesValidationSchema.validate({url: url, username: username, token: token}, { abortEarly: false })
+                                        .then(function() {
+                                            const err = createRegistry(url, `${username}:${token}`);
+                                            if (err) {
+                                                return err
+                                            }
+                                            getRegistries()
+                                        }).catch(function (err) {
+                                            if (err.inner.length > 0) {
+                                                return err.inner[0].message
+                                            }
+                                        });
                                 }
-                                if(username === "") {
-                                    setUserErr("Please enter a username...")
-                                    filledOut = false
-                                }
-                                if(token === "") {
-                                    setTokenErr("Please enter a token...")
-                                    filledOut = false
-                                }
-                                if(!filledOut) return "all fields must be filled out"
-                                let err = await createRegistry(url, `${username}:${token}`)
-                                if(err) return err
-                                await  getRegistries()
-                            }, "small blue", true, false),
+                            }, `small ${isButtonDisabled ? "disabled": "blue"}`, true, false),
                             ButtonDefinition("Test Connection", async () => {
-                                setURLErr("")
-                                setTokenErr("")
-                                setUserErr("")
-                                let filledOut = true
-                                if(url === ""){
-                                    setURLErr("Please enter a URL...")
-                                    filledOut = false
-                                }
-                                if(username === "") {
-                                    setUserErr("Please enter a username...")
-                                    filledOut = false
-                                }
-                                if(token === "") {
-                                    setTokenErr("Please enter a token...")
-                                    filledOut = false
-                                }
-                                if(!filledOut) return "all fields must be filled out"
-                                setTestConnLoading(true)
-                                let err = await TestRegistry(url, username, token)
-                                if(err) {
+                                if (!isButtonDisabled) {
+                                    setTestConnLoading(true)
+                                    let err = await TestRegistry(url, username, token)
+                                    if (err) {
+                                        setTestConnLoading(false)
+                                        setSuccessFeedback(false)
+                                        return err
+                                    }
                                     setTestConnLoading(false)
-                                    setSuccessFeedback(false)
-                                    return err
+                                    setSuccessFeedback(true)
                                 }
-                                setTestConnLoading(false)
-                                setSuccessFeedback(true)
-                            }, testConnBtnClasses, false, false),
+                            }, `small ${isButtonDisabled ? "disabled": testConnBtnClasses}`, false, false),
                             ButtonDefinition("Cancel", () => {
                             }, "small light", true, false)
                         ]}
                     >
-                        <AddRegistryPanel urlErr={urlErr} userErr={userErr} tokenErr={tokenErr} successMsg={successFeedback} token={token} setToken={setToken} username={username} setUsername={setUsername} url={url} setURL={setURL}/>    
+                        <AddRegistryPanel successMsg={successFeedback} token={token} setToken={setToken} username={username} setUsername={setUsername} url={url} setURL={setURL}/>
                     </Modal> 
                 </div>
             </ContentPanelTitle>
@@ -211,43 +189,54 @@ export function AddRegistryPanel(props) {
             </FlexBox>
             :<></>}
             <FlexBox className="col gap">
-            <FlexBox >
-            <input value={url} onChange={(e)=>setURL(e.target.value)} autoFocus placeholder="Enter URL" />
-
+                <FlexBox className="gap" style={{margin: "-12px 0 -8px 0"}}>
+                    URL
+                    <span className="required-label">*</span>
                 </FlexBox>
-                {urlErr !== "" ?
-                <FlexBox>
-                    <span style={{fontWeight:"normal", color:"red", fontSize:"10pt", lineHeight:"20px"}}>{tokenErr}</span>                  
+                <FlexBox className="gap">
+                    <input value={url} onChange={(e)=>setURL(e.target.value)} autoFocus placeholder="Enter URL" />
+                    {urlErr !== "" ?
+                        <FlexBox>
+                            <span style={{fontWeight:"normal", color:"red", fontSize:"10pt", lineHeight:"20px"}}>{tokenErr}</span>
+                        </FlexBox>
+                        :
+                        ""
+                    }
                 </FlexBox>
-                :
-                ""  
-                }
-          
             </FlexBox>
-            <FlexBox className="col gap">
+            <FlexBox className="col gap" style={ {paddingRight: "7px"}}>
+                <FlexBox className="gap" style={{margin: "-8px 20px -8px 0"}}>
+                    Username
+                    <span className="required-label">*</span>
+                </FlexBox>
                 <FlexBox>
-                    <input value={username} onChange={(e)=>setUsername(e.target.value)} placeholder="Enter username" />     
+                    <input value={username} onChange={(e)=>setUsername(e.target.value)} placeholder="Enter username" />
                 </FlexBox>
                 {userErr !== "" ?
                 <FlexBox>
-                    <span style={{fontWeight:"normal", color:"red", fontSize:"10pt", lineHeight:"20px"}}>{userErr}</span>                  
+                    <span style={{fontWeight:"normal", color:"red", fontSize:"10pt", lineHeight:"20px"}}>{userErr}</span>
                 </FlexBox>
                 :
-                ""  
+                ""
                 }
             </FlexBox>
             <FlexBox className="col gap">
-                <FlexBox >
-                <input value={token} onChange={(e)=>setToken(e.target.value)} type="password" placeholder="Enter token" />
-
+                <FlexBox className="gap">
+                    <FlexBox className="gap" style={{margin: "-16px 0 -8px 0"}}>
+                        Token
+                        <span className="required-label">*</span>
+                    </FlexBox>
                 </FlexBox>
-                {tokenErr !== "" ?
-                <FlexBox>
-                    <span style={{fontWeight:"normal", color:"red", fontSize:"10pt", lineHeight:"20px"}}>{tokenErr}</span>                  
+                <FlexBox className="gap">
+                    <input value={token} onChange={(e)=>setToken(e.target.value)} type="password" placeholder="Enter token" />
+                    {tokenErr !== "" ?
+                    <FlexBox>
+                        <span style={{fontWeight:"normal", color:"red", fontSize:"10pt", lineHeight:"20px"}}>{tokenErr}</span>
+                    </FlexBox>
+                    :
+                    ""
+                    }
                 </FlexBox>
-                :
-                ""  
-                }
             </FlexBox>
         </FlexBox>
     );

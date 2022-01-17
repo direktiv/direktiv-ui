@@ -1,12 +1,16 @@
-import React, { useState } from 'react'
+import React, {useEffect, useState} from 'react'
 import './style.css'
 import FlexBox from '../flexbox'
 
 function Tabs(props) {
 
     const [activeTab, setActiveTab] = useState(0)
+    let {style, headers, tabs, onTabChanged} = props;
 
-    let {style, headers, tabs} = props;
+    useEffect(() => {
+        onTabChanged && onTabChanged(headers[activeTab])
+    }, [activeTab])
+
     if (!headers || !tabs) {
         return (<>Bad tabs definition (missing tabs or headers).</>)
     }

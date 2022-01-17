@@ -4,6 +4,11 @@
     /* padding: 10px */
 }
 
+.required-label {
+    color: var(--theme-red);
+    margin-left: -3px;
+}
+
 .wait-message .msg-box {
     color: var(--theme-dark-gray-text);
     background-color: #fcfdfe;

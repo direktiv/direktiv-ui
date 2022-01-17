@@ -21,6 +21,7 @@ import { useSearchParams } from 'react-router-dom';
 import WorkflowRevisions from './workflow/revision';
 import WorkflowPod from './workflow/pod'
 import { AutoSizer } from 'react-virtualized';
+import * as yup from "yup";
 
 
 function Explorer(props) {
@@ -81,15 +82,39 @@ function ExplorerList(props) {
 
     const [currPath, setCurrPath] = useState("")
     
-    const [name, setName] = useState("")
+    const [directoryName, setDirectoryName] = useState("")
+    const [workflowName, setWorkflowName] = useState("")
     const [load, setLoad] = useState(true)
     const [orderFieldKey, setOrderFieldKey] = useState(orderFieldKeys[0])
 
     const [wfData, setWfData] = useState("")
     const [wfTemplate, setWfTemplate] = useState("")
+
     // const [pageNo, setPageNo] = useState(1);
 
+    const [isDirectoryButtonDisabled, setIsDirectoryButtonDisabled] = useState(false)
+    const [isWorkflowButtonDisabled, setIsWorkflowButtonDisabled] = useState(false)
+
     const {data, err, templates, createNode, deleteNode, renameNode } = useNodes(Config.url, true, namespace, path, localStorage.getItem("apikey"), orderFieldDictionary[orderFieldKey])
+
+    const directoryValidationSchema = yup.object().shape({
+        directoryName: yup.string().required()
+    })
+
+    const workflowValidationSchema = yup.object().shape({
+        workflowName: yup.string().required(),
+        workflowData: yup.string().required()
+    })
+
+    useEffect(() => {
+
+        directoryValidationSchema.isValid({ directoryName: directoryName })
+            .then((result) => setIsDirectoryButtonDisabled(!result))
+
+        workflowValidationSchema.isValid({ workflowName: workflowName, workflowData: wfData })
+            .then((result) => setIsWorkflowButtonDisabled(!result))
+
+    },[directoryValidationSchema, workflowValidationSchema, workflowName, directoryName, wfData])
 
     // control loading icon todo work out how to display this error
     useEffect(()=>{
@@ -110,7 +135,6 @@ function ExplorerList(props) {
             return <WorkflowPage namespace={namespace}/>
         }
     }
-    
 
     return(
         <FlexBox className="col gap" style={{paddingRight: "8px"}}>
@@ -156,28 +180,60 @@ function ExplorerList(props) {
                             onClose={()=>{
                                 setWfData("")
                                 setWfTemplate("")
-                                setName("")
+                                setWorkflowName("")
                             }}
                             actionButtons={[
-                                ButtonDefinition("Add", async () => {
-                                    let err = await createNode(name, "workflow", wfData)
-                                    if (err) return err
-                                }, "small blue", true, false),
+                                ButtonDefinition("Add",  () => {
+                                    if (!isWorkflowButtonDisabled) {
+                                        return workflowValidationSchema
+                                            .validate({ workflowName: workflowName, workflowData: wfData }, { abortEarly: false })
+                                            .then(async function() {
+                                                const err = await createNode(workflowName, "workflow", wfData)
+                                                if (err) {
+                                                    return err
+                                                }
+                                            }).catch(function (err) {
+                                                if (err.inner.length > 0) {
+                                                    return err.inner[0].message
+                                                }
+                                            });
+                                    }
+                                }, `small ${isWorkflowButtonDisabled ? "disabled": "blue"}`, true, false),
                                 ButtonDefinition("Cancel", () => {
                                 }, "small light", true, false)
                             ]}
 
                             keyDownActions={[
                                 KeyDownDefinition("Enter", async () => {
-                                    let err = await createNode(name, "workflow", wfData)
-                                    if (err) return err
-                                }, true, "workflow-name")
+                                    if (!isWorkflowButtonDisabled) {
+                                        return workflowValidationSchema
+                                            .validate({ workflowName: workflowName, workflowData: wfData }, { abortEarly: false })
+                                            .then(async function() {
+                                                const err = await createNode(workflowName, "workflow", wfData)
+                                                if (err) {
+                                                    return err
+                                                }
+                                            }).catch(function (err) {
+                                                if (err.inner.length > 0) {
+                                                    return err.inner[0].message
+                                                }
+                                            });
+
+                                    }
+                                }, !isWorkflowButtonDisabled, "workflow-name")
                             ]}
                         >
                             <FlexBox className="col gap" style={{fontSize: "12px", minHeight: "300px", minWidth: "550px"}}>
+                                <FlexBox className="gap" style={{margin: "-4px 0 -4px 0", maxHeight: 30}}>
+                                    Name
+                                    <span className="required-label">*</span>
+                                </FlexBox>
                                 <div style={{width: "100%", paddingRight: "12px", display: "flex"}}>
-                                    <input id={"workflow-name"} value={name} onChange={(e)=>setName(e.target.value)} autoFocus placeholder="Enter workflow name"/>
+                                    <input id={"workflow-name"} value={workflowName} onChange={(e)=>setWorkflowName(e.target.value)} autoFocus placeholder="Enter workflow name"/>
                                 </div>
+                                <FlexBox className="gap" style={{margin: "1px 0 -5px 0", maxHeight: 30}}>
+                                    Template
+                                </FlexBox>
                                 <select value={wfTemplate} onChange={(e)=>{
                                     setWfTemplate(e.target.value)
                                     // todo set wfdata to template on change
@@ -191,6 +247,10 @@ function ExplorerList(props) {
                                         )
                                     })}
                                 </select>
+                                <FlexBox className="gap" style={{margin: "0 0 -5px 0", maxHeight: 30}}>
+                                    Data
+                                    <span className="required-label">*</span>
+                                </FlexBox>
                                 <FlexBox className="gap">
                                     <FlexBox style={{overflow:"hidden"}}>
                                     <AutoSizer>
@@ -217,31 +277,53 @@ function ExplorerList(props) {
                                     </div>
                                 )}  
                                 onClose={()=>{
-                                    setName("")
-                                
+                                    setDirectoryName("")
                                 }}
                                 actionButtons={[
                                     ButtonDefinition("Add", async () => {
-                                        let err = await createNode(name, "directory")
-                                        if(err) return err
-                                    }, "small blue", true, false),
+                                        if (!isDirectoryButtonDisabled) {
+                                            return directoryValidationSchema
+                                                .validate({ directoryName: directoryName }, { abortEarly: false })
+                                                .then(function() {
+                                                    let err = createNode(directoryName, "directory")
+                                                    if(err) return err
+                                                    setDirectoryName("")
+                                                }).catch(function (err) {
+                                                    if (err.inner.length > 0) {
+                                                        return err.inner[0].message
+                                                    }
+                                                });
+                                        }
+                                    }, `small ${isDirectoryButtonDisabled ? "disabled": "blue"}`, true, false),
                                     ButtonDefinition("Cancel", () => {
                                     }, "small light", true, false)
                                 ]}
-
                                 keyDownActions={[
                                     KeyDownDefinition("Enter", async () => {
-                                        let err = await createNode(name, "directory")
-                                        if(err) return err
-                                        setName("")
-                                    }, true)
+                                        if (!isDirectoryButtonDisabled) {
+                                            return directoryValidationSchema
+                                                .validate({ directoryName: directoryName }, { abortEarly: false })
+                                                .then(function() {
+                                                    let err = createNode(directoryName, "directory")
+                                                    if(err) return err
+                                                    setDirectoryName("")
+                                                }).catch(function (err) {
+                                                    if (err.inner.length > 0) {
+                                                        return err.inner[0].message
+                                                    }
+                                                });
+                                        }
+                                    }, !isDirectoryButtonDisabled)
                                 ]}
-
                             >
                                 <FlexBox  className="col gap" style={{fontSize: "12px"}}>
-                                    <div style={{width: "100%", paddingRight: "12px", display: "flex"}}>
-                                        <input value={name} onChange={(e)=>setName(e.target.value)} autoFocus placeholder="Enter a directory name" />
-                                    </div>
+                                    <FlexBox className="col" style={{paddingRight:"10px"}}>
+                                        <FlexBox style={{display:"flex", alignItems:"center", margin: "-3px 0 8px 0", fontSize: "12px", fontWeight: "bold"}} className="gap">
+                                            Directory
+                                            <span className="required-label">*</span>
+                                        </FlexBox>
+                                        <input value={directoryName} onChange={(e)=>setDirectoryName(e.target.value)} autoFocus placeholder="Enter a directory name" />
+                                    </FlexBox>
                                 </FlexBox>
                             </Modal>
                         </div>

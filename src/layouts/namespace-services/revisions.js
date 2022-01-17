@@ -1,5 +1,5 @@
 import { useNamespaceService } from "direktiv-react-hooks"
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { IoPlay } from "react-icons/io5"
 import { useParams } from "react-router"
 import { Service } from "."
@@ -10,6 +10,7 @@ import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIco
 import FlexBox from "../../components/flexbox"
 import Modal, { ButtonDefinition, KeyDownDefinition } from "../../components/modal"
 import { Config } from "../../util"
+import * as yup from "yup";
 
 export default function NamespaceRevisionsPanel(props) {
     const {namespace} = props
@@ -29,32 +30,41 @@ export function RevisionCreatePanel(props){
 
     return(
         <FlexBox className="col gap" style={{fontSize: "12px"}}>
-            <FlexBox className="col gap">
-                    <FlexBox className="col" style={{paddingRight:"10px"}}>
-                        Image
-                        <input value={image} onChange={(e)=>setImage(e.target.value)} placeholder="Enter an image name" />
-                    </FlexBox>
-                    <FlexBox className="col" style={{paddingRight:"10px"}}>
-                        Scale
-                        <input type="range" style={{paddingLeft:"0px"}} min={"0"} max={maxscale.toString()} value={scale.toString()} onChange={(e)=>setScale(e.target.value)} />
-                    </FlexBox>
-                    <FlexBox className="col" style={{paddingRight:"10px"}}>
-                        Size
-                        <input list="sizeMarks" style={{paddingLeft:"0px"}} type="range" min={"0"} value={size.toString()}  max={"2"} onChange={(e)=>setSize(e.target.value)}/>
-                        <datalist style={{display:"flex", alignItems:'center'}} id="sizeMarks">
-                            <option style={{flex:"auto", textAlign:"left", lineHeight:"10px"}} value="0" label="small"/>
-                            <option style={{flex:"auto", textAlign:"center" , lineHeight:"10px"}} value="1" label="medium"/>
-                            <option style={{flex:"auto", textAlign:"right", lineHeight:"10px" }} value="2" label="large"/>
-                        </datalist>
-                    </FlexBox>
-                    <FlexBox className="col" style={{paddingRight:"10px"}}>
-                        CMD
-                        <input value={cmd} onChange={(e)=>setCmd(e.target.value)} placeholder="Enter the CMD for a service" />
-                    </FlexBox>
-                    <FlexBox className="col" style={{paddingRight:"10px"}}>
-                        Traffic
-                        <input type="range" style={{paddingLeft:"0px"}} min={"0"} max="100" value={traffic.toString()} onChange={(e)=>setTraffic(e.target.value)} />
-                    </FlexBox>
+            <FlexBox className="gap" style={{margin: "-11px 0 -9px 0"}}>
+                Image
+                <span className="required-label">*</span>
+            </FlexBox>
+            <FlexBox className="gap" style={{paddingRight:"10px"}}>
+                <input value={image} onChange={(e)=>setImage(e.target.value)} placeholder="Enter an image name" />
+            </FlexBox>
+            <FlexBox className="gap" style={{margin: "-8px 0 -10px 0"}}>
+                Scale
+            </FlexBox>
+            <FlexBox className="gap" style={{paddingRight:"10px"}}>
+                <input type="range" style={{paddingLeft:"0px"}} min={"0"} max={maxscale.toString()} value={scale.toString()} onChange={(e)=>setScale(e.target.value)} />
+            </FlexBox>
+            <FlexBox className="gap" style={{margin: "-8px 0 -10px 0"}}>
+                Size
+            </FlexBox>
+            <FlexBox className="gap" style={{paddingRight:"10px"}}>
+                <input list="sizeMarks"  type="range" min={"0"} value={size.toString()}  max={"2"} onChange={(e)=>setSize(e.target.value)}/>
+            </FlexBox>
+                <datalist  id="sizeMarks">
+                    <option style={{flex:"auto", textAlign:"left", lineHeight:"10px"}} value="0" label="small"/>
+                    <option style={{flex:"auto", textAlign:"center" , lineHeight:"10px"}} value="1" label="medium"/>
+                    <option style={{flex:"auto", textAlign:"right", lineHeight:"10px" }} value="2" label="large"/>
+                </datalist>
+            <FlexBox className="gap" style={{margin: "-8px 0 -10px 0"}}>
+                CMD
+            </FlexBox>
+            <FlexBox className="gap" style={{paddingRight:"10px"}}>
+                <input value={cmd} onChange={(e)=>setCmd(e.target.value)} placeholder="Enter the CMD for a service" />
+            </FlexBox>
+            <FlexBox className="gap" style={{margin: "-8px 0 -11px 0"}}>
+                Traffic
+            </FlexBox>
+            <FlexBox className="gap" style={{paddingRight:"10px"}}>
+                <input type="range" style={{paddingLeft:"0px"}} min={"0"} max="100" value={traffic.toString()} onChange={(e)=>setTraffic(e.target.value)} />
             </FlexBox>
         </FlexBox>
     )
@@ -71,7 +81,18 @@ function NamespaceRevisions(props) {
     const [size, setSize] = useState(0)
     const [trafficPercent, setTrafficPercent] = useState(100)
     const [cmd, setCmd] = useState("")
+    const [isButtonDisabled, setIsButtonDisabled] = useState(false)
 
+    const revisionValidationSchema = yup.object().shape({
+        image: yup.string().required()
+    })
+
+    useEffect(() => {
+
+        revisionValidationSchema.isValid({ image: image })
+            .then((result) => setIsButtonDisabled(!result))
+
+    },[revisionValidationSchema, image])
     
     useEffect(()=>{
         if(revisions !== null) {
@@ -122,13 +143,37 @@ function NamespaceRevisions(props) {
                                 )}  
                                 keyDownActions={[
                                     KeyDownDefinition("Enter", async () => {
-                                    }, true)
+                                        if (!isButtonDisabled) {
+                                            return revisionValidationSchema
+                                                .validate({ image: image }, { abortEarly: false })
+                                                .then(async function() {
+                                                    let err = await createNamespaceServiceRevision(image, parseInt(scale), parseInt(size), cmd, parseInt(trafficPercent))
+                                                    if (err) return err
+                                                }).catch(function (err) {
+                                                    if (err.inner.length > 0) {
+                                                        return err.inner[0].message
+                                                    }
+                                                });
+
+                                        }
+                                    }, !isButtonDisabled)
                                 ]}
                                 actionButtons={[
                                     ButtonDefinition("Add", async () => {
-                                        let err = await createNamespaceServiceRevision(image, parseInt(scale), parseInt(size), cmd, parseInt(trafficPercent))
-                                        if (err) return err
-                                    }, "small blue", true, false),
+                                        if (!isButtonDisabled) {
+                                            return revisionValidationSchema
+                                                .validate({ image: image }, { abortEarly: false })
+                                                .then(async function() {
+                                                    let err = await createNamespaceServiceRevision(image, parseInt(scale), parseInt(size), cmd, parseInt(trafficPercent))
+                                                    if (err) return err
+                                                }).catch(function (err) {
+                                                    if (err.inner.length > 0) {
+                                                        return err.inner[0].message
+                                                    }
+                                                });
+
+                                        }
+                                    }, `small ${isButtonDisabled ? "disabled": "blue"}`, true, false),
                                     ButtonDefinition("Cancel", () => {
                                     }, "small light", true, false)
                                 ]}

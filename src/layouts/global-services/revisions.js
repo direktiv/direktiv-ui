@@ -9,6 +9,7 @@ import FlexBox from "../../components/flexbox"
 import Modal, { ButtonDefinition, KeyDownDefinition } from "../../components/modal"
 import { Config } from "../../util"
 import { useGlobalService } from "direktiv-react-hooks"
+import * as yup from "yup";
 
 export default function GlobalRevisionsPanel(props){
     const {service} = useParams()
@@ -20,7 +21,18 @@ export default function GlobalRevisionsPanel(props){
     const [size, setSize] = useState(0)
     const [trafficPercent, setTrafficPercent] = useState(100)
     const [cmd, setCmd] = useState("")
+    const [isButtonDisabled, setIsButtonDisabled] = useState(false)
 
+    const revisionValidationSchema = yup.object().shape({
+        image: yup.string().required()
+    })
+
+    useEffect(() => {
+
+        revisionValidationSchema.isValid({ image: image })
+            .then((result) => setIsButtonDisabled(!result))
+
+    },[revisionValidationSchema, image])
 
     useEffect(()=>{
         if(revisions !== null) {
@@ -59,7 +71,7 @@ export default function GlobalRevisionsPanel(props){
                                 Service '{service}' Revisions
                             </FlexBox>
                             <div>
-                            <Modal title={`New '${service}' revision`} 
+                            <Modal title={`New '${service}' revision`}
                                 escapeToCancel
                                 modalStyle={{
                                     maxWidth: "300px"
@@ -73,13 +85,37 @@ export default function GlobalRevisionsPanel(props){
                                 )}  
                                 keyDownActions={[
                                     KeyDownDefinition("Enter", async () => {
-                                    }, true)
+                                        if (!isButtonDisabled) {
+                                            return revisionValidationSchema
+                                                .validate({ image: image }, { abortEarly: false })
+                                                .then(async function() {
+                                                    let err = await createGlobalServiceRevision(image, parseInt(scale), parseInt(size), cmd, parseInt(trafficPercent))
+                                                    if (err) return err
+                                                }).catch(function (err) {
+                                                    if (err.inner.length > 0) {
+                                                        return err.inner[0].message
+                                                    }
+                                                });
+
+                                        }
+                                    }, !isButtonDisabled)
                                 ]}
                                 actionButtons={[
                                     ButtonDefinition("Add", async () => {
-                                        let err = await createGlobalServiceRevision(image, parseInt(scale), parseInt(size), cmd, parseInt(trafficPercent))
-                                        if (err) return err
-                                    }, "small blue", true, false),
+                                        if (!isButtonDisabled) {
+                                            return revisionValidationSchema
+                                                .validate({ image: image }, { abortEarly: false })
+                                                .then(async function() {
+                                                    let err = await createGlobalServiceRevision(image, parseInt(scale), parseInt(size), cmd, parseInt(trafficPercent))
+                                                    if (err) return err
+                                                }).catch(function (err) {
+                                                    if (err.inner.length > 0) {
+                                                        return err.inner[0].message
+                                                    }
+                                                });
+
+                                        }
+                                    }, `small ${isButtonDisabled ? "disabled": "blue"}`, true, false),
                                     ButtonDefinition("Cancel", () => {
                                     }, "small light", true, false)
                                 ]}

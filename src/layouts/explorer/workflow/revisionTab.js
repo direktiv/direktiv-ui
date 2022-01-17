@@ -16,6 +16,7 @@ import { IoSettings } from 'react-icons/io5';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import { useNavigate } from 'react-router';
+import * as yup from "yup";
 function RevisionTab(props) {
 
     const navigate = useNavigate()
@@ -177,7 +178,6 @@ function TabbedButtons(props) {
     )
 }
 
-
 export function RevisionSelectorTab(props) {
     const {setRouter, namespace, tagWorkflow, filepath, updateWorkflow, editWorkflowRouter, getWorkflowRouter, getRevisions, setRevisions, err, revisions, router, deleteRevision, getWorkflowSankeyMetrics, executeWorkflow, searchParams, setSearchParams, getWorkflowRevisionData, getTags, removeTag} = props
     
@@ -231,8 +231,6 @@ export function RevisionSelectorTab(props) {
             <RevisionTab namespace={namespace} getWorkflowSankeyMetrics={getWorkflowSankeyMetrics} executeWorkflow={executeWorkflow} setRevision={setRevision} getWorkflowRevisionData={getWorkflowRevisionData}  searchParams={searchParams} setSearchParams={setSearchParams} revision={revision}/>
         )
     }
-
-  
 
     return (
         <FlexBox className="col gap">
@@ -473,6 +471,18 @@ function TagRevisionBtn(props) {
 
     let {tagWorkflow, obj, getRevisions, setRevisions, updateTags, getTags, isTag} = props;
     const [tag, setTag] = useState("")
+    const [isButtonDisabled, setIsButtonDisabled] = useState(false)
+
+    const tagRevisionValidationSchema = yup.object().shape({
+        tag: yup.string().required()
+    })
+
+    useEffect(() => {
+
+        tagRevisionValidationSchema.isValid({ tag: tag })
+            .then((result) => setIsButtonDisabled(!result))
+
+    },[tagRevisionValidationSchema, tag])
 
     return(
         <Modal
@@ -481,7 +491,7 @@ function TagRevisionBtn(props) {
                 flexDirection: "row-reverse",
                 marginRight: "8px"
             }}
-            title="Tag" 
+            title="Tag"
             onClose={()=>{
                 setTag("")
             }}
@@ -497,19 +507,32 @@ function TagRevisionBtn(props) {
             actionButtons={
                 [
                     ButtonDefinition("Tag", async () => {
-                        try {
-                            await tagWorkflow(obj.node.name, tag)
-                            setRevisions(await getRevisions())
-                            updateTags(await getTags())
-                        } catch(e) {
-                            return e.message
-                        }                        
-                    }, "small blue", true, false),
+                        if (!isButtonDisabled) {
+                            return tagRevisionValidationSchema.validate({ tag: tag }, { abortEarly: false })
+                                .then(async function() {
+                                    try {
+                                        await tagWorkflow(obj.node.name, tag)
+                                        setRevisions(await getRevisions())
+                                        updateTags(await getTags())
+                                    } catch(e) {
+                                        return e.message
+                                    }
+                                }).catch(function (err) {
+                                    if (err.inner.length > 0) {
+                                        return err.inner[0].message
+                                    }
+                                });
+                        }
+                    }, `small ${isButtonDisabled ? "disabled": "blue"}`, true, false),
                     ButtonDefinition("Cancel", () => {
                     }, "small light", true, false)
                 ]
             } 
         >
+            <FlexBox className="gap" style={{margin: "-2px 0 4px 0", fontSize: "12px", fontWeight: "bold"}}>
+                Tag
+                <span className="required-label">*</span>
+            </FlexBox>
             <FlexBox>
                 <input autoFocus value={tag} onChange={(e)=>setTag(e.target.value)} placeholder="Enter Tag" />
             </FlexBox>
