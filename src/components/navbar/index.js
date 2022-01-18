@@ -99,54 +99,27 @@ function NewNamespaceBtn(props) {
                        </div>
                    </FlexBox>
                )}
-
                titleIcon={<VscAdd/>}
-
                onClose={ () => {setNs("")}}
-
-               keyDownActions={[
-                   KeyDownDefinition("Enter", async () => {
-                       if (!isButtonDisabled) {
-                           return namespaceValidationSchema.validate({namespace: ns}, { abortEarly: false })
-                               .then(function() {
-                                   createNamespace(ns)
-                                   setTimeout(()=>{
-                                       navigate(`/n/${ns}`)
-                                   },200)
-                                   setNs("")
-                               }).catch(function (err) {
-                                   if (err.inner.length > 0) {
-                                       return err.inner[0].message
-                                   }
-                               });
-                       }
-                   }, !isButtonDisabled)
-               ]}
-
                actionButtons={[
                    ButtonDefinition("Add", async () => {
-                       if (!isButtonDisabled) {
-                           return namespaceValidationSchema.validate({namespace: ns}, { abortEarly: false })
-                               .then(function() {
-                                   createNamespace(ns)
-                                   setTimeout(()=>{
-                                       navigate(`/n/${ns}`)
-                                   },200)
-                                   setNs("")
-                               }).catch(function (err) {
-                                   if (err.inner.length > 0) {
-                                       return err.inner[0].message
-                                   }
-                               });
+                       try {
+                           await createNamespace(ns)
+                           setTimeout(()=>{
+                               navigate(`/n/${ns}`)
+                           },200)
+                           setNs("")
+                       } catch(err) {
+                           return err
                        }
-                   }, `small ${isButtonDisabled ? "disabled": "blue"}`, true, false),
+                   }, `small ${isButtonDisabled ? "disabled": "blue"}`, true, true),
                    ButtonDefinition("Cancel", () => {
                        setNs("")
                    }, "small light", true, false)
                ]}
         >
             <FlexBox className="col gap" style={{paddingRight:"10px"}}>
-                <FlexBox className="gap" style={{margin: "-2px 0 12px 0", fontSize: "12px", fontWeight: "bold"}}>
+                <FlexBox className="gap" style={{margin: "-1px 0 2px 0", fontSize: "12px", fontWeight: "bold"}}>
                     Name
                     <span className="required-label">*</span>
                 </FlexBox>

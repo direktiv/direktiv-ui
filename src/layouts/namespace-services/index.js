@@ -31,21 +31,21 @@ export function ServiceCreatePanel(props) {
 
     return(
         <FlexBox className="col gap" style={{fontSize: "12px"}}>
-            <FlexBox className="gap" style={{margin: "-11px 0 -9px 0"}}>
+            <FlexBox className="gap" style={{margin: "-12px 0 -9px 0"}}>
                 Name
                 <span className="required-label">*</span>
             </FlexBox>
             <FlexBox className="gap" style={{paddingRight:"10px"}}>
                 <input value={name} onChange={(e)=>setName(e.target.value)} placeholder="Enter name for service" />
             </FlexBox>
-            <FlexBox className="gap" style={{margin: "-8px 0 -8px 0"}}>
+            <FlexBox className="gap" style={{margin: "-9px 0 -9px 0"}}>
                 Image
                 <span className="required-label">*</span>
             </FlexBox>
             <FlexBox className="gap" style={{paddingRight:"10px"}}>
                 <input value={image} onChange={(e)=>setImage(e.target.value)} placeholder="Enter an image name" />
             </FlexBox>
-            <FlexBox className="gap" style={{margin: "-8px 0 -12px 0"}}>
+            <FlexBox className="gap" style={{margin: "-8px 0 -10px 0"}}>
                 Scale
             </FlexBox>
             <FlexBox className="gap" style={{paddingRight:"10px"}}>
@@ -54,14 +54,14 @@ export function ServiceCreatePanel(props) {
             <FlexBox className="gap" style={{margin: "-6px 0 -10px 0"}}>
                 Size
             </FlexBox>
-            <div  style={{padding:"-5px 14px 0 0"}}>
+            <FlexBox className="gap" style={{paddingRight:"10px"}}>
                 <input list="sizeMarks" style={{paddingLeft:"0px"}} type="range" min={"0"} value={size.toString()}  max={"2"} onChange={(e)=>setSize(e.target.value)}/>
-                <datalist style={{display:"flex", marginTop: "-3px", alignItems:'center'}} id="sizeMarks">
-                    <option style={{flex:"auto", textAlign:"left", lineHeight:"10px"}} value="0" label="small"/>
-                    <option style={{flex:"auto", textAlign:"center" , lineHeight:"10px"}} value="1" label="medium"/>
-                    <option style={{flex:"auto", textAlign:"right", lineHeight:"10px" }} value="2" label="large"/>
-                </datalist>
-            </div>
+            </FlexBox>
+            <datalist style={{display:"flex", marginTop: "-3px", justifyContent: "space-between", paddingRight:"11px"}} id="sizeMarks">
+                <option style={{display:"flex"}} value="0" label="small"/>
+                <option style={{display:"flex"}} value="1" label="medium"/>
+                <option style={{display:"flex"}} value="2" label="large"/>
+            </datalist>
             <FlexBox className="gap" style={{margin: "-12px 0 -8px 0"}}>
                 CMD
             </FlexBox>
@@ -146,38 +146,13 @@ function NamespaceServices(props) {
                     }}
                     button={(
                         <AddValueButton  label=" " />
-                    )}  
-                    keyDownActions={[
-                        KeyDownDefinition("Enter", async () => {
-                            if (!isButtonDisabled) {
-                                return serviceValidationSchema
-                                    .validate({ name: serviceName, image: image }, { abortEarly: false })
-                                    .then(async function() {
-                                        let err = await createNamespaceService(serviceName, image, parseInt(scale), parseInt(size), cmd)
-                                        if(err) return err
-                                    }).catch(function (err) {
-                                        if (err.inner.length > 0) {
-                                            return err.inner[0].message
-                                        }
-                                    });
-
-                            }
-                        }, !isButtonDisabled)
-                    ]}
+                    )}
                     actionButtons={[
                         ButtonDefinition("Add", async () => {
-                            if (!isButtonDisabled) {
-                                return serviceValidationSchema
-                                    .validate({ name: serviceName, image: image }, { abortEarly: false })
-                                    .then(async function() {
-                                        let err = await createNamespaceService(serviceName, image, parseInt(scale), parseInt(size), cmd)
-                                        if(err) return err
-                                    }).catch(function (err) {
-                                        if (err.inner.length > 0) {
-                                            return err.inner[0].message
-                                        }
-                                    });
-
+                            try {
+                                await createNamespaceService(serviceName, image, parseInt(scale), parseInt(size), cmd)
+                            } catch(err) {
+                                return err
                             }
                         }, `small ${isButtonDisabled ? "disabled": "blue"}`, true, false),
                         ButtonDefinition("Cancel", () => {

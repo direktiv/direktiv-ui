@@ -183,44 +183,15 @@ function ExplorerList(props) {
                                 setWorkflowName("")
                             }}
                             actionButtons={[
-                                ButtonDefinition("Add",  () => {
-                                    if (!isWorkflowButtonDisabled) {
-                                        return workflowValidationSchema
-                                            .validate({ workflowName: workflowName, workflowData: wfData }, { abortEarly: false })
-                                            .then(async function() {
-                                                const err = await createNode(workflowName, "workflow", wfData)
-                                                if (err) {
-                                                    return err
-                                                }
-                                            }).catch(function (err) {
-                                                if (err.inner.length > 0) {
-                                                    return err.inner[0].message
-                                                }
-                                            });
+                                ButtonDefinition("Add",async () => {
+                                    try {
+                                        await createNode(workflowName, "workflow", wfData)
+                                    } catch(err) {
+                                        return err
                                     }
                                 }, `small ${isWorkflowButtonDisabled ? "disabled": "blue"}`, true, false),
                                 ButtonDefinition("Cancel", () => {
-                                }, "small light", true, false)
-                            ]}
-
-                            keyDownActions={[
-                                KeyDownDefinition("Enter", async () => {
-                                    if (!isWorkflowButtonDisabled) {
-                                        return workflowValidationSchema
-                                            .validate({ workflowName: workflowName, workflowData: wfData }, { abortEarly: false })
-                                            .then(async function() {
-                                                const err = await createNode(workflowName, "workflow", wfData)
-                                                if (err) {
-                                                    return err
-                                                }
-                                            }).catch(function (err) {
-                                                if (err.inner.length > 0) {
-                                                    return err.inner[0].message
-                                                }
-                                            });
-
-                                    }
-                                }, !isWorkflowButtonDisabled, "workflow-name")
+                                }, "small light", true, true)
                             ]}
                         >
                             <FlexBox className="col gap" style={{fontSize: "12px", minHeight: "300px", minWidth: "550px"}}>
@@ -275,45 +246,21 @@ function ExplorerList(props) {
                                         <span className="hide-on-small">Directory</span>
                                         <span className="hide-on-medium-and-up">Dir</span>
                                     </div>
-                                )}  
+                                )}
                                 onClose={()=>{
                                     setDirectoryName("")
                                 }}
                                 actionButtons={[
                                     ButtonDefinition("Add", async () => {
-                                        if (!isDirectoryButtonDisabled) {
-                                            return directoryValidationSchema
-                                                .validate({ directoryName: directoryName }, { abortEarly: false })
-                                                .then(function() {
-                                                    let err = createNode(directoryName, "directory")
-                                                    if(err) return err
-                                                    setDirectoryName("")
-                                                }).catch(function (err) {
-                                                    if (err.inner.length > 0) {
-                                                        return err.inner[0].message
-                                                    }
-                                                });
+                                        try {
+                                            await createNode(directoryName, "directory")
+                                            setDirectoryName("")
+                                        } catch (err) {
+                                            return err
                                         }
-                                    }, `small ${isDirectoryButtonDisabled ? "disabled": "blue"}`, true, false),
+                                    }, `small ${isDirectoryButtonDisabled ? "disabled": "blue"}`, true, true),
                                     ButtonDefinition("Cancel", () => {
                                     }, "small light", true, false)
-                                ]}
-                                keyDownActions={[
-                                    KeyDownDefinition("Enter", async () => {
-                                        if (!isDirectoryButtonDisabled) {
-                                            return directoryValidationSchema
-                                                .validate({ directoryName: directoryName }, { abortEarly: false })
-                                                .then(function() {
-                                                    let err = createNode(directoryName, "directory")
-                                                    if(err) return err
-                                                    setDirectoryName("")
-                                                }).catch(function (err) {
-                                                    if (err.inner.length > 0) {
-                                                        return err.inner[0].message
-                                                    }
-                                                });
-                                        }
-                                    }, !isDirectoryButtonDisabled)
                                 ]}
                             >
                                 <FlexBox  className="col gap" style={{fontSize: "12px"}}>
