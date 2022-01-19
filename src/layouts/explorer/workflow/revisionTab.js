@@ -531,23 +531,14 @@ function TagRevisionBtn(props) {
             actionButtons={
                 [
                     ButtonDefinition("Tag", async () => {
-                        if (!isButtonDisabled) {
-                            return tagRevisionValidationSchema.validate({ tag: tag }, { abortEarly: false })
-                                .then(async function() {
-                                    try {
-                                        await tagWorkflow(obj.node.name, tag)
-                                        setRevisions(await getRevisions())
-                                        updateTags(await getTags())
-                                    } catch(e) {
-                                        return e.message
-                                    }
-                                }).catch(function (err) {
-                                    if (err.inner.length > 0) {
-                                        return err.inner[0].message
-                                    }
-                                });
+                        try {
+                            await tagWorkflow(obj.node.name, tag)
+                            setRevisions(await getRevisions())
+                            updateTags(await getTags())
+                        } catch(err) {
+                            return err
                         }
-                    }, `small ${isButtonDisabled ? "disabled": "blue"}`, true, false),
+                    }, `small ${isButtonDisabled ? "disabled": "blue"}`, true, true),
                     ButtonDefinition("Cancel", () => {
                     }, "small light", true, false)
                 ]

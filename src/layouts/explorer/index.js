@@ -189,7 +189,7 @@ function ExplorerList(props) {
                                     } catch(err) {
                                         return err
                                     }
-                                }, `small ${isWorkflowButtonDisabled ? "disabled": "blue"}`, true, false),
+                                }, `small ${isWorkflowButtonDisabled ? "disabled": "blue"}`, true, true),
                                 ButtonDefinition("Cancel", () => {
                                 }, "small light", true, true)
                             ]}

@@ -71,52 +71,25 @@ function RegistriesPanel(props){
                             setSuccessFeedback(false)
                             setTestConnLoading(false)
                         }}
-                        keyDownActions={[
-                            KeyDownDefinition("Enter", async () => {
-                                if (!isButtonDisabled) {
-                                    return registriesValidationSchema.validate({url: url, username: username, token: token}, { abortEarly: false })
-                                        .then(async function() {
-                                            let err = await createRegistry(url, `${username}:${token}`)
-                                            if(err) return err
-                                            await getRegistries()
-                                        }).catch(function (err) {
-                                            if (err.inner.length > 0) {
-                                                return err.inner[0].message
-                                            }
-                                        });
-                                }
-                            }, !isButtonDisabled)
-                        ]}
                         actionButtons={[
                             ButtonDefinition("Add", async() => {
-                                if (!isButtonDisabled) {
-                                    return registriesValidationSchema.validate({url: url, username: username, token: token}, { abortEarly: false })
-                                        .then(function() {
-                                            const err = createRegistry(url, `${username}:${token}`);
-                                            if (err) {
-                                                return err
-                                            }
-                                            getRegistries()
-                                        }).catch(function (err) {
-                                            if (err.inner.length > 0) {
-                                                return err.inner[0].message
-                                            }
-                                        });
+                                try {
+                                    await createRegistry(url, `${username}:${token}`);
+                                } catch(err) {
+                                    return err
                                 }
                             }, `small ${isButtonDisabled ? "disabled": "blue"}`, true, false),
                             ButtonDefinition("Test Connection", async () => {
-                                if (!isButtonDisabled) {
-                                    setTestConnLoading(true)
-                                    let err = await TestRegistry(url, username, token)
-                                    if (err) {
-                                        setTestConnLoading(false)
-                                        setSuccessFeedback(false)
-                                        return err
-                                    }
+                                setTestConnLoading(true)
+                                let err = await TestRegistry(url, username, token)
+                                if (err) {
                                     setTestConnLoading(false)
-                                    setSuccessFeedback(true)
+                                    setSuccessFeedback(false)
+                                    return {message: err}
                                 }
-                            }, `small ${isButtonDisabled ? "disabled": testConnBtnClasses}`, false, false),
+                                setTestConnLoading(false)
+                                setSuccessFeedback(true)
+                            }, `small ${isButtonDisabled ? "disabled": testConnBtnClasses}`, false, true),
                             ButtonDefinition("Cancel", () => {
                             }, "small light", true, false)
                         ]}

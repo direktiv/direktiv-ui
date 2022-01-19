@@ -58,7 +58,6 @@ export default function GlobalRevisionsPanel(props){
         return <></>
     }
 
-
     return(
         <FlexBox className="gap wrap" style={{paddingRight:"8px"}}>
             <FlexBox  className="gap">
@@ -83,40 +82,15 @@ export default function GlobalRevisionsPanel(props){
                                 }}
                                 button={(
                                     <AddValueButton  label=" " />
-                                )}  
-                                keyDownActions={[
-                                    KeyDownDefinition("Enter", async () => {
-                                        if (!isButtonDisabled) {
-                                            return revisionValidationSchema
-                                                .validate({ image: image }, { abortEarly: false })
-                                                .then(async function() {
-                                                    let err = await createGlobalServiceRevision(image, parseInt(scale), parseInt(size), cmd, parseInt(trafficPercent))
-                                                    if (err) return err
-                                                }).catch(function (err) {
-                                                    if (err.inner.length > 0) {
-                                                        return err.inner[0].message
-                                                    }
-                                                });
-
-                                        }
-                                    }, !isButtonDisabled)
-                                ]}
+                                )}
                                 actionButtons={[
                                     ButtonDefinition("Add", async () => {
-                                        if (!isButtonDisabled) {
-                                            return revisionValidationSchema
-                                                .validate({ image: image }, { abortEarly: false })
-                                                .then(async function() {
-                                                    let err = await createGlobalServiceRevision(image, parseInt(scale), parseInt(size), cmd, parseInt(trafficPercent))
-                                                    if (err) return err
-                                                }).catch(function (err) {
-                                                    if (err.inner.length > 0) {
-                                                        return err.inner[0].message
-                                                    }
-                                                });
-
+                                        try {
+                                            await createGlobalServiceRevision(image, parseInt(scale), parseInt(size), cmd, parseInt(trafficPercent))
+                                        } catch(err) {
+                                            return err
                                         }
-                                    }, `small ${isButtonDisabled ? "disabled": "blue"}`, true, false),
+                                    }, `small ${isButtonDisabled ? "disabled": "blue"}`, true, true),
                                     ButtonDefinition("Cancel", () => {
                                     }, "small light", true, false)
                                 ]}

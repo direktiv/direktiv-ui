@@ -67,44 +67,16 @@ function SecretsPanel(props){
                         
                         button={(
                             <AddValueButton label=" " />
-                        )}  
-                        
-                        keyDownActions={[
-                            KeyDownDefinition("Enter", async () => {
-                                if (!isButtonDisabled) {
-                                    return secretValidationSchema.validate({secretKey: keyValue, secretValue: vValue}, { abortEarly: false })
-                                        .then(function() {
-                                            const err = createSecret(keyValue, vValue)
-                                            if (err) {
-                                                return err
-                                            }
-                                            getSecrets()
-                                        }).catch(function (err) {
-                                            if (err.inner.length > 0) {
-                                                return err.inner[0].message
-                                            }
-                                        });
-                                }
-                            }, !isButtonDisabled)
-                        ]}
-                        
+                        )}
                         actionButtons={[
                             ButtonDefinition("Add", async () => {
-                                if (!isButtonDisabled) {
-                                    return secretValidationSchema.validate({secretKey: keyValue, secretValue: vValue}, { abortEarly: false })
-                                        .then(function() {
-                                            const err = createSecret(keyValue, vValue)
-                                            if (err) {
-                                                return err
-                                            }
-                                            getSecrets()
-                                        }).catch(function (err) {
-                                            if (err.inner.length > 0) {
-                                                return err.inner[0].message
-                                            }
-                                        });
+                                try {
+                                    await createSecret(keyValue, vValue)
+                                    getSecrets()
+                                } catch(err) {
+                                    return err
                                 }
-                            }, `small ${isButtonDisabled ? "disabled": "blue"}`, true, false),
+                            }, `small ${isButtonDisabled ? "disabled": "blue"}`, true, true),
                             ButtonDefinition("Cancel", () => {
                             }, "small light", true, false)
                         ]}
@@ -252,7 +224,7 @@ function AddSecretPanel(props) {
 
     return (
         <FlexBox className="col gap" style={{fontSize: "12px"}}>
-            <FlexBox className="gap" style={{margin: "-12px 0 -9px 0"}}>
+            <FlexBox className="gap" style={{margin: "-8px 0 -6px 0"}}>
                 Secret Key
                 <span className="required-label">*</span>
             </FlexBox>

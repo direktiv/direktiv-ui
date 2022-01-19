@@ -61,27 +61,16 @@ export function GlobalRegistries(){
                             setToken("")
                             setUsername("")
                         }}
-                        keyDownActions={[
-                            KeyDownDefinition("Enter", async () => {
-                                try { 
-                                    await createRegistry(url, `${username}:${token}`)
-                                    await  getRegistries()
-                                } catch(err) {
-                                    await  getRegistries()
-                                    return err
-                                }
-                            }, true)
-                        ]}
                         actionButtons={[
                             ButtonDefinition("Add", async() => {
-                                try { 
+                                try {
                                     await createRegistry(url, `${username}:${token}`)
-                                    await  getRegistries()
+                                    await getRegistries()
                                 } catch(err) {
-                                    await  getRegistries()
+                                    await getRegistries()
                                     return err
                                 }
-                            }, "small blue", true, false),
+                            }, "small blue", true, true),
                             ButtonDefinition("Cancel", () => {
                             }, "small light", true, false)
                         ]}

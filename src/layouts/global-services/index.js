@@ -22,17 +22,16 @@ export default function GlobalServicesPanel(props) {
     const [isButtonDisabled, setIsButtonDisabled] = useState(false)
 
     const serviceValidationSchema = yup.object().shape({
-        serviceName: yup.string().required("Name field is required"),
-        image: yup.string().required("Image field is required")
+        serviceName: yup.string().required(),
+        image: yup.string().required()
     })
-    let formData = {
-        serviceName: serviceName,
-        image: image
-    }
 
-    useEffect(async () => {
-        await serviceValidationSchema.isValid(formData).then((result) => setIsButtonDisabled(!result));
-    })
+    useEffect(() => {
+
+        serviceValidationSchema.isValid({ serviceName: serviceName, image: image })
+            .then((result) => setIsButtonDisabled(!result))
+
+    },[serviceValidationSchema, image, serviceName])
 
     useEffect(()=>{
         async function getcfg() {
@@ -83,24 +82,15 @@ export default function GlobalServicesPanel(props) {
                         }}
                         button={(
                             <AddValueButton  label=" " />
-                        )}  
-                        keyDownActions={[
-                            KeyDownDefinition("Enter", async () => {
-                            }, true)
-                        ]}
+                        )}
                         actionButtons={[
                             ButtonDefinition("Add", async () => {
-                                if (!isButtonDisabled) {
-                                    return serviceValidationSchema.validate(formData, { abortEarly: false })
-                                        .then(function() {
-                                            createGlobalService(serviceName, image, parseInt(scale), parseInt(size), cmd)
-                                        }).catch(function (err) {
-                                            if (err.inner.length > 0) {
-                                                return err.inner[0].message
-                                            }
-                                        });
+                                try {
+                                    await createGlobalService(serviceName, image, parseInt(scale), parseInt(size), cmd)
+                                } catch(err) {
+                                    return err
                                 }
-                            }, `small ${isButtonDisabled ? "disabled": "blue"}`, true, false),
+                            }, `small ${isButtonDisabled ? "disabled": "blue"}`, true, true),
                             ButtonDefinition("Cancel", () => {
                             }, "small light", true, false)
                         ]}

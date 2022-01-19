@@ -54,6 +54,7 @@ function VariablesPanel(props){
             uploadValidationSchema.isValid({ uploadVariableName: keyValue, file: file })
                 .then((result) => setIsUploadButtonDisabled(!result))
         }
+
     },[manualValidationSchema, uploadValidationSchema, keyValue, dValue, file, currentTab])
 
     const {data, err, setNamespaceVariable, getNamespaceVariable, deleteNamespaceVariable} = useNamespaceVariables(Config.url, true, namespace, localStorage.getItem("apikey"))
@@ -70,40 +71,26 @@ function VariablesPanel(props){
 
     const manualActionButtons = [
         ButtonDefinition("Add", async () => {
-            if (!isManualButtonDisabled) {
-                return manualValidationSchema.validate({ manualVariableName: keyValue, data: dValue }, { abortEarly: false })
-                    .then(async function() {
-                        setUploading(true)
-                        let err = await setNamespaceVariable(keyValue, file, mimeType)
-                        if (err) {
-                            setUploading(false)
-                            return err
-                        }
-                    }).catch(function (err) {
-                        if (err.inner.length > 0) {
-                            return err.inner[0].message
-                        }
-                    });
+            try {
+                setUploading(true)
+                await setNamespaceVariable(keyValue, file, mimeType)
+            } catch(err) {
+                setUploading(false)
+                return err
             }
-        }, `small ${isManualButtonDisabled ? "disabled" : uploadingBtn}`, true, false),
+        }, `small ${isManualButtonDisabled ? "disabled" : uploadingBtn}`, true, true),
         ButtonDefinition("Cancel", () => {
         }, "small light", true, false)
     ];
 
     const uploadActionButtons = [
         ButtonDefinition("Add", async () => {
-            if (!isUploadButtonDisabled) {
-                return uploadValidationSchema.validate({ uploadVariableName: keyValue, file: file }, { abortEarly: false })
-                    .then(async function() {
-                        let err = await setNamespaceVariable(keyValue, dValue, mimeType)
-                        if (err) return err
-                    }).catch(function (err) {
-                        if (err.inner.length > 0) {
-                            return err.inner[0].message
-                        }
-                    });
+            try {
+                await setNamespaceVariable(keyValue, dValue, mimeType)
+            } catch(err) {
+                return err
             }
-        }, `small ${isUploadButtonDisabled ? "disabled" : uploadingBtn}`, true, false),
+        }, `small ${isUploadButtonDisabled ? "disabled" : uploadingBtn}`, true, true),
         ButtonDefinition("Cancel", () => {
         }, "small light", true, false)
     ];
@@ -257,7 +244,7 @@ function AddVariablePanel(props) {
                 </FlexBox>
             ),(
                 <FlexBox id="file-picker" className="col gap" style={{fontSize: "12px"}}>
-                    <FlexBox className="gap" style={{display: "flex", alignItems: "center", margin: "0 0 5px 0", fontSize: "12px", fontWeight: "bold", maxHeight: "20px"}}>
+                    <FlexBox className="gap" style={{display: "flex", alignItems: "center", margin: "0 0 4px 0", fontSize: "12px", fontWeight: "bold", maxHeight: "20px"}}>
                         Name
                         <span className="required-label">*</span>
                     </FlexBox>
@@ -279,10 +266,6 @@ function AddVariablePanel(props) {
 
 function Variables(props) {
     const {variables, namespace, getNamespaceVariable, setNamespaceVariable, deleteNamespaceVariable} = props
-
- 
-    
-
 
     return(
         <FlexBox>
@@ -386,7 +369,7 @@ function Variable(props) {
                                 } catch(err) {
                                     return err
                                 }
-                            }, "small blue", true, false),
+                            }, "small blue", true, true),
                             ButtonDefinition("Cancel", () => {
                             }, "small light", true, false)
                         ]

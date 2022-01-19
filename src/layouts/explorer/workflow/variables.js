@@ -72,20 +72,12 @@ function AddWorkflowVariablePanel(props) {
 
     const manualActionButtons = [
         ButtonDefinition("Add", async () => {
-            if (!isManualButtonDisabled) {
-                return manualValidationSchema.validate({ manualVariableName: keyValue, data: dValue }, { abortEarly: false })
-                    .then(async function() {
-                        setUploading(true)
-                        let err = await setWorkflowVariable(keyValue, file, mimeType)
-                        if (err) {
-                            setUploading(false)
-                            return err
-                        }
-                    }).catch(function (err) {
-                        if (err.inner.length > 0) {
-                            return err.inner[0].message
-                        }
-                    });
+            try {
+                setUploading(true)
+                await setWorkflowVariable(keyValue, file, mimeType)
+            } catch(err) {
+                setUploading(false)
+                return err
             }
         }, `small ${isManualButtonDisabled ? "disabled" : uploadingBtn}`, true, false),
         ButtonDefinition("Cancel", () => {
@@ -94,16 +86,11 @@ function AddWorkflowVariablePanel(props) {
 
     const uploadActionButtons = [
         ButtonDefinition("Add", async () => {
-            if (!isUploadButtonDisabled) {
-                return uploadValidationSchema.validate({ uploadVariableName: keyValue, file: file }, { abortEarly: false })
-                    .then(async function() {
-                        let err = await setWorkflowVariable(keyValue, dValue, mimeType)
-                        if (err) return err
-                    }).catch(function (err) {
-                        if (err.inner.length > 0) {
-                            return err.inner[0].message
-                        }
-                    });
+            try {
+                await setWorkflowVariable(keyValue, dValue, mimeType)
+            } catch(err) {
+                setUploading(false)
+                return err
             }
         }, `small ${isUploadButtonDisabled ? "disabled" : uploadingBtn}`, true, false),
         ButtonDefinition("Cancel", () => {
@@ -225,7 +212,7 @@ function AddVariablePanel(props) {
                 </FlexBox>
             ),(
                 <FlexBox id="file-picker" className="col gap" style={{fontSize: "12px"}}>
-                    <FlexBox className="gap" style={{display: "flex", alignItems: "center", margin: "0 0 5px 0", fontSize: "12px", fontWeight: "bold", maxHeight: "20px"}}>
+                    <FlexBox className="gap" style={{display: "flex", alignItems: "center", margin: "0 0 3px 0", fontSize: "12px", fontWeight: "bold", maxHeight: "20px"}}>
                         Name
                         <span className="required-label">*</span>
                     </FlexBox>
@@ -426,25 +413,15 @@ function Variable(props) {
                     actionButtons={
                         [
                             ButtonDefinition("Upload", async () => {
-                                if (!isButtonDisabled) {
-                                    return variableValidationSchema
-                                        .validate({ variableData: file }, { abortEarly: false })
-                                        .then(async function() {
-                                            setUploading(true)
-                                            let err = await setWorkflowVariable(obj.node.name, file, mimeType)
-                                            if (err) {
-                                                setUploading(false)
-                                                return err
-                                            }
-                                            setUploading(false)
-                                        }).catch(function (err) {
-                                            if (err.inner.length > 0) {
-                                                return err.inner[0].message
-                                            }
-                                        });
-
+                                try {
+                                    setUploading(true)
+                                    await setWorkflowVariable(obj.node.name, file, mimeType)
+                                    setUploading(false)
+                                } catch(err) {
+                                    setUploading(false)
+                                    return err
                                 }
-                            }, `small ${isButtonDisabled ? "disabled": uploadingBtn}`, true, false),
+                            }, `small ${isButtonDisabled ? "disabled": uploadingBtn}`, true, true),
                             ButtonDefinition("Cancel", () => {
                             }, "small light", true, false)
                         ]

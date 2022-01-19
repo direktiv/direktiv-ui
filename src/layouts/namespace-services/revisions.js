@@ -30,7 +30,7 @@ export function RevisionCreatePanel(props){
 
     return(
         <FlexBox className="col gap" style={{fontSize: "12px"}}>
-            <FlexBox className="gap" style={{margin: "-11px 0 -9px 0"}}>
+            <FlexBox className="gap" style={{margin: "-12px 0 -9px 0"}}>
                 Image
                 <span className="required-label">*</span>
             </FlexBox>
@@ -43,18 +43,18 @@ export function RevisionCreatePanel(props){
             <FlexBox className="gap" style={{paddingRight:"10px"}}>
                 <input type="range" style={{paddingLeft:"0px"}} min={"0"} max={maxscale.toString()} value={scale.toString()} onChange={(e)=>setScale(e.target.value)} />
             </FlexBox>
-            <FlexBox className="gap" style={{margin: "-8px 0 -10px 0"}}>
+            <FlexBox className="gap" style={{margin: "-6px 0 -10px 0"}}>
                 Size
             </FlexBox>
             <FlexBox className="gap" style={{paddingRight:"10px"}}>
                 <input list="sizeMarks"  type="range" min={"0"} value={size.toString()}  max={"2"} onChange={(e)=>setSize(e.target.value)}/>
             </FlexBox>
-                <datalist  id="sizeMarks">
+                <datalist id="sizeMarks">
                     <option style={{flex:"auto", textAlign:"left", lineHeight:"10px"}} value="0" label="small"/>
                     <option style={{flex:"auto", textAlign:"center" , lineHeight:"10px"}} value="1" label="medium"/>
                     <option style={{flex:"auto", textAlign:"right", lineHeight:"10px" }} value="2" label="large"/>
                 </datalist>
-            <FlexBox className="gap" style={{margin: "-8px 0 -10px 0"}}>
+            <FlexBox className="gap" style={{margin: "-6px 0 -8px 0"}}>
                 CMD
             </FlexBox>
             <FlexBox className="gap" style={{paddingRight:"10px"}}>
@@ -129,7 +129,7 @@ function NamespaceRevisions(props) {
                             Service '{service}' Revisions
                         </FlexBox>
                         <div>
-                            <Modal title={`New '${service}' revision`} 
+                            <Modal title={`New '${service}' revision`}
                                 escapeToCancel
                                 modalStyle={{
                                     maxWidth: "300px"
@@ -140,38 +140,13 @@ function NamespaceRevisions(props) {
                                 }}
                                 button={(
                                     <AddValueButton  label=" " />
-                                )}  
-                                keyDownActions={[
-                                    KeyDownDefinition("Enter", async () => {
-                                        if (!isButtonDisabled) {
-                                            return revisionValidationSchema
-                                                .validate({ image: image }, { abortEarly: false })
-                                                .then(async function() {
-                                                    let err = await createNamespaceServiceRevision(image, parseInt(scale), parseInt(size), cmd, parseInt(trafficPercent))
-                                                    if (err) return err
-                                                }).catch(function (err) {
-                                                    if (err.inner.length > 0) {
-                                                        return err.inner[0].message
-                                                    }
-                                                });
-
-                                        }
-                                    }, !isButtonDisabled)
-                                ]}
+                                )}
                                 actionButtons={[
                                     ButtonDefinition("Add", async () => {
-                                        if (!isButtonDisabled) {
-                                            return revisionValidationSchema
-                                                .validate({ image: image }, { abortEarly: false })
-                                                .then(async function() {
-                                                    let err = await createNamespaceServiceRevision(image, parseInt(scale), parseInt(size), cmd, parseInt(trafficPercent))
-                                                    if (err) return err
-                                                }).catch(function (err) {
-                                                    if (err.inner.length > 0) {
-                                                        return err.inner[0].message
-                                                    }
-                                                });
-
+                                        try {
+                                            await createNamespaceServiceRevision(image, parseInt(scale), parseInt(size), cmd, parseInt(trafficPercent))
+                                        } catch(err) {
+                                            return err
                                         }
                                     }, `small ${isButtonDisabled ? "disabled": "blue"}`, true, false),
                                     ButtonDefinition("Cancel", () => {
