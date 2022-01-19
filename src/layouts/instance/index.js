@@ -19,6 +19,7 @@ import DirektivEditor from '../../components/editor';
 import WorkflowDiagram from '../../components/diagram';
 import { HiOutlineArrowsExpand } from 'react-icons/hi';
 import Modal, { ButtonDefinition } from '../../components/modal';
+import Alert from '../../components/alert';
 
 function InstancePageWrapper(props) {
 
@@ -132,7 +133,7 @@ function InstancePage(props) {
                                         </ContentPanelHeaderButton>
                                     )}
                                     actionButtons={[
-                                        ButtonDefinition("Close", () => {}, "small light", true, false)
+                                        ButtonDefinition("Close", () => {}, "small light", ()=>{}, true, false)
                                     ]}
                                 >
                                     <InstanceLogs setClipData={setClipData} clipData={clipData} noPadding namespace={namespace} instanceID={instanceID} follow={follow} setFollow={setFollow} width={width}/>
@@ -176,7 +177,7 @@ function InstancePage(props) {
                                     </ContentPanelHeaderButton>
                                 )}
                                 actionButtons={[
-                                    ButtonDefinition("Close", () => {}, "small light", true, false)
+                                    ButtonDefinition("Close", () => {}, "small light", ()=>{}, true, false)
                                 ]}
                             >
                                 <Input getInput={getInput}/>
@@ -239,7 +240,7 @@ function InstancePage(props) {
                                     </ContentPanelHeaderButton>
                                 )}
                                 actionButtons={[
-                                    ButtonDefinition("Close", () => {}, "small light", true, false)
+                                    ButtonDefinition("Close", () => {}, "small light", ()=>{}, true, false)
                                 ]}
                             >
                                 <Output getOutput={getOutput} status={data.status}/>
@@ -293,7 +294,7 @@ function InstanceLogs(props) {
     )
 }
 
-function TerminalButton(props) {
+export function TerminalButton(props) {
 
     let {children, onClick} = props;
     return (
@@ -346,26 +347,25 @@ function Input(props) {
 
     useEffect(()=>{
         async function get() {
-            if(input === "") {
                 let data = await getInput()
-                if(data === "") {
-                    data = "No input data was provided..."
-                }
                 setInput(data)
-            }
         }
         get()
     },[input, getInput])
 
     return(
-        <FlexBox style={{overflow: "hidden"}}>
-            {/* <div style={{width: "100%", height: "100%"}}> */}
-            <AutoSizer>
-                {({height, width})=>(
-                    <DirektivEditor height={height} width={width} dlang="json" value={input} readonly={true}/>
-                )}
-            </AutoSizer>
-            {/* </div> */}
+        <FlexBox style={{flexDirection:"column"}}>
+            {!input ? 
+            <Alert className="instance-input-banner">No input data was provided</Alert> : null}
+            <FlexBox style={{overflow: "hidden"}}>
+                {/* <div style={{width: "100%", height: "100%"}}> */}
+                    <AutoSizer>
+                        {({height, width})=>(
+                            <DirektivEditor height={height} width={width} dlang="json" value={input} readonly={true}/>
+                        )}
+                    </AutoSizer>
+                {/* </div> */}
+            </FlexBox>
         </FlexBox>
     )
 }

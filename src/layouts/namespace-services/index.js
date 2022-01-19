@@ -156,7 +156,7 @@ function NamespaceServices(props) {
                             }
                         }, `small ${isButtonDisabled ? "disabled": "blue"}`, true, false),
                         ButtonDefinition("Cancel", () => {
-                        }, "small light", true, false)
+                        }, "small light", ()=>{}, true, false)
                     ]}
                 >
                     {config !== null ? 
@@ -244,22 +244,14 @@ export function Service(props) {
                         actionButtons={[
                             ButtonDefinition("Delete", async () => {
                                 if(revision !== undefined) {
-                                    try { 
-                                        await deleteService(revision)
-                                    } catch(err) {
-                                        return err
-                                    }
+                                    await deleteService(revision)
                                 }else {
-                                    try { 
-                                        await deleteService(name)
-                                    } catch(err) {
-                                        return err
-                                    }
+                                    await deleteService(name)
                                 }
                              
-                            }, "small red", true, false),
+                            }, "small red", ()=>{}, true, false),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light", true, false)
+                            }, "small light", ()=>{}, true, false)
                         ]}
                     >
                         <FlexBox className="col gap">
@@ -292,11 +284,11 @@ function ServiceDetails(props) {
             {conditions.map((obj)=>{
                 if(obj.name === 'Active' && obj.reason === 'NoTraffic' && obj.message === "The target is not receiving traffic."){
                     return(
-                        <Condition status={"True"} name={obj.name} reason={""} message={""} />
+                        <Condition key={GenerateRandomKey('service-condition-')} status={"True"} name={obj.name} reason={""} message={""} />
                     )
                 }
                 return(
-                    <Condition status={obj.status} name={obj.name} reason={obj.reason} message={obj.message}/>
+                    <Condition key={GenerateRandomKey('service-condition-')} status={obj.status} name={obj.name} reason={obj.reason} message={obj.message}/>
                 )
             })}
 

@@ -115,7 +115,7 @@ function NewNamespaceBtn(props) {
                    }, `small ${isButtonDisabled ? "disabled": "blue"}`, true, true),
                    ButtonDefinition("Cancel", () => {
                        setNs("")
-                   }, "small light", true, false)
+                   }, "small light", ()=>{}, true, false)
                ]}
         >
             <FlexBox className="col gap" style={{paddingRight:"10px"}}>

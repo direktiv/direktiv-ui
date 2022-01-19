@@ -92,7 +92,7 @@ export default function GlobalServicesPanel(props) {
                                 }
                             }, `small ${isButtonDisabled ? "disabled": "blue"}`, true, true),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light", true, false)
+                            }, "small light", ()=>{}, true, false)
                         ]}
                     >
                         {config !== null ? 
@@ -122,8 +122,9 @@ export default function GlobalServicesPanel(props) {
                                 data.map((obj)=>{
                                     return(
                                         <Service 
+                                            key={GenerateRandomKey('global-service-')}
                                             url={`/g/services/${obj.info.name}`} 
-                                            deleteService={deleteGlobalService} 
+                                            deleteService={deleteGlobalService}
                                             conditions={obj.conditions} 
                                             name={obj.info.name} 
                                             status={obj.status} 

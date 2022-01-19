@@ -11,7 +11,7 @@ import DirektivEditor from '../../../components/editor';
 import FlexBox from '../../../components/flexbox';
 import Modal, { ButtonDefinition } from '../../../components/modal';
 import Tabs from '../../../components/tabs';
-import { Config } from '../../../util';
+import { Config, CanPreviewMimeType } from '../../../util';
 import { VariableFilePicker } from '../../settings/variables-panel';
 import { AutoSizer } from 'react-virtualized';
 import * as yup from "yup";
@@ -334,25 +334,29 @@ function Variable(props) {
                     actionButtons={
                         [
                             ButtonDefinition("Save", async () => {
-                                try { 
-                                    await setWorkflowVariable(obj.node.name, val , mimeType)
-                                } catch(err) {
-                                    return err
-                                }
-                            }, "small blue", true, false),
+                                await setWorkflowVariable(obj.node.name, val , mimeType)
+                            }, "small blue", ()=>{}, true, false),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light", true, false)
+                            }, "small light", ()=>{}, true, false)
                         ]
                     } 
                 >
                     <FlexBox className="col gap" style={{fontSize: "12px", width: "580px", minHeight: "500px"}}>
                         <FlexBox className="gap" style={{flexGrow: 1}}>
                             <FlexBox style={{overflow:"hidden"}}>
+                            {CanPreviewMimeType(mimeType) ?   
                             <AutoSizer>
                                 {({height, width})=>(
                                 <DirektivEditor dlang={lang} width={width} dvalue={val} setDValue={setValue} height={height}/>
                                 )}
                             </AutoSizer>
+                            :
+                            <div style={{width: "100%", display:"flex", justifyContent: "center", alignItems:"center"}}>
+                                <p style={{fontSize:"11pt"}}>
+                                    Cannot preview variable with mime-type: {mimeType}
+                                </p>
+                            </div>
+                            }
                             </FlexBox>
                         </FlexBox>
                         <FlexBox className="gap" style={{flexGrow: 0, flexShrink: 1}}>
@@ -423,7 +427,7 @@ function Variable(props) {
                                 }
                             }, `small ${isButtonDisabled ? "disabled": uploadingBtn}`, true, true),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light", true, false)
+                            }, "small light",()=>{}, true, false)
                         ]
                     } 
                 >
@@ -447,14 +451,10 @@ function Variable(props) {
                     actionButtons={
                         [
                             ButtonDefinition("Delete", async () => {
-                                try { 
                                     await deleteWorkflowVariable(obj.node.name)
-                                } catch(err) {
-                                    return err
-                                }
-                            }, "small red", true, false),
+                            }, "small red", ()=>{}, true, false),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light", true, false)
+                            }, "small light", ()=>{}, true, false)
                         ]
                     } 
                 >

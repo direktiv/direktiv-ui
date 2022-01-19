@@ -25,6 +25,7 @@ function RevisionTab(props) {
     const {searchParams, setSearchParams, revision, setRevision, getWorkflowRevisionData, getWorkflowSankeyMetrics, executeWorkflow, namespace} = props
     const [load, setLoad] = useState(true)
     const [workflow, setWorkflowData] = useState(null)
+    const [revisionID, setRevisionID] = useState(null)
     const [tabBtn, setTabBtn] = useState(searchParams.get('revtab') !== null ? parseInt(searchParams.get('revtab')): 0);
     const [input, setInput] = useState("{\n\t\n}")
 
@@ -43,6 +44,7 @@ function RevisionTab(props) {
             if(load && searchParams.get('revtab') !== null) {
                 let wfdata = await getWorkflowRevisionData(revision)
                 setWorkflowData(atob(wfdata.revision.source))
+                setRevisionID(wfdata.revision.name)
                 setLoad(false)
             }
         }
@@ -72,7 +74,7 @@ function RevisionTab(props) {
                             <BsCodeSquare />
                         </ContentPanelTitleIcon>
                         <div>
-                        {revision}
+                        {revision === revisionID ? revision : `${revision} => ${revisionID}`}
                         </div>
                         <TabbedButtons revision={revision} setSearchParams={setSearchParams} searchParams={searchParams} tabBtn={tabBtn} setTabBtn={setTabBtn} />
                     </ContentPanelTitle>
@@ -104,13 +106,13 @@ function RevisionTab(props) {
                                                     }
                                                     if(r.includes("execute workflow")){
                                                         // is an error
-                                                        return r
+                                                        throw new Error(r)
                                                     } else {
                                                         navigate(`/n/${namespace}/instances/${r}`)
                                                     }
-                                                }, "small blue", true, false),
+                                                }, "small blue", ()=>{}, true, false),
                                                 ButtonDefinition("Cancel", async () => {
-                                                }, "small light", true, false)
+                                                }, "small light", ()=>{}, true, false)
                                             ]}
                                             button={(
                                                 <div style={{alignItems:"center", gap:"3px",backgroundColor:"#355166", paddingTop:"3px", paddingBottom:"3px", paddingLeft:"6px", paddingRight:"6px", cursor:"pointer", borderRadius:"3px"}}>
@@ -143,7 +145,7 @@ function RevisionTab(props) {
 
 export default RevisionTab;
 
-function TabbedButtons(props) {
+export function TabbedButtons(props) {
 
     let {tabBtn, setTabBtn, searchParams, setSearchParams, revision} = props;
 
@@ -314,9 +316,9 @@ export function RevisionSelectorTab(props) {
                                                         Traffic amount
                                                     </div>
                                                     <div style={{width:'100%'}}>
-                                                        <Slider defaultValue={router.routes[0].weight} className="traffic-mini-distribution" disabled={true}/>
+                                                        <Slider defaultValue={router.routes.length === 2 ? router.routes[0].weight: 100} className="traffic-mini-distribution" disabled={true}/>
                                                         <div>
-                                                           {router.routes[0].weight}%
+                                                            {router.routes.length === 2 ? `${router.routes[0].weight}%`: "100%" }
                                                         </div>
                                                     </div>
                                                 </FlexBox>
@@ -377,7 +379,7 @@ export function RevisionSelectorTab(props) {
                                     }}>
                                         
                                     </FlexBox> */}
-                                    <div>
+                                    <div style={obj.node.name === "latest" ? {visibility: "hidden"} : null}>
                                         <FlexBox className="gap">
                                             {tags !== null && tags[obj.node.name] ? 
                                                 <Modal
@@ -394,17 +396,12 @@ export function RevisionSelectorTab(props) {
                                                     actionButtons={
                                                         [
                                                             ButtonDefinition("Remove", async () => {
-                                                                try {
-                                                                    await removeTag(obj.node.name)
-                                                                    setRevisions(await getRevisions())
-                                                                    updateTags(await getTags())
-                                                                } catch(e) {
-                                                                    return e.message
-                                                                }
-
-                                                            }, "small red", true, false),
+                                                                await removeTag(obj.node.name)
+                                                                setRevisions(await getRevisions())
+                                                                updateTags(await getTags())
+                                                            }, "small red", ()=>{}, true, false),
                                                             ButtonDefinition("Cancel", () => {
-                                                            }, "small light", true, false)
+                                                            }, "small light", ()=>{}, true, false)
                                                         ]
                                                     }
                                                 >
@@ -429,15 +426,12 @@ export function RevisionSelectorTab(props) {
                                                     actionButtons={
                                                         [
                                                             ButtonDefinition("Delete", async () => {
-                                                                try { 
                                                                     await deleteRevision(obj.node.name)
                                                                     setRevisions(await getRevisions())
-                                                                } catch(err) {
-                                                                    return err
-                                                                }
-                                                            }, "small red", true, false),
+                                                                    setRouter(await getWorkflowRouter())
+                                                            }, "small red", ()=>{}, true, false),
                                                             ButtonDefinition("Cancel", () => {
-                                                            }, "small light", true, false)
+                                                            }, "small light", ()=>{}, true, false)
                                                         ]
                                                     }
                                                 >
@@ -472,7 +466,7 @@ export function RevisionSelectorTab(props) {
                                                 Revert To
                                             </Button>
                                             </div>
-                                            <div style={{visibility:"hidden"}}>
+                                            <div>
                                             <Button className="small light bold" onClick={()=>{
                                                 setSearchParams({tab: 1, revision: obj.node.name})
                                             }}>
@@ -531,7 +525,6 @@ function TagRevisionBtn(props) {
             actionButtons={
                 [
                     ButtonDefinition("Tag", async () => {
-                        try {
                             await tagWorkflow(obj.node.name, tag)
                             setRevisions(await getRevisions())
                             updateTags(await getTags())
@@ -540,7 +533,7 @@ function TagRevisionBtn(props) {
                         }
                     }, `small ${isButtonDisabled ? "disabled": "blue"}`, true, true),
                     ButtonDefinition("Cancel", () => {
-                    }, "small light", true, false)
+                    }, "small light", ()=>{}, true, false)
                 ]
             } 
         >
@@ -563,10 +556,22 @@ export function RevisionTrafficShaper(props) {
     const [traffic, setTraffic] = useState(router.routes.length === 0 ? 100 : 0)
 
     useEffect(()=>{
+
+        if (router.routes[0]){
+            setRev1(router.routes[0].ref)
+            setTraffic(router.routes[1] ? router.routes[0].weight: 100)
+        }
+
+        if(router.routes[1]){
+            setRev2(router.routes[1].ref)
+        } else {setRev2("")}
+    },[router, setRev1, setRev2])
+
+    useEffect(()=>{
         if(load){
             if (router.routes[0]){
                 setRev1(router.routes[0].ref)
-                setTraffic(router.routes[0].weight)
+                setTraffic(router.routes[1] ? router.routes[0].weight: 100)
             }
 
             if(router.routes[1]){
@@ -739,7 +744,7 @@ export function RevisionTrafficShaper(props) {
                         }
                         await editWorkflowRouter(arr, router.live)
                         setRouter(await getWorkflowRouter())
-                    }} className="small">
+                    }} className={`small ${rev2 && rev1 ? "" : "disabled"}`}>
                         Save
                     </Button>
                 </FlexBox>

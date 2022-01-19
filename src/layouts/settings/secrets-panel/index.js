@@ -78,7 +78,7 @@ function SecretsPanel(props){
                                 }
                             }, `small ${isButtonDisabled ? "disabled": "blue"}`, true, true),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light", true, false)
+                            }, "small light",()=>{}, true, false)
                         ]}
                     >
                          <Tabs 
@@ -181,16 +181,11 @@ function Secrets(props) {
                                             [
                                                 // label, onClick, classList, closesModal, async
                                                 ButtonDefinition("Delete", async () => {
-                                                    try { 
-                                                        await deleteSecret(obj.node.name)
-                                                        await getSecrets()
-                                                    } catch(err) {
-                                                        await getSecrets()
-                                                        return err
-                                                    }
-                                                }, "small red", true, false),
+                                                    await deleteSecret(obj.node.name)
+                                                    await getSecrets()
+                                                }, "small red",()=>{}, true, false),
                                                 ButtonDefinition("Cancel", () => {
-                                                }, "small light", true, false)
+                                                }, "small light",()=>{}, true, false)
                                             ]
                                         }   
                                     >
@@ -238,9 +233,7 @@ function AddSecretPanel(props) {
                 <span className="required-label">*</span>
             </FlexBox>
             <FlexBox className="gap">
-                <FlexBox style={{overflow:"hidden"}}>
-                    <DirektivEditor dValue={vValue} setDValue={setVValue}  width={600} height={180}/>
-                    </FlexBox>
+                <FlexBox><input type="password"  value={vValue} onChange={(e)=>setVValue(e.target.value)} placeholder="Enter value" /></FlexBox>
             </FlexBox>
         </FlexBox>
     );

@@ -79,12 +79,14 @@ const orderFieldKeys = Object.keys(orderFieldDictionary)
 
 function ExplorerList(props) {
     const {namespace, path} = props
-
+    const navigate= useNavigate()
+    
     const [currPath, setCurrPath] = useState("")
     
     const [directoryName, setDirectoryName] = useState("")
     const [workflowName, setWorkflowName] = useState("")
     const [load, setLoad] = useState(true)
+
     const [orderFieldKey, setOrderFieldKey] = useState(orderFieldKeys[0])
 
     const [wfData, setWfData] = useState("")
@@ -260,7 +262,7 @@ function ExplorerList(props) {
                                         }
                                     }, `small ${isDirectoryButtonDisabled ? "disabled": "blue"}`, true, true),
                                     ButtonDefinition("Cancel", () => {
-                                    }, "small light", true, false)
+                                    }, "small light", ()=>{}, true, false)
                                 ]}
                             >
                                 <FlexBox  className="col gap" style={{fontSize: "12px"}}>
@@ -415,14 +417,10 @@ function DirListItem(props) {
                                     ButtonDefinition("Delete", async () => {
                                         let p = path.split('/', -1);
                                         let pLast = p[p.length-1];
-                                        try { 
-                                            await deleteNode(pLast)
-                                        } catch(err) {
-                                            return err
-                                        }
-                                    }, "small red", true, false),
+                                        await deleteNode(pLast)
+                                    }, "small red", ()=>{}, true, false),
                                     ButtonDefinition("Cancel", () => {
-                                    }, "small light", true, false)
+                                    }, "small light", ()=>{}, true, false)
                                 ]
                             } 
                         >
@@ -516,17 +514,12 @@ function WorkflowListItem(props) {
                                 actionButtons={
                                     [
                                         ButtonDefinition("Delete", async () => {
-                                        let p = path.split('/', -1);
-                                        let pLast = p[p.length-1];
-
-                                        try { 
+                                            let p = path.split('/', -1);
+                                            let pLast = p[p.length-1];
                                             await deleteNode(pLast)
-                                        } catch(err) {
-                                            return err
-                                        }
-                                        }, "small red", true, false),
+                                        }, "small red", ()=>{}, true, false),
                                         ButtonDefinition("Cancel", () => {
-                                        }, "small light", true, false)
+                                        }, "small light", ()=>{}, true, false)
                                     ]
                                 } 
                             >

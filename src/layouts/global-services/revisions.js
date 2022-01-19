@@ -92,7 +92,7 @@ export default function GlobalRevisionsPanel(props){
                                         }
                                     }, `small ${isButtonDisabled ? "disabled": "blue"}`, true, true),
                                     ButtonDefinition("Cancel", () => {
-                                    }, "small light", true, false)
+                                    }, "small light", ()=>{}, true, false)
                                 ]}
                             >
                                 {config !== null ? 
@@ -110,19 +110,24 @@ export default function GlobalRevisionsPanel(props){
                             <ContentPanelBody className="secrets-panel">
                                 <FlexBox className="gap col">
                                     <FlexBox className="col gap">
-                                        {revisions.map((obj)=>{
+                                        {revisions.map((obj, key)=>{
                                             let dontDelete = false
                                             if(revisions.length === 1) {
                                                 dontDelete = true
                                             }
-                                            for(var i=0; i < traffic.length; i++) {
-                                                if(traffic[i].revisionName === obj.name){
-                                                    dontDelete= true
-                                                    break
+                                            let t = 0
+                                            if(traffic && typeof traffic == typeof [])
+                                                for(var i=0; i < traffic.length; i++) {
+                                                    if(traffic[i].revisionName === obj.name){
+                                                        dontDelete= true
+                                                        t= traffic[i].traffic
+                                                        break
+                                                    }
                                                 }
-                                            }
                                             return(
                                                 <Service 
+                                                    traffic={t}
+                                                    key={key}
                                                     dontDelete={dontDelete}
                                                     revision={obj.rev}
                                                     deleteService={deleteGlobalServiceRevision}
@@ -138,7 +143,10 @@ export default function GlobalRevisionsPanel(props){
                             </ContentPanelBody>
                         </ContentPanel>
                     </FlexBox>
-                    <UpdateTraffic setNamespaceServiceRevisionTraffic={setGlobalServiceRevisionTraffic} service={service} revisions={revisions} traffic={traffic}/>
+                    {
+                        traffic &&
+                        <UpdateTraffic setNamespaceServiceRevisionTraffic={setGlobalServiceRevisionTraffic} service={service} revisions={revisions} traffic={traffic}/>
+                    }
                     </FlexBox>
         </FlexBox>
     )

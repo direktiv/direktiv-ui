@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import ContentPanel, {ContentPanelTitle, ContentPanelTitleIcon, ContentPanelBody } from '../../components/content-panel';
-import Modal, { ButtonDefinition, KeyDownDefinition } from '../../components/modal';
+import Modal, { ButtonDefinition } from '../../components/modal';
 import AddValueButton from '../../components/add-button';
 import FlexBox from '../../components/flexbox';
 import Alert from '../../components/alert';
@@ -72,7 +72,7 @@ export function GlobalRegistries(){
                                 }
                             }, "small blue", true, true),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light", true, false)
+                            }, "small light", ()=>{},true, false)
                         ]}
                     >
                         <AddRegistryPanel token={token} setToken={setToken} username={username} setUsername={setUsername} url={url} setURL={setURL}/>    
@@ -144,41 +144,17 @@ export function GlobalPrivateRegistries(){
                             setToken("")
                             setUsername("")
                         }}
-                        keyDownActions={[
-                            KeyDownDefinition("Enter", async () => {
-                                if (!isButtonDisabled) {
-                                    return registryValidationSchema
-                                        .validate({ url: url, username: username, token: token }, { abortEarly: false })
-                                        .then(async function() {
-                                            let err = await createRegistry(url, `${username}:${token}`)
-                                            if(err) return err
-                                            await getRegistries()
-                                        }).catch(function (err) {
-                                            if (err.inner.length > 0) {
-                                                return err.inner[0].message
-                                            }
-                                        });
-                                }
-                            }, !isButtonDisabled)
-                        ]}
                         actionButtons={[
                             ButtonDefinition("Add", async() => {
-                                if (!isButtonDisabled) {
-                                    return registryValidationSchema
-                                        .validate({ url: url, username: username, token: token }, { abortEarly: false })
-                                        .then(async function() {
-                                            let err = await createRegistry(url, `${username}:${token}`)
-                                            if(err) return err
-                                            await getRegistries()
-                                        }).catch(function (err) {
-                                            if (err.inner.length > 0) {
-                                                return err.inner[0].message
-                                            }
-                                        });
+                                try {
+                                    await createRegistry(url, `${username}:${token}`)
+                                    await getRegistries()
+                                } catch(err) {
+                                    return err
                                 }
-                            }, `small ${isButtonDisabled ? "disabled": "blue"}`, true, false),
+                            }, `small ${isButtonDisabled ? "disabled": "blue"}`, true, true),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light", true, false)
+                            }, "small light", ()=>{}, true, false)
                         ]}
                     >
                         <AddRegistryPanel token={token} setToken={setToken} username={username} setUsername={setUsername} url={url} setURL={setURL}/>    

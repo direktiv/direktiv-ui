@@ -5,7 +5,7 @@ import FlexBox from '../../../components/flexbox';
 import Modal, { ButtonDefinition } from '../../../components/modal';
 import AddValueButton from '../../../components/add-button';
 import { useNamespaceVariables } from 'direktiv-react-hooks';
-import { Config } from '../../../util';
+import { Config, CanPreviewMimeType } from '../../../util';
 import DirektivEditor from '../../../components/editor';
 import Button from '../../../components/button';
 import {useDropzone} from 'react-dropzone'
@@ -362,25 +362,32 @@ function Variable(props) {
                     actionButtons={
                         [
                             ButtonDefinition("Save", async () => {
-                                try { 
                                     await setNamespaceVariable(obj.node.name, val , mimeType)
                                 } catch(err) {
                                     return err
                                 }
                             }, "small blue", true, true),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light", true, false)
+                            }, "small light",()=>{}, true, false)
                         ]
                     } 
                 >
                     <FlexBox className="col gap" style={{fontSize: "12px", width: "580px", minHeight: "500px"}}>
                         <FlexBox className="gap" style={{flexGrow: 1}}>
                             <FlexBox style={{overflow:"hidden"}}>
+                                {CanPreviewMimeType(mimeType) ?                                
                                 <AutoSizer>
                                     {({height, width})=>(
                                     <DirektivEditor dlang={lang} width={width} dvalue={val} setDValue={setValue} height={height}/>
                                     )}
                                 </AutoSizer>
+                                :
+                                <div style={{width: "100%", display:"flex", justifyContent: "center", alignItems:"center"}}>
+                                    <p style={{fontSize:"11pt"}}>
+                                        Cannot preview variable with mime-type: {mimeType}
+                                    </p>
+                                </div>
+                                }
                             </FlexBox>
                         </FlexBox>
                         <FlexBox className="gap" style={{flexGrow: 0, flexShrink: 1}}>
@@ -442,6 +449,7 @@ function Variable(props) {
                     }}
                     onClose={()=>{
                         setFile(null)
+                        setUploading(false)
                     }}
                     title="Replace variable" 
                     button={(
@@ -450,28 +458,17 @@ function Variable(props) {
                     actionButtons={
                         [
                             ButtonDefinition("Upload", async () => {
-                                if (!isButtonDisabled) {
-                                    return variableValidationSchema
-                                        .validate({ variableData: file }, { abortEarly: false })
-                                        .then(async function() {
-
-                                            setUploading(true)
-                                            let err = await setNamespaceVariable(obj.node.name, file, mimeType)
-                                            if (err) {
-                                                setUploading(false)
-                                                return err
-                                            }
-                                            setUploading(false)
-                                        }).catch(function (err) {
-                                            if (err.inner.length > 0) {
-                                                return err.inner[0].message
-                                            }
-                                        });
-
+                                try {
+                                    setUploading(true)
+                                    await setNamespaceVariable(obj.node.name, file, mimeType)
+                                    setUploading(false)
+                                } catch(err) {
+                                    setUploading(false)
+                                    return err
                                 }
                             }, `small ${isButtonDisabled ? "disabled": uploadingBtn}`, true, false),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light", true, false)
+                            }, "small light", ()=>{}, true, false)
                         ]
                     } 
                 >
@@ -495,14 +492,10 @@ function Variable(props) {
                     actionButtons={
                         [
                             ButtonDefinition("Delete", async () => {
-                                try { 
-                                    await deleteNamespaceVariable(obj.node.name)
-                                } catch(err) {
-                                    return err
-                                }
-                            }, "small red", true, false),
+                                await deleteNamespaceVariable(obj.node.name)
+                            }, "small red", ()=>{}, true, false),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light", true, false)
+                            }, "small light", ()=>{}, true, false)
                         ]
                     } 
                 >
@@ -515,66 +508,7 @@ function Variable(props) {
                 </FlexBox>
                 </Modal>
             </FlexBox>
-            {/* <FlexBox style={{justifyContent:"center"}} >
-                <FlexBox>
-                    <VariablesDownloadButton /> 
-                </FlexBox>
-                <Modal
-                    escapeToCancel
-                    style={{
-                        flexDirection: "row-reverse",
-                    }}
-                    onClose={()=>{
-                        setFile(null)
-                    }}
-                    title="Upload to a variable" 
-                    button={(
-                        <VariablesUploadButton />
-                    )}
-                    actionButtons={
-                        [
-                            ButtonDefinition("Upload", async () => {
-                                try { await setNamespaceVariable(obj.node.name, file, mimeType)
-                                if (err) return err
-                            }, "small blue", true, false),
-                            ButtonDefinition("Cancel", () => {
-                            }, "small light", true, false)
-                        ]
-                    } 
-                >
-                    <FlexBox className="col gap">
-                        <VariableFilePicker file={file} setFile={setFile} />
-                    </FlexBox>
-                </Modal>
-                <Modal
-                    escapeToCancel
-                    style={{
-                        flexDirection: "row-reverse",
-                    }}
-                    title="Delete a variable" 
-                    button={(
-                        <SecretsDeleteButton/>
-                    )}
-                    actionButtons={
-                        [
-                            ButtonDefinition("Delete", async () => {
-                                try { await deleteNamespaceVariable(obj.node.name)
-                                if (err) return err
-                            }, "small red", true, false),
-                            ButtonDefinition("Cancel", () => {
-                            }, "small light", true, false)
-                        ]
-                    } 
-                >
-                        <FlexBox className="col gap">
-                    <FlexBox >
-                        Are you sure you want to delete '{obj.node.name}'?
-                        <br/>
-                        This action cannot be undone.
-                    </FlexBox>
-                </FlexBox>
-                </Modal>
-            </FlexBox> */}
+        
         </td>
     </tr>
     )
