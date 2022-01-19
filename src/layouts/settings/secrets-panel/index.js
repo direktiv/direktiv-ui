@@ -54,15 +54,7 @@ function SecretsPanel(props){
                         
                         button={(
                             <AddValueButton label=" " />
-                        )}  
-                        
-                        keyDownActions={[
-                            KeyDownDefinition("Enter", async () => {
-                                    await createSecret(keyValue, vValue)
-                                    await getSecrets()
-                            }, ()=>{}, true)
-                        ]}
-                        
+                        )}                         
                         actionButtons={[
                             ButtonDefinition("Add", async () => {
                                 if(document.getElementById("file-picker")){
@@ -231,7 +223,7 @@ function AddSecretPanel(props) {
                     <input value={keyValue} onChange={(e)=>setKeyValue(e.target.value)} autoFocus placeholder="Enter key" />
                 </FlexBox>
             </FlexBox>
-            <FlexBox className="gap" style={{minHeight:"150px"}}>
+            <FlexBox className="gap" style={{minHeight:"250px"}}>
                 <FlexBox style={{overflow:"hidden"}}>
                     <AutoSizer>
                         {({height, width})=>(
