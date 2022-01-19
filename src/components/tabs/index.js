@@ -9,7 +9,7 @@ function Tabs(props) {
 
     useEffect(() => {
         onTabChanged && onTabChanged(headers[activeTab])
-    }, [activeTab])
+    }, [activeTab, onTabChanged, headers])
 
     if (!headers || !tabs) {
         return (<>Bad tabs definition (missing tabs or headers).</>)

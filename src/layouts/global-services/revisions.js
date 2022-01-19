@@ -6,7 +6,7 @@ import { RevisionCreatePanel, UpdateTraffic } from "../namespace-services/revisi
 import AddValueButton from "../../components/add-button"
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from "../../components/content-panel"
 import FlexBox from "../../components/flexbox"
-import Modal, { ButtonDefinition, KeyDownDefinition } from "../../components/modal"
+import Modal, { ButtonDefinition } from "../../components/modal"
 import { Config } from "../../util"
 import { useGlobalService } from "direktiv-react-hooks"
 import * as yup from "yup";

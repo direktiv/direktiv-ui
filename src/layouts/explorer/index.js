@@ -10,7 +10,7 @@ import { FcWorkflow } from 'react-icons/fc';
 import { HiOutlineTrash } from 'react-icons/hi';
 import { useNodes } from 'direktiv-react-hooks';
 import { useNavigate, useParams } from 'react-router';
-import Modal, {ButtonDefinition, KeyDownDefinition} from '../../components/modal'
+import Modal, {ButtonDefinition} from '../../components/modal'
 import DirektivEditor from '../../components/editor';
 import { BsCodeSlash } from 'react-icons/bs';
 import Button from '../../components/button';

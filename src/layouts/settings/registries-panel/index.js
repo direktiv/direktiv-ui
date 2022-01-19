@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import ContentPanel, {ContentPanelTitle, ContentPanelTitleIcon, ContentPanelBody } from '../../../components/content-panel';
-import Modal, { ButtonDefinition, KeyDownDefinition } from '../../../components/modal';
+import Modal, { ButtonDefinition } from '../../../components/modal';
 import AddValueButton from '../../../components/add-button';
 import FlexBox from '../../../components/flexbox';
 import {SecretsDeleteButton} from '../secrets-panel';

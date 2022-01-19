@@ -8,7 +8,7 @@ import Alert from "../../components/alert"
 import Button from "../../components/button"
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon, ContentPanelFooter } from "../../components/content-panel"
 import FlexBox from "../../components/flexbox"
-import Modal, { ButtonDefinition, KeyDownDefinition } from "../../components/modal"
+import Modal, { ButtonDefinition } from "../../components/modal"
 import { Config } from "../../util"
 import * as yup from "yup";
 

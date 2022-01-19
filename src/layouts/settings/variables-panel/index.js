@@ -15,8 +15,6 @@ import { VscCloudDownload, VscCloudUpload, VscEye, VscLoading, VscTrash, VscVari
 import { AutoSizer } from 'react-virtualized';
 import * as yup from "yup";
 
-
-
 function VariablesPanel(props){
 
     const {namespace} = props

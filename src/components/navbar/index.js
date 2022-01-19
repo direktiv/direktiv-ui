@@ -4,7 +4,7 @@ import Logo from '../../assets/nav-logo.png'
 import FlexBox from '../flexbox';
 import NamespaceSelector from '../namespace-selector';
 
-import Modal, { KeyDownDefinition } from '../modal';
+import Modal from '../modal';
 import { ButtonDefinition } from '../modal';
 import {VscAdd,  VscFolderOpened, VscGraph, VscLayers, VscServer,  VscSettingsGear,  VscSymbolEvent, VscVmRunning} from 'react-icons/vsc';
 
