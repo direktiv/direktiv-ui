@@ -12,6 +12,7 @@ import {Config, GenerateRandomKey} from '../../../util'
 import HelpIcon from '../../../components/help';
 import Tabs from '../../../components/tabs'
 import DirektivEditor from '../../../components/editor';
+import { AutoSizer } from 'react-virtualized';
 
 
 
@@ -248,11 +249,15 @@ function AddSecretPanel(props) {
                     <input value={keyValue} onChange={(e)=>setKeyValue(e.target.value)} autoFocus placeholder="Enter key" />
                 </FlexBox>
             </FlexBox>
-            <FlexBox className="gap">
+            <FlexBox className="gap" style={{minHeight:"150px"}}>
                 <FlexBox style={{overflow:"hidden"}}>
-                    <DirektivEditor dValue={vValue} setDValue={setVValue}  width={400} height={180}/>
+                    <AutoSizer>
+                        {({height, width})=>(
+                            <DirektivEditor width={width} dValue={vValue} setDValue={setVValue} height={height}/>
+                        )}
+                        </AutoSizer>
+                    </FlexBox>
                 </FlexBox>
             </FlexBox>
-        </FlexBox>
     );
 }
