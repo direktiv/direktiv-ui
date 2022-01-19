@@ -250,7 +250,7 @@ function AddSecretPanel(props) {
             </FlexBox>
             <FlexBox className="gap">
                 <FlexBox style={{overflow:"hidden"}}>
-                    <DirektivEditor dValue={vValue} setDValue={setVValue}  width={600} height={180}/>
+                    <DirektivEditor dValue={vValue} setDValue={setVValue}  width={400} height={180}/>
                 </FlexBox>
             </FlexBox>
         </FlexBox>
