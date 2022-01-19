@@ -33,6 +33,7 @@ import SankeyDiagram from '../../../components/sankey';
 import {PieChart} from 'react-minimal-pie-chart'
 import HelpIcon from "../../../components/help";
 import Loader from '../../../components/loader';
+import Alert from '../../../components/alert';
 
 dayjs.extend(utc)
 dayjs.extend(relativeTime);
@@ -75,6 +76,9 @@ function InitialWorkflowHook(props){
 
     const [activeTab, setActiveTab] = useState(searchParams.get("tab") !== null ? parseInt(searchParams.get('tab')): 0)
 
+    useEffect(()=>{
+        setActiveTab(searchParams.get("tab") !== null ? parseInt(searchParams.get('tab')): 0)
+    }, [searchParams])
     // todo handle err from hook below
     const {data,  getSuccessFailedMetrics, tagWorkflow, addAttributes, deleteAttributes, setWorkflowLogToEvent, editWorkflowRouter, getWorkflowSankeyMetrics, getWorkflowRevisionData, getWorkflowRouter, toggleWorkflow, executeWorkflow, getInstancesForWorkflow, getRevisions, getTags, deleteRevision, saveWorkflow, updateWorkflow, discardWorkflow, removeTag} = useWorkflow(Config.url, true, namespace, filepath.substring(1), localStorage.getItem("apikey"))
     const [router, setRouter] = useState(null)
@@ -260,6 +264,9 @@ function WorkingRevision(props) {
 
     const [tabBtn, setTabBtn] = useState(searchParams.get('revtab') !== null ? parseInt(searchParams.get('revtab')): 0);
 
+    useEffect(()=>{
+        setTabBtn(searchParams.get('revtab') !== null ? parseInt(searchParams.get('revtab')): 0)
+    }, [searchParams])
 
     // Error States
     const [errors, setErrors] = useState([])
@@ -372,13 +379,13 @@ function WorkingRevision(props) {
                                             }
                                             if(r.includes("execute workflow")){
                                                 // is an error
-                                                return r
+                                                throw new Error(r)
                                             } else {
                                                 navigate(`/n/${namespace}/instances/${r}`)
                                             }
-                                        }, "small blue", true, false),
+                                        }, "small blue", ()=>{}, true, false),
                                         ButtonDefinition("Cancel", async () => {
-                                        }, "small light", true, false)
+                                        }, "small light", ()=>{}, true, false)
                                     ]}
                                     button={(
                                         <div className={`btn-terminal ${opLoadingStates["IsLoading"] ? "terminal-disabled" : ""}`}>
@@ -407,11 +414,24 @@ function WorkingRevision(props) {
                                 </div>
                                 <div className={`btn-terminal ${opLoadingStates["IsLoading"] ? "terminal-disabled" : ""}`} title={"Save latest workflow as new revision"} onClick={async () => {
                                     setErrors([])
-                                    await saveWorkflow()
-                                    updateRevisions()
-                                    setShowErrors(false)
+                                    try{
+                                        const result = await saveWorkflow()
+                                        if(result?.node?.name)
+                                        {
+                                            updateRevisions()
+                                            setShowErrors(false)
+                                            navigate(`/n/${namespace}/explorer/${result.node.name}?tab=1&revision=${result.revision.name}&revtab=0`)
+                                        }else{
+                                            setErrors("Something went wrong")
+                                            setShowErrors(true)
+                                        }
+                                    }catch(e){
+                                        setErrors(e.toString())
+                                        setShowErrors(true)
+                                    }
+                                    
                                 }}>
-                                    Save as new revision
+                                    Make Revision
                                 </div>
                                 <div className={"btn-terminal editor-info"} title={`${showErrors ? "Hide Problems": "Show Problems"}`} onClick={async () => {
                                     setShowErrors(!showErrors)
@@ -925,8 +945,10 @@ function WorkflowAttributes(props) {
 function SettingsTab(props) {
 
     const {namespace, workflow, addAttributes, deleteAttributes, workflowData, setWorkflowLogToEvent} = props
-
     const [logToEvent, setLogToEvent] = useState(workflowData.eventLogging)
+
+    const [lteStatus, setLTEStatus] = useState(null);
+    const [lteStatusMessage, setLTEStatusMessage] = useState(null);
 
     return (
         <>
@@ -957,15 +979,19 @@ function SettingsTab(props) {
                                             <input value={logToEvent} onChange={(e)=>setLogToEvent(e.target.value)} type="text" placeholder="Enter the 'event' type to send logs to" />
                                         </FlexBox>
                                         <div style={{width:"99.5%", margin:"auto", background: "#E9ECEF", height:"1px"}}/>
-                                        <FlexBox style={{justifyContent:"flex-end", width:"100%"}}>
+                                        <FlexBox className="gap" style={{justifyContent:"flex-end", width:"100%"}}>
+                                            { lteStatus ? <Alert className={`${lteStatus} small`}>{lteStatusMessage}</Alert> : <></> }
                                             <Button onClick={async()=>{
                                                 try { 
                                                     await setWorkflowLogToEvent(logToEvent)
                                                 } catch(err) {
-                                                    // todo err
-                                                    console.log(err, "NOTIFY IF ERR")
+                                                    setLTEStatus("failed")
+                                                    setLTEStatusMessage(err.message)
                                                     return err
                                                 }
+
+                                                setLTEStatus("success")
+                                                setLTEStatusMessage("'Log to Event' value set!")
                                             }} className="small">
                                                 Save
                                             </Button>

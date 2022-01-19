@@ -12,6 +12,7 @@ import {Config, GenerateRandomKey} from '../../../util'
 import HelpIcon from '../../../components/help';
 import Tabs from '../../../components/tabs'
 import DirektivEditor from '../../../components/editor';
+import { AutoSizer } from 'react-virtualized';
 
 
 
@@ -53,51 +54,30 @@ function SecretsPanel(props){
                         
                         button={(
                             <AddValueButton label=" " />
-                        )}  
-                        
-                        keyDownActions={[
-                            KeyDownDefinition("Enter", async () => {
-                                try { 
-                                    await createSecret(keyValue, vValue)
-                                    await getSecrets()
-                                } catch(err) {
-                                    await getSecrets()
-                                    return err
-                                }
-                            }, true)
-                        ]}
-                        
+                        )}                         
                         actionButtons={[
                             ButtonDefinition("Add", async () => {
                                 if(document.getElementById("file-picker")){
                                     if(keyValue.trim() === "") {
-                                        return "Secret key name needs to be provided."
+                                        throw new Error("Secret key name needs to be provided.")
                                     }
                                     if(!file) {
-                                        return "Please add or select file"
+                                        throw new Error("Please add or select file")
                                     }
-                                    try { 
-                                        await createSecret(keyValue, file)
-                                    } catch(err) {
-                                        return err
-                                    }
+                                    await createSecret(keyValue, file)
                                 } else {
                                     if(keyValue.trim() === "") {
-                                        return "Secret key name needs to be provided."
+                                        throw new Error("Secret key name needs to be provided.")
                                     }
                                     if(vValue.trim() === "") {
-                                        return "Secret value needs to be provided."
+                                        throw new Error("Secret value needs to be provided.")
                                     }
-                                    try { 
-                                        await createSecret(keyValue, vValue)
-                                    } catch(err) {
-                                        return err
-                                    }
+                                    await createSecret(keyValue, vValue)
                                 }
                                 await  getSecrets()
-                            }, "small blue", true, false),
+                            }, "small blue",()=>{}, true, false),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light", true, false)
+                            }, "small light",()=>{}, true, false)
                         ]}
                     >
                          <Tabs 
@@ -200,16 +180,11 @@ function Secrets(props) {
                                             [
                                                 // label, onClick, classList, closesModal, async
                                                 ButtonDefinition("Delete", async () => {
-                                                    try { 
-                                                        await deleteSecret(obj.node.name)
-                                                        await getSecrets()
-                                                    } catch(err) {
-                                                        await getSecrets()
-                                                        return err
-                                                    }
-                                                }, "small red", true, false),
+                                                    await deleteSecret(obj.node.name)
+                                                    await getSecrets()
+                                                }, "small red",()=>{}, true, false),
                                                 ButtonDefinition("Cancel", () => {
-                                                }, "small light", true, false)
+                                                }, "small light",()=>{}, true, false)
                                             ]
                                         }   
                                     >
@@ -248,9 +223,15 @@ function AddSecretPanel(props) {
                     <input value={keyValue} onChange={(e)=>setKeyValue(e.target.value)} autoFocus placeholder="Enter key" />
                 </FlexBox>
             </FlexBox>
-            <FlexBox className="gap">
-                <FlexBox><input type="password"  value={vValue} onChange={(e)=>setVValue(e.target.value)} placeholder="Enter value" /></FlexBox>
+            <FlexBox className="gap" style={{minHeight:"250px"}}>
+                <FlexBox style={{overflow:"hidden"}}>
+                    <AutoSizer>
+                        {({height, width})=>(
+                            <DirektivEditor width={width} dValue={vValue} setDValue={setVValue} height={height}/>
+                        )}
+                        </AutoSizer>
+                    </FlexBox>
+                </FlexBox>
             </FlexBox>
-        </FlexBox>
     );
 }
