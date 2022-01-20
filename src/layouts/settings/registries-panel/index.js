@@ -76,14 +76,11 @@ function RegistriesPanel(props){
                                 await createRegistry(url, `${username}:${token}`);
                             }, `small ${isButtonDisabled ? "disabled": "blue"}`, (err)=>{return err}, true, false),
                             ButtonDefinition("Test Connection", async () => {
-                                console.log(1)
                                 setTestConnLoading(true)
                                 await TestRegistry(url, username, token)
                                 setTestConnLoading(false)
                                 setSuccessFeedback(true)
-                                console.log(2)
                             }, `small ${isButtonDisabled ? "disabled": testConnBtnClasses}`, (err)=>{
-                                console.log(3)
                                 setTestConnLoading(false)
                                 setSuccessFeedback(false)
                                 return {message: err}

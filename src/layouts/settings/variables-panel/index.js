@@ -88,7 +88,7 @@ function VariablesPanel(props){
     ];
 
     const chooseSubmitButton = (currentTab) => {
-        console.log(currentTab);
+
         if (currentTab === "Upload") {
             return uploadActionButtons
         } else if (currentTab === "Manual") {
