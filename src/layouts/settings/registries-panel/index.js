@@ -73,23 +73,21 @@ function RegistriesPanel(props){
                         }}
                         actionButtons={[
                             ButtonDefinition("Add", async() => {
-                                try {
-                                    await createRegistry(url, `${username}:${token}`);
-                                } catch(err) {
-                                    return err
-                                }
-                            }, `small ${isButtonDisabled ? "disabled": "blue"}`, ()=>{}, true, false),
+                                await createRegistry(url, `${username}:${token}`);
+                            }, `small ${isButtonDisabled ? "disabled": "blue"}`, (err)=>{return err}, true, false),
                             ButtonDefinition("Test Connection", async () => {
+                                console.log(1)
                                 setTestConnLoading(true)
-                                let err = await TestRegistry(url, username, token)
-                                if (err) {
-                                    setTestConnLoading(false)
-                                    setSuccessFeedback(false)
-                                    return {message: err}
-                                }
+                                await TestRegistry(url, username, token)
                                 setTestConnLoading(false)
                                 setSuccessFeedback(true)
-                            }, `small ${isButtonDisabled ? "disabled": testConnBtnClasses}`, false, true),
+                                console.log(2)
+                            }, `small ${isButtonDisabled ? "disabled": testConnBtnClasses}`, (err)=>{
+                                console.log(3)
+                                setTestConnLoading(false)
+                                setSuccessFeedback(false)
+                                return {message: err}
+                            }, false, true),
                             ButtonDefinition("Cancel", () => {
                             }, "small light", ()=>{}, true, false)
                         ]}
@@ -134,19 +132,18 @@ async function TestRegistry(url, username, token) {
 
     if(resp.status === 500) {
         let json = await resp.json()
-        return json.message
+        throw new Error(json.message)
     }
 
     if(resp.status === 401) {
         if(url === "https://registry.hub.docker.com") {
             let text = await resp.text()
-            return text
+            throw new Error(text)
         } else {
             let json = await resp.json()
-            return json.errors[0].message
+            throw new Error(json.errors[0].message)
         }
     }
-    
 }
 
 // const registries = ["https://docker.io", "https://gcr.io", "https://us.gcr.io"]

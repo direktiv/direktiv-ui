@@ -70,13 +70,9 @@ function SecretsPanel(props){
                         )}
                         actionButtons={[
                             ButtonDefinition("Add", async () => {
-                                try {
-                                    await createSecret(keyValue, vValue)
-                                    getSecrets()
-                                } catch(err) {
-                                    return err
-                                }
-                            }, `small ${isButtonDisabled ? "disabled": "blue"}`, ()=>{}, true, true),
+                                await createSecret(keyValue, vValue)
+                                getSecrets()
+                            }, `small ${isButtonDisabled ? "disabled": "blue"}`, (err)=>{return err}, true, true),
                             ButtonDefinition("Cancel", () => {
                             }, "small light",()=>{}, true, false)
                         ]}

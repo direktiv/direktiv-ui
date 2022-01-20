@@ -149,12 +149,8 @@ function NamespaceServices(props) {
                     )}
                     actionButtons={[
                         ButtonDefinition("Add", async () => {
-                            try {
-                                await createNamespaceService(serviceName, image, parseInt(scale), parseInt(size), cmd)
-                            } catch(err) {
-                                return err
-                            }
-                        }, `small ${isButtonDisabled ? "disabled": "blue"}`,()=>{},true,false),
+                            await createNamespaceService(serviceName, image, parseInt(scale), parseInt(size), cmd)
+                        }, `small ${isButtonDisabled ? "disabled": "blue"}`,(err)=>{return err},true,false),
                         ButtonDefinition("Cancel", () => {
                         }, "small light", ()=>{}, true, false)
                     ]}

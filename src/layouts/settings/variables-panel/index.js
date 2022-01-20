@@ -69,26 +69,20 @@ function VariablesPanel(props){
 
     const manualActionButtons = [
         ButtonDefinition("Add", async () => {
-            try {
-                setUploading(true)
-                await setNamespaceVariable(keyValue, file, mimeType)
-            } catch(err) {
-                setUploading(false)
-                return err
-            }
-        }, `small ${isManualButtonDisabled ? "disabled" : uploadingBtn}`, true, true),
+            setUploading(true)
+            await setNamespaceVariable(keyValue, file, mimeType)
+        }, `small ${isManualButtonDisabled ? "disabled" : uploadingBtn}`, (err)=>{
+            setUploading(false)
+            return err
+        }, true, true),
         ButtonDefinition("Cancel", () => {
         }, "small light", ()=>{}, true, false)
     ];
 
     const uploadActionButtons = [
         ButtonDefinition("Add", async () => {
-            try {
-                await setNamespaceVariable(keyValue, dValue, mimeType)
-            } catch(err) {
-                return err
-            }
-        }, `small ${isUploadButtonDisabled ? "disabled" : uploadingBtn}`, true, true),
+            await setNamespaceVariable(keyValue, dValue, mimeType)
+        }, `small ${isUploadButtonDisabled ? "disabled" : uploadingBtn}`, (err)=>{return err}, true, true),
         ButtonDefinition("Cancel", () => {
         }, "small light", ()=>{},true, false)
     ];
@@ -115,7 +109,7 @@ function VariablesPanel(props){
                     <HelpIcon msg={"Unencrypted key/value pairs that can be referenced within workflows."} />
                 </FlexBox>
                 <div>
-                    <Modal title="New variable" 
+                    <Modal title="New variable"
                         escapeToCancel
                         titleIcon={<VscVariableGroup/>}
                         button={(
@@ -362,12 +356,8 @@ function Variable(props) {
                     actionButtons={
                         [
                             ButtonDefinition("Save", async () => {
-                                try {
-                                    await setNamespaceVariable(obj.node.name, val , mimeType)
-                                } catch(err) {
-                                    return err
-                                }
-                            }, "small blue",()=>{}, true, false),
+                                await setNamespaceVariable(obj.node.name, val , mimeType)
+                            }, "small blue",(err)=>{return err}, true, false),
                             ButtonDefinition("Cancel", () => {
                             }, "small light",()=>{}, true, false)
                         ]
@@ -459,25 +449,13 @@ function Variable(props) {
                     actionButtons={
                         [
                             ButtonDefinition("Upload", async () => {
-                                if (!isButtonDisabled) {
-                                    return variableValidationSchema
-                                        .validate({ variableData: file }, { abortEarly: false })
-                                        .then(async function() {
-
-                                            setUploading(true)
-                                            let err = await setNamespaceVariable(obj.node.name, file, mimeType)
-                                            if (err) {
-                                                setUploading(false)
-                                                return err
-                                            }
-                                            setUploading(false)
-                                        }).catch(function (err) {
-                                            if (err.inner.length > 0) {
-                                                return err.inner[0].message
-                                            }
-                                        });
-                                }
-                            }, `small ${isButtonDisabled ? "disabled": uploadingBtn}`, ()=>{setUploading(false)}, true, false),
+                                setUploading(true)
+                                await setNamespaceVariable(obj.node.name, file, mimeType)
+                                setUploading(false)
+                            }, `small ${isButtonDisabled ? "disabled": uploadingBtn}`, (err)=>{
+                                setUploading(false)
+                                return err
+                            }, true, false),
                             ButtonDefinition("Cancel", () => {
                             }, "small light", ()=>{}, true, false)
                         ]

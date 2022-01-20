@@ -63,14 +63,12 @@ export function GlobalRegistries(){
                         }}
                         actionButtons={[
                             ButtonDefinition("Add", async() => {
-                                try {
-                                    await createRegistry(url, `${username}:${token}`)
-                                    await getRegistries()
-                                } catch(err) {
-                                    await getRegistries()
-                                    return err
-                                }
-                            }, "small blue", ()=>{},true,true),
+                                await createRegistry(url, `${username}:${token}`)
+                                await getRegistries()
+                            }, "small blue", async (err)=>{
+                                await getRegistries()
+                                return err
+                            },true,true),
                             ButtonDefinition("Cancel", () => {
                             }, "small light", ()=>{},true, false)
                         ]}
@@ -144,39 +142,11 @@ export function GlobalPrivateRegistries(){
                             setToken("")
                             setUsername("")
                         }}
-                        keyDownActions={[
-                            KeyDownDefinition("Enter", async () => {
-                                if (!isButtonDisabled) {
-                                    return registryValidationSchema
-                                        .validate({ url: url, username: username, token: token }, { abortEarly: false })
-                                        .then(async function() {
-                                            let err = await createRegistry(url, `${username}:${token}`)
-                                            if(err) return err
-                                            await getRegistries()
-                                        }).catch(function (err) {
-                                            if (err.inner.length > 0) {
-                                                return err.inner[0].message
-                                            }
-                                        });
-                                }
-                            }, !isButtonDisabled)
-                        ]}
                         actionButtons={[
                             ButtonDefinition("Add", async() => {
-                                if (!isButtonDisabled) {
-                                    return registryValidationSchema
-                                        .validate({ url: url, username: username, token: token }, { abortEarly: false })
-                                        .then(async function() {
-                                            let err = await createRegistry(url, `${username}:${token}`)
-                                            if(err) return err
-                                            await getRegistries()
-                                        }).catch(function (err) {
-                                            if (err.inner.length > 0) {
-                                                return err.inner[0].message
-                                            }
-                                        });
-                                }
-                            }, `small ${isButtonDisabled ? "disabled": "blue"}`, ()=>{},true,false),
+                                await createRegistry(url, `${username}:${token}`)
+                                await getRegistries()
+                            }, `small ${isButtonDisabled ? "disabled": "blue"}`, (err)=>{return err},true,false),
                             ButtonDefinition("Cancel", () => {
                             }, "small light", ()=>{}, true, false)
                         ]}

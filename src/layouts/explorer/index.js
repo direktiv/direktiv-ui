@@ -309,12 +309,8 @@ function ExplorerList(props) {
                             }}
                             actionButtons={[
                                 ButtonDefinition("Add",async () => {
-                                    try {
-                                        await createNode(workflowName, "workflow", wfData)
-                                    } catch(err) {
-                                        return err
-                                    }
-                                }, `small ${isWorkflowButtonDisabled ? "disabled": "blue"}`, true, true),
+                                    await createNode(workflowName, "workflow", wfData)
+                                }, `small ${isWorkflowButtonDisabled ? "disabled": "blue"}`, (err)=>{return err}, true, true),
                                 ButtonDefinition("Cancel", () => {
                                 }, "small light", ()=>{}, true, true)
                             ]}
@@ -377,13 +373,9 @@ function ExplorerList(props) {
                                 }}
                                 actionButtons={[
                                     ButtonDefinition("Add", async () => {
-                                        try {
-                                            await createNode(directoryName, "directory")
-                                            setDirectoryName("")
-                                        } catch (err) {
-                                            return err
-                                        }
-                                    }, `small ${isDirectoryButtonDisabled ? "disabled": "blue"}`, ()=>{}, true, true),
+                                        await createNode(directoryName, "directory")
+                                        setDirectoryName("")
+                                    }, `small ${isDirectoryButtonDisabled ? "disabled": "blue"}`, (err)=>{return err}, true, true),
                                     ButtonDefinition("Cancel", () => {
                                     }, "small light", ()=>{}, true, false)
                                 ]}

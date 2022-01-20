@@ -85,12 +85,8 @@ export default function GlobalRevisionsPanel(props){
                                 )}
                                 actionButtons={[
                                     ButtonDefinition("Add", async () => {
-                                        try {
-                                            await createGlobalServiceRevision(image, parseInt(scale), parseInt(size), cmd, parseInt(trafficPercent))
-                                        } catch(err) {
-                                            return err
-                                        }
-                                    }, `small ${isButtonDisabled ? "disabled": "blue"}`, ()=>{},true,true),
+                                        await createGlobalServiceRevision(image, parseInt(scale), parseInt(size), cmd, parseInt(trafficPercent))
+                                    }, `small ${isButtonDisabled ? "disabled": "blue"}`, (err)=>{return err},true,true),
                                     ButtonDefinition("Cancel", () => {
                                     }, "small light", ()=>{}, true, false)
                                 ]}

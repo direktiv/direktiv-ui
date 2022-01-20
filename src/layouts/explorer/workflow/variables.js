@@ -72,27 +72,23 @@ function AddWorkflowVariablePanel(props) {
 
     const manualActionButtons = [
         ButtonDefinition("Add", async () => {
-            try {
-                setUploading(true)
-                await setWorkflowVariable(keyValue, file, mimeType)
-            } catch(err) {
-                setUploading(false)
-                return err
-            }
-        }, `small ${isManualButtonDisabled ? "disabled" : uploadingBtn}`, true, false),
+            setUploading(true)
+            await setWorkflowVariable(keyValue, file, mimeType)
+        }, `small ${isManualButtonDisabled ? "disabled" : uploadingBtn}`, (err)=>{
+            setUploading(false)
+            return err
+        }, true, false),
         ButtonDefinition("Cancel", () => {
         }, "small light", ()=>{}, true, false)
     ];
 
     const uploadActionButtons = [
         ButtonDefinition("Add", async () => {
-            try {
-                await setWorkflowVariable(keyValue, dValue, mimeType)
-            } catch(err) {
-                setUploading(false)
-                return err
-            }
-        }, `small ${isUploadButtonDisabled ? "disabled" : uploadingBtn}`, true, false),
+            await setWorkflowVariable(keyValue, dValue, mimeType)
+        }, `small ${isUploadButtonDisabled ? "disabled" : uploadingBtn}`, (err)=>{
+            setUploading(false)
+            return err
+        }, true, false),
         ButtonDefinition("Cancel", () => {
         }, "small light", ()=>{},true, false)
     ];
@@ -117,7 +113,7 @@ function AddWorkflowVariablePanel(props) {
                     </div>
                     <HelpIcon msg={"List of variables for that workflow."} />
                 </FlexBox>
-                    <Modal title="New variable" 
+                    <Modal title="New variable"
                         escapeToCancel
                         button={(
                             <AddValueButton label=" " />
@@ -417,15 +413,13 @@ function Variable(props) {
                     actionButtons={
                         [
                             ButtonDefinition("Upload", async () => {
-                                try {
-                                    setUploading(true)
-                                    await setWorkflowVariable(obj.node.name, file, mimeType)
-                                    setUploading(false)
-                                } catch(err) {
-                                    setUploading(false)
-                                    return err
-                                }
-                            }, `small ${isButtonDisabled ? "disabled": uploadingBtn}`, ()=>{}, true, true),
+                                setUploading(true)
+                                await setWorkflowVariable(obj.node.name, file, mimeType)
+                                setUploading(false)
+                            }, `small ${isButtonDisabled ? "disabled": uploadingBtn}`, (err)=>{
+                                setUploading(false)
+                                return err
+                            }, true, true),
                             ButtonDefinition("Cancel", () => {
                             }, "small light",()=>{}, true, false)
                         ]
@@ -451,7 +445,7 @@ function Variable(props) {
                     actionButtons={
                         [
                             ButtonDefinition("Delete", async () => {
-                                    await deleteWorkflowVariable(obj.node.name)
+                                await deleteWorkflowVariable(obj.node.name)
                             }, "small red", ()=>{}, true, false),
                             ButtonDefinition("Cancel", () => {
                             }, "small light", ()=>{}, true, false)

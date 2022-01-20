@@ -103,16 +103,12 @@ function NewNamespaceBtn(props) {
                onClose={ () => {setNs("")}}
                actionButtons={[
                    ButtonDefinition("Add", async () => {
-                       try {
-                           await createNamespace(ns)
-                           setTimeout(()=>{
-                               navigate(`/n/${ns}`)
-                           },200)
-                           setNs("")
-                       } catch(err) {
-                           return err
-                       }
-                   }, `small ${isButtonDisabled ? "disabled": "blue"}`, ()=>{}, true, true),
+                       await createNamespace(ns)
+                       setTimeout(()=>{
+                           navigate(`/n/${ns}`)
+                       },200)
+                       setNs("")
+                   }, `small ${isButtonDisabled ? "disabled": "blue"}`, (err)=>{return err}, true, true),
                    ButtonDefinition("Cancel", () => {
                        setNs("")
                    }, "small light", ()=>{}, true, false)
