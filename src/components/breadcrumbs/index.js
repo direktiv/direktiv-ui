@@ -54,7 +54,9 @@ function Breadcrumbs(props) {
                         </li>
                     )
                 })}
-                <span>{". . . "}</span>
+                <li id={"crumb-divider"} key={"crumb-divider"}>
+                    <span>{". . . "}</span>
+                </li>
                 {breadcrumbs.slice(-3).map((obj)=>{
                     let key = GenerateRandomKey("crumb-");
                
