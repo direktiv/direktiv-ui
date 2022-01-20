@@ -1,39 +1,44 @@
 import { useEffect, useState } from "react"
 import './style.css'
+
+
 export default function Loader(props) {
 
     const {load, children, timer} = props
-    
     const [display, setDisplay] = useState(false)
+    const [timeoutTimer, setTimeoutTimer] = useState(null)
 
+    // show loader if timer is hit set timeout to set display to true
     useEffect(()=>{
-        if(timer){
-            setTimeout(()=>{
+        if(timer !== null && load) {
+            let t = setTimeout(()=>{
                 setDisplay(true)
-            },timer)
+            }, timer)
+            setTimeoutTimer(t)
         }
-    },[timer])
+    },[timer, load])
 
-    // when children change reset the timer
+    // check if load has been changed to true
     useEffect(()=>{
-        if(display){
+        // if its finished loading and timeoutTimer isn't null show children
+        if(!load && timeoutTimer !== null){
+            clearTimeout(timeoutTimer)
             setDisplay(false)
-            setTimeout(()=>{
-                setDisplay(true)
-            },timer)
         }
-    },[children, display, timer])
+    },[load, timeoutTimer])
 
-    if(load) {
+    if(display && load) {
         // return a loader
-        
         return (
-            <div style={{ display:"flex", alignItems:"center", justifyContent:"center", flex: 1, width:"100%", height:"100%", padding:"8px"}}>
-                <div style={{visibility: display ? "visible": "hidden"}} className="loader">
+            <div className="container" style={{display:'flex'}}>
+                <div className="loader" >
                 </div>
             </div>
-
         )
+    }
+    
+    if(load){
+        return ""
     }
 
     return(

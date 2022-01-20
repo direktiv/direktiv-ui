@@ -62,19 +62,17 @@ export function GlobalRegistries(){
                         }}
                         keyDownActions={[
                             KeyDownDefinition("Enter", async () => {
-                                let err = await createRegistry(url, `${username}:${token}`)
-                                if(err) return err
-                                await getRegistries()
-                            }, true)
+                                    await createRegistry(url, `${username}:${token}`)
+                                    await  getRegistries()
+                            }, ()=>{}, true)
                         ]}
                         actionButtons={[
                             ButtonDefinition("Add", async() => {
-                                let err = await createRegistry(url, `${username}:${token}`)
-                                if(err) return err
-                                await  getRegistries()
-                            }, "small blue", true, false),
+                                    await createRegistry(url, `${username}:${token}`)
+                                    await  getRegistries()
+                            }, "small blue", ()=>{}, true, false),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light", true, false)
+                            }, "small light", ()=>{},true, false)
                         ]}
                     >
                         <AddRegistryPanel token={token} setToken={setToken} username={username} setUsername={setUsername} url={url} setURL={setURL}/>    
@@ -134,19 +132,17 @@ export function GlobalPrivateRegistries(){
                         }}
                         keyDownActions={[
                             KeyDownDefinition("Enter", async () => {
-                                let err = await createRegistry(url, `${username}:${token}`)
-                                if(err) return err
-                                await getRegistries()
-                            }, true)
+                                    await createRegistry(url, `${username}:${token}`)
+                                    await getRegistries()
+                            }, ()=>{}, true)
                         ]}
                         actionButtons={[
                             ButtonDefinition("Add", async() => {
-                                let err = await createRegistry(url, `${username}:${token}`)
-                                if(err) return err
-                                await  getRegistries()
-                            }, "small blue", true, false),
+                                    await createRegistry(url, `${username}:${token}`)
+                                    await  getRegistries()
+                            }, "small blue", ()=>{}, true, false),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light", true, false)
+                            }, "small light", ()=>{}, true, false)
                         ]}
                     >
                         <AddRegistryPanel token={token} setToken={setToken} username={username} setUsername={setUsername} url={url} setURL={setURL}/>    

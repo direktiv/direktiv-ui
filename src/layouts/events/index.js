@@ -2,12 +2,23 @@ import React, { useState } from 'react';
 import { Config } from '../../util';
 import {  VscCloud, VscRedo, VscSymbolEvent } from 'react-icons/vsc';
 import Button from '../../components/button';
-import ContentPanel, { ContentPanelBody, ContentPanelHeaderButton, ContentPanelHeaderButtonIcon, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
+import ContentPanel, { ContentPanelBody, ContentPanelHeaderButton, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
 import FlexBox from '../../components/flexbox';
 import {useEvents} from 'direktiv-react-hooks'
 import Modal, { ButtonDefinition } from '../../components/modal';
 import DirektivEditor from '../../components/editor';
 import { AutoSizer } from 'react-virtualized';
+import HelpIcon from "../../components/help";
+
+import * as dayjs from "dayjs"
+import relativeTime from "dayjs/plugin/relativeTime";
+import utc from "dayjs/plugin/utc"
+import './style.css'
+import { Link } from 'react-router-dom';
+
+dayjs.extend(utc)
+dayjs.extend(relativeTime);
+
 
 
 function EventsPageWrapper(props) {
@@ -27,13 +38,10 @@ export default EventsPageWrapper;
 function EventsPage(props) {
 
     let {namespace} = props;
-    console.log(useEvents);
 
-    let {getEventListeners, sendEvent} = useEvents(Config.url, true, namespace)
-    console.log(getEventListeners);
-    console.log(sendEvent);
-
-
+    // errHistory and errListeners TODO show error if one
+    let {eventHistory, eventListeners, sendEvent, replayEvent} = useEvents(Config.url, true, namespace, localStorage.getItem("apikey"))
+    console.log(eventHistory, eventListeners)
     return(
         <>
             <FlexBox className="gap col" style={{paddingRight: "8px"}}>
@@ -43,50 +51,77 @@ function EventsPage(props) {
                             <ContentPanelTitleIcon>
                                 <VscCloud/>
                             </ContentPanelTitleIcon>
-                            <div>
-                                Cloud Events History
-                            </div>
+                            <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
+                                <div>
+                                    Cloud Events History
+                                </div>
+                                <HelpIcon msg={"A history of events that have hit this specific namespace."} />
+                            </FlexBox>
                             <SendEventModal sendEvent={sendEvent}/>
                         </ContentPanelTitle>
                         <ContentPanelBody>
                             <div style={{maxHeight: "40vh", overflowY: "auto", fontSize: "12px"}}>
-                                <table>
+                                <table className="cloudevents-table" style={{width: "100%"}}>
                                     <thead>
                                         <tr>
                                             <th>
                                                 Type
                                             </th>
-                                            <th>
+                                            <th style={{width:"250px"}}>
                                                 Source
                                             </th>
                                             <th>
                                                 Time
                                             </th>
-                                            <th>
-                                                <div style={{display: "flex", alignItems: "flex-end", justifyContent: "right"}}>
+                                            <th style={{textAlign:'center'}}>
                                                     Retrigger  
-                                                </div>
                                             </th>
                                         </tr>
                                     </thead>
+                                    {eventHistory !== null ?
                                     <tbody>
-                                        <td>
-                                            azure.example
-                                        </td>
-                                        <td>
-                                            Azure
-                                        </td>
-                                        <td>
-                                            2.30pm (a while ago)
-                                        </td>
-                                        <td>
-                                            <div style={{display: "flex", alignItems: "flex-end", justifyContent: "right", paddingRight: "10px"}}>
-                                                <Button className="small light">
-                                                    <VscRedo/>
-                                                </Button>
-                                            </div>
-                                        </td>
-                                    </tbody>
+                                        {eventHistory.map((obj)=>{
+                                            return <tr style={{borderBottom:"1px solid #f4f4f4"}}>
+                                                <td title={obj.node.type} style={{textOverflow:"ellipsis", overflow:"hidden"}}>
+                                                    {obj.node.type}
+                                                </td>
+                                                <td title={obj.node.source} style={{textOverflow:"ellipsis", overflow:"hidden"}}>
+                                                    {obj.node.source}
+                                                </td>
+                                                <td>
+                                                    {dayjs.utc(obj.node.receivedAt).local().format("HH:mm:ss a")}
+                                                </td>
+                                                <td style={{textAlign:'center', justifyContent:"center"}}>
+                                                <Modal 
+                                                    style={{ justifyContent: "center" }}
+                                                    className="run-workflow-modal"
+                                                    modalStyle={{color: "black"}}
+                                                    title="Retrigger Event"
+                                                    onClose={()=>{
+                                                    }}
+                                                    button={     <div onClick={async ()=>{
+                                                    }} style={{display: "flex", alignItems: "flex-end", justifyContent: "center", paddingRight: "10px"}}>
+                                                        <Button className="small light">
+                                                            <VscRedo/>
+                                                        </Button>
+                                                    </div>}
+                                                    actionButtons={[
+                                                        ButtonDefinition("Retrigger", async () => {
+                                                            await replayEvent(obj.node.id)  
+                                                        }, "small blue", ()=>{}, true, true),
+                                                        ButtonDefinition("Cancel", async () => {
+                                                        }, "small light", ()=>{}, true, false)
+                                                    ]}
+                                                >
+                                                    <FlexBox style={{overflow:"hidden"}}>
+                                                        Are you sure you want to retrigger {obj.node.id}?
+                                                    </FlexBox>
+                                                </Modal>
+                                               
+                                                </td>
+                                            </tr>
+                                        })}
+                                    </tbody>: ""}
                                 </table>
                             </div>
                         </ContentPanelBody>
@@ -98,11 +133,16 @@ function EventsPage(props) {
                             <ContentPanelTitleIcon>
                                 <VscSymbolEvent/>
                             </ContentPanelTitleIcon>
-                            <div>Active Event Listeners</div>
+                            <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
+                                <div>
+                                    Active Event Listeners
+                                </div>
+                                <HelpIcon msg={"Current listeners in a namespace that are listening for a cloud a event."} />
+                            </FlexBox>
                         </ContentPanelTitle>
                         <ContentPanelBody>
                             <div style={{maxHeight: "40vh", overflowY: "auto", fontSize: "12px"}}>
-                                <table>
+                                <table className="event-listeners-table" style={{width: "100%"}}>
                                     <thead>
                                         <tr>
                                             <th>
@@ -112,21 +152,44 @@ function EventsPage(props) {
                                                 Type
                                             </th>
                                             <th>
-                                                Source
+                                                Mode
+                                            </th>
+                                            <th>
+                                                Updated
+                                            </th>
+                                            <th>
+                                                Event Types
                                             </th>
                                         </tr>
                                     </thead>
+                                    {eventListeners !== null ?
                                     <tbody>
-                                        <td>
-                                            /workflows/my-test-workflow
-                                        </td>
-                                        <td>
-                                            azure.example
-                                        </td>
-                                        <td>
-                                            Azure
-                                        </td>
-                                    </tbody>
+                                        {eventListeners.map((obj)=>{
+                                            return(
+                                                <tr  style={{borderBottom:"1px solid #f4f4f4"}}>
+                                                    <td style={{textOverflow:"ellipsis", overflow:"hidden"}}>
+                                                        <Link style={{color:"#2396d8"}} to={`/n/${namespace}/explorer${obj.node.workflow}`}>
+                                                            {obj.node.workflow}
+                                                        </Link> 
+                                                    </td>
+                                                    <td style={{textOverflow:"ellipsis", overflow:"hidden"}}>
+                                                        {obj.node.instance !== "" ? <Link style={{color:"#2396d8"}} to={`/n/${namespace}/instances/${obj.node.instance}`}>{obj.node.instance.split("-")[0]}</Link> : "start"}
+                                                    </td>
+                                                    <td style={{textOverflow:"ellipsis", overflow:"hidden"}}>
+                                                        {obj.node.mode}
+                                                    </td>
+                                                    <td>
+                                                        {dayjs.utc(obj.node.receivedAt).local().format("HH:mm:ss a")}
+                                                    </td>
+                                                    <td className="event-split">
+                                                        {obj.node.events.map((obj)=>{
+                                                            return <span>{obj.type}</span>
+                                                        })}
+                                                    </td>
+                                                </tr>
+                                            )
+                                        })}
+                                    </tbody>:""}
                                 </table>
                             </div>
                         </ContentPanelBody>
@@ -165,10 +228,9 @@ function SendEventModal(props) {
             )}
             actionButtons={[
                 ButtonDefinition("Send", async () => {
-                    let err = await sendEvent(eventData)
-                    if (err) return err
-                }, "small", true, false),
-                ButtonDefinition("Cancel", () => {}, "small light", true, false)
+                    await sendEvent(eventData)
+                }, "small", ()=>{}, true, false),
+                ButtonDefinition("Cancel", () => {}, "small light", ()=>{}, true, false)
             ]}
             noPadding
         >

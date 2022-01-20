@@ -3,9 +3,9 @@ import './style.css';
 
 import ContentPanel, { ContentPanelBody, ContentPanelHeaderButton, ContentPanelHeaderButtonIcon, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
 import FlexBox from '../../components/flexbox';
-import { VscTriangleDown, VscAdd, VscClose,  VscSearch, VscEdit, VscTrash, VscFolderOpened } from 'react-icons/vsc';
+import { VscAdd, VscClose,  VscSearch, VscEdit, VscTrash, VscFolderOpened } from 'react-icons/vsc';
 import { Config, GenerateRandomKey } from '../../util';
-import { FiEdit, FiFolder } from 'react-icons/fi';
+import { FiFolder } from 'react-icons/fi';
 import { FcWorkflow } from 'react-icons/fc';
 import { HiOutlineTrash } from 'react-icons/hi';
 import { useNodes } from 'direktiv-react-hooks';
@@ -78,18 +78,20 @@ const orderFieldKeys = Object.keys(orderFieldDictionary)
 
 function ExplorerList(props) {
     const {namespace, path} = props
-
+    const navigate= useNavigate()
+    
     const [currPath, setCurrPath] = useState("")
     
     const [name, setName] = useState("")
     const [load, setLoad] = useState(true)
+
     const [orderFieldKey, setOrderFieldKey] = useState(orderFieldKeys[0])
 
     const [wfData, setWfData] = useState("")
     const [wfTemplate, setWfTemplate] = useState("")
     // const [pageNo, setPageNo] = useState(1);
 
-    const {data, err, templates, createNode, deleteNode, renameNode } = useNodes(Config.url, true, namespace, path, localStorage.getItem("apikey"), orderFieldDictionary[orderFieldKey])
+    const {data, err, templates, pageInfo, createNode, deleteNode, renameNode } = useNodes(Config.url, true, namespace, path, localStorage.getItem("apikey"), `order.field=${orderFieldDictionary[orderFieldKey]}`)
 
     // control loading icon todo work out how to display this error
     useEffect(()=>{
@@ -113,7 +115,7 @@ function ExplorerList(props) {
     
 
     return(
-        <FlexBox className="col gap" style={{paddingRight: "8px"}}>
+        <FlexBox className="col gap"  style={{paddingRight: "8px"}}>
         <Loader load={load} timer={1000}>
         <FlexBox className="gap" style={{maxHeight: "32px"}}>
             <FlexBox>
@@ -160,18 +162,23 @@ function ExplorerList(props) {
                             }}
                             actionButtons={[
                                 ButtonDefinition("Add", async () => {
-                                    let err = await createNode(name, "workflow", wfData)
-                                    if (err) return err
-                                }, "small blue", true, false),
+                                    const result = await createNode(name, "workflow", wfData)
+                                    if(result.node && result.namespace){
+                                        navigate(`/n/${result.namespace}/explorer/${result.node.path.substring(1)}`)
+                                    }
+                                }, `small blue ${(name.trim() && wfTemplate) ? "" : "disabled"}`, ()=>{}, true, false),
                                 ButtonDefinition("Cancel", () => {
-                                }, "small light", true, false)
+                                }, "small light", ()=>{}, true, false)
                             ]}
 
                             keyDownActions={[
                                 KeyDownDefinition("Enter", async () => {
-                                    let err = await createNode(name, "workflow", wfData)
-                                    if (err) return err
-                                }, true, "workflow-name")
+                                    if(name.trim() && wfTemplate) {
+                                        await createNode(name, "workflow", wfData)
+                                    } else {
+                                        throw new Error("Please fill in name and choose template")
+                                    }
+                                }, ()=>{}, true, "workflow-name")
                             ]}
                         >
                             <FlexBox className="col gap" style={{fontSize: "12px", minHeight: "300px", minWidth: "550px"}}>
@@ -222,19 +229,21 @@ function ExplorerList(props) {
                                 }}
                                 actionButtons={[
                                     ButtonDefinition("Add", async () => {
-                                        let err = await createNode(name, "directory")
-                                        if(err) return err
-                                    }, "small blue", true, false),
+                                        await createNode(name, "directory")
+                                    }, `small blue ${name.trim() ? "" : "disabled"}`, ()=>{}, true, false),
                                     ButtonDefinition("Cancel", () => {
-                                    }, "small light", true, false)
+                                    }, "small light", ()=>{}, true, false)
                                 ]}
 
                                 keyDownActions={[
                                     KeyDownDefinition("Enter", async () => {
-                                        let err = await createNode(name, "directory")
-                                        if(err) return err
+                                        if(name.trim()) {
+                                            await createNode(name, "directory")
+                                        } else {
+                                            throw new Error("Please enter directory name")
+                                        }
                                         setName("")
-                                    }, true)
+                                    }, ()=>{}, true)
                                 ]}
 
                             >
@@ -330,14 +339,14 @@ function DirListItem(props) {
                 {
                     rename ? 
                     <FlexBox className="explorer-item-name">
-                        <input type="text" value={renameValue} onKeyPress={async (e)=>{
+                        <input onClick={(ev)=>ev.stopPropagation()} type="text" value={renameValue} onKeyPress={async (e)=>{
                             if(e.key === "Enter"){
-                                let err = await renameNode("", path, renameValue)
-                                if(err){
-                                    setErr(err)
-                                    return
+                                try { 
+                                    await renameNode("/", path, renameValue)
+                                    setRename(!rename)
+                                } catch(err) {
+                                    setErr(err.message)
                                 }
-                                setRename(!rename)
                             }
                         }} onChange={(e)=>setRenameValue(e.target.value)} autoFocus style={{maxWidth:"300px", height:"38px"}}/>
                         {err !== "" ? 
@@ -386,11 +395,10 @@ function DirListItem(props) {
                                     ButtonDefinition("Delete", async () => {
                                         let p = path.split('/', -1);
                                         let pLast = p[p.length-1];
-                                        let err = await deleteNode(pLast)
-                                        if (err) return err
-                                    }, "small red", true, false),
+                                        await deleteNode(pLast)
+                                    }, "small red", ()=>{}, true, false),
                                     ButtonDefinition("Cancel", () => {
-                                    }, "small light", true, false)
+                                    }, "small light", ()=>{}, true, false)
                                 ]
                             } 
                         >
@@ -430,14 +438,14 @@ function WorkflowListItem(props) {
                 {
                     rename ? 
                     <FlexBox className="explorer-item-name">
-                        <input type="text" value={renameValue} onKeyPress={async (e)=>{
+                        <input onClick={(ev)=>ev.stopPropagation()} type="text" value={renameValue} onKeyPress={async (e)=>{
                             if(e.key === "Enter"){
-                                let err = await renameNode("", path, renameValue)
-                                if(err){
-                                    setErr(err)
-                                    return
+                                try { 
+                                    await renameNode("/", path, renameValue)
+                                    setRename(!rename)
+                                } catch(err) {
+                                    setErr(err.message)
                                 }
-                                setRename(!rename)
                             }
                         }} onChange={(e)=>setRenameValue(e.target.value)} autoFocus style={{maxWidth:"300px", height:"38px"}}/>
                         {err !== "" ? 
@@ -484,14 +492,12 @@ function WorkflowListItem(props) {
                                 actionButtons={
                                     [
                                         ButtonDefinition("Delete", async () => {
-                                        let p = path.split('/', -1);
-                                        let pLast = p[p.length-1];
-
-                                        let err = await deleteNode(pLast)
-                                            if (err) return err
-                                        }, "small red", true, false),
+                                            let p = path.split('/', -1);
+                                            let pLast = p[p.length-1];
+                                            await deleteNode(pLast)
+                                        }, "small red", ()=>{}, true, false),
                                         ButtonDefinition("Cancel", () => {
-                                        }, "small light", true, false)
+                                        }, "small light", ()=>{}, true, false)
                                     ]
                                 } 
                             >

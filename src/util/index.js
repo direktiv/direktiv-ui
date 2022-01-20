@@ -1,5 +1,5 @@
 export const Config = {
-    url: process.env.REACT_APP_API
+    url: process.env.REACT_APP_API ? process.env.REACT_APP_API : "/api/" 
 }
 
 function fallbackCopyTextToClipboard(text) {
@@ -46,4 +46,19 @@ export function GenerateRandomKey(prefix) {
 
     return prefix + Array(16).fill().map(()=>"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".charAt(Math.random()*62)).join("")
 }
+
+const PreviewableMimeTypes = ["application/json", "application/x-sh", "text/html", "application/yaml", "text/plain"]
+
+export function CanPreviewMimeType(mime) {
+
+  for (let index = 0; index < PreviewableMimeTypes.length; index++) {
+      const pmt = PreviewableMimeTypes[index];
+      if (mime == pmt) {
+          return true
+      }
+  }
+
+  return false
+}
+
 

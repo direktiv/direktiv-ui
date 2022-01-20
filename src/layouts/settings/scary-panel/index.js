@@ -26,7 +26,7 @@ function ScarySettings(props) {
                             <Scary namespace={namespace} deleteErr={deleteErr} deleteNamespace={deleteNamespace}/>
                         </FlexBox>
                         <FlexBox>
-                            <Alert className="critical">These settings are super dangerous! Use at your own risk!</Alert>
+                            <Alert style={{width: "100%"}} className="critical">These settings are super dangerous! Use at your own risk!</Alert>
                         </FlexBox>
                     </FlexBox>
                 </ContentPanelBody>
@@ -66,11 +66,11 @@ function Scary(props) {
                             </Button>
                         )}  
                         actionButtons={[
-                            ButtonDefinition("Delete", () => {
-                                deleteNamespace(namespace)
-                            }, delBtnClasses, true, false),
+                            ButtonDefinition("Delete", async () => {
+                                await deleteNamespace(namespace)
+                            }, delBtnClasses,()=>{}, true, false),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light", true, false)
+                            }, "small light",()=>{}, true, false)
                         ]}
                     >
                         <DeleteNamespaceConfirmationPanel namespace={namespace} setDelButtonEnabled={setDelButtonEnabled} />

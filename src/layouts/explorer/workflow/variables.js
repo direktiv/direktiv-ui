@@ -11,9 +11,10 @@ import DirektivEditor from '../../../components/editor';
 import FlexBox from '../../../components/flexbox';
 import Modal, { ButtonDefinition } from '../../../components/modal';
 import Tabs from '../../../components/tabs';
-import { Config } from '../../../util';
+import { Config, CanPreviewMimeType } from '../../../util';
 import { VariableFilePicker } from '../../settings/variables-panel';
 import { AutoSizer } from 'react-virtualized';
+import HelpIcon from "../../../components/help";
 
 
 function AddWorkflowVariablePanel(props) {
@@ -44,7 +45,12 @@ function AddWorkflowVariablePanel(props) {
                 <ContentPanelTitleIcon>
                     <IoMdLock/>
                 </ContentPanelTitleIcon>
-                Variables
+                <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
+                    <div>
+                        Variables
+                    </div>
+                    <HelpIcon msg={"List of variables for that workflow."} />
+                </FlexBox>
                     <Modal title="New variable" 
                         escapeToCancel
                         button={(
@@ -62,25 +68,18 @@ function AddWorkflowVariablePanel(props) {
                                 if(document.getElementById("file-picker")){
                                     setUploading(true)
                                     if(keyValue === "") {
-                                        setUploading(false)
-                                        return "Variable key name needs to be provided."
+                                        throw new Error("Variable key name needs to be provided.")
                                     }
-                                    let err = await setWorkflowVariable(keyValue, file, mimeType)
-                                    if (err) {
-                                        setUploading(false)
-                                        return err
-                                    }
+                                    await setWorkflowVariable(encodeURIComponent(keyValue), file, mimeType)
                                 } else {
                                     if(keyValue === "") {
-                                        setUploading(false)
-                                        return "Variable key name needs to be provided."
+                                        throw new Error("Variable key name needs to be provided.")
                                     }
-                                    let err = await setWorkflowVariable(keyValue, dValue, mimeType)
-                                    if (err) return err
+                                    await setWorkflowVariable(encodeURIComponent(keyValue), dValue, mimeType)
                                 }
-                            }, uploadingBtn, true, false),
+                            }, uploadingBtn, ()=>{setUploading(false)}, true, false),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light", true, false)
+                            }, "small light",()=>{}, true, false)
                         ]}
                     >
                         <AddVariablePanel mimeType={mimeType} setMimeType={setMimeType} file={file} setFile={setFile} setKeyValue={setKeyValue} keyValue={keyValue} dValue={dValue} setDValue={setDValue}/>
@@ -253,24 +252,29 @@ function Variable(props) {
                     actionButtons={
                         [
                             ButtonDefinition("Save", async () => {
-                                let err = await setWorkflowVariable(obj.node.name, val , mimeType)
-                                if (err) {
-                                    return err
-                                }
-                            }, "small blue", true, false),
+                                await setWorkflowVariable(obj.node.name, val , mimeType)
+                            }, "small blue", ()=>{}, true, false),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light", true, false)
+                            }, "small light", ()=>{}, true, false)
                         ]
                     } 
                 >
                     <FlexBox className="col gap" style={{fontSize: "12px", width: "580px", minHeight: "500px"}}>
                         <FlexBox className="gap" style={{flexGrow: 1}}>
                             <FlexBox style={{overflow:"hidden"}}>
+                            {CanPreviewMimeType(mimeType) ?   
                             <AutoSizer>
                                 {({height, width})=>(
                                 <DirektivEditor dlang={lang} width={width} dvalue={val} setDValue={setValue} height={height}/>
                                 )}
                             </AutoSizer>
+                            :
+                            <div style={{width: "100%", display:"flex", justifyContent: "center", alignItems:"center"}}>
+                                <p style={{fontSize:"11pt"}}>
+                                    Cannot preview variable with mime-type: {mimeType}
+                                </p>
+                            </div>
+                            }
                             </FlexBox>
                         </FlexBox>
                         <FlexBox className="gap" style={{flexGrow: 0, flexShrink: 1}}>
@@ -332,15 +336,10 @@ function Variable(props) {
                         [
                             ButtonDefinition("Upload", async () => {
                                 setUploading(true)
-                                let err = await setWorkflowVariable(obj.node.name, file, mimeType)
-                                if (err) {
-                                    setUploading(false)
-                                    return err
-                                }
-                                setUploading(false)
-                            }, uploadingBtn, true, false),
+                                await setWorkflowVariable(obj.node.name, file, mimeType)
+                            }, uploadingBtn, ()=>{setUploading(false)}, true, false),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light", true, false)
+                            }, "small light",()=>{}, true, false)
                         ]
                     } 
                 >
@@ -360,11 +359,10 @@ function Variable(props) {
                     actionButtons={
                         [
                             ButtonDefinition("Delete", async () => {
-                                let err = await deleteWorkflowVariable(obj.node.name)
-                                if (err) return err
-                            }, "small red", true, false),
+                                    await deleteWorkflowVariable(obj.node.name)
+                            }, "small red", ()=>{}, true, false),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light", true, false)
+                            }, "small light", ()=>{}, true, false)
                         ]
                     } 
                 >

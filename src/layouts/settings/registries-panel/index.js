@@ -82,11 +82,10 @@ function RegistriesPanel(props){
                                     setTokenErr("token must be filled out")
                                     filledOut = false
                                 }
-                                if(!filledOut) return "all fields must be filled out"
-                                let err = await createRegistry(url, `${username}:${token}`)
-                                if(err) return err
+                                if(!filledOut) throw new Error("all fields must be filled out")
+                                await createRegistry(url, `${username}:${token}`)
                                 await getRegistries()
-                            }, true)
+                            }, ()=>{}, true)
                         ]}
                         actionButtons={[
                             ButtonDefinition("Add", async() => {
@@ -106,11 +105,10 @@ function RegistriesPanel(props){
                                     setTokenErr("Please enter a token...")
                                     filledOut = false
                                 }
-                                if(!filledOut) return "all fields must be filled out"
-                                let err = await createRegistry(url, `${username}:${token}`)
-                                if(err) return err
+                                if(!filledOut) throw new Error("all fields must be filled out")
+                                await createRegistry(url, `${username}:${token}`)
                                 await  getRegistries()
-                            }, "small blue", true, false),
+                            }, "small blue", ()=>{}, true, false),
                             ButtonDefinition("Test Connection", async () => {
                                 setURLErr("")
                                 setTokenErr("")
@@ -128,19 +126,16 @@ function RegistriesPanel(props){
                                     setTokenErr("Please enter a token...")
                                     filledOut = false
                                 }
-                                if(!filledOut) return "all fields must be filled out"
+                                if(!filledOut) throw new Error("all fields must be filled out")
                                 setTestConnLoading(true)
-                                let err = await TestRegistry(url, username, token)
-                                if(err) {
-                                    setTestConnLoading(false)
-                                    setSuccessFeedback(false)
-                                    return err
-                                }
+                                await TestRegistry(url, username, token)
                                 setTestConnLoading(false)
                                 setSuccessFeedback(true)
-                            }, testConnBtnClasses, false, false),
+                           
+                            }, testConnBtnClasses, ()=>{   setTestConnLoading(false)
+                                setSuccessFeedback(false)}, false, false),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light", true, false)
+                            }, "small light", ()=>{}, true, false)
                         ]}
                     >
                         <AddRegistryPanel urlErr={urlErr} userErr={userErr} tokenErr={tokenErr} successMsg={successFeedback} token={token} setToken={setToken} username={username} setUsername={setUsername} url={url} setURL={setURL}/>    
@@ -260,7 +255,7 @@ export function Registries(props) {
         <>
             <FlexBox className="col gap" style={{ maxHeight: "236px", overflowY: "auto" }}>
             {registries.length === 0 ? 
-                     <FlexBox className="secret-tuple">
+                     <FlexBox className="secret-tuple empty-content">
                      <FlexBox className="key">No registries are stored...</FlexBox>
                      <FlexBox className="val"></FlexBox>
                      <FlexBox className="val"></FlexBox>
@@ -272,7 +267,7 @@ export function Registries(props) {
             {registries.map((obj)=>{
                     return (
                         <FlexBox key={obj.name} className="secret-tuple">
-                            <FlexBox className="key">{obj.name}</FlexBox>
+                            <FlexBox className="key">{obj.name} <span className="muted-text" style={{ marginLeft: "8px" }}>({obj.user})</span></FlexBox>
                             <FlexBox className="val"></FlexBox>
                             <FlexBox className="val"></FlexBox>
                             <FlexBox className="actions">
@@ -291,12 +286,11 @@ export function Registries(props) {
                                         [
                                             // label, onClick, classList, closesModal, async
                                             ButtonDefinition("Delete", async () => {
-                                                let err = await deleteRegistry(obj.name)
-                                                if (err) return err
-                                                await getRegistries()
-                                            }, "small red", true, false),
+                                                    await deleteRegistry(obj.name)
+                                                    await getRegistries()
+                                            }, "small red",()=>{}, true, false),
                                             ButtonDefinition("Cancel", () => {
-                                            }, "small light", true, false)
+                                            }, "small light",()=>{}, true, false)
                                         ]
                                     }   
                                 >

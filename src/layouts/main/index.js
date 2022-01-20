@@ -21,10 +21,10 @@ import GlobalPodPanel from '../global-services/pod'
 import Loader from '../../components/loader';
 import Button from '../../components/button';
 import { IoMenu } from 'react-icons/io5';
-import Login from '../login';
 import InstancePageWrapper from '../instance';
 // import PermissionsPageWrapper from '../permissions';
 import EventsPageWrapper from '../events';
+import Monitoring from '../monitoring';
 
 
 function NamespaceNavigation(props){
@@ -95,7 +95,13 @@ function NamespaceNavigation(props){
             <FlexBox className="col" style={{paddingBottom: "8px"}}>
                 {namespaces !== null ? 
                 <Routes>
-                    <Route path="/" element={<div>index route:)</div>} />
+                    <Route path="/" element={
+                        <div className="message-container">
+                            <p className="no-workspace-message">
+                                You are not a part of any namespaces! Create a namespace to continue using Direktiv.
+                            </p>
+                        </div>
+                    }/>
                     {/* Explorer routing */}
                     <Route path="/n/:namespace" element={<Explorer namespace={namespace} />} >
                         <Route path="explorer/*" element={<Explorer namespace={namespace} />} />
@@ -103,7 +109,7 @@ function NamespaceNavigation(props){
                    
                 
 
-                    <Route path="/n/:namespace/monitoring" element={<div>monitor</div>}/>
+                    <Route path="/n/:namespace/monitoring" element={<Monitoring namespace={namespace}/>}/>
                     {/* <Route path="/n/:namespace/builder" element={<WorkflowBuilder namespace={namespace}/>}/> */}
                     <Route path="/n/:namespace/instances" element={<InstancesPage namespace={namespace} />}/>
                     <Route path="/n/:namespace/instances/:id" element={<InstancePageWrapper namespace={namespace} />} />
@@ -141,11 +147,11 @@ function NamespaceNavigation(props){
 
 
 function MainLayout(props) {
-    let {onClick, style, className, extraNavigation, extraRoutes} = props;
+    let {onClick, style, className, extraNavigation, extraRoutes, footer, akey, akeyReq} = props;
 
-    const [akey, setAKey] = useState(localStorage.getItem('apikey'))
+   
     const [load, setLoad] = useState(true)
-    const [login, setLogin] = useState(false)
+ 
     const [namespace, setNamespace] = useState(null)
     const [toggleResponsive, setToggleResponsive] = useState(false);
     const {data, err, createNamespace, deleteNamespace} = useNamespaces(Config.url, true, akey)
@@ -157,9 +163,6 @@ function MainLayout(props) {
             setLoad(false)
         }
         if(err !== null) {
-            if(err.status && err.status === 401){
-                setLogin(true)
-            }
             setLoad(false)
         }
     },[data, err])
@@ -183,17 +186,13 @@ function MainLayout(props) {
                     Left col: navigation
                     Right : page contents 
                 */}
-                <Loader load={load} timer={1000}>
-                        {login ? 
-                            <Login setLogin={setLogin} setAKey={setAKey} />
-                            :
-                            <BrowserRouter>
-                              <FlexBox className="navigation-col">
-                                <NavBar extraNavigation={extraNavigation}  toggleResponsive={toggleResponsive} setToggleResponsive={setToggleResponsive} setNamespace={setNamespace} namespace={namespace} createNamespace={createNamespace} deleteNamespace={deleteNamespace} namespaces={data} />
-                              </FlexBox>
-                              <NamespaceNavigation extraRoutes={extraRoutes} deleteNamespace={deleteNamespace} namespace={namespace} setNamespace={setNamespace} namespaces={data}/>
-                            </BrowserRouter>
-                        }
+                <Loader load={load} timer={1000} >
+                    <BrowserRouter>
+                        <FlexBox className="navigation-col">
+                        <NavBar akeyReq={akeyReq} footer={footer} extraNavigation={extraNavigation}  toggleResponsive={toggleResponsive} setToggleResponsive={setToggleResponsive} setNamespace={setNamespace} namespace={namespace} createNamespace={createNamespace} deleteNamespace={deleteNamespace} namespaces={data} />
+                        </FlexBox>
+                        <NamespaceNavigation  akey={akey} extraRoutes={extraRoutes} deleteNamespace={deleteNamespace} namespace={namespace} setNamespace={setNamespace} namespaces={data}/>
+                    </BrowserRouter>
                 </Loader>
             </FlexBox>
         </div>

@@ -1,7 +1,7 @@
 import { useNamespaceService } from "direktiv-react-hooks"
 import { useEffect, useState } from "react"
 import { IoPlay } from "react-icons/io5"
-import { useParams } from "react-router"
+import { useNavigate, useParams } from "react-router"
 import { Service } from "."
 import AddValueButton from "../../components/add-button"
 import Alert from "../../components/alert"
@@ -62,8 +62,8 @@ export function RevisionCreatePanel(props){
 
 function NamespaceRevisions(props) {
     const {namespace, service} = props
-
-    const {revisions, config, traffic, setNamespaceServiceRevisionTraffic, deleteNamespaceServiceRevision, getNamespaceServiceConfig, createNamespaceServiceRevision} = useNamespaceService(Config.url, namespace, service,localStorage.getItem("apikey"))
+    const navigate = useNavigate()
+    const {revisions, config, traffic, setNamespaceServiceRevisionTraffic, deleteNamespaceServiceRevision, getNamespaceServiceConfig, createNamespaceServiceRevision} = useNamespaceService(Config.url, namespace, service, navigate, localStorage.getItem("apikey"))
 
     const [load, setLoad] = useState(true)
     const [image, setImage] = useState("")
@@ -74,7 +74,7 @@ function NamespaceRevisions(props) {
 
     
     useEffect(()=>{
-        if(revisions !== null) {
+        if(revisions !== null && revisions.length > 0) {
             setScale(revisions[0].minScale)
             setSize(revisions[0].size)
             setImage(revisions[0].image)
@@ -122,15 +122,14 @@ function NamespaceRevisions(props) {
                                 )}  
                                 keyDownActions={[
                                     KeyDownDefinition("Enter", async () => {
-                                    }, true)
+                                    }, ()=>{}, true)
                                 ]}
                                 actionButtons={[
                                     ButtonDefinition("Add", async () => {
-                                        let err = await createNamespaceServiceRevision(image, parseInt(scale), parseInt(size), cmd, parseInt(trafficPercent))
-                                        if (err) return err
-                                    }, "small blue", true, false),
+                                        await createNamespaceServiceRevision(image, parseInt(scale), parseInt(size), cmd, parseInt(trafficPercent))
+                                    }, "small blue", ()=>{}, true, false),
                                     ButtonDefinition("Cancel", () => {
-                                    }, "small light", true, false)
+                                    }, "small light", ()=>{}, true, false)
                                 ]}
                             >
                                 {config !== null ? 
@@ -149,7 +148,8 @@ function NamespaceRevisions(props) {
 
                         <FlexBox className="gap col">
                             <FlexBox className="gap col">
-                                {revisions.map((obj) => {
+                                {revisions.sort((a, b)=> (a.created > b.created) ? -1 : 1).map((obj, i) => {
+
                                     let dontDelete = false
                                     let t = 0
                                     for (let i=0; i < traffic.length; i++) {
@@ -162,8 +162,9 @@ function NamespaceRevisions(props) {
 
                                     return (
                                         <Service 
+                                            latest={i===0}
                                             traffic={t}
-                                            dontDelete={dontDelete}
+                                            dontDelete={dontDelete && i !== 0} 
                                             revision={obj.rev}
                                             deleteService={deleteNamespaceServiceRevision}
                                             url={`/n/${namespace}/services/${service}/${obj.rev}`}
@@ -232,10 +233,10 @@ export function UpdateTraffic(props){
                                             setRevOne(e.target.value)
                                         }}>
                                             <option value="">No revision selected</option>
-                                            {revisions.map((obj)=>{
+                                            {revisions.map((obj, key)=>{
                                                 if(obj.name !== revTwo) {
                                                     return(
-                                                        <option value={obj.name}>{obj.name}</option>
+                                                        <option key={`option-rev-update-traffic-1-${key}`} value={obj.name}>{obj.name}</option>
                                                     )
                                                 } else {
                                                     return <></>
@@ -252,10 +253,10 @@ export function UpdateTraffic(props){
                                             setRevTwo(e.target.value)
                                         }}>
                                             <option value="">No revision selected</option>
-                                            {revisions.map((obj)=>{
+                                            {revisions.map((obj, key)=>{
                                                 if(obj.name !== revOne) {
                                                     return(
-                                                        <option value={obj.name}>{obj.name}</option>
+                                                        <option key={`option-rev-update-traffic-2-${key}`} value={obj.name}>{obj.name}</option>
                                                     )
                                                 } else {
                                                     return <></>
@@ -296,11 +297,15 @@ export function UpdateTraffic(props){
                         <ContentPanelFooter>
                             <FlexBox className="col" style={{alignItems:"flex-end"}}>
                                 <Button className="small" onClick={async ()=>{
-                                    let err = await setNamespaceServiceRevisionTraffic(revOne, parseInt(tpercent), revTwo, parseInt(100-tpercent))
-                                    if (err) {
-                                        setErrMsg(err)
-                                    } else {
+                                    try { 
+                                        await setNamespaceServiceRevisionTraffic(revOne, parseInt(tpercent), revTwo, parseInt(100-tpercent))
                                         setErrMsg("")
+                                    } catch(err) {
+                                        if(err.message){
+                                            setErrMsg(err.message)
+                                        } else {
+                                            setErrMsg(err)
+                                        }
                                     }
                                 }}>
                                     Save

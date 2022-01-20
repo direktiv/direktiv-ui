@@ -35,10 +35,9 @@ function InstancesTable(props) {
     const {namespace} = props
     const [load, setLoad] = useState(true)
     const [ page, setPage ] = useState(1)
-
-    const {data, err, getInstances} = useInstances(Config.url, true, namespace, localStorage.getItem("apikey"))
-    
     const pageSize = 5
+    const [iQueryParams, ] = useState([])
+    const {data, err, getInstances} = useInstances(Config.url, true, namespace, localStorage.getItem("apikey"), ...iQueryParams)
 
     useEffect(()=>{
         getInstances(
@@ -57,9 +56,8 @@ function InstancesTable(props) {
             setLoad(false)
         }
     },[data, err])
-
     return(
-        <Loader load={load} timer={1000}>
+        <Loader load={load} timer={3000}>
 
         <ContentPanel>
         <ContentPanelTitle>
@@ -127,7 +125,7 @@ function InstancesTable(props) {
         </ContentPanelBody>
     </ContentPanel>
     <FlexBox>
-        <Pagination max={10} currentIndex={pageNo} pageNoSetter={setPageNo} />
+        {/* <Pagination max={10} currentIndex={pageNo} pageNoSetter={setPageNo} /> */}
     </FlexBox>
     </Loader>
         
@@ -142,7 +140,7 @@ const cancelled = "cancelled";
 const running = "pending";
 
 export function InstanceRow(props) {
-    let {state, name, wf, started, startedFrom, finished, finishedFrom, id, namespace} = props;
+    let {state, name, wf, started,  finished,  id, namespace} = props;
     const navigate = useNavigate()
 
     let label;
@@ -159,6 +157,10 @@ export function InstanceRow(props) {
     let wfStr = name.split(':')[0]
     let revStr = name.split(':')[1]
 
+    let pathwf = wfStr.split("/")
+    let wfname = pathwf[pathwf.length-1]
+    pathwf.splice(pathwf.length-1, pathwf.length-1)
+    
     return(
     
     <tr onClick={()=>{
@@ -168,10 +170,16 @@ export function InstanceRow(props) {
             {label}
         </td>
         {!wf ? 
-        <td className="center-align" style={{fontSize: "12px", lineHeight: "20px"}}>
-            {wfStr}
+        <td title={wfStr} className="center-align" style={{ fontSize: "12px", lineHeight: "20px", display:"flex", justifyContent:"center", marginTop:"12px"}}>
+            <div style={{marginLeft:"10px", textOverflow:"ellipsis", overflow:"hidden"}}>
+                /{pathwf.join("/")}
+            </div>
+            {pathwf.length !== 1 ?
+            <div>
+                /{wfname}
+            </div>:""}
         </td>: ""}
-        <td style={{ fontSize: "12px", lineHeight: "20px" }} className="center-align">
+        <td title={revStr} style={{ fontSize: "12px", lineHeight: "20px", textOverflow:"ellipsis", overflow:"hidden" }} className="center-align">
             {revStr}
         </td>
         <td className="center-align">
