@@ -13,8 +13,7 @@ import Tabs from '../../../components/tabs';
 import HelpIcon from '../../../components/help';
 import { VscCloudDownload, VscCloudUpload, VscEye, VscLoading, VscTrash, VscVariableGroup } from 'react-icons/vsc';
 import { AutoSizer } from 'react-virtualized';
-
-
+import {ExtractQueryString} from "direktiv-react-hooks/src/util";
 
 function VariablesPanel(props){
 
@@ -135,27 +134,30 @@ export function VariableFilePicker(props) {
 function AddVariablePanel(props) {
     const {keyValue, setKeyValue, dValue, setDValue, file, setFile, mimeType, setMimeType} = props
 
-    let lang = ""
-
-    switch(mimeType){
-    case "application/json":
-        lang = "json"
-        break
-    case "application/x-sh":
-        lang = "shell"
-        break
-    case "text/html":
-        lang = "html"
-        break
-    case "text/css":
-        lang = "css"
-        break
-    case "application/yaml":
-        lang = "yaml"
-        break
-    default:
-        lang = "plain"
+    const getLangByMimeType = (mimeType) => {
+        switch(mimeType){
+            case "text/plain":
+                return "txt"
+            case "application/json":
+                return "json"
+            case "application/x-sh":
+                return "shell"
+            case "text/html":
+                return "html"
+            case "text/css":
+                return "css"
+            case "application/yaml":
+                return "yaml"
+            case "image/jpeg":
+                return "jpg"
+            case "image/gif":
+                return "gif"
+            case "image/png":
+                return "png"
+        }
     }
+
+    let lang = getLangByMimeType(mimeType)
 
     return(
         <Tabs 
@@ -204,10 +206,6 @@ function AddVariablePanel(props) {
 function Variables(props) {
     const {variables, namespace, getNamespaceVariable, setNamespaceVariable, deleteNamespaceVariable} = props
 
- 
-    
-
-
     return(
         <FlexBox>
             {variables.length === 0  ? <div style={{paddingLeft:"10px", fontSize:"10pt"}}>No variables are stored...</div>:
@@ -226,36 +224,39 @@ function Variables(props) {
 }
 
 function Variable(props) {
-    const {obj, getNamespaceVariable, setNamespaceVariable, deleteNamespaceVariable} = props
+    const {obj, getNamespaceVariable, setNamespaceVariable, deleteNamespaceVariable, namespace} = props
     const [val, setValue] = useState("")
     const [mimeType, setType] = useState("")
     const [file, setFile] = useState(null)
     const [downloading, setDownloading] = useState(false)
     const [uploading, setUploading] = useState(false)
     let uploadingBtn = "small green"
-    if (uploading) {
-        uploadingBtn += " btn-loading"
-    }
-    let lang = ""
-    switch(mimeType){
-        case "application/json":
-            lang = "json"
-            break
-        case "application/x-sh":
-            lang = "shell"
-            break
-        case "text/html":
-            lang = "html"
-            break
-        case "text/css":
-            lang = "css"
-            break
-        case "application/yaml":
-            lang = "yaml"
-            break
-        default:
-            lang = "plain"
+    if (uploading) { uploadingBtn += " btn-loading" }
+
+    const getLangByMimeType = (mimeType) => {
+        switch(mimeType){
+            case "text/plain":
+                return "txt"
+            case "application/json":
+                return "json"
+            case "application/x-sh":
+                return "shell"
+            case "text/html":
+                return "html"
+            case "text/css":
+                return "css"
+            case "application/yaml":
+                return "yaml"
+            case "image/jpeg":
+                return "jpg"
+            case "image/gif":
+                return "gif"
+            case "image/png":
+                return "png"
         }
+    }
+
+    let lang = getLangByMimeType(mimeType)
 
     return(
         <tr className="body-row" key={`${obj.node.name}${obj.node.size}`}>
@@ -339,35 +340,29 @@ function Variable(props) {
         <td style={{ width: "120px", maxWidth: "120px", paddingLeft: "12px" }}> 
             <FlexBox style={{gap: "2px"}}>
                 <FlexBox>
-                    
-                    {!downloading? 
+                    {!downloading?
                     <VariablesDownloadButton onClick={async()=>{
                         setDownloading(true)
-                        let resp = await getNamespaceVariable(obj.node.name)
-                        let b = new Blob([resp.data], {type:resp.contentType})
-                        let url = URL.createObjectURL(b)
-                        const a = document.createElement('a');
-                        a.href = url
-                        a.download = obj.node.name
 
-                        const clickHandler = () => {
-                            setTimeout(() => {
-                                URL.revokeObjectURL(url);
-                                a.removeEventListener('click', clickHandler);
-                            }, 150);
-                        };
+                        const variableData = await getNamespaceVariable(obj.node.name)
+                        const lang = getLangByMimeType(variableData.contentType)
+                        const fileType = variableData.contentType.split("/")[0] + `/${lang}`
 
-                        a.addEventListener('click', clickHandler, false);
-                        a.click();
+                        const apiKey = localStorage.getItem("apikey")
+                        const resp = await fetch(`${Config.url}namespaces/${namespace}/vars/${obj.node.name}`,
+                            {headers: apiKey === undefined ? {} : { "apikey": apiKey}})
+
+                        const buffer = await resp.arrayBuffer()
+
+                        const bitArray = btoa(String.fromCharCode.apply(null, new Uint8Array(buffer)))
+
+                        const a = document.createElement('a')
+                        a.href = `data:${variableData.contentType};base64,` + bitArray
+                        a.download = obj.node.name + `.${fileType}`
+                        a.click()
+
                         setDownloading(false)
                     }}/>:<VariablesDownloadingButton />}
-                    
-                     {
-                         // this logic could work on ee as keycloak isn't handle by me
-                         // but sending an apikey via a link is impossible
-                     /* <a download href={`${Config.url}/namespaces/${namespace}/vars/${obj.node.name}`}>
-                        <VariablesDownloadButton/>
-                     </a> */}
                 </FlexBox>
                 <Modal
                     escapeToCancel
