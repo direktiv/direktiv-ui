@@ -196,7 +196,7 @@ function ExplorerList(props) {
     const [isDirectoryButtonDisabled, setIsDirectoryButtonDisabled] = useState(false)
     const [isWorkflowButtonDisabled, setIsWorkflowButtonDisabled] = useState(false)
 
-    const {data, err, templates, pageInfo, createNode, deleteNode, renameNode } = useNodes(Config.url, true, namespace, path, localStorage.getItem("apikey"), `order.field=${orderFieldDictionary[orderFieldKey]}`)
+    const {data, err, templates, createNode, deleteNode, renameNode } = useNodes(Config.url, true, namespace, path, localStorage.getItem("apikey"), orderFieldDictionary[orderFieldKey])
 
     const directoryValidationSchema = yup.object().shape({
         directoryName: yup.string().required()

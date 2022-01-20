@@ -7,7 +7,7 @@ import { FaCircle} from "react-icons/fa"
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from "../../components/content-panel";
 import FlexBox from "../../components/flexbox";
 import { Config, GenerateRandomKey } from "../../util";
-import Modal, { ButtonDefinition, KeyDownDefinition } from "../../components/modal";
+import Modal, { ButtonDefinition } from "../../components/modal";
 import AddValueButton from "../../components/add-button";
 import {Link} from 'react-router-dom'
 import HelpIcon from "../../components/help"

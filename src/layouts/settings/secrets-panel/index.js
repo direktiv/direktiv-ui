@@ -77,7 +77,7 @@ function SecretsPanel(props){
                             }, "small light",()=>{}, true, false)
                         ]}
                     >
-                         <Tabs 
+                    <Tabs
             style={{minHeight: "100px", minWidth: "400px"}}
             headers={["Manual", "Upload"]}
             tabs={[(     

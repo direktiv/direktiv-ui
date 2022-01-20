@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import ContentPanel, {ContentPanelTitle, ContentPanelTitleIcon, ContentPanelBody } from '../../components/content-panel';
-import Modal, { ButtonDefinition, KeyDownDefinition } from '../../components/modal';
+import Modal, { ButtonDefinition } from '../../components/modal';
 import AddValueButton from '../../components/add-button';
 import FlexBox from '../../components/flexbox';
 import Alert from '../../components/alert';
@@ -73,7 +73,7 @@ export function GlobalRegistries(){
                             }, "small light", ()=>{},true, false)
                         ]}
                     >
-                        <AddRegistryPanel token={token} setToken={setToken} username={username} setUsername={setUsername} url={url} setURL={setURL}/>    
+                        <AddRegistryPanel token={token} setToken={setToken} username={username} setUsername={setUsername} url={url} setURL={setURL}/>
                     </Modal> 
                 </div>
             </ContentPanelTitle>
@@ -151,7 +151,7 @@ export function GlobalPrivateRegistries(){
                             }, "small light", ()=>{}, true, false)
                         ]}
                     >
-                        <AddRegistryPanel token={token} setToken={setToken} username={username} setUsername={setUsername} url={url} setURL={setURL}/>    
+                        <AddRegistryPanel token={token} setToken={setToken} username={username} setUsername={setUsername} url={url} setURL={setURL}/>
                     </Modal> 
                 </div>
             </ContentPanelTitle>

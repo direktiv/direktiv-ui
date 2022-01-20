@@ -4,7 +4,7 @@ import {useEffect, useState} from "react"
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from "../../components/content-panel";
 import FlexBox from "../../components/flexbox";
 import { Config, GenerateRandomKey } from "../../util";
-import Modal, { ButtonDefinition, KeyDownDefinition } from "../../components/modal";
+import Modal, { ButtonDefinition } from "../../components/modal";
 import AddValueButton from "../../components/add-button";
 import { IoPlay } from "react-icons/io5";
 import HelpIcon from "../../components/help"
@@ -91,7 +91,7 @@ export default function GlobalServicesPanel(props) {
                             }, "small light", ()=>{}, true, false)
                         ]}
                     >
-                        {config !== null ? 
+                        {config !== null ?
                             <ServiceCreatePanel cmd={cmd} setCmd={setCmd} size={size} setSize={setSize} name={serviceName} setName={setServiceName} image={image} setImage={setImage} scale={scale} setScale={setScale} maxscale={config.maxscale} />
                             :
                             ""

@@ -361,7 +361,7 @@ function Variable(props) {
                             ButtonDefinition("Cancel", () => {
                             }, "small light",()=>{}, true, false)
                         ]
-                    } 
+                    }
                 >
                     <FlexBox className="col gap" style={{fontSize: "12px", width: "580px", minHeight: "500px"}}>
                         <FlexBox className="gap" style={{flexGrow: 1}}>
@@ -459,7 +459,7 @@ function Variable(props) {
                             ButtonDefinition("Cancel", () => {
                             }, "small light", ()=>{}, true, false)
                         ]
-                    } 
+                    }
                 >
                     <FlexBox className="col gap">
                         <FlexBox className="gap" style={{margin: "-8px 0 -4px 0", fontWeight: "bold"}}>
