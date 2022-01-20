@@ -19,18 +19,21 @@ import {VscChevronDown, VscChevronUp} from 'react-icons/vsc'
 import { Service } from '../../namespace-services';
 import DirektivEditor from '../../../components/editor';
 import AddWorkflowVariablePanel from './variables';
-import { RevisionSelectorTab } from './revisionTab';
+import { RevisionSelectorTab, TabbedButtons } from './revisionTab';
 import DependencyDiagram from '../../../components/dependency-diagram';
+import YAML from 'js-yaml'
+import WorkflowDiagram from '../../../components/diagram';
 
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import Button from '../../../components/button';
 import Modal, { ButtonDefinition } from '../../../components/modal';
 
-
+import SankeyDiagram from '../../../components/sankey';
 import {PieChart} from 'react-minimal-pie-chart'
 import HelpIcon from "../../../components/help";
 import Loader from '../../../components/loader';
+import Alert from '../../../components/alert';
 
 dayjs.extend(utc)
 dayjs.extend(relativeTime);
@@ -73,6 +76,9 @@ function InitialWorkflowHook(props){
 
     const [activeTab, setActiveTab] = useState(searchParams.get("tab") !== null ? parseInt(searchParams.get('tab')): 0)
 
+    useEffect(()=>{
+        setActiveTab(searchParams.get("tab") !== null ? parseInt(searchParams.get('tab')): 0)
+    }, [searchParams])
     // todo handle err from hook below
     const {data,  getSuccessFailedMetrics, tagWorkflow, addAttributes, deleteAttributes, setWorkflowLogToEvent, editWorkflowRouter, getWorkflowSankeyMetrics, getWorkflowRevisionData, getWorkflowRouter, toggleWorkflow, executeWorkflow, getInstancesForWorkflow, getRevisions, getTags, deleteRevision, saveWorkflow, updateWorkflow, discardWorkflow, removeTag} = useWorkflow(Config.url, true, namespace, filepath.substring(1), localStorage.getItem("apikey"))
     const [router, setRouter] = useState(null)
@@ -88,8 +94,8 @@ function InitialWorkflowHook(props){
             if(revisions === null){
                 // get workflow revisions
                 let resp = await getRevisions()
-                if(Array.isArray(resp)){
-                    setRevisions(resp)
+                if(Array.isArray(resp.edges)){
+                    setRevisions(resp.edges)
                 } else {
                     setRevsErr(resp)
                 }
@@ -128,11 +134,17 @@ function InitialWorkflowHook(props){
                     :<></>}
                     { activeTab === 2 ?
                         <WorkingRevision 
+                            getWorkflowSankeyMetrics={getWorkflowSankeyMetrics}
+                            searchParams={searchParams}
+                            setSearchParams={setSearchParams}
                             namespace={namespace}
                             executeWorkflow={executeWorkflow}
                             saveWorkflow={saveWorkflow} 
                             updateWorkflow={updateWorkflow} 
                             discardWorkflow={discardWorkflow} 
+                            updateRevisions={() => {
+                                setRevisions(null)
+                            }}
                             wf={atob(data.revision.source)} 
                         />
                     :<></>}
@@ -242,13 +254,19 @@ function WorkingRevisionErrorBar(props) {
 }
 
 function WorkingRevision(props) {
-    const {wf, updateWorkflow, discardWorkflow, saveWorkflow, executeWorkflow,namespace} = props
+    const {updateRevisions, searchParams, setSearchParams, getWorkflowSankeyMetrics, wf, updateWorkflow, discardWorkflow, saveWorkflow, executeWorkflow,namespace} = props
 
     const navigate = useNavigate()
     const [load, setLoad] = useState(true)
     const [oldWf, setOldWf] = useState("")
     const [workflow, setWorkflow] = useState("")
     const [input, setInput] = useState("{\n\t\n}")
+
+    const [tabBtn, setTabBtn] = useState(searchParams.get('revtab') !== null ? parseInt(searchParams.get('revtab')): 0);
+
+    useEffect(()=>{
+        setTabBtn(searchParams.get('revtab') !== null ? parseInt(searchParams.get('revtab')): 0)
+    }, [searchParams])
 
     // Error States
     const [errors, setErrors] = useState([])
@@ -288,6 +306,27 @@ function WorkingRevision(props) {
         }
     },[oldWf, wf, pushOpLoadingState])
 
+    let saveFn = (newWf, oldWf) => {
+
+        return () => {
+            if (newWf === oldWf) {
+                setErrors(["Can't save - no changes have been made."])
+                setShowErrors(true)
+                pushOpLoadingState("Save", false)
+                return
+            }
+            setErrors([])
+            pushOpLoadingState("Save", true)
+            updateWorkflow(newWf).then(()=>{
+                setShowErrors(false)
+            }).catch((opError) => {
+                setErrors([opError.message])
+                setShowErrors(true)
+                pushOpLoadingState("Save", false)
+            })
+        }
+    }
+
     return(
         <FlexBox style={{width:"100%"}}>
             <ContentPanel style={{width:"100%"}}>
@@ -300,12 +339,14 @@ function WorkingRevision(props) {
                             Active Revision
                         </div>
                         <HelpIcon msg={"Latest revision where you can edit and create new revisions."} />
+                        <TabbedButtons revision={"latest"} setSearchParams={setSearchParams} searchParams={searchParams} tabBtn={tabBtn} setTabBtn={setTabBtn} />
                     </FlexBox>
                 </ContentPanelTitle>
                 <ContentPanelBody style={{padding: "0px"}}>
+                {tabBtn === 0 ?
                     <FlexBox className="col" style={{ overflow: "hidden" }}>
                         <FlexBox>
-                            <DirektivEditor style={{borderRadius: "0px"}} dlang="yaml" value={workflow} dvalue={oldWf} setDValue={setWorkflow} disableBottomRadius={true} />
+                            <DirektivEditor saveFn={saveFn(workflow, oldWf)} style={{borderRadius: "0px"}} dlang="yaml" value={workflow} dvalue={oldWf} setDValue={setWorkflow} disableBottomRadius={true} />
                         </FlexBox>
                         <FlexBox className="gap" style={{ backgroundColor: "#223848", color: "white", height: "44px", maxHeight: "44px", paddingLeft: "10px", minHeight: "44px", alignItems: 'center', position: "relative", borderRadius: "0px 0px 8px 8px" }}>
                             <WorkingRevisionErrorBar errors={errors} showErrors={showErrors}/>
@@ -338,13 +379,13 @@ function WorkingRevision(props) {
                                             }
                                             if(r.includes("execute workflow")){
                                                 // is an error
-                                                return r
+                                                throw new Error(r)
                                             } else {
                                                 navigate(`/n/${namespace}/instances/${r}`)
                                             }
-                                        }, "small blue", true, false),
+                                        }, "small blue", ()=>{}, true, false),
                                         ButtonDefinition("Cancel", async () => {
-                                        }, "small light", true, false)
+                                        }, "small light", ()=>{}, true, false)
                                     ]}
                                     button={(
                                         <div className={`btn-terminal ${opLoadingStates["IsLoading"] ? "terminal-disabled" : ""}`}>
@@ -373,10 +414,24 @@ function WorkingRevision(props) {
                                 </div>
                                 <div className={`btn-terminal ${opLoadingStates["IsLoading"] ? "terminal-disabled" : ""}`} title={"Save latest workflow as new revision"} onClick={async () => {
                                     setErrors([])
-                                    await saveWorkflow()
-                                    setShowErrors(false)
+                                    try{
+                                        const result = await saveWorkflow()
+                                        if(result?.node?.name)
+                                        {
+                                            updateRevisions()
+                                            setShowErrors(false)
+                                            navigate(`/n/${namespace}/explorer/${result.node.name}?tab=1&revision=${result.revision.name}&revtab=0`)
+                                        }else{
+                                            setErrors("Something went wrong")
+                                            setShowErrors(true)
+                                        }
+                                    }catch(e){
+                                        setErrors(e.toString())
+                                        setShowErrors(true)
+                                    }
+                                    
                                 }}>
-                                    Save as new revision
+                                    Make Revision
                                 </div>
                                 <div className={"btn-terminal editor-info"} title={`${showErrors ? "Hide Problems": "Show Problems"}`} onClick={async () => {
                                     setShowErrors(!showErrors)
@@ -389,7 +444,9 @@ function WorkingRevision(props) {
                                 </div>
                             </div>
                         </FlexBox>
-                    </FlexBox>
+                    </FlexBox>:""}
+                    {tabBtn === 1 ? <WorkflowDiagram disabled={true} workflow={YAML.load(workflow)}/>:""}
+                    {tabBtn === 2 ? <SankeyDiagram revision={"latest"} getWorkflowSankeyMetrics={getWorkflowSankeyMetrics} />:""}
                 </ContentPanelBody>
             </ContentPanel>
         </FlexBox>
@@ -745,6 +802,7 @@ function TrafficDistribution(props) {
         )
     }
 
+
     return(
         <ContentPanelBody>
             <FlexBox className="col gap" style={{justifyContent:'center'}}>
@@ -758,11 +816,11 @@ function TrafficDistribution(props) {
                         <span title={routes[1].ref}>{routes[1].ref.substr(0,8)}</span>
                     </FlexBox>:""}
                 </FlexBox>
-                <Slider value={routes[0] ? routes[0].weight : 0} className="traffic-distribution" disabled={true}/>
+                <Slider value={routes[0] ? routes.length === 2 ? `${routes[0].weight}`: `100` : 0} className="traffic-distribution" disabled={true}/>
                 <FlexBox style={{fontSize:"10pt", marginTop:"5px", maxHeight:"50px", color: "#C1C5C8"}}>
                     {routes[0] ? 
                     <FlexBox className="col">
-                        <span>{routes[0].weight}%</span>
+                        <span>{routes.length === 2 ? `${routes[0].weight}%`: `100%`}</span>
                     </FlexBox>:""}
                     {routes[1] ? 
                     <FlexBox className="col" style={{ textAlign:'right'}}>
@@ -887,8 +945,10 @@ function WorkflowAttributes(props) {
 function SettingsTab(props) {
 
     const {namespace, workflow, addAttributes, deleteAttributes, workflowData, setWorkflowLogToEvent} = props
-
     const [logToEvent, setLogToEvent] = useState(workflowData.eventLogging)
+
+    const [lteStatus, setLTEStatus] = useState(null);
+    const [lteStatusMessage, setLTEStatusMessage] = useState(null);
 
     return (
         <>
@@ -919,15 +979,19 @@ function SettingsTab(props) {
                                             <input value={logToEvent} onChange={(e)=>setLogToEvent(e.target.value)} type="text" placeholder="Enter the 'event' type to send logs to" />
                                         </FlexBox>
                                         <div style={{width:"99.5%", margin:"auto", background: "#E9ECEF", height:"1px"}}/>
-                                        <FlexBox style={{justifyContent:"flex-end", width:"100%"}}>
+                                        <FlexBox className="gap" style={{justifyContent:"flex-end", width:"100%"}}>
+                                            { lteStatus ? <Alert className={`${lteStatus} small`}>{lteStatusMessage}</Alert> : <></> }
                                             <Button onClick={async()=>{
                                                 try { 
                                                     await setWorkflowLogToEvent(logToEvent)
                                                 } catch(err) {
-                                                    // todo err
-                                                    console.log(err, "NOTIFY IF ERR")
+                                                    setLTEStatus("failed")
+                                                    setLTEStatusMessage(err.message)
                                                     return err
                                                 }
+
+                                                setLTEStatus("success")
+                                                setLTEStatusMessage("'Log to Event' value set!")
                                             }} className="small">
                                                 Save
                                             </Button>

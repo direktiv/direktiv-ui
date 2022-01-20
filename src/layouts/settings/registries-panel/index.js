@@ -78,7 +78,7 @@ function RegistriesPanel(props){
                                 } catch(err) {
                                     return err
                                 }
-                            }, `small ${isButtonDisabled ? "disabled": "blue"}`, true, false),
+                            }, `small ${isButtonDisabled ? "disabled": "blue"}`, ()=>{}, true, false),
                             ButtonDefinition("Test Connection", async () => {
                                 setTestConnLoading(true)
                                 let err = await TestRegistry(url, username, token)
@@ -91,7 +91,7 @@ function RegistriesPanel(props){
                                 setSuccessFeedback(true)
                             }, `small ${isButtonDisabled ? "disabled": testConnBtnClasses}`, false, true),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light", true, false)
+                            }, "small light", ()=>{}, true, false)
                         ]}
                     >
                         <AddRegistryPanel successMsg={successFeedback} token={token} setToken={setToken} username={username} setUsername={setUsername} url={url} setURL={setURL}/>
@@ -234,7 +234,7 @@ export function Registries(props) {
             {registries.map((obj)=>{
                     return (
                         <FlexBox key={obj.name} className="secret-tuple">
-                            <FlexBox className="key">{obj.name}</FlexBox>
+                            <FlexBox className="key">{obj.name} <span className="muted-text" style={{ marginLeft: "8px" }}>({obj.user})</span></FlexBox>
                             <FlexBox className="val"></FlexBox>
                             <FlexBox className="val"></FlexBox>
                             <FlexBox className="actions">
@@ -253,16 +253,11 @@ export function Registries(props) {
                                         [
                                             // label, onClick, classList, closesModal, async
                                             ButtonDefinition("Delete", async () => {
-                                                try { 
                                                     await deleteRegistry(obj.name)
                                                     await getRegistries()
-                                                } catch(err) {
-                                                    await getRegistries()
-                                                    return err
-                                                }
-                                            }, "small red", true, false),
+                                            }, "small red",()=>{}, true, false),
                                             ButtonDefinition("Cancel", () => {
-                                            }, "small light", true, false)
+                                            }, "small light",()=>{}, true, false)
                                         ]
                                     }   
                                 >

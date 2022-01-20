@@ -40,8 +40,8 @@ function EventsPage(props) {
     let {namespace} = props;
 
     // errHistory and errListeners TODO show error if one
-    let {eventHistory, eventListeners, sendEvent, replayEvent} = useEvents(Config.url, true, namespace, localStorage.getItem("apikey"))
-
+    let {eventHistory, eventListeners, eventListenersPageInfo, eventHistoryPageInfo, sendEvent, replayEvent} = useEvents(Config.url, true, namespace, localStorage.getItem("apikey"), {listners: [], history: []})
+    console.log(eventHistory, eventListeners)
     return(
         <>
             <FlexBox className="gap col" style={{paddingRight: "8px"}}>
@@ -89,16 +89,35 @@ function EventsPage(props) {
                                                     {obj.node.source}
                                                 </td>
                                                 <td>
-                                                    {dayjs.utc(obj.node.receivedAt).local().format("HH:mm a")}
+                                                    {dayjs.utc(obj.node.receivedAt).local().format("HH:mm:ss a")}
                                                 </td>
                                                 <td style={{textAlign:'center', justifyContent:"center"}}>
-                                                    <div onClick={async ()=>{
-                                                        await replayEvent(obj.node.id)
+                                                <Modal 
+                                                    style={{ justifyContent: "center" }}
+                                                    className="run-workflow-modal"
+                                                    modalStyle={{color: "black"}}
+                                                    title="Retrigger Event"
+                                                    onClose={()=>{
+                                                    }}
+                                                    button={     <div onClick={async ()=>{
                                                     }} style={{display: "flex", alignItems: "flex-end", justifyContent: "center", paddingRight: "10px"}}>
                                                         <Button className="small light">
                                                             <VscRedo/>
                                                         </Button>
-                                                    </div>
+                                                    </div>}
+                                                    actionButtons={[
+                                                        ButtonDefinition("Retrigger", async () => {
+                                                            await replayEvent(obj.node.id)  
+                                                        }, "small blue", ()=>{}, true, true),
+                                                        ButtonDefinition("Cancel", async () => {
+                                                        }, "small light", ()=>{}, true, false)
+                                                    ]}
+                                                >
+                                                    <FlexBox style={{overflow:"hidden"}}>
+                                                        Are you sure you want to retrigger {obj.node.id}?
+                                                    </FlexBox>
+                                                </Modal>
+                                               
                                                 </td>
                                             </tr>
                                         })}
@@ -136,6 +155,9 @@ function EventsPage(props) {
                                                 Mode
                                             </th>
                                             <th>
+                                                Updated
+                                            </th>
+                                            <th>
                                                 Event Types
                                             </th>
                                         </tr>
@@ -155,6 +177,9 @@ function EventsPage(props) {
                                                     </td>
                                                     <td style={{textOverflow:"ellipsis", overflow:"hidden"}}>
                                                         {obj.node.mode}
+                                                    </td>
+                                                    <td>
+                                                        {dayjs.utc(obj.node.receivedAt).local().format("HH:mm:ss a")}
                                                     </td>
                                                     <td className="event-split">
                                                         {obj.node.events.map((obj)=>{
@@ -203,13 +228,9 @@ function SendEventModal(props) {
             )}
             actionButtons={[
                 ButtonDefinition("Send", async () => {
-                    try { 
-                      await sendEvent(eventData)
-                    } catch(err) {
-                      return err
-                    }
-                }, "small", true, false),
-                ButtonDefinition("Cancel", () => {}, "small light", true, false)
+                    await sendEvent(eventData)
+                }, "small", ()=>{}, true, false),
+                ButtonDefinition("Cancel", () => {}, "small light", ()=>{}, true, false)
             ]}
             noPadding
         >

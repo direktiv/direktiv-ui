@@ -148,9 +148,9 @@ function NamespaceRevisions(props) {
                                         } catch(err) {
                                             return err
                                         }
-                                    }, `small ${isButtonDisabled ? "disabled": "blue"}`, true, false),
+                                    }, `small ${isButtonDisabled ? "disabled": "blue"}`,()=>{},true, false),
                                     ButtonDefinition("Cancel", () => {
-                                    }, "small light", true, false)
+                                    }, "small light", ()=>{}, true, false)
                                 ]}
                             >
                                 {config !== null ? 
@@ -169,7 +169,8 @@ function NamespaceRevisions(props) {
 
                         <FlexBox className="gap col">
                             <FlexBox className="gap col">
-                                {revisions.map((obj) => {
+                                {revisions.sort((a, b)=> (a.created > b.created) ? -1 : 1).map((obj, i) => {
+
                                     let dontDelete = false
                                     let t = 0
                                     for (let i=0; i < traffic.length; i++) {
@@ -182,8 +183,9 @@ function NamespaceRevisions(props) {
 
                                     return (
                                         <Service 
+                                            latest={i===0}
                                             traffic={t}
-                                            dontDelete={dontDelete}
+                                            dontDelete={dontDelete && i !== 0} 
                                             revision={obj.rev}
                                             deleteService={deleteNamespaceServiceRevision}
                                             url={`/n/${namespace}/services/${service}/${obj.rev}`}
@@ -252,10 +254,10 @@ export function UpdateTraffic(props){
                                             setRevOne(e.target.value)
                                         }}>
                                             <option value="">No revision selected</option>
-                                            {revisions.map((obj)=>{
+                                            {revisions.map((obj, key)=>{
                                                 if(obj.name !== revTwo) {
                                                     return(
-                                                        <option value={obj.name}>{obj.name}</option>
+                                                        <option key={`option-rev-update-traffic-1-${key}`} value={obj.name}>{obj.name}</option>
                                                     )
                                                 } else {
                                                     return <></>
@@ -272,10 +274,10 @@ export function UpdateTraffic(props){
                                             setRevTwo(e.target.value)
                                         }}>
                                             <option value="">No revision selected</option>
-                                            {revisions.map((obj)=>{
+                                            {revisions.map((obj, key)=>{
                                                 if(obj.name !== revOne) {
                                                     return(
-                                                        <option value={obj.name}>{obj.name}</option>
+                                                        <option key={`option-rev-update-traffic-2-${key}`} value={obj.name}>{obj.name}</option>
                                                     )
                                                 } else {
                                                     return <></>
@@ -320,7 +322,11 @@ export function UpdateTraffic(props){
                                         await setNamespaceServiceRevisionTraffic(revOne, parseInt(tpercent), revTwo, parseInt(100-tpercent))
                                         setErrMsg("")
                                     } catch(err) {
-                                        setErrMsg(err)
+                                        if(err.message){
+                                            setErrMsg(err.message)
+                                        } else {
+                                            setErrMsg(err)
+                                        }
                                     }
                                 }}>
                                     Save

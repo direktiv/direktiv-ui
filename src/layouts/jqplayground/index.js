@@ -5,6 +5,7 @@ import { VscFileCode } from 'react-icons/vsc';
 import Button from '../../components/button';
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
 import DirektivEditor from '../../components/editor';
+import Alert from '../../components/alert';
 import FlexBox from '../../components/flexbox';
 import HelpIcon from '../../components/help';
 import { Config } from '../../util';
@@ -243,8 +244,21 @@ function JQFilter(props) {
     
     async function execute() {
         setError(null)
-        setFilter(".")
-        await executeJQ(query, btoa(data))
+        // setFilter("")
+        try{
+            const result = await executeJQ(query, btoa(data))
+            return {
+                error: false,
+                data: result
+            }
+        }catch(e){
+            setError(e.toString())
+            return {
+                error: true,
+                msg: e.toString()
+            }
+        }
+        
     }
 
 
@@ -276,7 +290,7 @@ function JQFilter(props) {
                     </FlexBox>
                 </ContentPanelBody>
                 <FlexBox>
-                    {error ? <div className='error-message'>{error.replace("execute jq: ", "")}</div> : null}
+                {error ? <Alert className="error-message"><div><span>error executing JQ command:</span>{error.replace("execute jq: error executing JQ command:", "")}</div></Alert> : null}
                 </FlexBox>
             </ContentPanel>
         </FlexBox>

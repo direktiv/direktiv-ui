@@ -70,9 +70,9 @@ export function GlobalRegistries(){
                                     await getRegistries()
                                     return err
                                 }
-                            }, "small blue", true, true),
+                            }, "small blue", ()=>{},true,true),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light", true, false)
+                            }, "small light", ()=>{},true, false)
                         ]}
                     >
                         <AddRegistryPanel token={token} setToken={setToken} username={username} setUsername={setUsername} url={url} setURL={setURL}/>    
@@ -176,9 +176,9 @@ export function GlobalPrivateRegistries(){
                                             }
                                         });
                                 }
-                            }, `small ${isButtonDisabled ? "disabled": "blue"}`, true, false),
+                            }, `small ${isButtonDisabled ? "disabled": "blue"}`, ()=>{},true,false),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light", true, false)
+                            }, "small light", ()=>{}, true, false)
                         ]}
                     >
                         <AddRegistryPanel token={token} setToken={setToken} username={username} setUsername={setUsername} url={url} setURL={setURL}/>    

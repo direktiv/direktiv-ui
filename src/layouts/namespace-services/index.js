@@ -6,8 +6,8 @@ import { RiDeleteBin2Line } from "react-icons/ri";
 import { FaCircle} from "react-icons/fa"
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from "../../components/content-panel";
 import FlexBox from "../../components/flexbox";
-import { Config } from "../../util";
-import Modal, { ButtonDefinition } from "../../components/modal";
+import { Config, GenerateRandomKey } from "../../util";
+import Modal, { ButtonDefinition, KeyDownDefinition } from "../../components/modal";
 import AddValueButton from "../../components/add-button";
 import {Link} from 'react-router-dom'
 import HelpIcon from "../../components/help"
@@ -154,9 +154,9 @@ function NamespaceServices(props) {
                             } catch(err) {
                                 return err
                             }
-                        }, `small ${isButtonDisabled ? "disabled": "blue"}`, true, false),
+                        }, `small ${isButtonDisabled ? "disabled": "blue"}`,()=>{},true,false),
                         ButtonDefinition("Cancel", () => {
-                        }, "small light", true, false)
+                        }, "small light", ()=>{}, true, false)
                     ]}
                 >
                     {config !== null ? 
@@ -206,8 +206,7 @@ function NamespaceServices(props) {
 }
 
 export function Service(props) {
-    const {name, image, status, conditions, deleteService, url, revision, dontDelete, traffic} = props
-
+    const {name, image, status, conditions, deleteService, url, revision, dontDelete, traffic, latest} = props
     return(
         <div className="col" style={{minWidth: "300px"}}>
             <FlexBox style={{ height:"40px", border:"1px solid #f4f4f4", backgroundColor:"#fcfdfe"}}>
@@ -227,7 +226,14 @@ export function Service(props) {
                         </div> */}
                     </FlexBox>
                 </Link>
-                {!dontDelete ? 
+                {!dontDelete && !traffic ? 
+                <>
+                        {latest ? 
+                         <div style={{height: "100%", display: "flex", paddingRight: "26px" }}>
+                         <HelpIcon msg={"Unable to delete latest revision"} />
+
+                         </div>
+                    :
                 <div style={{paddingRight:"25px", maxWidth:"20px", margin: "auto"}}>
                     <Modal  title="Delete namespace service" 
                         escapeToCancel
@@ -244,22 +250,14 @@ export function Service(props) {
                         actionButtons={[
                             ButtonDefinition("Delete", async () => {
                                 if(revision !== undefined) {
-                                    try { 
-                                        await deleteService(revision)
-                                    } catch(err) {
-                                        return err
-                                    }
+                                    await deleteService(revision)
                                 }else {
-                                    try { 
-                                        await deleteService(name)
-                                    } catch(err) {
-                                        return err
-                                    }
+                                    await deleteService(name)
                                 }
                              
-                            }, "small red", true, false),
+                            }, "small red", ()=>{}, true, false),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light", true, false)
+                            }, "small light", ()=>{}, true, false)
                         ]}
                     >
                         <FlexBox className="col gap">
@@ -270,12 +268,16 @@ export function Service(props) {
                             </FlexBox>
                         </FlexBox>
                     </Modal>
-                </div>: 
-                <>     
-                {traffic ?     
-                <div style={{paddingRight:"25px", maxWidth:"20px", margin: "auto", fontSize:"10pt", fontWeight:"bold"}}>
-                    {traffic}%
-                </div>:""}</>}
+                </div>}
+                </>
+                : 
+                    <>
+                    {traffic ?     
+                    <div style={{paddingRight:"25px", maxWidth:"20px", margin: "auto", fontSize:"10pt", fontWeight:"bold"}}>
+                        {traffic}%
+                    </div>:""}
+                    </>
+                }
             </FlexBox>
             <FlexBox style={{border:"1px solid #f4f4f4", borderTop:"none"}}>
                 <ServiceDetails conditions={conditions} />
@@ -292,11 +294,11 @@ function ServiceDetails(props) {
             {conditions.map((obj)=>{
                 if(obj.name === 'Active' && obj.reason === 'NoTraffic' && obj.message === "The target is not receiving traffic."){
                     return(
-                        <Condition status={"True"} name={obj.name} reason={""} message={""} />
+                        <Condition key={GenerateRandomKey('service-condition-')} status={"True"} name={obj.name} reason={""} message={""} />
                     )
                 }
                 return(
-                    <Condition status={obj.status} name={obj.name} reason={obj.reason} message={obj.message}/>
+                    <Condition key={GenerateRandomKey('service-condition-')} status={obj.status} name={obj.name} reason={obj.reason} message={obj.message}/>
                 )
             })}
 

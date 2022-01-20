@@ -13,7 +13,7 @@ import HelpIcon from '../../../components/help';
 import Tabs from '../../../components/tabs'
 import DirektivEditor from '../../../components/editor';
 import * as yup from "yup";
-
+import { AutoSizer } from 'react-virtualized';
 
 function SecretsPanel(props){
     const {namespace} = props
@@ -76,9 +76,9 @@ function SecretsPanel(props){
                                 } catch(err) {
                                     return err
                                 }
-                            }, `small ${isButtonDisabled ? "disabled": "blue"}`, true, true),
+                            }, `small ${isButtonDisabled ? "disabled": "blue"}`, ()=>{}, true, true),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light", true, false)
+                            }, "small light",()=>{}, true, false)
                         ]}
                     >
                          <Tabs 
@@ -181,16 +181,11 @@ function Secrets(props) {
                                             [
                                                 // label, onClick, classList, closesModal, async
                                                 ButtonDefinition("Delete", async () => {
-                                                    try { 
-                                                        await deleteSecret(obj.node.name)
-                                                        await getSecrets()
-                                                    } catch(err) {
-                                                        await getSecrets()
-                                                        return err
-                                                    }
-                                                }, "small red", true, false),
+                                                    await deleteSecret(obj.node.name)
+                                                    await getSecrets()
+                                                }, "small red",()=>{}, true, false),
                                                 ButtonDefinition("Cancel", () => {
-                                                }, "small light", true, false)
+                                                }, "small light",()=>{}, true, false)
                                             ]
                                         }   
                                     >
@@ -237,11 +232,15 @@ function AddSecretPanel(props) {
                 Secret Value
                 <span className="required-label">*</span>
             </FlexBox>
-            <FlexBox className="gap">
+            <FlexBox className="gap" style={{minHeight:"250px"}}>
                 <FlexBox style={{overflow:"hidden"}}>
-                    <DirektivEditor dValue={vValue} setDValue={setVValue}  width={600} height={180}/>
+                    <AutoSizer>
+                        {({height, width})=>(
+                            <DirektivEditor width={width} dValue={vValue} setDValue={setVValue} height={height}/>
+                        )}
+                        </AutoSizer>
                     </FlexBox>
+                </FlexBox>
             </FlexBox>
-        </FlexBox>
     );
 }

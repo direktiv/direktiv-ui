@@ -3,7 +3,7 @@ import './style.css';
 
 import ContentPanel, { ContentPanelBody, ContentPanelHeaderButton, ContentPanelHeaderButtonIcon, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
 import FlexBox from '../../components/flexbox';
-import { VscAdd, VscClose,  VscSearch, VscEdit, VscTrash, VscFolderOpened } from 'react-icons/vsc';
+import { VscAdd, VscClose,  VscSearch, VscEdit, VscTrash, VscFolderOpened, VscCode } from 'react-icons/vsc';
 import { Config, GenerateRandomKey } from '../../util';
 import { FiFolder } from 'react-icons/fi';
 import { FcWorkflow } from 'react-icons/fc';
@@ -22,7 +22,103 @@ import WorkflowRevisions from './workflow/revision';
 import WorkflowPod from './workflow/pod'
 import { AutoSizer } from 'react-virtualized';
 import * as yup from "yup";
+import { FaAppStoreIos } from 'react-icons/fa';
+import Editor from '@monaco-editor/react';
 
+const apiHelps = (namespace) => {
+    let url = window.location.origin
+    return(
+        [
+            {
+                method: "GET",
+                url: `${url}/api/namespaces/${namespace}/tree`,
+                description: `List nodes`,
+            },
+            {
+                method: "PUT",
+                description: `Create a directory`,
+                url: `${url}/api/namespaces/${namespace}/tree/NODE_NAME?op=create-directory`,
+                body: `{
+  "type": "directory"
+}`,
+                type: "json"
+            },
+            {
+                method: "PUT",
+                description: `Create a workflow `,
+                url: `${url}/api/namespaces/${namespace}/tree/NODE_NAME?op=create-workflow`,
+                body: `description: A simple 'no-op' state that returns 'Hello world!'
+states:
+- id: helloworld
+type: noop
+transform:
+    result: Hello world!`,
+                type: "yaml"
+            },
+            {
+                method: "POST",
+                description: "Rename a node",
+                url: `${url}/api/namespaces/${namespace}/tree/NODE_NAME?op=rename-node`,
+                body:`{
+  "new": "NEW_NODE_NAME"
+}`,
+                type: "json"
+            },
+            {
+                method: "DEL",
+                description: `Delete a node`,
+                url: `${url}/api/namespaces/${namespace}/tree/NODE_NAME?op=delete-node`,
+            }
+        ]
+    )
+}
+
+// const apiHelps = [
+//     {
+//         method: "get",
+//         url: "https:awsdev.direktiv.io/api/anmespaces/direktiv/tree/",
+//         description: "List Nodes at: /directive",
+//         body: `function toCelsiu (fahrenheit) { 
+//             return (5/9)* (fahrenheit-32); 
+// } 
+// document.getElementByID(“demo”).innerHTML = toCelsus(77);
+//         `,
+//         type: "javascript"
+//     },
+//     {
+//         method: "put",
+//         url: "https:awsdev.direktiv.io/api/anmespaces/direktiv/tree/",
+//         description: "List Nodes at: /directive",
+//         body: `function toCelsiu (fahrenheit) { 
+//             return (5/9)* (fahrenheit-32); 
+// } 
+// document.getElementByID(“demo”).innerHTML = toCelsus(77);
+//         `,
+//         type: "javascript"
+//     },
+//     {
+//         method: "post",
+//         url: "https:awsdev.direktiv.io/api/anmespaces/direktiv/tree/",
+//         description: "List Nodes at: /directive",
+//         body: `function toCelsiu (fahrenheit) { 
+//             return (5/9)* (fahrenheit-32); 
+// } 
+// document.getElementByID(“demo”).innerHTML = toCelsus(77);
+//         `,
+//         type: "javascript"
+//     },
+//     {
+//         method: "delete",
+//         url: "https:awsdev.direktiv.io/api/anmespaces/direktiv/tree/",
+//         description: "List Nodes at: /directive",
+//         body: `function toCelsiu (fahrenheit) { 
+//             return (5/9)* (fahrenheit-32); 
+// } 
+// document.getElementByID(“demo”).innerHTML = toCelsus(77);
+//         `,
+//         type: "javascript"
+//     },
+// ]
 
 function Explorer(props) {
     const params = useParams()
@@ -79,12 +175,17 @@ const orderFieldKeys = Object.keys(orderFieldDictionary)
 
 function ExplorerList(props) {
     const {namespace, path} = props
+    const navigate= useNavigate()
+    
+    //api helper modal
+    const [showApiHelper, setShowApiHelper] = useState(false)
 
     const [currPath, setCurrPath] = useState("")
     
     const [directoryName, setDirectoryName] = useState("")
     const [workflowName, setWorkflowName] = useState("")
     const [load, setLoad] = useState(true)
+
     const [orderFieldKey, setOrderFieldKey] = useState(orderFieldKeys[0])
 
     const [wfData, setWfData] = useState("")
@@ -95,7 +196,7 @@ function ExplorerList(props) {
     const [isDirectoryButtonDisabled, setIsDirectoryButtonDisabled] = useState(false)
     const [isWorkflowButtonDisabled, setIsWorkflowButtonDisabled] = useState(false)
 
-    const {data, err, templates, createNode, deleteNode, renameNode } = useNodes(Config.url, true, namespace, path, localStorage.getItem("apikey"), orderFieldDictionary[orderFieldKey])
+    const {data, err, templates, pageInfo, createNode, deleteNode, renameNode } = useNodes(Config.url, true, namespace, path, localStorage.getItem("apikey"), `order.field=${orderFieldDictionary[orderFieldKey]}`)
 
     const directoryValidationSchema = yup.object().shape({
         directoryName: yup.string().required()
@@ -141,12 +242,36 @@ function ExplorerList(props) {
         <Loader load={load} timer={1000}>
         <FlexBox className="gap" style={{maxHeight: "32px"}}>
             <FlexBox>
-                <Button className="small light" style={{ display: "flex", minWidth: "120px" }}>
-                    <ContentPanelHeaderButtonIcon>
-                        <BsCodeSlash style={{ maxHeight: "12px", marginRight: "4px" }} />
-                    </ContentPanelHeaderButtonIcon>
-                    API Commands
-                </Button>
+                <div>
+                    <Modal
+                        titleIcon={<VscCode/>}
+                        button={
+                            <Button className="small light" style={{ display: "flex", minWidth: "120px" }}>
+                                <ContentPanelHeaderButtonIcon>
+                                    <VscCode style={{ maxHeight: "12px", marginRight: "4px" }} />
+                                </ContentPanelHeaderButtonIcon>
+                                API Commands
+                            </Button>
+                        }
+                        escapeToCancel
+                        withCloseButton
+                        maximised
+                        title={"Namespace API Interactions"}
+                    >
+                        {
+                            apiHelps(namespace).map((help)=>(
+                                <ApiFragment
+                                    description={help.description}
+                                    url={help.url}
+                                    method={help.method}
+                                    body={help.body}
+                                    type={help.type}
+                                />
+                            ))
+                        }
+                    </Modal>
+                </div>
+                
             </FlexBox>
             <FlexBox style={{flexDirection: "row-reverse"}}>
                 <SearchBar />
@@ -191,7 +316,7 @@ function ExplorerList(props) {
                                     }
                                 }, `small ${isWorkflowButtonDisabled ? "disabled": "blue"}`, true, true),
                                 ButtonDefinition("Cancel", () => {
-                                }, "small light", true, true)
+                                }, "small light", ()=>{}, true, true)
                             ]}
                         >
                             <FlexBox className="col gap" style={{fontSize: "12px", minHeight: "300px", minWidth: "550px"}}>
@@ -258,9 +383,9 @@ function ExplorerList(props) {
                                         } catch (err) {
                                             return err
                                         }
-                                    }, `small ${isDirectoryButtonDisabled ? "disabled": "blue"}`, true, true),
+                                    }, `small ${isDirectoryButtonDisabled ? "disabled": "blue"}`, ()=>{}, true, true),
                                     ButtonDefinition("Cancel", () => {
-                                    }, "small light", true, false)
+                                    }, "small light", ()=>{}, true, false)
                                 ]}
                             >
                                 <FlexBox  className="col gap" style={{fontSize: "12px"}}>
@@ -415,14 +540,10 @@ function DirListItem(props) {
                                     ButtonDefinition("Delete", async () => {
                                         let p = path.split('/', -1);
                                         let pLast = p[p.length-1];
-                                        try { 
-                                            await deleteNode(pLast)
-                                        } catch(err) {
-                                            return err
-                                        }
-                                    }, "small red", true, false),
+                                        await deleteNode(pLast)
+                                    }, "small red", ()=>{}, true, false),
                                     ButtonDefinition("Cancel", () => {
-                                    }, "small light", true, false)
+                                    }, "small light", ()=>{}, true, false)
                                 ]
                             } 
                         >
@@ -516,17 +637,12 @@ function WorkflowListItem(props) {
                                 actionButtons={
                                     [
                                         ButtonDefinition("Delete", async () => {
-                                        let p = path.split('/', -1);
-                                        let pLast = p[p.length-1];
-
-                                        try { 
+                                            let p = path.split('/', -1);
+                                            let pLast = p[p.length-1];
                                             await deleteNode(pLast)
-                                        } catch(err) {
-                                            return err
-                                        }
-                                        }, "small red", true, false),
+                                        }, "small red", ()=>{}, true, false),
                                         ButtonDefinition("Cancel", () => {
-                                        }, "small light", true, false)
+                                        }, "small light", ()=>{}, true, false)
                                     ]
                                 } 
                             >
@@ -542,5 +658,26 @@ function WorkflowListItem(props) {
                 </FlexBox>
             </FlexBox>
         </div>
+    )
+}
+
+function ApiFragment(props) {
+    const { url, method, body, type, description } = props
+    return (
+        <FlexBox className='helper-wrap col'>
+            <FlexBox className='helper-title row'>
+                <FlexBox className='row vertical-center'>
+                    <Button className={`btn-method ${method}`}>{method}</Button>
+                    <div className='url'>{url}</div>
+                </FlexBox>
+                <div className='description' style={{textAlign:"right"}}>{description}</div>
+            </FlexBox>
+            {body ? 
+            <FlexBox>    
+                <DirektivEditor 
+                    height={150}
+                    value={props.body} readonly dlang={props.type}/>
+            </FlexBox>:""}
+        </FlexBox>
     )
 }
