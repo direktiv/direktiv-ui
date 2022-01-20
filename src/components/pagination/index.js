@@ -1,86 +1,37 @@
 import React from 'react';
 import './style.css';
 import FlexBox from '../flexbox';
-import {VscChevronLeft, VscChevronRight} from 'react-icons/vsc'
+import {BsChevronBarLeft, BsChevronBarRight, BsChevronLeft, BsChevronRight} from 'react-icons/bs'
 
 function Pagination(props) {
 
-    let {max, currentIndex, pageNoSetter} = props;
-    let min = currentIndex-1;
-    if (min < 1) {
-        min = 1
-    }
-
-    if (max === currentIndex) {
-        min = max-4;
-        if (min < 1) {
-            min = 1;
-        }
-    }
-
-    let rangeMin = min;
-    if (max - rangeMin < 5) {
-        rangeMin = max - 5;
-    } 
-
-    let count = 0;
-
-    let pageBtns = [];
-    for (let i = rangeMin; i < min+5; i++) {
-        if (i > 0) {
-            if (i > max) {
-                break
-            }
+    let {pageInfo, updatePage} = props;
     
-            if ((i === min+4) && (i !== max)) {
-                count += 2;
-                pageBtns.push(
-                    <PaginationButton label="..."/>
-                )
-                pageBtns.push(
-                    <PaginationButton currentIndex={i === currentIndex} label={max} onClick={() => {
-                        pageNoSetter(max)
-                    }}/>
-                )
-    
-                break;
-            } else {
-                count++;
-                pageBtns.push(
-                    <PaginationButton currentIndex={i === currentIndex} label={i} onClick={() => {
-                        pageNoSetter(i)
-                    }}/>
-                )
-            }
-        }
-    }
-
-    let leftPaginationBtnClasses = "pagination-btn";
-    let leftChevronClasses = "auto-margin"
-    if (currentIndex === 1) {
-        leftChevronClasses += " hidden"
-        leftPaginationBtnClasses += " disabled"
-    }
-
-    let rightPaginationBtnClasses = "pagination-btn";
-    let rightChevronClasses = "auto-margin"
-    if (currentIndex === max) {
-        rightChevronClasses += " hidden"
-        rightPaginationBtnClasses += " disabled"
-    }
 
     return(
-        <FlexBox className="pagination-container auto-margin" style={{ maxWidth: ((count + 2) * 24) + (count-1 * 8) + "px" }}>
-            <FlexBox className={leftPaginationBtnClasses} style={{ maxWidth: "24px" }} onClick={() => {
-                pageNoSetter(currentIndex-1)
+        <FlexBox className="pagination-container auto-margin" style={{}}>
+            <FlexBox className={'pagination-btn'} style={{ maxWidth: "24px" }} onClick={() => {
+                updatePage('first')
             }}>
-                <VscChevronLeft className={leftChevronClasses} />
+                <BsChevronBarLeft className={'active'} />
             </FlexBox>
-            {pageBtns}
-            <FlexBox className={rightPaginationBtnClasses} onClick={() => {
-                pageNoSetter(currentIndex+1)
+            
+            <FlexBox className={'pagination-btn'} style={{ maxWidth: "24px" }} onClick={() => {
+                updatePage('prev')
             }}>
-                <VscChevronRight className={rightChevronClasses} />
+                <BsChevronLeft className={'active'} />
+            </FlexBox>
+
+            <FlexBox className={'pagination-btn'} style={{ maxWidth: "24px" }} onClick={() => {
+                updatePage('next')
+            }}>
+                <BsChevronRight className={'active'} />
+            </FlexBox>
+
+            <FlexBox className={'pagination-btn'} onClick={() => {
+                updatePage('last')
+            }}>
+                <BsChevronBarRight className={'active'} />
             </FlexBox>
         </FlexBox>
     )

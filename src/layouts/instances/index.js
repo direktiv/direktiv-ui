@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import './style.css';
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
+import Pagination from '../../components/pagination';
 import FlexBox from '../../components/flexbox';
 import {VscFileCode} from 'react-icons/vsc';
 import { BsDot } from 'react-icons/bs';
@@ -36,13 +37,14 @@ function InstancesTable(props) {
     const [load, setLoad] = useState(true)
     const [ page, setPage ] = useState(1)
     const pageSize = 5
-    const [iQueryParams, ] = useState([])
-    const {data, err, getInstances} = useInstances(Config.url, true, namespace, localStorage.getItem("apikey"), ...iQueryParams)
+    const [queryParams, setQueryParams] = useState([])
+    const {data, err, getInstances, pageInfo} = useInstances(Config.url, true, namespace, localStorage.getItem("apikey"))
 
+    const updatePage = useCallback(()=>{
+
+    }, [])
     useEffect(()=>{
-        getInstances(
-            `first=${pageSize}`,
-        ).then((resp)=>{
+        getInstances().then((resp)=>{
             console.log("==get instances==",resp)
         }).catch((e)=>{
             console.log("===catched get instances===", e)
@@ -125,7 +127,7 @@ function InstancesTable(props) {
         </ContentPanelBody>
     </ContentPanel>
     <FlexBox>
-        {/* <Pagination max={10} currentIndex={pageNo} pageNoSetter={setPageNo} /> */}
+        <Pagination pageinfo={pageInfo} updatePage={updatePage}/>
     </FlexBox>
     </Loader>
         
