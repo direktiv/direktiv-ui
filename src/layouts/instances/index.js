@@ -38,7 +38,7 @@ function InstancesTable(props) {
     const PAGE_SIZE = 5
     const [queryParams, setQueryParams] = useState([`first=${PAGE_SIZE}`])
     const {data, err, getInstances, pageInfo} = useInstances(Config.url, true, namespace, localStorage.getItem("apikey"), ...queryParams)
-
+    console.log(pageInfo)
     const updatePage = useCallback((direction)=>{
         switch(direction){
             case 'next':
@@ -51,7 +51,7 @@ function InstancesTable(props) {
             case 'prev':
                 if(pageInfo?.hasPreviousPage){
                     const before = `before=${pageInfo?.startCursor}`
-                    const first = `first=${PAGE_SIZE}`
+                    const first = `last=${PAGE_SIZE}`
                     setQueryParams([before, first])
                 }
                 break
