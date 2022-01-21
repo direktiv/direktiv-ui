@@ -5,7 +5,7 @@ import FlexBox from '../../../components/flexbox';
 import Modal, { ButtonDefinition } from '../../../components/modal';
 import AddValueButton from '../../../components/add-button';
 import { useNamespaceVariables } from 'direktiv-react-hooks';
-import { Config, CanPreviewMimeType } from '../../../util';
+import { Config, CanPreviewMimeType, MimeTypeFileExtension } from '../../../util';
 import DirektivEditor from '../../../components/editor';
 import Button from '../../../components/button';
 import {useDropzone} from 'react-dropzone'
@@ -24,7 +24,7 @@ function VariablesPanel(props){
     const [uploading, setUploading] = useState(false)
     const [mimeType, setMimeType] = useState("application/json")
 
-    const {data, err, setNamespaceVariable, getNamespaceVariable, deleteNamespaceVariable} = useNamespaceVariables(Config.url, true, namespace, localStorage.getItem("apikey"))
+    const {data, err, setNamespaceVariable, getNamespaceVariable, getNamespaceVariableBuffer, deleteNamespaceVariable} = useNamespaceVariables(Config.url, true, namespace, localStorage.getItem("apikey"))
 
     // something went wrong with error listing for variables
     if(err !== null){
@@ -94,7 +94,7 @@ function VariablesPanel(props){
             <ContentPanelBody style={{minHeight:"180px"}}>
                 {data !== null ?
                 <div>
-                    <Variables namespace={namespace} deleteNamespaceVariable={deleteNamespaceVariable} setNamespaceVariable={setNamespaceVariable} getNamespaceVariable={getNamespaceVariable} variables={data}/>
+                    <Variables namespace={namespace} deleteNamespaceVariable={deleteNamespaceVariable} setNamespaceVariable={setNamespaceVariable} getNamespaceVariable={getNamespaceVariable} getNamespaceVariableBuffer={getNamespaceVariableBuffer} variables={data}/>
                 </div>:""}
             </ContentPanelBody>
         </ContentPanel>
@@ -204,7 +204,7 @@ function AddVariablePanel(props) {
 }
 
 function Variables(props) {
-    const {variables, namespace, getNamespaceVariable, setNamespaceVariable, deleteNamespaceVariable} = props
+    const {variables, namespace, getNamespaceVariable, setNamespaceVariable, deleteNamespaceVariable, getNamespaceVariableBuffer} = props
 
     return(
         <FlexBox>
@@ -214,7 +214,7 @@ function Variables(props) {
                  
                     {variables.map((obj)=>{
                         return(
-                            <Variable namespace={namespace} obj={obj} getNamespaceVariable={getNamespaceVariable} deleteNamespaceVariable={deleteNamespaceVariable} setNamespaceVariable={setNamespaceVariable}/>
+                            <Variable namespace={namespace} obj={obj} getNamespaceVariable={getNamespaceVariable} getNamespaceVariableBuffer={getNamespaceVariableBuffer} deleteNamespaceVariable={deleteNamespaceVariable} setNamespaceVariable={setNamespaceVariable}/>
                         )
                     })}
                 </tbody>
@@ -224,7 +224,7 @@ function Variables(props) {
 }
 
 function Variable(props) {
-    const {obj, getNamespaceVariable, setNamespaceVariable, deleteNamespaceVariable, namespace} = props
+    const {obj, getNamespaceVariable, getNamespaceVariableBuffer, setNamespaceVariable, deleteNamespaceVariable, namespace} = props
     const [val, setValue] = useState("")
     const [mimeType, setType] = useState("")
     const [file, setFile] = useState(null)
@@ -233,30 +233,7 @@ function Variable(props) {
     let uploadingBtn = "small green"
     if (uploading) { uploadingBtn += " btn-loading" }
 
-    const getLangByMimeType = (mimeType) => {
-        switch(mimeType){
-            case "text/plain":
-                return "txt"
-            case "application/json":
-                return "json"
-            case "application/x-sh":
-                return "shell"
-            case "text/html":
-                return "html"
-            case "text/css":
-                return "css"
-            case "application/yaml":
-                return "yaml"
-            case "image/jpeg":
-                return "jpg"
-            case "image/gif":
-                return "gif"
-            case "image/png":
-                return "png"
-        }
-    }
-
-    let lang = getLangByMimeType(mimeType)
+    let lang = MimeTypeFileExtension(mimeType)
 
     return(
         <tr className="body-row" key={`${obj.node.name}${obj.node.size}`}>
@@ -344,21 +321,13 @@ function Variable(props) {
                     <VariablesDownloadButton onClick={async()=>{
                         setDownloading(true)
 
-                        const variableData = await getNamespaceVariable(obj.node.name)
-                        const lang = getLangByMimeType(variableData.contentType)
-                        const fileType = variableData.contentType.split("/")[0] + `/${lang}`
-
-                        const apiKey = localStorage.getItem("apikey")
-                        const resp = await fetch(`${Config.url}namespaces/${namespace}/vars/${obj.node.name}`,
-                            {headers: apiKey === undefined ? {} : { "apikey": apiKey}})
-
-                        const buffer = await resp.arrayBuffer()
-
-                        const bitArray = btoa(String.fromCharCode.apply(null, new Uint8Array(buffer)))
+                        const variableData = await getNamespaceVariableBuffer(obj.node.name)
+                        const extension = MimeTypeFileExtension(variableData.contentType)
+                        const bitArray = btoa(String.fromCharCode.apply(null, new Uint8Array(variableData.data)))
 
                         const a = document.createElement('a')
                         a.href = `data:${variableData.contentType};base64,` + bitArray
-                        a.download = obj.node.name + `.${fileType}`
+                        a.download = obj.node.name + `${extension ? `.${extension}`: ""}`
                         a.click()
 
                         setDownloading(false)
