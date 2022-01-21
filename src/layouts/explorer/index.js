@@ -177,7 +177,7 @@ const orderFieldKeys = Object.keys(orderFieldDictionary)
 function ExplorerList(props) {
     const {namespace, path} = props
     const navigate= useNavigate()
-    
+
     //api helper modal
     const [search, setSearch] = useState("")
 
@@ -189,15 +189,15 @@ function ExplorerList(props) {
 
     const [orderFieldKey, setOrderFieldKey] = useState(orderFieldKeys[0])
 
-    const [wfData, setWfData] = useState(templates["noop"])
-    const [wfTemplate, setWfTemplate] = useState("noop")
-
     // const [pageNo, setPageNo] = useState(1);
 
     const [isDirectoryButtonDisabled, setIsDirectoryButtonDisabled] = useState(false)
     const [isWorkflowButtonDisabled, setIsWorkflowButtonDisabled] = useState(false)
 
     const {data, err, templates, createNode, deleteNode, renameNode } = useNodes(Config.url, true, namespace, path, localStorage.getItem("apikey"), `order.field=${orderFieldDictionary[orderFieldKey]}`, `filter.field=NAME`, `filter.val=${search}`, `filter.type=CONTAINS`)
+
+    const [wfData, setWfData] = useState(templates["noop"])
+    const [wfTemplate, setWfTemplate] = useState("noop")
 
     const directoryValidationSchema = yup.object().shape({
         directoryName: yup.string().required()
@@ -309,7 +309,7 @@ function ExplorerList(props) {
                             }}
                             actionButtons={[
                                 ButtonDefinition("Add",async () => {
-                                    const result = await createNode(name, "workflow", wfData)
+                                    const result = await createNode(workflowName, "workflow", wfData)
                                     if(result.node && result.namespace){
                                         navigate(`/n/${result.namespace}/explorer/${result.node.path.substring(1)}`)
                                     }

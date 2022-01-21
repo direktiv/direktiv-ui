@@ -25,19 +25,63 @@ function SecretsPanel(props){
 
     // createErr is the error when creating a secret
 
-    const [isButtonDisabled, setIsButtonDisabled] = useState(false)
+    const [isManualButtonDisabled, setIsManualButtonDisabled] = useState(false)
+    const [isUploadButtonDisabled, setIsUploadButtonDisabled] = useState(false)
+    const [currentTab, setCurrentTab] = useState("")
 
-    const secretValidationSchema = yup.object().shape({
-        secretKey: yup.string().required(),
-        secretValue: yup.string().required()
+    const manualValidationSchema = yup.object().shape({
+        manualVariableName: yup.string().required(),
+        data: yup.string().required()
     })
+
+    const uploadValidationSchema = yup.object().shape({
+        uploadVariableName: yup.string().required(),
+        file: yup.mixed().required(),
+    })
+
+    const onTabChanged = (tab) => {
+        setCurrentTab(tab)
+    }
 
     useEffect(() => {
 
-        secretValidationSchema.isValid({secretKey: keyValue, secretValue: vValue})
-            .then((result) => setIsButtonDisabled(!result))
+        if (currentTab === "Manual") {
+            manualValidationSchema.isValid({ manualVariableName: keyValue, data: vValue })
+                .then((result) => setIsManualButtonDisabled(!result))
+        }
 
-    },[secretValidationSchema, keyValue, vValue])
+        if (currentTab === "Upload") {
+            uploadValidationSchema.isValid({ uploadVariableName: keyValue, file: file })
+                .then((result) => setIsUploadButtonDisabled(!result))
+        }
+
+    },[manualValidationSchema, uploadValidationSchema, keyValue, vValue, file, currentTab])
+
+    const manualActionButtons = [
+        ButtonDefinition("Add", async () => {
+            await createSecret(keyValue, vValue)
+            getSecrets()
+        }, `small ${isManualButtonDisabled ? "disabled" : "blue"}`, (err)=>{return err}, true, true),
+        ButtonDefinition("Cancel", () => {
+        }, "small light", ()=>{}, true, false)
+    ];
+
+    const uploadActionButtons = [
+        ButtonDefinition("Add", async () => {
+            await createSecret(keyValue, file)
+            getSecrets()
+        }, `small ${isUploadButtonDisabled ? "disabled" : "blue"}`, (err)=>{return err}, true, true),
+        ButtonDefinition("Cancel", () => {
+        }, "small light", ()=>{},true, false)
+    ];
+
+    const chooseSubmitButton = (currentTab) => {
+        if (currentTab === "Upload") {
+            return uploadActionButtons
+        } else if (currentTab === "Manual") {
+            return manualActionButtons
+        }
+    }
 
     return (
         <ContentPanel style={{ height: "100%", minHeight: "180px", width: "100%" }}>
@@ -55,38 +99,34 @@ function SecretsPanel(props){
                     <Modal title="New secret" 
                         escapeToCancel
                         titleIcon={<VscLock/>}
-
-                        onOpen={() => {
-                        }}
-
+                        onOpen={() => {}}
                         onClose={()=>{
                             setKeyValue("")
                             setVValue("")
                             setFile(null)
                         }}
-                        
-                        button={(
-                            <AddValueButton label=" " />
-                        )}
-                        actionButtons={[
-                            ButtonDefinition("Add", async () => {
-                                await createSecret(keyValue, vValue)
-                                getSecrets()
-                            }, `small ${isButtonDisabled ? "disabled": "blue"}`, (err)=>{return err}, true, true),
-                            ButtonDefinition("Cancel", () => {
-                            }, "small light",()=>{}, true, false)
-                        ]}
+                        button={(<AddValueButton label=" " />)}
+                        actionButtons={chooseSubmitButton(currentTab)}
                     >
                     <Tabs
             style={{minHeight: "100px", minWidth: "400px"}}
             headers={["Manual", "Upload"]}
+            onTabChanged={onTabChanged}
             tabs={[(     
                 <AddSecretPanel keyValue={keyValue} vValue={vValue} setKeyValue={setKeyValue} setVValue={setVValue} />
             ),(
                 <FlexBox id="file-picker" className="col gap" style={{fontSize: "12px"}}>
+                    <FlexBox className="gap" style={{display: "flex", alignItems: "center", margin: "0 0 4px 0", fontSize: "12px", fontWeight: "bold", maxHeight: "20px"}}>
+                        Name
+                        <span className="required-label">*</span>
+                    </FlexBox>
                     <div style={{width: "100%", paddingRight: "12px", display: "flex"}}>
-                    <input value={keyValue} onChange={(e)=>setKeyValue(e.target.value)} autoFocus placeholder="Enter key" />
+                        <input value={keyValue} onChange={(e)=>setKeyValue(e.target.value)} autoFocus placeholder="Enter key" />
                     </div>
+                    <FlexBox className="gap" style={{display: "flex", alignItems: "center", margin: "3px 0 3px 0", fontSize: "12px", fontWeight: "bold", maxHeight: "20px"}}>
+                        Data
+                        <span className="required-label">*</span>
+                    </FlexBox>
                     <FlexBox id="file-picker" className="gap">
                         <SecretFilePicker file={file} setFile={setFile} id="add-secret-panel"/>
                     </FlexBox>

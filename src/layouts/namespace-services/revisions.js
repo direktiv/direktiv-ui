@@ -32,42 +32,42 @@ export function RevisionCreatePanel(props){
 
     return(
         <FlexBox className="col gap" style={{fontSize: "12px"}}>
-            <FlexBox className="gap" style={{margin: "-12px 0 -9px 0"}}>
+            <FlexBox className="gap" style={{margin: "-12px 0 -8px 0"}}>
                 Image
                 <span className="required-label">*</span>
             </FlexBox>
             <FlexBox className="gap" style={{paddingRight:"10px"}}>
                 <input value={image} onChange={(e)=>setImage(e.target.value)} placeholder="Enter an image name" />
             </FlexBox>
-            <FlexBox className="col" style={{paddingRight:"10px"}}>
+            <FlexBox className="col" style={{paddingRight:"10px", marginTop: "-8px"}}>
                 Scale
-                <Tippy content={scale} trigger={"mouseenter click"}>
-                    <input type="range" style={{paddingLeft:"0px"}} min={"0"} max={maxScale.toString()} value={scale.toString()} onChange={(e)=>setScale(e.target.value)} />
+                <Tippy content={scale} trigger={"mouseenter click"} >
+                    <input type="range" style={{paddingLeft:"0px", marginTop: "0px"}} min={"0"} max={maxScale.toString()} value={scale.toString()} onChange={(e)=>setScale(e.target.value)} />
                 </Tippy>
                 <datalist style={{display:"flex", alignItems:'center'}} id="sizeMarks">
                     <option style={{flex:"auto", textAlign:"left", lineHeight:"10px", paddingLeft:"8px"}} value="0" label="0"/>
                     <option style={{flex:"auto", textAlign:"right", lineHeight:"10px", paddingRight:"5px" }} value={maxScale} label={maxScale}/>
                 </datalist>
             </FlexBox>
-            <FlexBox className="col" style={{paddingRight:"10px"}}>
+            <FlexBox className="col" style={{paddingRight:"10px", marginTop: "-12px"}}>
                 Size
-                <input list="sizeMarks" style={{paddingLeft:"0px"}} type="range" min={"0"} value={size.toString()}  max={"2"} onChange={(e)=>setSize(e.target.value)}/>
+                <input list="sizeMarks" style={{paddingLeft:"0px", marginTop: "0px"}} type="range" min={"0"} value={size.toString()}  max={"2"} onChange={(e)=>setSize(e.target.value)}/>
                 <datalist style={{display:"flex", alignItems:'center'}} id="sizeMarks">
                     <option style={{flex:"auto", textAlign:"left", lineHeight:"10px"}} value="0" label="small"/>
                     <option style={{flex:"auto", textAlign:"center" , lineHeight:"10px"}} value="1" label="medium"/>
                     <option style={{flex:"auto", textAlign:"right", lineHeight:"10px" }} value="2" label="large"/>
                 </datalist>
             </FlexBox>
-            <FlexBox className="gap" style={{margin: "-6px 0 -8px 0"}}>
+            <FlexBox className="gap" style={{margin: "-13px 0 -8px 0"}}>
                 CMD
             </FlexBox>
             <FlexBox className="gap" style={{paddingRight:"10px"}}>
                 <input value={cmd} onChange={(e)=>setCmd(e.target.value)} placeholder="Enter the CMD for a service" />
             </FlexBox>
-            <FlexBox className="col" style={{paddingRight:"10px"}}>
+            <FlexBox className="col" style={{paddingRight:"10px", marginTop: "-7px"}}>
                 Traffic
                 <Tippy content={`${traffic}%`} trigger={"mouseenter click"}>
-                    <input type="range" style={{paddingLeft:"0px"}} min={"0"} max="100" value={traffic.toString()} onChange={(e)=>setTraffic(e.target.value)} />
+                    <input type="range" style={{paddingLeft:"0px", marginTop: "0px"}} min={"0"} max="100" value={traffic.toString()} onChange={(e)=>setTraffic(e.target.value)} />
                 </Tippy>
                 <datalist style={{display:"flex", alignItems:'center'}} id="sizeMarks">
                     <option style={{flex:"auto", textAlign:"left", lineHeight:"10px"}} value={0} label="0%"/>

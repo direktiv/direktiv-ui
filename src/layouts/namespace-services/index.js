@@ -47,10 +47,10 @@ export function ServiceCreatePanel(props) {
             <FlexBox className="gap" style={{paddingRight:"10px"}}>
                 <input value={image} onChange={(e)=>setImage(e.target.value)} placeholder="Enter an image name" />
             </FlexBox>
-            <FlexBox className="col" style={{paddingRight:"10px"}}>
+            <FlexBox className="col" style={{paddingRight:"10px", margin: "-8px 0 -12px 0"}}>
                 Scale
                 <Tippy content={scale} trigger={"mouseenter click"}>
-                    <input type="range" style={{paddingLeft:"0px"}} min={"0"} max={maxScale.toString()} value={scale.toString()} onChange={(e)=>setScale(e.target.value)} />
+                    <input type="range" style={{paddingLeft:"0px", marginTop: "0px"}} min={"0"} max={maxScale.toString()} value={scale.toString()} onChange={(e)=>setScale(e.target.value)} />
                 </Tippy>
                 <datalist style={{display:"flex", alignItems:'center'}} id="sizeMarks">
                     <option style={{flex:"auto", textAlign:"left", lineHeight:"10px", paddingLeft:"8px"}} value="0" label="0"/>
@@ -59,7 +59,7 @@ export function ServiceCreatePanel(props) {
             </FlexBox>
             <FlexBox className="col" style={{paddingRight:"10px"}}>
                 Size
-                <input list="sizeMarks" style={{paddingLeft:"0px"}} type="range" min={"0"} value={size.toString()}  max={"2"} onChange={(e)=>setSize(e.target.value)}/>
+                <input list="sizeMarks" style={{paddingLeft:"0px", marginTop: "0px"}} type="range" min={"0"} value={size.toString()}  max={"2"} onChange={(e)=>setSize(e.target.value)}/>
                 <datalist style={{display:"flex", alignItems:'center'}} id="sizeMarks">
                     <option style={{flex:"auto", textAlign:"left", lineHeight:"10px"}} value="0" label="small"/>
                     <option style={{flex:"auto", textAlign:"center" , lineHeight:"10px"}} value="1" label="medium"/>

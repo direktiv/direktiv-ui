@@ -161,9 +161,6 @@ export function AddRegistryPanel(props) {
                     <span className="required-label">*</span>
                     <HelpIcon msg={`An example of url for Docker is https://index.docker.io or for Google https://gcr.io`}/>
                 </FlexBox>
-                <FlexBox style={{paddingRight:"8px"}}>
-                    <input value={url} onChange={(e)=>setURL(e.target.value)} autoFocus placeholder={`Enter URL`} />
-                </FlexBox>
                 <FlexBox className="gap">
                     <input value={url} onChange={(e)=>setURL(e.target.value)} autoFocus placeholder="Enter URL" />
                     {urlErr !== "" ?

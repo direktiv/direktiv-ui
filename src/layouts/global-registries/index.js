@@ -32,6 +32,20 @@ export function GlobalRegistries(){
     const [url, setURL] = useState("")
     const [username, setUsername] = useState("")
     const [token, setToken] = useState("")
+    const [isButtonDisabled, setIsButtonDisabled] = useState(false)
+
+    const registriesValidationSchema = yup.object().shape({
+        url: yup.string().required(),
+        username: yup.string().required(),
+        token: yup.string().required()
+    })
+
+    useEffect(() => {
+
+        registriesValidationSchema.isValid({url: url, username: username, token: token})
+            .then((result) => setIsButtonDisabled(!result))
+
+    },[registriesValidationSchema, url, username, token])
 
     return (
         <ContentPanel style={{width: "100%", minHeight: "180px"}}>
@@ -65,7 +79,7 @@ export function GlobalRegistries(){
                             ButtonDefinition("Add", async() => {
                                 await createRegistry(url, `${username}:${token}`)
                                 await getRegistries()
-                            }, "small blue", async (err)=>{
+                            }, `small ${isButtonDisabled ? "disabled": "blue"}`, async (err)=>{
                                 await getRegistries()
                                 return err
                             },true,true),
