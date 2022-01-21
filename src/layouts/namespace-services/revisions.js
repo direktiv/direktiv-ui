@@ -11,6 +11,8 @@ import FlexBox from "../../components/flexbox"
 import Modal, { ButtonDefinition } from "../../components/modal"
 import { Config } from "../../util"
 import * as yup from "yup";
+import Tippy from '@tippyjs/react'
+import 'tippy.js/dist/tippy.css'
 
 export default function NamespaceRevisionsPanel(props) {
     const {namespace} = props
@@ -26,7 +28,7 @@ export default function NamespaceRevisionsPanel(props) {
 }
 
 export function RevisionCreatePanel(props){
-    const {image, setImage, scale, setScale, size, setSize, cmd, setCmd, traffic, setTraffic, maxscale} = props
+    const {image, setImage, scale, setScale, size, setSize, cmd, setCmd, traffic, setTraffic, maxScale} = props
 
     return(
         <FlexBox className="col gap" style={{fontSize: "12px"}}>
@@ -37,34 +39,40 @@ export function RevisionCreatePanel(props){
             <FlexBox className="gap" style={{paddingRight:"10px"}}>
                 <input value={image} onChange={(e)=>setImage(e.target.value)} placeholder="Enter an image name" />
             </FlexBox>
-            <FlexBox className="gap" style={{margin: "-8px 0 -10px 0"}}>
+            <FlexBox className="col" style={{paddingRight:"10px"}}>
                 Scale
+                <Tippy content={scale} trigger={"mouseenter click"}>
+                    <input type="range" style={{paddingLeft:"0px"}} min={"0"} max={maxScale.toString()} value={scale.toString()} onChange={(e)=>setScale(e.target.value)} />
+                </Tippy>
+                <datalist style={{display:"flex", alignItems:'center'}} id="sizeMarks">
+                    <option style={{flex:"auto", textAlign:"left", lineHeight:"10px", paddingLeft:"8px"}} value="0" label="0"/>
+                    <option style={{flex:"auto", textAlign:"right", lineHeight:"10px", paddingRight:"5px" }} value={maxScale} label={maxScale}/>
+                </datalist>
             </FlexBox>
-            <FlexBox className="gap" style={{paddingRight:"10px"}}>
-                <input type="range" style={{paddingLeft:"0px"}} min={"0"} max={maxscale.toString()} value={scale.toString()} onChange={(e)=>setScale(e.target.value)} />
-            </FlexBox>
-            <FlexBox className="gap" style={{margin: "-6px 0 -10px 0"}}>
+            <FlexBox className="col" style={{paddingRight:"10px"}}>
                 Size
-            </FlexBox>
-            <FlexBox className="gap" style={{paddingRight:"10px"}}>
-                <input list="sizeMarks"  type="range" min={"0"} value={size.toString()}  max={"2"} onChange={(e)=>setSize(e.target.value)}/>
-            </FlexBox>
-                <datalist id="sizeMarks">
+                <input list="sizeMarks" style={{paddingLeft:"0px"}} type="range" min={"0"} value={size.toString()}  max={"2"} onChange={(e)=>setSize(e.target.value)}/>
+                <datalist style={{display:"flex", alignItems:'center'}} id="sizeMarks">
                     <option style={{flex:"auto", textAlign:"left", lineHeight:"10px"}} value="0" label="small"/>
                     <option style={{flex:"auto", textAlign:"center" , lineHeight:"10px"}} value="1" label="medium"/>
                     <option style={{flex:"auto", textAlign:"right", lineHeight:"10px" }} value="2" label="large"/>
                 </datalist>
+            </FlexBox>
             <FlexBox className="gap" style={{margin: "-6px 0 -8px 0"}}>
                 CMD
             </FlexBox>
             <FlexBox className="gap" style={{paddingRight:"10px"}}>
                 <input value={cmd} onChange={(e)=>setCmd(e.target.value)} placeholder="Enter the CMD for a service" />
             </FlexBox>
-            <FlexBox className="gap" style={{margin: "-8px 0 -11px 0"}}>
+            <FlexBox className="col" style={{paddingRight:"10px"}}>
                 Traffic
-            </FlexBox>
-            <FlexBox className="gap" style={{paddingRight:"10px"}}>
-                <input type="range" style={{paddingLeft:"0px"}} min={"0"} max="100" value={traffic.toString()} onChange={(e)=>setTraffic(e.target.value)} />
+                <Tippy content={`${traffic}%`} trigger={"mouseenter click"}>
+                    <input type="range" style={{paddingLeft:"0px"}} min={"0"} max="100" value={traffic.toString()} onChange={(e)=>setTraffic(e.target.value)} />
+                </Tippy>
+                <datalist style={{display:"flex", alignItems:'center'}} id="sizeMarks">
+                    <option style={{flex:"auto", textAlign:"left", lineHeight:"10px"}} value={0} label="0%"/>
+                    <option style={{flex:"auto", textAlign:"right", lineHeight:"10px" }} value={100} label="100%"/>
+                </datalist>
             </FlexBox>
         </FlexBox>
     )
@@ -82,6 +90,7 @@ function NamespaceRevisions(props) {
     const [trafficPercent, setTrafficPercent] = useState(100)
     const [cmd, setCmd] = useState("")
     const [isButtonDisabled, setIsButtonDisabled] = useState(false)
+    const [maxScale, setMaxScale] = useState(0)
 
     const revisionValidationSchema = yup.object().shape({
         image: yup.string().required()
@@ -105,7 +114,7 @@ function NamespaceRevisions(props) {
 
     useEffect(()=>{
         async function cfgGet() {
-            await getNamespaceServiceConfig()
+            await getNamespaceServiceConfig().then(response => setMaxScale(response.maxscale));
         }
         if(load && config === null) {
             cfgGet()
@@ -156,7 +165,7 @@ function NamespaceRevisions(props) {
                                     size={size} setSize={setSize}
                                     cmd={cmd} setCmd={setCmd}
                                     traffic={trafficPercent} setTraffic={setTrafficPercent}
-                                    maxscale={config.maxscale}
+                                    maxScale={maxScale}
                                 />:""}
                             </Modal>
                         </div>

@@ -23,6 +23,7 @@ export default function GlobalRevisionsPanel(props){
     const [trafficPercent, setTrafficPercent] = useState(100)
     const [cmd, setCmd] = useState("")
     const [isButtonDisabled, setIsButtonDisabled] = useState(false)
+    const [maxScale, setMaxScale] = useState(0)
 
     const revisionValidationSchema = yup.object().shape({
         image: yup.string().required()
@@ -46,7 +47,7 @@ export default function GlobalRevisionsPanel(props){
 
     useEffect(()=>{
         async function cfgGet() {
-            await getServiceConfig()
+            await getServiceConfig().then(response => setMaxScale(response.maxscale));
         }
         if(load && config === null) {
             cfgGet()
@@ -98,7 +99,7 @@ export default function GlobalRevisionsPanel(props){
                                     size={size} setSize={setSize}
                                     cmd={cmd} setCmd={setCmd}
                                     traffic={trafficPercent} setTraffic={setTrafficPercent}
-                                    maxscale={config.maxscale}
+                                    maxScale={maxScale}
                                 />:""}
                             </Modal>
                         </div>

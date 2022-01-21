@@ -157,8 +157,12 @@ export function AddRegistryPanel(props) {
             :<></>}
             <FlexBox className="col gap">
                 <FlexBox className="gap" style={{margin: "-12px 0 -8px 0"}}>
-                    URL
+                    Registry URL
                     <span className="required-label">*</span>
+                    <HelpIcon msg={`An example of url for Docker is https://index.docker.io or for Google https://gcr.io`}/>
+                </FlexBox>
+                <FlexBox style={{paddingRight:"8px"}}>
+                    <input value={url} onChange={(e)=>setURL(e.target.value)} autoFocus placeholder={`Enter URL`} />
                 </FlexBox>
                 <FlexBox className="gap">
                     <input value={url} onChange={(e)=>setURL(e.target.value)} autoFocus placeholder="Enter URL" />
@@ -190,7 +194,7 @@ export function AddRegistryPanel(props) {
             <FlexBox className="col gap">
                 <FlexBox className="gap">
                     <FlexBox className="gap" style={{margin: "-16px 0 -8px 0"}}>
-                        Token
+                        Password
                         <span className="required-label">*</span>
                     </FlexBox>
                 </FlexBox>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Button from '../../../components/button';
 import { BsCodeSquare } from 'react-icons/bs';
 import {HiOutlineTrash} from 'react-icons/hi';
-import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from '../../../components/content-panel';
+import ContentPanel, { ContentPanelBody, ContentPanelHeaderButtonIcon, ContentPanelTitle, ContentPanelTitleIcon } from '../../../components/content-panel';
 import FlexBox from '../../../components/flexbox';
 import {GenerateRandomKey} from '../../../util';
 import {BiChevronLeft} from 'react-icons/bi';
@@ -18,6 +18,9 @@ import 'rc-slider/assets/index.css';
 import { useNavigate } from 'react-router';
 import * as yup from "yup";
 import HelpIcon from "../../../components/help";
+import { AutoSizer } from 'react-virtualized';
+import { VscCode } from 'react-icons/vsc';
+import { ApiFragment } from '..';
 
 function RevisionTab(props) {
 
@@ -79,7 +82,7 @@ function RevisionTab(props) {
                         <TabbedButtons revision={revision} setSearchParams={setSearchParams} searchParams={searchParams} tabBtn={tabBtn} setTabBtn={setTabBtn} />
                     </ContentPanelTitle>
                     <ContentPanelBody style={{padding: "0px"}}>
-                        {tabBtn === 0 ? 
+                        {tabBtn === 0 ?
                             <FlexBox className="col" style={{overflow:"hidden"}}>
                                 <FlexBox >
                                     <DirektivEditor style={{borderRadius: "0px"}} value={workflow} readonly={true} disableBottomRadius={true} dlang="yaml" />
@@ -120,8 +123,14 @@ function RevisionTab(props) {
                                                 </div>
                                             )}
                                         >
-                                            <FlexBox style={{overflow:"hidden"}}>
-                                                <DirektivEditor height="200" width="300" dlang="json" dvalue={input} setDValue={setInput}/>
+                                            <FlexBox style={{height: "40vh", width: "30vw", minWidth: "250px", minHeight: "200px"}}>
+                                                <FlexBox style={{overflow:"hidden"}}>
+                                                    <AutoSizer>
+                                                        {({height, width})=>(
+                                                            <DirektivEditor height={height} width={width} dlang="json" dvalue={input} setDValue={setInput}/>
+                                                        )}
+                                                    </AutoSizer>
+                                                </FlexBox>
                                             </FlexBox>
                                         </Modal>
                                     </div>
@@ -182,8 +191,47 @@ export function TabbedButtons(props) {
     )
 }
 
+const apiHelps = (namespace, workflow) => {
+    let url = window.location.origin
+    return(
+        [
+            {
+                method: "GET",
+                url: `${url}/api/namespaces/${namespace}/tree/${workflow}?op=wait`,
+                description: `Execute a Workflow`,
+            },
+            {
+                method: "POST",
+                description: `Execute a Workflow With Body`,
+                url: `${url}/api/namespaces/${namespace}/tree/${workflow}?op=wait`,
+                body: `{}`,
+                type: "json"
+            },
+            {
+                method: "POST",
+                description: `Update a workflow `,
+                url: `${url}/api/namespaces/${namespace}/tree/${workflow}?op=update-workflow`,
+                body: `description: A simple 'no-op' state that returns 'Hello world!'
+states:
+- id: helloworld
+type: noop
+transform:
+    result: Hello world!`,
+                type: "yaml"
+            },
+            {
+                method: "POST",
+                description: "Execute a workflow",
+                url: `${url}/api/namespaces/${namespace}/tree/${workflow}?op=execute`,
+                body:`{}`,
+                type: "json"
+            }
+        ]
+    )
+}
+
 export function RevisionSelectorTab(props) {
-    const {setRouter, namespace, tagWorkflow, filepath, updateWorkflow, editWorkflowRouter, getWorkflowRouter, getRevisions, setRevisions, err, revisions, router, deleteRevision, getWorkflowSankeyMetrics, executeWorkflow, searchParams, setSearchParams, getWorkflowRevisionData, getTags, removeTag} = props
+    const {workflowName, setRouter, namespace, tagWorkflow, filepath, updateWorkflow, editWorkflowRouter, getWorkflowRouter, getRevisions, setRevisions, err, revisions, router, deleteRevision, getWorkflowSankeyMetrics, executeWorkflow, searchParams, setSearchParams, getWorkflowRevisionData, getTags, removeTag} = props
     
     const navigate = useNavigate()
     // const [load, setLoad] = useState(true)
@@ -237,12 +285,42 @@ export function RevisionSelectorTab(props) {
     }
 
     if(!revisions) return null
+
     return (
         <FlexBox className="col gap">
+            <div style={{maxWidth: "142px"}}>
+                <Modal
+                    titleIcon={<VscCode/>}
+                    button={
+                        <Button className="small light" style={{ display: "flex", minWidth: "120px" }}>
+                            <ContentPanelHeaderButtonIcon>
+                                <VscCode style={{ maxHeight: "12px", marginRight: "4px" }} />
+                            </ContentPanelHeaderButtonIcon>
+                            API Commands
+                        </Button>
+                    }
+                    escapeToCancel
+                    withCloseButton
+                    maximised
+                    title={"Namespace API Interactions"}
+                >
+                    {
+                        apiHelps(namespace, workflowName).map((help)=>(
+                            <ApiFragment
+                                description={help.description}
+                                url={help.url}
+                                method={help.method}
+                                body={help.body}
+                                type={help.type}
+                            />
+                        ))
+                    }
+                </Modal>
+            </div>
             <div>
                 <RevisionTrafficShaper rev1={rev1} rev2={rev2} setRev1={setRev1} setRev2={setRev2} setRouter={setRouter} revisions={revisions}  router={router} editWorkflowRouter={editWorkflowRouter} getWorkflowRouter={getWorkflowRouter} />
             </div>
-            <div>
+            <div>   
                 <ContentPanel style={{width: "100%", minWidth: "300px"}}>
                     <ContentPanelTitle>
                         <ContentPanelTitleIcon>
@@ -430,7 +508,8 @@ export function RevisionSelectorTab(props) {
                                                         [
                                                             ButtonDefinition("Delete", async () => {
                                                                     await deleteRevision(obj.node.name)
-                                                                    setRevisions(await getRevisions())
+                                                                    let x = await getRevisions()
+                                                                    setRevisions(x.edges)
                                                                     setRouter(await getWorkflowRouter())
                                                             }, "small red", ()=>{}, true, false),
                                                             ButtonDefinition("Cancel", () => {

@@ -34,6 +34,7 @@ import {PieChart} from 'react-minimal-pie-chart'
 import HelpIcon from "../../../components/help";
 import Loader from '../../../components/loader';
 import Alert from '../../../components/alert';
+import {AutoSizer} from "react-virtualized";
 
 dayjs.extend(utc)
 dayjs.extend(relativeTime);
@@ -127,6 +128,7 @@ function InitialWorkflowHook(props){
                     { activeTab === 1 ?
                         <>
                         <RevisionSelectorTab 
+                        workflowName={filepath.substring(1)}
                         tagWorkflow={tagWorkflow}
                          namespace={namespace}
                           filepath={filepath} updateWorkflow={updateWorkflow} setRouter={setRouter} editWorkflowRouter={editWorkflowRouter} getWorkflowRouter={getWorkflowRouter} setRevisions={setRevisions} revisions={revisions} router={router} getWorkflowSankeyMetrics={getWorkflowSankeyMetrics} executeWorkflow={executeWorkflow} getWorkflowRevisionData={getWorkflowRevisionData} searchParams={searchParams} setSearchParams={setSearchParams} deleteRevision={deleteRevision}  getRevisions={getRevisions} getTags={getTags} removeTag={removeTag}  />
@@ -388,13 +390,27 @@ function WorkingRevision(props) {
                                         }, "small light", ()=>{}, true, false)
                                     ]}
                                     button={(
-                                        <div className={`btn-terminal ${opLoadingStates["IsLoading"] ? "terminal-disabled" : ""}`}>
-                                            Run
-                                        </div>
+                                        <>
+                                            { workflow !== oldWf ?
+                                            <div className='btn-terminal disabled' >
+                                                Run (requires save)
+                                            </div>
+                                            :
+                                            <div className={`btn-terminal ${opLoadingStates["IsLoading"] ? "terminal-disabled" : ""}`}>
+                                                Run
+                                            </div>
+                                            }                                        
+                                        </>
                                     )}
                                 >
-                                    <FlexBox style={{overflow:"hidden"}}>
-                                        <DirektivEditor height="200" width="300" dlang="json" dvalue={input} setDValue={setInput}/>
+                                    <FlexBox style={{height: "40vh", width: "30vw", minWidth: "250px", minHeight: "200px"}}>
+                                        <FlexBox style={{overflow:"hidden"}}>
+                                            <AutoSizer>
+                                                {({height, width})=>(
+                                                    <DirektivEditor height={height} width={width} dlang="json" dvalue={input} setDValue={setInput}/>
+                                                )}
+                                            </AutoSizer>
+                                        </FlexBox>
                                     </FlexBox>
                                 </Modal>
                             </div>
@@ -575,11 +591,13 @@ function OverviewTab(props) {
         async function listData() {
             if(load){
                 // get the instances
-                let resp = await getInstancesForWorkflow()
-                if(Array.isArray(resp)){
-                    setInstances(resp)
-                } else {
-                    setErr(resp)
+                try {
+                    let resp = await getInstancesForWorkflow()
+                    if (resp.instances.edges) {
+                        setInstances(resp.instances.edges)
+                    }
+                } catch (e) {
+                    setErr(e)
                 }
             }
             setLoad(false)

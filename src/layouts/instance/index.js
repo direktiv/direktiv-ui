@@ -48,7 +48,7 @@ function InstancePage(props) {
     let instanceID = params["id"];
 
     // todo implement cancelInstance
-    let {data, err,  getInput, getOutput} = useInstance(Config.url, true, namespace, instanceID, localStorage.getItem("apikey"));
+    let {data, err,  getInput, getOutput, cancelInstance} = useInstance(Config.url, true, namespace, instanceID, localStorage.getItem("apikey"));
 
 
     useEffect(()=>{
@@ -104,6 +104,16 @@ function InstancePage(props) {
                                 </div>
                                 {label} 
                                 <FlexBox style={{flex: "auto", justifyContent: "right", paddingRight: "6px", alignItems: "center"}}>
+                                    { data.status === "running" || data.status === "pending" ? 
+                                    <Button className="small light" style={{marginRight: "8px"}} onClick={() => {
+                                        cancelInstance()
+                                        setLoad(true)
+                                    }}>
+                                        <span className="red-text">
+                                            Cancel
+                                        </span>
+                                    </Button>
+                                    :<></>}
                                     <Link to={linkURL}>
                                         <Button className="small light">
                                             <span className="hide-on-small">View</span> Workflow
@@ -333,8 +343,6 @@ function InstanceDiagram(props) {
         return <></>
     }
     
-    console.log(status, "STATUS OF INSTANCE")
-
     return(
         <WorkflowDiagram instanceStatus={status} disabled={true} flow={flow} workflow={YAML.load(wfdata)}/>
     )
@@ -379,23 +387,33 @@ function Output(props){
     useEffect(()=>{
         async function get() {
             if (load && status !== "pending"){
-                let data = await getOutput()
-                setOutput(data)
-                setLoad(false)
+                try {
+                    let data = await getOutput()
+                    let x = JSON.stringify(JSON.parse(data),null,2)
+                    setOutput(x)
+                    setLoad(false)
+                } catch(e) {
+                    console.log(e);
+                }
             }
         }
         get()
-    },[output, load, getOutput, status])
+    },[output, load, getOutput, status, setOutput])
 
     useEffect(()=>{
         async function reGetOutput() {
             if(status !== "pending"){
-                let data = await getOutput()
-                setOutput(data)
+                try {
+                    let data = await getOutput()
+                    let x = JSON.stringify(JSON.parse(data),null,2)
+                    setOutput(x)
+                } catch(e) {
+                    console.log(e);
+                }
             }
         }
        reGetOutput()
-    },[status, getOutput])
+    },[status, getOutput, setOutput])
 
     return(
         <FlexBox style={{flexDirection:"column"}}>

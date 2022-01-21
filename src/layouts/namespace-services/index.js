@@ -12,6 +12,8 @@ import AddValueButton from "../../components/add-button";
 import {Link} from 'react-router-dom'
 import HelpIcon from "../../components/help"
 import * as yup from "yup";
+import Tippy from '@tippyjs/react';
+import 'tippy.js/dist/tippy.css';
 
 export default function ServicesPanel(props) {
     const {namespace} = props
@@ -27,7 +29,7 @@ export default function ServicesPanel(props) {
 }
 
 export function ServiceCreatePanel(props) {
-    const {name, setName, image, setImage, scale, setScale, size, setSize, cmd, setCmd, maxscale} = props
+    const {name, setName, image, setImage, scale, setScale, size, setSize, cmd, setCmd, maxScale} = props
 
     return(
         <FlexBox className="col gap" style={{fontSize: "12px"}}>
@@ -45,23 +47,25 @@ export function ServiceCreatePanel(props) {
             <FlexBox className="gap" style={{paddingRight:"10px"}}>
                 <input value={image} onChange={(e)=>setImage(e.target.value)} placeholder="Enter an image name" />
             </FlexBox>
-            <FlexBox className="gap" style={{margin: "-8px 0 -10px 0"}}>
+            <FlexBox className="col" style={{paddingRight:"10px"}}>
                 Scale
+                <Tippy content={scale} trigger={"mouseenter click"}>
+                    <input type="range" style={{paddingLeft:"0px"}} min={"0"} max={maxScale.toString()} value={scale.toString()} onChange={(e)=>setScale(e.target.value)} />
+                </Tippy>
+                <datalist style={{display:"flex", alignItems:'center'}} id="sizeMarks">
+                    <option style={{flex:"auto", textAlign:"left", lineHeight:"10px", paddingLeft:"8px"}} value="0" label="0"/>
+                    <option style={{flex:"auto", textAlign:"right", lineHeight:"10px", paddingRight:"5px" }} value={maxScale} label={maxScale}/>
+                </datalist>
             </FlexBox>
-            <FlexBox className="gap" style={{paddingRight:"10px"}}>
-                <input type="range" style={{paddingLeft:"0px"}} min={"0"} max={maxscale.toString()} value={scale.toString()} onChange={(e)=>setScale(e.target.value)} />
-            </FlexBox>
-            <FlexBox className="gap" style={{margin: "-6px 0 -10px 0"}}>
+            <FlexBox className="col" style={{paddingRight:"10px"}}>
                 Size
-            </FlexBox>
-            <FlexBox className="gap" style={{paddingRight:"10px"}}>
                 <input list="sizeMarks" style={{paddingLeft:"0px"}} type="range" min={"0"} value={size.toString()}  max={"2"} onChange={(e)=>setSize(e.target.value)}/>
+                <datalist style={{display:"flex", alignItems:'center'}} id="sizeMarks">
+                    <option style={{flex:"auto", textAlign:"left", lineHeight:"10px"}} value="0" label="small"/>
+                    <option style={{flex:"auto", textAlign:"center" , lineHeight:"10px"}} value="1" label="medium"/>
+                    <option style={{flex:"auto", textAlign:"right", lineHeight:"10px" }} value="2" label="large"/>
+                </datalist>
             </FlexBox>
-            <datalist style={{display:"flex", marginTop: "-3px", justifyContent: "space-between", paddingRight:"11px"}} id="sizeMarks">
-                <option style={{display:"flex"}} value="0" label="small"/>
-                <option style={{display:"flex"}} value="1" label="medium"/>
-                <option style={{display:"flex"}} value="2" label="large"/>
-            </datalist>
             <FlexBox className="gap" style={{margin: "-12px 0 -8px 0"}}>
                 CMD
             </FlexBox>
@@ -82,6 +86,7 @@ function NamespaceServices(props) {
     const [size, setSize] = useState(0)
     const [cmd, setCmd] = useState("")
     const [isButtonDisabled, setIsButtonDisabled] = useState(false)
+    const [maxScale, setMaxScale] = useState(0)
 
     const serviceValidationSchema = yup.object().shape({
         name: yup.string().required(),
@@ -99,8 +104,8 @@ function NamespaceServices(props) {
 
     useEffect(()=>{
         async function getcfg() {
-            await getNamespaceConfig()
-            await getNamespaceServices()
+            await getNamespaceConfig().then(response => setMaxScale(response.maxscale));
+            await getNamespaceServices();
         }
         if(load && config === null && data === null) {
             getcfg()
@@ -156,7 +161,7 @@ function NamespaceServices(props) {
                     ]}
                 >
                     {config !== null ? 
-                        <ServiceCreatePanel cmd={cmd} setCmd={setCmd} size={size} setSize={setSize} name={serviceName} setName={setServiceName} image={image} setImage={setImage} scale={scale} setScale={setScale} maxscale={config.maxscale} />
+                        <ServiceCreatePanel cmd={cmd} setCmd={setCmd} size={size} setSize={setSize} name={serviceName} setName={setServiceName} image={image} setImage={setImage} scale={scale} setScale={setScale} maxScale={maxScale} />
                         :
                         ""
                     }
@@ -203,6 +208,7 @@ function NamespaceServices(props) {
 
 export function Service(props) {
     const {name, image, status, conditions, deleteService, url, revision, dontDelete, traffic, latest} = props
+    console.log(url)
     return(
         <div className="col" style={{minWidth: "300px"}}>
             <FlexBox style={{ height:"40px", border:"1px solid #f4f4f4", backgroundColor:"#fcfdfe"}}>

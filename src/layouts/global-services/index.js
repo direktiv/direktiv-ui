@@ -20,6 +20,7 @@ export default function GlobalServicesPanel(props) {
     const [size, setSize] = useState(0)
     const [cmd, setCmd] = useState("")
     const [isButtonDisabled, setIsButtonDisabled] = useState(false)
+    const [maxScale, setMaxScale] = useState(0)
 
     const serviceValidationSchema = yup.object().shape({
         serviceName: yup.string().required(),
@@ -35,8 +36,8 @@ export default function GlobalServicesPanel(props) {
 
     useEffect(()=>{
         async function getcfg() {
-            await getConfig()
-            await getGlobalServices()
+            await getConfig().then(response => setMaxScale(response.maxscale));
+            await getGlobalServices();
         }
         if(load && config === null && data === null) {
             getcfg()
@@ -91,8 +92,8 @@ export default function GlobalServicesPanel(props) {
                             }, "small light", ()=>{}, true, false)
                         ]}
                     >
-                        {config !== null ?
-                            <ServiceCreatePanel cmd={cmd} setCmd={setCmd} size={size} setSize={setSize} name={serviceName} setName={setServiceName} image={image} setImage={setImage} scale={scale} setScale={setScale} maxscale={config.maxscale} />
+                        {config !== null ? 
+                            <ServiceCreatePanel maxScale={maxScale} cmd={cmd} setCmd={setCmd} size={size} setSize={setSize} name={serviceName} setName={setServiceName} image={image} setImage={setImage} scale={scale} setScale={setScale} />
                             :
                             ""
                         }
