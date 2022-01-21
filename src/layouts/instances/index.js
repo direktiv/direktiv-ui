@@ -35,24 +35,37 @@ export default InstancesPage;
 function InstancesTable(props) {
     const {namespace} = props
     const [load, setLoad] = useState(true)
-    const [ page, setPage ] = useState(1)
-    const pageSize = 5
-    const [queryParams, setQueryParams] = useState([])
-    const {data, err, getInstances, pageInfo} = useInstances(Config.url, true, namespace, localStorage.getItem("apikey"))
+    const PAGE_SIZE = 5
+    const [queryParams, setQueryParams] = useState([`first=${PAGE_SIZE}`])
+    const {data, err, getInstances, pageInfo} = useInstances(Config.url, true, namespace, localStorage.getItem("apikey"), ...queryParams)
 
-    const updatePage = useCallback(()=>{
+    const updatePage = useCallback((direction)=>{
+        switch(direction){
+            case 'next':
+                if(pageInfo?.hasNextPage){
+                    const after = `after=${pageInfo?.endCursor}`
+                    const first = `first=${PAGE_SIZE}`
+                    setQueryParams([first, after])
+                }
+                break
+            case 'prev':
+                if(pageInfo?.hasPreviousPage){
+                    const before = `before=${pageInfo?.startCursor}`
+                    const first = `first=${PAGE_SIZE}`
+                    setQueryParams([before, first])
+                }
+                break
+            case 'first': 
+                setQueryParams([`first=${PAGE_SIZE}`])
+                break;
+            case 'last':
+                setQueryParams([`last=${PAGE_SIZE}`])
+                break;
+            default:   
+                return    
+        }
+    }, [pageInfo])
 
-    }, [])
-    useEffect(()=>{
-        getInstances().then((resp)=>{
-            console.log("==get instances==",resp)
-        }).catch((e)=>{
-            console.log("===catched get instances===", e)
-        })
-        console.log(data)
-    }, [ page ])
-        
-    // console.log("====get instances====", paginatedData())
     useEffect(()=>{
         if(data !== null || err !== null) {
             setLoad(false)
@@ -127,7 +140,7 @@ function InstancesTable(props) {
         </ContentPanelBody>
     </ContentPanel>
     <FlexBox>
-        <Pagination pageinfo={pageInfo} updatePage={updatePage}/>
+        <Pagination pageInfo={pageInfo} updatePage={updatePage}/>
     </FlexBox>
     </Loader>
         

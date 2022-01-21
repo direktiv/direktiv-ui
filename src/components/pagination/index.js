@@ -7,32 +7,37 @@ function Pagination(props) {
 
     let {pageInfo, updatePage} = props;
     
-
+    const hasNext = pageInfo?.hasNextPage? 'arrow active': 'arrow'
+    const hasPrev = pageInfo?.hasNextPreviousPage? 'arrow active': 'arrow'
     return(
-        <FlexBox className="pagination-container auto-margin" style={{}}>
+        <FlexBox style={{justifyContent: "flex-end"}}>
+        <FlexBox className="pagination-container" style={{}}>
             <FlexBox className={'pagination-btn'} style={{ maxWidth: "24px" }} onClick={() => {
                 updatePage('first')
             }}>
-                <BsChevronBarLeft className={'active'} />
+                <BsChevronBarLeft className={'arrow active'} />
             </FlexBox>
             
             <FlexBox className={'pagination-btn'} style={{ maxWidth: "24px" }} onClick={() => {
                 updatePage('prev')
             }}>
-                <BsChevronLeft className={'active'} />
+                <BsChevronLeft className={hasPrev} />
             </FlexBox>
+            <FlexBox style={{width: "40px"}}>
 
+            </FlexBox>
             <FlexBox className={'pagination-btn'} style={{ maxWidth: "24px" }} onClick={() => {
                 updatePage('next')
             }}>
-                <BsChevronRight className={'active'} />
+                <BsChevronRight className={hasNext} />
             </FlexBox>
 
             <FlexBox className={'pagination-btn'} onClick={() => {
                 updatePage('last')
             }}>
-                <BsChevronBarRight className={'active'} />
+                <BsChevronBarRight className={'arrow active'} />
             </FlexBox>
+        </FlexBox>
         </FlexBox>
     )
 }
