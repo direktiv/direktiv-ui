@@ -5,7 +5,7 @@ import Button from '../../components/button';
 import { useParams } from 'react-router';
 import ContentPanel, { ContentPanelBody, ContentPanelHeaderButton, ContentPanelHeaderButtonIcon, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
 import FlexBox from '../../components/flexbox';
-import {AiFillCode} from 'react-icons/ai';
+import {AiFillCode, AiOutlineDelete} from 'react-icons/ai';
 import {useInstance, useInstanceLogs, useWorkflow} from 'direktiv-react-hooks';
 import { CancelledState, FailState, RunningState, SuccessState } from '../instances';
 
@@ -48,7 +48,7 @@ function InstancePage(props) {
     let instanceID = params["id"];
 
     // todo implement cancelInstance
-    let {data, err,  getInput, getOutput} = useInstance(Config.url, true, namespace, instanceID, localStorage.getItem("apikey"));
+    let {data, err,  getInput, getOutput, cancelInstance} = useInstance(Config.url, true, namespace, instanceID, localStorage.getItem("apikey"));
 
 
     useEffect(()=>{
@@ -104,6 +104,16 @@ function InstancePage(props) {
                                 </div>
                                 {label} 
                                 <FlexBox style={{flex: "auto", justifyContent: "right", paddingRight: "6px", alignItems: "center"}}>
+                                    { data.status === "running" || data.status === "pending" ? 
+                                    <Button className="small light" style={{marginRight: "8px"}} onClick={() => {
+                                        cancelInstance()
+                                        setLoad(true)
+                                    }}>
+                                        <span className="red-text">
+                                            Cancel
+                                        </span>
+                                    </Button>
+                                    :<></>}
                                     <Link to={linkURL}>
                                         <Button className="small light">
                                             <span className="hide-on-small">View</span> Workflow
@@ -374,17 +384,12 @@ function Output(props){
     const {getOutput, status} = props
 
     const [load, setLoad] = useState(true)
-    const [output, setOutput] = useState("Waiting for instance to complete...")
+    const [output, setOutput] = useState("")
 
     useEffect(()=>{
         async function get() {
             if (load && status !== "pending"){
                 let data = await getOutput()
-                if(data === "") {
-                    data = "No output data was resolved..."
-                } else {
-                    data = JSON.stringify(JSON.parse(data), null, 2)
-                }
                 setOutput(data)
                 setLoad(false)
             }
@@ -396,11 +401,6 @@ function Output(props){
         async function reGetOutput() {
             if(status !== "pending"){
                 let data = await getOutput()
-                if(data === "") {
-                    data = "\"No output data was resolved...\""
-                } else {
-                    data = JSON.stringify(JSON.parse(data), null, 2)
-                }
                 setOutput(data)
             }
         }
@@ -408,12 +408,16 @@ function Output(props){
     },[status, getOutput])
 
     return(
+        <FlexBox style={{flexDirection:"column"}}>
+        {!output ? 
+            <Alert className="instance-input-banner">No output data was resolved</Alert> : null}
         <FlexBox style={{padding: "0px", overflow: "hidden"}}>
             <AutoSizer>
                 {({height, width})=>(
                     <DirektivEditor disableCursor height={height} width={width} dlang="json" value={output} readonly={true}/>
                 )}
             </AutoSizer>
+        </FlexBox>
         </FlexBox>
     )
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { VscInfo } from 'react-icons/vsc';
 import Tippy from '@tippyjs/react';
-import 'tippy.js/dist/tippy.css';
+import 'tippy.js/dist/tippy.css'
 import './style.css';
 
 function HelpIcon(props) {
@@ -13,7 +13,7 @@ function HelpIcon(props) {
 
     return (
         <>
-            <Tippy content={msg} trigger={'mouseenter focus click'} zIndex={0}>
+            <Tippy content={msg} trigger={'mouseenter focus click'} zIndex={10}>
                 <div className={"iconWrapper"}>
                     <VscInfo className="grey-text"/>
                 </div>

@@ -11,6 +11,9 @@ import Modal, { ButtonDefinition, KeyDownDefinition } from "../../components/mod
 import AddValueButton from "../../components/add-button";
 import {Link} from 'react-router-dom'
 import HelpIcon from "../../components/help"
+import Tippy from '@tippyjs/react';
+import 'tippy.js/dist/tippy.css';
+import { VscInfo } from "react-icons/vsc";
 
 export default function ServicesPanel(props) {
     const {namespace} = props
@@ -26,7 +29,7 @@ export default function ServicesPanel(props) {
 }
 
 export function ServiceCreatePanel(props) {
-    const {name, setName, image, setImage, scale, setScale, size, setSize, cmd, setCmd, maxscale} = props
+    const {name, setName, image, setImage, scale, setScale, size, setSize, cmd, setCmd, maxScale} = props
 
     return(
         <FlexBox className="col gap" style={{fontSize: "12px"}}>
@@ -41,7 +44,13 @@ export function ServiceCreatePanel(props) {
                     </FlexBox>
                     <FlexBox className="col" style={{paddingRight:"10px"}}>
                         Scale
-                        <input type="range" style={{paddingLeft:"0px"}} min={"0"} max={maxscale.toString()} value={scale.toString()} onChange={(e)=>setScale(e.target.value)} />
+                        <Tippy content={scale} trigger={"mouseenter click"}>
+                            <input type="range" style={{paddingLeft:"0px"}} min={"0"} max={maxScale.toString()} value={scale.toString()} onChange={(e)=>setScale(e.target.value)} />
+                        </Tippy>
+                        <datalist style={{display:"flex", alignItems:'center'}} id="sizeMarks">
+                            <option style={{flex:"auto", textAlign:"left", lineHeight:"10px", paddingLeft:"8px"}} value="0" label="0"/>
+                            <option style={{flex:"auto", textAlign:"right", lineHeight:"10px", paddingRight:"5px" }} value={maxScale} label={maxScale}/>
+                        </datalist>
                     </FlexBox>
                     <FlexBox className="col" style={{paddingRight:"10px"}}>
                         Size
@@ -70,13 +79,14 @@ function NamespaceServices(props) {
     const [scale, setScale] = useState(0)
     const [size, setSize] = useState(0)
     const [cmd, setCmd] = useState("")
+    const [maxScale, setMaxScale] = useState(0)
 
     const {data, err, config, getNamespaceConfig, getNamespaceServices, createNamespaceService, deleteNamespaceService} = useNamespaceServices(Config.url, true, namespace, localStorage.getItem("apikey"))
 
     useEffect(()=>{
         async function getcfg() {
-            await getNamespaceConfig()
-            await getNamespaceServices()
+            await getNamespaceConfig().then(response => setMaxScale(response.maxscale));
+            await getNamespaceServices();
         }
         if(load && config === null && data === null) {
             getcfg()
@@ -138,7 +148,7 @@ function NamespaceServices(props) {
                     ]}
                 >
                     {config !== null ? 
-                        <ServiceCreatePanel cmd={cmd} setCmd={setCmd} size={size} setSize={setSize} name={serviceName} setName={setServiceName} image={image} setImage={setImage} scale={scale} setScale={setScale} maxscale={config.maxscale} />
+                        <ServiceCreatePanel cmd={cmd} setCmd={setCmd} size={size} setSize={setSize} name={serviceName} setName={setServiceName} image={image} setImage={setImage} scale={scale} setScale={setScale} maxScale={maxScale} />
                         :
                         ""
                     }
@@ -184,8 +194,7 @@ function NamespaceServices(props) {
 }
 
 export function Service(props) {
-    const {name, image, status, conditions, deleteService, url, revision, dontDelete, traffic} = props
-
+    const {name, image, status, conditions, deleteService, url, revision, dontDelete, traffic, latest} = props
     return(
         <div className="col" style={{minWidth: "300px"}}>
             <FlexBox style={{ height:"40px", border:"1px solid #f4f4f4", backgroundColor:"#fcfdfe"}}>
@@ -205,7 +214,14 @@ export function Service(props) {
                         </div> */}
                     </FlexBox>
                 </Link>
-                {!dontDelete ? 
+                {!dontDelete && !traffic ? 
+                <>
+                        {latest ? 
+                         <div style={{height: "100%", display: "flex", paddingRight: "26px" }}>
+                         <HelpIcon msg={"Unable to delete latest revision"} />
+
+                         </div>
+                    :
                 <div style={{paddingRight:"25px", maxWidth:"20px", margin: "auto"}}>
                     <Modal  title="Delete namespace service" 
                         escapeToCancel
@@ -240,12 +256,16 @@ export function Service(props) {
                             </FlexBox>
                         </FlexBox>
                     </Modal>
-                </div>: 
-                <>     
-                {traffic ?     
-                <div style={{paddingRight:"25px", maxWidth:"20px", margin: "auto", fontSize:"10pt", fontWeight:"bold"}}>
-                    {traffic}%
-                </div>:""}</>}
+                </div>}
+                </>
+                : 
+                    <>
+                    {traffic ?     
+                    <div style={{paddingRight:"25px", maxWidth:"20px", margin: "auto", fontSize:"10pt", fontWeight:"bold"}}>
+                        {traffic}%
+                    </div>:""}
+                    </>
+                }
             </FlexBox>
             <FlexBox style={{border:"1px solid #f4f4f4", borderTop:"none"}}>
                 <ServiceDetails conditions={conditions} />

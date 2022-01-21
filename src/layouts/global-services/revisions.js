@@ -21,7 +21,7 @@ export default function GlobalRevisionsPanel(props){
     const [size, setSize] = useState(0)
     const [trafficPercent, setTrafficPercent] = useState(100)
     const [cmd, setCmd] = useState("")
-
+    const [maxScale, setMaxScale] = useState(0)
 
     useEffect(()=>{
         if(revisions !== null && revisions.length > 0) {
@@ -34,7 +34,7 @@ export default function GlobalRevisionsPanel(props){
 
     useEffect(()=>{
         async function cfgGet() {
-            await getServiceConfig()
+            await getServiceConfig().then(response => setMaxScale(response.maxscale));
         }
         if(load && config === null) {
             cfgGet()
@@ -45,7 +45,6 @@ export default function GlobalRevisionsPanel(props){
     if(revisions === null) {
         return <></>
     }
-
 
     return(
         <FlexBox className="gap wrap" style={{paddingRight:"8px"}}>
@@ -78,7 +77,7 @@ export default function GlobalRevisionsPanel(props){
                                 ]}
                                 actionButtons={[
                                     ButtonDefinition("Add", async () => {
-                                            await createGlobalServiceRevision(image, parseInt(scale), parseInt(size), cmd, parseInt(trafficPercent))
+                                        await createGlobalServiceRevision(image, parseInt(scale), parseInt(size), cmd, parseInt(trafficPercent))
                                     }, "small blue", ()=>{}, true, false),
                                     ButtonDefinition("Cancel", () => {
                                     }, "small light", ()=>{}, true, false)
@@ -91,7 +90,7 @@ export default function GlobalRevisionsPanel(props){
                                     size={size} setSize={setSize}
                                     cmd={cmd} setCmd={setCmd}
                                     traffic={trafficPercent} setTraffic={setTrafficPercent}
-                                    maxscale={config.maxscale}
+                                    maxScale={maxScale}
                                 />:""}
                             </Modal>
                         </div>
@@ -99,7 +98,8 @@ export default function GlobalRevisionsPanel(props){
                             <ContentPanelBody className="secrets-panel">
                                 <FlexBox className="gap col">
                                     <FlexBox className="col gap">
-                                        {revisions.map((obj, key)=>{
+                                        {
+                                            revisions.sort((a, b)=> (a.created > b.created) ? -1 : 1).map((obj, key)=>{
                                             let dontDelete = false
                                             if(revisions.length === 1) {
                                                 dontDelete = true
@@ -115,9 +115,10 @@ export default function GlobalRevisionsPanel(props){
                                                 }
                                             return(
                                                 <Service 
+                                                    latest={key===0}
                                                     traffic={t}
                                                     key={key}
-                                                    dontDelete={dontDelete}
+                                                    dontDelete={dontDelete && key !== 0}
                                                     revision={obj.rev}
                                                     deleteService={deleteGlobalServiceRevision}
                                                     url={`/g/services/${service}/${obj.rev}`}

@@ -34,6 +34,7 @@ import {PieChart} from 'react-minimal-pie-chart'
 import HelpIcon from "../../../components/help";
 import Loader from '../../../components/loader';
 import Alert from '../../../components/alert';
+import {AutoSizer} from "react-virtualized";
 
 dayjs.extend(utc)
 dayjs.extend(relativeTime);
@@ -76,6 +77,9 @@ function InitialWorkflowHook(props){
 
     const [activeTab, setActiveTab] = useState(searchParams.get("tab") !== null ? parseInt(searchParams.get('tab')): 0)
 
+    useEffect(()=>{
+        setActiveTab(searchParams.get("tab") !== null ? parseInt(searchParams.get('tab')): 0)
+    }, [searchParams])
     // todo handle err from hook below
     const {data,  getSuccessFailedMetrics, tagWorkflow, addAttributes, deleteAttributes, setWorkflowLogToEvent, editWorkflowRouter, getWorkflowSankeyMetrics, getWorkflowRevisionData, getWorkflowRouter, toggleWorkflow, executeWorkflow, getInstancesForWorkflow, getRevisions, getTags, deleteRevision, saveWorkflow, updateWorkflow, discardWorkflow, removeTag} = useWorkflow(Config.url, true, namespace, filepath.substring(1), localStorage.getItem("apikey"))
     const [router, setRouter] = useState(null)
@@ -91,8 +95,8 @@ function InitialWorkflowHook(props){
             if(revisions === null){
                 // get workflow revisions
                 let resp = await getRevisions()
-                if(Array.isArray(resp)){
-                    setRevisions(resp)
+                if(Array.isArray(resp.edges)){
+                    setRevisions(resp.edges)
                 } else {
                     setRevsErr(resp)
                 }
@@ -261,6 +265,9 @@ function WorkingRevision(props) {
 
     const [tabBtn, setTabBtn] = useState(searchParams.get('revtab') !== null ? parseInt(searchParams.get('revtab')): 0);
 
+    useEffect(()=>{
+        setTabBtn(searchParams.get('revtab') !== null ? parseInt(searchParams.get('revtab')): 0)
+    }, [searchParams])
 
     // Error States
     const [errors, setErrors] = useState([])
@@ -387,8 +394,14 @@ function WorkingRevision(props) {
                                         </div>
                                     )}
                                 >
-                                    <FlexBox style={{overflow:"hidden"}}>
-                                        <DirektivEditor height="200" width="300" dlang="json" dvalue={input} setDValue={setInput}/>
+                                    <FlexBox style={{height: "40vh", width: "30vw", minWidth: "250px", minHeight: "200px"}}>
+                                        <FlexBox style={{overflow:"hidden"}}>
+                                            <AutoSizer>
+                                                {({height, width})=>(
+                                                    <DirektivEditor height={height} width={width} dlang="json" dvalue={input} setDValue={setInput}/>
+                                                )}
+                                            </AutoSizer>
+                                        </FlexBox>
                                     </FlexBox>
                                 </Modal>
                             </div>
@@ -408,11 +421,24 @@ function WorkingRevision(props) {
                                 </div>
                                 <div className={`btn-terminal ${opLoadingStates["IsLoading"] ? "terminal-disabled" : ""}`} title={"Save latest workflow as new revision"} onClick={async () => {
                                     setErrors([])
-                                    await saveWorkflow()
-                                    updateRevisions()
-                                    setShowErrors(false)
+                                    try{
+                                        const result = await saveWorkflow()
+                                        if(result?.node?.name)
+                                        {
+                                            updateRevisions()
+                                            setShowErrors(false)
+                                            navigate(`/n/${namespace}/explorer/${result.node.name}?tab=1&revision=${result.revision.name}&revtab=0`)
+                                        }else{
+                                            setErrors("Something went wrong")
+                                            setShowErrors(true)
+                                        }
+                                    }catch(e){
+                                        setErrors(e.toString())
+                                        setShowErrors(true)
+                                    }
+                                    
                                 }}>
-                                    Save as new revision
+                                    Make Revision
                                 </div>
                                 <div className={"btn-terminal editor-info"} title={`${showErrors ? "Hide Problems": "Show Problems"}`} onClick={async () => {
                                     setShowErrors(!showErrors)
