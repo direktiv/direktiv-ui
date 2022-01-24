@@ -34,10 +34,12 @@ import {PieChart} from 'react-minimal-pie-chart'
 import HelpIcon from "../../../components/help";
 import Loader from '../../../components/loader';
 import Alert from '../../../components/alert';
+import Pagination from '../../../components/pagination';
 
 dayjs.extend(utc)
 dayjs.extend(relativeTime);
 
+const PAGE_SIZE = 4
 
 function WorkflowPage(props) {
     const {namespace} = props
@@ -569,15 +571,20 @@ function OverviewTab(props) {
     const [load, setLoad] = useState(true)
     const [instances, setInstances] = useState([])
     const [err, setErr] = useState(null)
+    const [pageInfo, setPageInfo] = useState()
+    const [total, setTotal] = useState(PAGE_SIZE)
+    const [queryParams, setQueryParams] = useState([`first=${PAGE_SIZE}`])
 
     // fetch instances using the workflow hook from above
     useEffect(()=>{
         async function listData() {
             if(load){
                 // get the instances
-                let resp = await getInstancesForWorkflow()
-                if(Array.isArray(resp)){
-                    setInstances(resp)
+                let resp = await getInstancesForWorkflow(...queryParams)
+                setTotal(resp.instances.totalCount)
+                setPageInfo(resp?.instances?.pageInfo)
+                if(Array.isArray(resp?.instances?.edges)){
+                    setInstances(resp?.instances?.edges)
                 } else {
                     setErr(resp)
                 }
@@ -585,8 +592,12 @@ function OverviewTab(props) {
             setLoad(false)
         }
         listData()
-    },[load, getInstancesForWorkflow])
+    },[queryParams]) // removed dependency [load, getInstancesForWorkflow] // by aaron
 
+    const updatePage = useCallback((newParam)=>{
+        setLoad(true)
+        setQueryParams([...newParam])
+    }, [])
     if (err) {
         // TODO report error
     }
@@ -609,6 +620,9 @@ function OverviewTab(props) {
                                 </FlexBox>
                             </ContentPanelTitle>
                             <WorkflowInstances instances={instances} namespace={namespace} />
+                            {
+                               !!total && <Pagination pageInfo={pageInfo} total={total} updatePage={updatePage} pageSize={PAGE_SIZE}/>
+                            }
                         </ContentPanel>
                     </FlexBox>
                     <FlexBox style={{ minWidth: "370px", maxHeight: "342px" }}>

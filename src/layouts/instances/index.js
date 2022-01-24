@@ -15,6 +15,8 @@ import utc from "dayjs/plugin/utc"
 import { useNavigate } from 'react-router-dom';
 import Loader from '../../components/loader';
 
+const PAGE_SIZE = 5
+
 dayjs.extend(utc)
 dayjs.extend(relativeTime);
 
@@ -35,36 +37,13 @@ export default InstancesPage;
 function InstancesTable(props) {
     const {namespace} = props
     const [load, setLoad] = useState(true)
-    const PAGE_SIZE = 5
+    
     const [queryParams, setQueryParams] = useState([`first=${PAGE_SIZE}`])
-    const {data, err, getInstances, pageInfo} = useInstances(Config.url, true, namespace, localStorage.getItem("apikey"), ...queryParams)
-    console.log(pageInfo)
-    const updatePage = useCallback((direction)=>{
-        switch(direction){
-            case 'next':
-                if(pageInfo?.hasNextPage){
-                    const after = `after=${pageInfo?.endCursor}`
-                    const first = `first=${PAGE_SIZE}`
-                    setQueryParams([first, after])
-                }
-                break
-            case 'prev':
-                if(pageInfo?.hasPreviousPage){
-                    const before = `before=${pageInfo?.startCursor}`
-                    const first = `last=${PAGE_SIZE}`
-                    setQueryParams([before, first])
-                }
-                break
-            case 'first': 
-                setQueryParams([`first=${PAGE_SIZE}`])
-                break;
-            case 'last':
-                setQueryParams([`last=${PAGE_SIZE}`])
-                break;
-            default:   
-                return    
-        }
-    }, [pageInfo])
+    const {data, err, getInstances, pageInfo, totalCount} = useInstances(Config.url, true, namespace, localStorage.getItem("apikey"), ...queryParams)
+
+    const updatePage = useCallback((newParam)=>{
+        setQueryParams(newParam)
+    }, [])
 
     useEffect(()=>{
         if(data !== null || err !== null) {
@@ -140,7 +119,7 @@ function InstancesTable(props) {
         </ContentPanelBody>
     </ContentPanel>
     <FlexBox>
-        <Pagination pageInfo={pageInfo} updatePage={updatePage}/>
+        {!!totalCount && <Pagination pageInfo={pageInfo} updatePage={updatePage} total={totalCount}/>}
     </FlexBox>
     </Loader>
         

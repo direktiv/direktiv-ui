@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Config } from '../../util';
 import {  VscCloud, VscRedo, VscSymbolEvent } from 'react-icons/vsc';
 import Button from '../../components/button';
@@ -15,6 +15,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import utc from "dayjs/plugin/utc"
 import './style.css'
 import { Link } from 'react-router-dom';
+import Pagination from '../../components/pagination';
 
 dayjs.extend(utc)
 dayjs.extend(relativeTime);
@@ -35,13 +36,22 @@ function EventsPageWrapper(props) {
 
 export default EventsPageWrapper;
 
+const PAGE_SIZE = 5;
+
 function EventsPage(props) {
 
     let {namespace} = props;
 
     // errHistory and errListeners TODO show error if one
-    let {eventHistory, eventListeners, eventListenersPageInfo, eventHistoryPageInfo, sendEvent, replayEvent} = useEvents(Config.url, true, namespace, localStorage.getItem("apikey"), {listners: [], history: []})
-    console.log(eventHistory, eventListeners)
+    const [listenersParam, setListenersParam] = useState([`first=${PAGE_SIZE}`])
+    const [historyParam, setHistoryParam] = useState([`first=${PAGE_SIZE}`])
+    let {eventHistory, eventListeners, eventListenersTotalCount, eventListenersPageInfo, eventHistoryTotalCount, eventHistoryPageInfo, sendEvent, replayEvent} = useEvents(Config.url, true, namespace, localStorage.getItem("apikey"), {listners: listenersParam, history: historyParam})
+    const updateEventHistoryPage = useCallback((newParam)=>{
+        setHistoryParam([...newParam])
+    }, [])
+    const updateListenersPage = useCallback((newParam)=>{
+        setListenersParam([...newParam])
+    }, [])
     return(
         <>
             <FlexBox className="gap col" style={{paddingRight: "8px"}}>
@@ -124,7 +134,16 @@ function EventsPage(props) {
                                     </tbody>: ""}
                                 </table>
                             </div>
-                        </ContentPanelBody>
+                            {
+                                !!eventHistoryTotalCount && 
+                                <Pagination
+                                    pageSize={PAGE_SIZE}
+                                    total={eventHistoryTotalCount}
+                                    pageInfo={eventHistoryPageInfo}
+                                    updatePage={updateEventHistoryPage}
+                                />
+                            }
+                        </ContentPanelBody>                 
                     </ContentPanel>
                 </FlexBox>
                 <FlexBox>
@@ -192,6 +211,15 @@ function EventsPage(props) {
                                     </tbody>:""}
                                 </table>
                             </div>
+                            {
+                                !!eventListenersTotalCount && 
+                                <Pagination
+                                    pageSize={PAGE_SIZE}
+                                    total={eventListenersTotalCount}
+                                    pageInfo={eventListenersPageInfo}
+                                    updatePage={updateListenersPage}
+                                />
+                            }
                         </ContentPanelBody>
                     </ContentPanel>
                 </FlexBox>

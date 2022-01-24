@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useCallback} from 'react';
 import './style.css';
 
 import ContentPanel, { ContentPanelBody, ContentPanelHeaderButton, ContentPanelHeaderButtonIcon, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
@@ -21,7 +21,9 @@ import { useSearchParams } from 'react-router-dom';
 import WorkflowRevisions from './workflow/revision';
 import WorkflowPod from './workflow/pod'
 import { AutoSizer } from 'react-virtualized';
+import Pagination from '../../components/pagination';
 
+const PAGE_SIZE = 5
 
 function Explorer(props) {
     const params = useParams()
@@ -89,9 +91,9 @@ function ExplorerList(props) {
 
     const [wfData, setWfData] = useState("")
     const [wfTemplate, setWfTemplate] = useState("")
-    // const [pageNo, setPageNo] = useState(1);
-
-    const {data, err, templates, pageInfo, createNode, deleteNode, renameNode } = useNodes(Config.url, true, namespace, path, localStorage.getItem("apikey"), `order.field=${orderFieldDictionary[orderFieldKey]}`)
+     
+    const [queryParams, setQueryParams] = useState([`first=${PAGE_SIZE}`])
+    const {data, err, templates, pageInfo, createNode, deleteNode, renameNode, totalCount } = useNodes(Config.url, true, namespace, path, localStorage.getItem("apikey"), ...queryParams, `order.field=${orderFieldDictionary[orderFieldKey]}`)
 
     // control loading icon todo work out how to display this error
     useEffect(()=>{
@@ -107,11 +109,17 @@ function ExplorerList(props) {
         }
     },[path, currPath])
 
+    //pagination
+    const updatePage = useCallback((newParam)=>{
+        setQueryParams(newParam)
+    }, [])
+
     if(data !== null) {
         if(data.node.type === "workflow") {
             return <WorkflowPage namespace={namespace}/>
         }
     }
+    
     
 
     return(
@@ -308,10 +316,10 @@ function ExplorerList(props) {
                         })}</>}</>: <></>}
                     </FlexBox>
             </ContentPanelBody>
+            <FlexBox>
+                { !!totalCount && <Pagination pageInfo={pageInfo} updatePage={updatePage} total={totalCount}/>}
+            </FlexBox>
         </ContentPanel>
-    {/* <FlexBox>
-        <Pagination max={10} currentIndex={pageNo} pageNoSetter={setPageNo} />
-    </FlexBox> */}
     </Loader>
   
     </FlexBox>
