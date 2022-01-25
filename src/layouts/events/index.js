@@ -45,7 +45,7 @@ function EventsPage(props) {
     // errHistory and errListeners TODO show error if one
     const [listenersParam, setListenersParam] = useState([`first=${PAGE_SIZE}`])
     const [historyParam, setHistoryParam] = useState([`first=${PAGE_SIZE}`])
-    let {eventHistory, eventListeners, eventListenersTotalCount, eventListenersPageInfo, eventHistoryTotalCount, eventHistoryPageInfo, sendEvent, replayEvent} = useEvents(Config.url, true, namespace, localStorage.getItem("apikey"), {listners: listenersParam, history: historyParam})
+    let {eventHistory, eventListeners, eventListenersTotalCount, eventListenersPageInfo, eventHistoryTotalCount, eventHistoryPageInfo, sendEvent, replayEvent} = useEvents(Config.url, true, namespace, localStorage.getItem("apikey"), {listeners: listenersParam, history: historyParam})
     const updateEventHistoryPage = useCallback((newParam)=>{
         setHistoryParam([...newParam])
     }, [])
