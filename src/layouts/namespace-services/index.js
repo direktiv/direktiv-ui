@@ -1,9 +1,10 @@
 import { useNamespaceServices } from "direktiv-react-hooks";
-import { IoChevronDownOutline, IoChevronForwardOutline, IoPlay } from "react-icons/io5";
+import {VscLayers, VscChevronDown, VscChevronRight, VscRefresh} from 'react-icons/vsc';
+
 import "./style.css"
 import {useEffect, useState} from "react"
-import { RiDeleteBin2Line } from "react-icons/ri";
-import { FaCircle} from "react-icons/fa"
+import { VscTrash, VscCircleLargeFilled } from 'react-icons/vsc';
+
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from "../../components/content-panel";
 import FlexBox from "../../components/flexbox";
 import { Config, GenerateRandomKey } from "../../util";
@@ -11,7 +12,9 @@ import Modal, { ButtonDefinition, KeyDownDefinition } from "../../components/mod
 import AddValueButton from "../../components/add-button";
 import {Link} from 'react-router-dom'
 import HelpIcon from "../../components/help"
-import { VscInfo } from "react-icons/vsc";
+import Tippy from '@tippyjs/react';
+import 'tippy.js/dist/tippy.css';
+import Button from "../../components/button";
 
 export default function ServicesPanel(props) {
     const {namespace} = props
@@ -27,7 +30,7 @@ export default function ServicesPanel(props) {
 }
 
 export function ServiceCreatePanel(props) {
-    const {name, setName, image, setImage, scale, setScale, size, setSize, cmd, setCmd, maxscale} = props
+    const {name, setName, image, setImage, scale, setScale, size, setSize, cmd, setCmd, maxScale} = props
 
     return(
         <FlexBox className="col gap" style={{fontSize: "12px"}}>
@@ -42,7 +45,13 @@ export function ServiceCreatePanel(props) {
                     </FlexBox>
                     <FlexBox className="col" style={{paddingRight:"10px"}}>
                         Scale
-                        <input type="range" style={{paddingLeft:"0px"}} min={"0"} max={maxscale.toString()} value={scale.toString()} onChange={(e)=>setScale(e.target.value)} />
+                        <Tippy content={scale} trigger={"mouseenter click"}>
+                            <input type="range" style={{paddingLeft:"0px"}} min={"0"} max={maxScale.toString()} value={scale.toString()} onChange={(e)=>setScale(e.target.value)} />
+                        </Tippy>
+                        <datalist style={{display:"flex", alignItems:'center'}} id="sizeMarks">
+                            <option style={{flex:"auto", textAlign:"left", lineHeight:"10px", paddingLeft:"8px"}} value="0" label="0"/>
+                            <option style={{flex:"auto", textAlign:"right", lineHeight:"10px", paddingRight:"5px" }} value={maxScale} label={maxScale}/>
+                        </datalist>
                     </FlexBox>
                     <FlexBox className="col" style={{paddingRight:"10px"}}>
                         Size
@@ -71,13 +80,14 @@ function NamespaceServices(props) {
     const [scale, setScale] = useState(0)
     const [size, setSize] = useState(0)
     const [cmd, setCmd] = useState("")
+    const [maxScale, setMaxScale] = useState(0)
 
     const {data, err, config, getNamespaceConfig, getNamespaceServices, createNamespaceService, deleteNamespaceService} = useNamespaceServices(Config.url, true, namespace, localStorage.getItem("apikey"))
 
     useEffect(()=>{
         async function getcfg() {
-            await getNamespaceConfig()
-            await getNamespaceServices()
+            await getNamespaceConfig().then(response => setMaxScale(response.maxscale));
+            await getNamespaceServices();
         }
         if(load && config === null && data === null) {
             getcfg()
@@ -100,7 +110,7 @@ function NamespaceServices(props) {
         <ContentPanel style={{width:"100%", minWidth: "300px"}}>
             <ContentPanelTitle>
                 <ContentPanelTitleIcon>
-                    <IoPlay/>
+                    <VscLayers/>
                 </ContentPanelTitleIcon>
                 <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
                             <div>
@@ -139,7 +149,7 @@ function NamespaceServices(props) {
                     ]}
                 >
                     {config !== null ? 
-                        <ServiceCreatePanel cmd={cmd} setCmd={setCmd} size={size} setSize={setSize} name={serviceName} setName={setServiceName} image={image} setImage={setImage} scale={scale} setScale={setScale} maxscale={config.maxscale} />
+                        <ServiceCreatePanel cmd={cmd} setCmd={setCmd} size={size} setSize={setSize} name={serviceName} setName={setServiceName} image={image} setImage={setImage} scale={scale} setScale={setScale} maxScale={maxScale} />
                         :
                         ""
                     }
@@ -185,7 +195,7 @@ function NamespaceServices(props) {
 }
 
 export function Service(props) {
-    const {name, image, status, conditions, deleteService, url, revision, dontDelete, traffic, latest} = props
+    const {allowRedeploy, name, image, status, conditions, deleteService, url, revision, dontDelete, traffic, latest} = props
     return(
         <div className="col" style={{minWidth: "300px"}}>
             <FlexBox style={{ height:"40px", border:"1px solid #f4f4f4", backgroundColor:"#fcfdfe"}}>
@@ -257,6 +267,58 @@ export function Service(props) {
                     </div>:""}
                     </>
                 }
+                { allowRedeploy ? 
+                <div>
+                    <FlexBox style={{ alignItems: "center", justifyContent: "center", height: "100%", paddingRight: "6px" }}>
+                        <Modal
+                            title="Redeploy service"
+                            titleIcon={(
+                                <VscRefresh />
+                            )}
+                            button={(
+                                <Button className="light small">
+                                    <VscRefresh className="grey-text" style={{ fontSize: "16px" }} />
+                                </Button>
+                            )}
+                            actionButtons={[
+                                ButtonDefinition(
+                                    "Yes", 
+                                    async () => {
+                                        await deleteService(name, revision)
+                                    },
+                                    "small",
+                                    () => {
+                                        console.log("err func")
+                                    },
+                                    true,
+                                    true
+                                ),
+                                ButtonDefinition(
+                                    "Cancel", 
+                                    () => {},
+                                    "small light",
+                                    () => {},
+                                    true,
+                                    false
+                                )
+                            ]}
+                        >
+                            <div style={{ textAlign: "center" }}>
+                                <div>
+                                    This will delete the pods running to support this service.
+                                </div>
+                                <div>
+                                    The pods will be recreated the next time an action is executed that requires this service.
+                                </div>
+                                <br/>
+                                <div>
+                                    Do you wish to continue?
+                                </div>
+                            </div>
+                        </Modal>
+                    </FlexBox>
+                </div>
+                :<></>}
             </FlexBox>
             <FlexBox style={{border:"1px solid #f4f4f4", borderTop:"none"}}>
                 <ServiceDetails conditions={conditions} />
@@ -322,12 +384,12 @@ function Condition(props){
                             }}>
                             {showDetails ?
                             <>
-                                <IoChevronDownOutline />
+                                <VscChevronDown />
                                 <div>Hide Details</div>
                             </>
                             :   
                             <>
-                                <IoChevronForwardOutline />
+                                <VscChevronRight />
                                 <div>Show Details</div>
                             </>}
                             </div>
@@ -382,7 +444,7 @@ export function ServiceStatus(props) {
 
     return(
         <div>   
-            <FaCircle style={{fontSize:"6pt", fill: color}} />
+            <VscCircleLargeFilled style={{fontSize:"6pt", fill: color}} />
         </div>
     )
 }
@@ -393,7 +455,7 @@ function ServicesDeleteButton(props) {
     return (
         <FlexBox onClick={onClick} className="col red-text" style={{height: "100%", textAlign:"right", width:"30px"}}>
             <div className="secrets-delete-btn" style={{height: "100%", display: "flex", paddingRight: "8px" }}>
-                <RiDeleteBin2Line className="auto-margin" />
+                <VscTrash className="auto-margin" />
             </div>
         </FlexBox>
     )

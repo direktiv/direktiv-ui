@@ -2,9 +2,12 @@ import React, {useEffect, useState} from 'react';
 import './style.css';
 import Button from '../button';
 import ContentPanel, {ContentPanelTitle, ContentPanelBody, ContentPanelTitleIcon, ContentPanelFooter} from '../../components/content-panel';
-import { IoLockClosedOutline, IoCloseCircleSharp } from 'react-icons/io5';
+
+import { VscDiffAdded } from 'react-icons/vsc';
+
 import FlexBox from '../flexbox';
 import Alert from '../alert';
+import { VscClose } from 'react-icons/vsc';
 
 
 function Modal(props) {
@@ -155,13 +158,9 @@ function ModalOverlay(props) {
         closeButton = (
             <FlexBox className="modal-buttons" style={{ flexDirection: "column-reverse" }}>
                 <div>
-                    <IoCloseCircleSharp 
-                        className="red-text auto-margin" 
-                        style={{ marginRight: "8px" }}
-                        onClick={() => {
-                            callback()
-                        }}
-                    />
+                    <VscClose onClick={()=>{
+                        callback()
+                    }} className="auto-margin" style={{marginRight:"8px"}} />
                 </div>
             </FlexBox>
         )
@@ -214,7 +213,7 @@ function ModalOverlay(props) {
                                             ? 
                                             [titleIcon]
                                             :
-                                            <IoLockClosedOutline />
+                                            <VscDiffAdded />
                                         }
                                     </ContentPanelTitleIcon>
                                 </FlexBox>
@@ -287,7 +286,7 @@ function generateButtons(closeModal, setDisplayAlert, setAlertMessage, actionBut
         let btn = actionButtons[i];
         let onClick =  async () => {
             try {
-                let json = await btn.onClick()
+                await btn.onClick()
                 if(btn.closesModal){
                     closeModal()
                 } else {
