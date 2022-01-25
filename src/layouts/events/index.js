@@ -46,6 +46,7 @@ function EventsPage(props) {
     const [listenersParam, setListenersParam] = useState([`first=${PAGE_SIZE}`])
     const [historyParam, setHistoryParam] = useState([`first=${PAGE_SIZE}`])
     let {eventHistory, eventListeners, eventListenersTotalCount, eventListenersPageInfo, eventHistoryTotalCount, eventHistoryPageInfo, sendEvent, replayEvent} = useEvents(Config.url, true, namespace, localStorage.getItem("apikey"), {listners: listenersParam, history: historyParam})
+    console.log({eventListeners})
     const updateEventHistoryPage = useCallback((newParam)=>{
         setHistoryParam([...newParam])
     }, [])
