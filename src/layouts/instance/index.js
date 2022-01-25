@@ -5,19 +5,19 @@ import Button from '../../components/button';
 import { useParams } from 'react-router';
 import ContentPanel, { ContentPanelBody, ContentPanelHeaderButton, ContentPanelHeaderButtonIcon, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
 import FlexBox from '../../components/flexbox';
-import {AiFillCode} from 'react-icons/ai';
 import {useInstance, useInstanceLogs, useWorkflow} from 'direktiv-react-hooks';
 import { CancelledState, FailState, RunningState, SuccessState } from '../instances';
 
 import { Link } from 'react-router-dom';
 import { AutoSizer, List, CellMeasurer, CellMeasurerCache } from 'react-virtualized';
-import { IoCopy, IoEye, IoEyeOff } from 'react-icons/io5';
+import { VscCopy, VscEye, VscEyeClosed, VscSourceControl, VscScreenFull, VscTerminal } from 'react-icons/vsc';
+
 import * as dayjs from "dayjs"
 import YAML from 'js-yaml'
 
 import DirektivEditor from '../../components/editor';
 import WorkflowDiagram from '../../components/diagram';
-import { HiOutlineArrowsExpand } from 'react-icons/hi';
+
 import Modal, { ButtonDefinition } from '../../components/modal';
 import Alert from '../../components/alert';
 
@@ -48,7 +48,7 @@ function InstancePage(props) {
     let instanceID = params["id"];
 
     // todo implement cancelInstance
-    let {data, err,  getInput, getOutput} = useInstance(Config.url, true, namespace, instanceID, localStorage.getItem("apikey"));
+    let {data, err,  getInput, getOutput, cancelInstance} = useInstance(Config.url, true, namespace, instanceID, localStorage.getItem("apikey"));
 
 
     useEffect(()=>{
@@ -72,12 +72,12 @@ function InstancePage(props) {
     let label = <></>;
     if (data.status === "complete") {
         label = <SuccessState />
+    } else if (data.status === "cancelled" || data.errorCode === "direktiv.cancels.api") {
+        label = <CancelledState />
     } else if (data.status === "failed" || data.status === "crashed") {
         label = <FailState />
     }  else  if (data.status === "running") {
         label = <RunningState />
-    } else if (data.status === "cancelled") {
-        label = <CancelledState />
     }
 
     let wfName = data.as.split(":")[0]
@@ -96,7 +96,7 @@ function InstancePage(props) {
                     <ContentPanel style={{width: "100%", minHeight: "40vh"}}>
                         <ContentPanelTitle>
                             <ContentPanelTitleIcon>
-                                <AiFillCode />
+                                <VscTerminal />
                             </ContentPanelTitleIcon>
                             <FlexBox className="gap" style={{alignItems:"center"}}>
                                 <div>
@@ -104,6 +104,16 @@ function InstancePage(props) {
                                 </div>
                                 {label} 
                                 <FlexBox style={{flex: "auto", justifyContent: "right", paddingRight: "6px", alignItems: "center"}}>
+                                    { data.status === "running" || data.status === "pending" ? 
+                                    <Button className="small light" style={{marginRight: "8px"}} onClick={() => {
+                                        cancelInstance()
+                                        setLoad(true)
+                                    }}>
+                                        <span className="red-text">
+                                            Cancel
+                                        </span>
+                                    </Button>
+                                    :<></>}
                                     <Link to={linkURL}>
                                         <Button className="small light">
                                             <span className="hide-on-small">View</span> Workflow
@@ -116,7 +126,7 @@ function InstancePage(props) {
                                     noPadding
                                     title="Instance Details"
                                     titleIcon={
-                                        <AiFillCode />
+                                        <VscTerminal />
                                     }
                                     style={{
                                         maxWidth: "50px"
@@ -128,7 +138,7 @@ function InstancePage(props) {
                                     button={(
                                         <ContentPanelHeaderButton hackyStyle={{ marginBottom: "8px", height: "29px" }}>
                                             <ContentPanelHeaderButtonIcon>
-                                                <HiOutlineArrowsExpand />
+                                                <VscScreenFull />
                                             </ContentPanelHeaderButtonIcon>
                                         </ContentPanelHeaderButton>
                                     )}
@@ -144,12 +154,12 @@ function InstancePage(props) {
                         <InstanceLogs setClipData={setClipData} clipData={clipData} namespace={namespace} instanceID={instanceID} follow={follow} setFollow={setFollow} width={width} />
                     </ContentPanel>
                 </FlexBox>
-                <FlexBox className="gap wrap" style={{minHeight: "40%", minWidth: "300px", flex: "2", flexWrap: "wrap-reverse"}}>
+                <FlexBox className="gap wrap" style={{minIoCopyHeight: "40%", minWidth: "300px", flex: "2", flexWrap: "wrap-reverse"}}>
                     <FlexBox style={{minWidth: "300px"}}>
                         <ContentPanel style={{width: "100%", minHeight: "40vh"}}>
                         <ContentPanelTitle>
                             <ContentPanelTitleIcon>
-                                <AiFillCode />
+                                <VscTerminal />
                             </ContentPanelTitleIcon>
                             <FlexBox className="gap">
                                 <div>
@@ -163,7 +173,7 @@ function InstancePage(props) {
                                 noPadding
                                 title="Input"
                                 titleIcon={
-                                    <AiFillCode />
+                                    <VscTerminal />
                                 }
                                 modalStyle={{
                                     overflow: "hidden",
@@ -172,7 +182,7 @@ function InstancePage(props) {
                                 button={(
                                     <ContentPanelHeaderButton>
                                         <ContentPanelHeaderButtonIcon>
-                                            <HiOutlineArrowsExpand />
+                                            <VscScreenFull />
                                         </ContentPanelHeaderButtonIcon>
                                     </ContentPanelHeaderButton>
                                 )}
@@ -195,7 +205,7 @@ function InstancePage(props) {
                     <ContentPanel style={{width: "100%", minHeight: "40vh"}}>
                         <ContentPanelTitle>
                             <ContentPanelTitleIcon>
-                                <AiFillCode />
+                                <VscSourceControl />
                             </ContentPanelTitleIcon>
                             <FlexBox className="gap" style={{alignItems:"center"}}>
                                 <div>
@@ -212,7 +222,7 @@ function InstancePage(props) {
                     <ContentPanel style={{width: "100%", minHeight: "40vh"}}>
                         <ContentPanelTitle>
                             <ContentPanelTitleIcon>
-                                <AiFillCode />
+                                <VscTerminal />
                             </ContentPanelTitleIcon>
                             <FlexBox className="gap">
                                 <div>
@@ -226,7 +236,7 @@ function InstancePage(props) {
                                 noPadding
                                 title="Output"
                                 titleIcon={
-                                    <AiFillCode />
+                                    <VscTerminal />
                                 }
                                 modalStyle={{
                                     overflow: "hidden",
@@ -235,7 +245,7 @@ function InstancePage(props) {
                                 button={(
                                     <ContentPanelHeaderButton>
                                         <ContentPanelHeaderButtonIcon>
-                                            <HiOutlineArrowsExpand />
+                                            <VscScreenFull />
                                         </ContentPanelHeaderButtonIcon>
                                     </ContentPanelHeaderButton>
                                 )}
@@ -276,15 +286,15 @@ function InstanceLogs(props) {
                         <TerminalButton onClick={()=>{
                             copyTextToClipboard(clipData)
                         }}>
-                                <IoCopy/> Copy {width > 999 ? <span>to Clipboard</span>:""}
+                                <VscCopy/> Copy {width > 999 ? <span>to Clipboard</span>:""}
                         </TerminalButton>
                         {follow ?
                             <TerminalButton onClick={(e)=>setFollow(!follow)} className={"btn-terminal"}>
-                                <IoEyeOff/> Stop {width > 999 ? <span>watching</span>: ""}
+                                <VscEyeClosed/> Stop {width > 999 ? <span>watching</span>: ""}
                             </TerminalButton>
                             :
                             <TerminalButton onClick={(e)=>setFollow(!follow)} className={"btn-terminal"} >
-                                    <IoEye/> <div>Follow {width > 999 ? <span>logs</span>: ""}</div>
+                                <VscEye/> <div>Follow {width > 999 ? <span>logs</span>: ""}</div>
                             </TerminalButton>
                         }
                     </FlexBox>
@@ -333,8 +343,6 @@ function InstanceDiagram(props) {
         return <></>
     }
     
-    console.log(status, "STATUS OF INSTANCE")
-
     return(
         <WorkflowDiagram instanceStatus={status} disabled={true} flow={flow} workflow={YAML.load(wfdata)}/>
     )
@@ -379,23 +387,33 @@ function Output(props){
     useEffect(()=>{
         async function get() {
             if (load && status !== "pending"){
-                let data = await getOutput()
-                setOutput(data)
-                setLoad(false)
+                try {
+                    let data = await getOutput()
+                    let x = JSON.stringify(JSON.parse(data),null,2)
+                    setOutput(x)
+                    setLoad(false)
+                } catch(e) {
+                    console.log(e);
+                }
             }
         }
         get()
-    },[output, load, getOutput, status])
+    },[output, load, getOutput, status, setOutput])
 
     useEffect(()=>{
         async function reGetOutput() {
             if(status !== "pending"){
-                let data = await getOutput()
-                setOutput(data)
+                try {
+                    let data = await getOutput()
+                    let x = JSON.stringify(JSON.parse(data),null,2)
+                    setOutput(x)
+                } catch(e) {
+                    console.log(e);
+                }
             }
         }
        reGetOutput()
-    },[status, getOutput])
+    },[status, getOutput, setOutput])
 
     return(
         <FlexBox style={{flexDirection:"column"}}>

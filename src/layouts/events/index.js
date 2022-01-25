@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { Config } from '../../util';
-import {  VscCloud, VscRedo, VscSymbolEvent } from 'react-icons/vsc';
+import {  VscCloud, VscPlay, VscDebugStepInto } from 'react-icons/vsc';
 import Button from '../../components/button';
 import ContentPanel, { ContentPanelBody, ContentPanelHeaderButton, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
 import FlexBox from '../../components/flexbox';
@@ -88,7 +88,7 @@ function EventsPage(props) {
                                             </th>
                                         </tr>
                                     </thead>
-                                    {eventHistory !== null ?
+                                    {eventHistory !== null && typeof eventHistory === typeof [] && eventHistory.length > 0?
                                     <tbody>
                                         {eventHistory.map((obj)=>{
                                             return <tr style={{borderBottom:"1px solid #f4f4f4"}}>
@@ -112,7 +112,7 @@ function EventsPage(props) {
                                                     button={     <div onClick={async ()=>{
                                                     }} style={{display: "flex", alignItems: "flex-end", justifyContent: "center", paddingRight: "10px"}}>
                                                         <Button className="small light">
-                                                            <VscRedo/>
+                                                            <VscPlay/>
                                                         </Button>
                                                     </div>}
                                                     actionButtons={[
@@ -131,7 +131,11 @@ function EventsPage(props) {
                                                 </td>
                                             </tr>
                                         })}
-                                    </tbody>: ""}
+                                    </tbody>: 
+                                    <FlexBox className='table-no-content'>
+                                        No cloud events history
+                                    </FlexBox>
+                                }
                                 </table>
                             </div>
                             {
@@ -150,7 +154,7 @@ function EventsPage(props) {
                     <ContentPanel style={{ width: "100%" }}>
                         <ContentPanelTitle>
                             <ContentPanelTitleIcon>
-                                <VscSymbolEvent/>
+                                <VscDebugStepInto/>
                             </ContentPanelTitleIcon>
                             <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
                                 <div>
@@ -181,7 +185,7 @@ function EventsPage(props) {
                                             </th>
                                         </tr>
                                     </thead>
-                                    {eventListeners !== null ?
+                                    {eventListeners !== null && typeof eventListeners === typeof [] && eventListeners?.length > 0 ?
                                     <tbody>
                                         {eventListeners.map((obj)=>{
                                             return(
@@ -198,7 +202,7 @@ function EventsPage(props) {
                                                         {obj.node.mode}
                                                     </td>
                                                     <td>
-                                                        {dayjs.utc(obj.node.receivedAt).local().format("HH:mm:ss a")}
+                                                        {dayjs.utc(obj.node.updatedAt).local().format("HH:mm:ss a")}
                                                     </td>
                                                     <td className="event-split">
                                                         {obj.node.events.map((obj)=>{
@@ -208,7 +212,11 @@ function EventsPage(props) {
                                                 </tr>
                                             )
                                         })}
-                                    </tbody>:""}
+                                    </tbody>:
+                                        <FlexBox className='table-no-content'>
+                                            No active event listeners
+                                        </FlexBox>
+                                    }
                                 </table>
                             </div>
                             {

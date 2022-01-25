@@ -3,7 +3,7 @@ import './style.css';
 import FlexBox from '../../../components/flexbox';
 import {useSearchParams} from 'react-router-dom'
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from '../../../components/content-panel';
-import {BsCodeSquare} from 'react-icons/bs'
+import { VscFileCode, VscExtensions } from 'react-icons/vsc'
 import { useNamespaceDependencies, useWorkflow, useWorkflowServices } from 'direktiv-react-hooks';
 import { Config } from '../../../util';
 import { useNavigate, useParams } from 'react-router';
@@ -13,9 +13,9 @@ import * as dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime";
 import utc from "dayjs/plugin/utc"
 import { InstanceRow } from '../../instances';
-import { IoMdLock } from 'react-icons/io';
-import {IoCloseCircleOutline, IoCheckmarkCircleOutline} from 'react-icons/io5'
-import {VscChevronDown, VscChevronUp} from 'react-icons/vsc'
+
+import {VscTag, VscNote, VscError, VscPass, VscChevronDown, VscChevronUp, VscTypeHierarchySub, VscVmRunning, VscLayers, VscPieChart} from 'react-icons/vsc'
+
 import { Service } from '../../namespace-services';
 import DirektivEditor from '../../../components/editor';
 import AddWorkflowVariablePanel from './variables';
@@ -35,6 +35,8 @@ import HelpIcon from "../../../components/help";
 import Loader from '../../../components/loader';
 import Alert from '../../../components/alert';
 import Pagination from '../../../components/pagination';
+import {AutoSizer} from "react-virtualized";
+import Tippy from '@tippyjs/react';
 
 dayjs.extend(utc)
 dayjs.extend(relativeTime);
@@ -129,6 +131,7 @@ function InitialWorkflowHook(props){
                     { activeTab === 1 ?
                         <>
                         <RevisionSelectorTab 
+                        workflowName={filepath.substring(1)}
                         tagWorkflow={tagWorkflow}
                          namespace={namespace}
                           filepath={filepath} updateWorkflow={updateWorkflow} setRouter={setRouter} editWorkflowRouter={editWorkflowRouter} getWorkflowRouter={getWorkflowRouter} setRevisions={setRevisions} revisions={revisions} router={router} getWorkflowSankeyMetrics={getWorkflowSankeyMetrics} executeWorkflow={executeWorkflow} getWorkflowRevisionData={getWorkflowRevisionData} searchParams={searchParams} setSearchParams={setSearchParams} deleteRevision={deleteRevision}  getRevisions={getRevisions} getTags={getTags} removeTag={removeTag}  />
@@ -195,7 +198,7 @@ function WorkflowDependencies(props) {
             <ContentPanel style={{width:"100%"}}>
                 <ContentPanelTitle>
                     <ContentPanelTitleIcon>
-                        <BsCodeSquare />
+                        <VscExtensions />
                     </ContentPanelTitleIcon>
                     <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
                         <div>
@@ -232,7 +235,7 @@ function WorkingRevisionErrorBar(props) {
                             {errors.map((err) => {
                                 return (
                                     <FlexBox className="row" style={{ justifyContent: "flex-start", alignItems: "center", paddingBottom: "4px" }}>
-                                        <IoCloseCircleOutline style={{ paddingRight: "6px", color: "#ec4f79" }} />
+                                        <VscError style={{ paddingRight: "6px", color: "#ec4f79" }} />
                                         <div>
                                             {err}
                                         </div>
@@ -243,7 +246,7 @@ function WorkingRevisionErrorBar(props) {
                         </>
                         :
                         <FlexBox className="row" style={{ justifyContent: "flex-start", alignItems: "center" }}>
-                            <IoCheckmarkCircleOutline style={{ paddingRight: "6px", color: "#28a745" }} />
+                            <VscPass style={{ paddingRight: "6px", color: "#28a745" }} />
                             <div>
                                 No Errors
                             </div>
@@ -334,7 +337,7 @@ function WorkingRevision(props) {
             <ContentPanel style={{width:"100%"}}>
                 <ContentPanelTitle>
                     <ContentPanelTitleIcon>
-                        <BsCodeSquare />
+                        <VscFileCode />
                     </ContentPanelTitleIcon>
                     <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
                         <div>
@@ -362,7 +365,13 @@ function WorkingRevision(props) {
                                 </div>
                             </div>
                             <div style={{display:"flex", flex:1, justifyContent:"center"}}>
-                                <Modal 
+                                { workflow !== oldWf ?
+                                <Tippy content={"Requires save"} trigger={'mouseenter focus click'} zIndex={10}>
+                                <div>
+                                    <div className='btn-terminal disabled' style={{ userSelect: "none" }}> Run </div>
+                                </div>
+                                </Tippy>
+                                : <Modal 
                                     style={{ justifyContent: "center" }}
                                     className="run-workflow-modal"
                                     modalStyle={{color: "black"}}
@@ -390,15 +399,21 @@ function WorkingRevision(props) {
                                         }, "small light", ()=>{}, true, false)
                                     ]}
                                     button={(
-                                        <div className={`btn-terminal ${opLoadingStates["IsLoading"] ? "terminal-disabled" : ""}`}>
-                                            Run
-                                        </div>
+                                            <div className={`btn-terminal ${opLoadingStates["IsLoading"] ? "terminal-disabled" : ""}`}>
+                                                Run
+                                            </div>
                                     )}
                                 >
-                                    <FlexBox style={{overflow:"hidden"}}>
-                                        <DirektivEditor height="200" width="300" dlang="json" dvalue={input} setDValue={setInput}/>
+                                    <FlexBox style={{height: "40vh", width: "30vw", minWidth: "250px", minHeight: "200px"}}>
+                                        <FlexBox style={{overflow:"hidden"}}>
+                                            <AutoSizer>
+                                                {({height, width})=>(
+                                                    <DirektivEditor height={height} width={width} dlang="json" dvalue={input} setDValue={setInput}/>
+                                                )}
+                                            </AutoSizer>
+                                        </FlexBox>
                                     </FlexBox>
-                                </Modal>
+                                </Modal>}
                             </div>
                             <div style={{ display: "flex", flex: 1, gap: "3px", justifyContent: "flex-end", paddingRight: "10px"}}>
                                 <div className={`btn-terminal ${opLoadingStates["Save"] ? "terminal-loading" : ""} ${workflow === oldWf ? "terminal-disabled" : ""}`} title={"Save workflow to latest"} onClick={async () => {
@@ -414,6 +429,7 @@ function WorkingRevision(props) {
                                 }}>
                                     Save
                                 </div>
+                                { workflow === oldWf ?
                                 <div className={`btn-terminal ${opLoadingStates["IsLoading"] ? "terminal-disabled" : ""}`} title={"Save latest workflow as new revision"} onClick={async () => {
                                     setErrors([])
                                     try{
@@ -435,6 +451,15 @@ function WorkingRevision(props) {
                                 }}>
                                     Make Revision
                                 </div>
+                                :
+                                <Tippy content={"Requires save"} trigger={'mouseenter focus click'} zIndex={10}>
+                                    <div>
+                                        <div className="btn-terminal disabled" title={"Save latest workflow as new revision"}>
+                                            Make Revision
+                                        </div>
+                                    </div>
+                                </Tippy>
+                                }
                                 <div className={"btn-terminal editor-info"} title={`${showErrors ? "Hide Problems": "Show Problems"}`} onClick={async () => {
                                     setShowErrors(!showErrors)
                                 }}>
@@ -540,13 +565,20 @@ function WorkflowInstances(props) {
                 <>
                     <>
                     {instances.map((obj)=>{
+
+                    console.log(obj);
+                    let state = obj.node.status;
+                    if (obj.node.errorCode === "direktiv.cancels.api") {
+                        state = "cancelled"
+                    }
+
                     let key = GenerateRandomKey("instance-")
                     return(
                         <InstanceRow
                             wf={true}
                             key={key}
                             namespace={namespace}
-                            state={obj.node.status} 
+                            state={state} 
                             name={obj.node.as} 
                             id={obj.node.id}
                             started={dayjs.utc(obj.node.createdAt).local().format("HH:mm:ss a")} 
@@ -580,13 +612,13 @@ function OverviewTab(props) {
         async function listData() {
             if(load){
                 // get the instances
-                let resp = await getInstancesForWorkflow(...queryParams)
-                setTotal(resp.instances.totalCount)
-                setPageInfo(resp?.instances?.pageInfo)
-                if(Array.isArray(resp?.instances?.edges)){
-                    setInstances(resp?.instances?.edges)
-                } else {
-                    setErr(resp)
+                try {
+                    let resp = await getInstancesForWorkflow()
+                    if (resp.instances.edges) {
+                        setInstances(resp.instances.edges)
+                    }
+                } catch (e) {
+                    setErr(e)
                 }
             }
             setLoad(false)
@@ -607,10 +639,10 @@ function OverviewTab(props) {
             <div className="gap">
                 <FlexBox className="gap wrap">
                     <FlexBox style={{ minWidth: "370px", width:"60%", maxHeight: "342px"}}>
-                        <ContentPanel style={{ width: "100%", minWidth: "300px"}}>
+                        <ContentPanel style={{ width: "100%", minWidth: "300px", overflowY: "auto"}}>
                             <ContentPanelTitle>
                                 <ContentPanelTitleIcon>
-                                    <BsCodeSquare />
+                                    <VscVmRunning />
                                 </ContentPanelTitleIcon>
                                 <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
                                     <div>
@@ -629,7 +661,7 @@ function OverviewTab(props) {
                         <ContentPanel style={{ width: "100%", minWidth: "300px"}}>
                             <ContentPanelTitle>
                                 <ContentPanelTitleIcon>
-                                    <BsCodeSquare />
+                                    <VscPieChart />
                                 </ContentPanelTitleIcon>
                                 <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
                                     <div>
@@ -649,7 +681,7 @@ function OverviewTab(props) {
                 <ContentPanel style={{ width: "100%", minWidth: "300px" }}>
                     <ContentPanelTitle>
                         <ContentPanelTitleIcon>
-                            <BsCodeSquare />
+                            <VscTypeHierarchySub />
                         </ContentPanelTitleIcon>
                         <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
                             <div>
@@ -665,7 +697,7 @@ function OverviewTab(props) {
                 <ContentPanel style={{ width: "100%", minWidth: "300px"}}>
                     <ContentPanelTitle>
                         <ContentPanelTitleIcon>
-                            <BsCodeSquare />
+                            <VscLayers />
                         </ContentPanelTitleIcon>
                         <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
                             <div>
@@ -848,7 +880,7 @@ function TrafficDistribution(props) {
 
 function WorkflowServices(props) {
     const {namespace, filepath} = props
-    const {data, err} = useWorkflowServices(Config.url, true, namespace, filepath.substring(1), localStorage.getItem("apikey"))
+    const {data, err, deleteWorkflowService} = useWorkflowServices(Config.url, true, namespace, filepath.substring(1), localStorage.getItem("apikey"))
 
     if (data === null) {
         return     <div className="col">
@@ -883,12 +915,15 @@ function WorkflowServices(props) {
                 {data.map((obj)=>{
                     return(
                         <Service
+                            allowRedeploy={true}
                             dontDelete={true}
                             url={`/n/${namespace}/explorer/${filepath.substring(1)}?function=${obj.info.name}&version=${obj.info.revision}`}
                             name={obj.info.name}
+                            revision={obj.info.revision}
                             status={obj.status}
                             image={obj.info.image}
                             conditions={obj.conditions}
+                            deleteService={deleteWorkflowService}
                         />
       
                     )
@@ -976,7 +1011,7 @@ function SettingsTab(props) {
                             <ContentPanel style={{width: "100%", height: "100%"}}>
                                 <ContentPanelTitle>
                                     <ContentPanelTitleIcon>
-                                        <IoMdLock/>
+                                        <VscNote/>
                                     </ContentPanelTitleIcon>
                                     <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
                                         <div>
@@ -1021,7 +1056,7 @@ function SettingsTab(props) {
                             <ContentPanel style={{width: "100%"}}>
                                 <ContentPanelTitle>
                                     <ContentPanelTitleIcon>
-                                        <IoMdLock/>
+                                        <VscTag/>
                                     </ContentPanelTitleIcon>
                                     <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
                                         <div>

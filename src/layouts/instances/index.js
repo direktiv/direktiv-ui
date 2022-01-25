@@ -3,7 +3,7 @@ import './style.css';
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
 import Pagination from '../../components/pagination';
 import FlexBox from '../../components/flexbox';
-import {VscFileCode} from 'react-icons/vsc';
+import { VscVmRunning } from 'react-icons/vsc';
 import { BsDot } from 'react-icons/bs';
 import HelpIcon from '../../components/help';
 import { useInstances } from 'direktiv-react-hooks';
@@ -56,7 +56,7 @@ function InstancesTable(props) {
         <ContentPanel>
         <ContentPanelTitle>
             <ContentPanelTitleIcon>
-                <VscFileCode/>
+                <VscVmRunning/>
             </ContentPanelTitleIcon>
             <FlexBox className="gap" style={{ alignItems: "center" }}>
                 <div>
@@ -140,12 +140,12 @@ export function InstanceRow(props) {
     let label;
     if (state === success) {
         label = <SuccessState />
+    } else if (state === cancelled) {
+        label = <CancelledState />
     } else if (state === fail || state === crashed) {
         label = <FailState />
     }  else  if (state === running) {
         label = <RunningState />
-    } else if (state === cancelled) {
-        label = <CancelledState />
     }
 
     let wfStr = name.split(':')[0]

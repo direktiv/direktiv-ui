@@ -1,9 +1,8 @@
 import { useWorkflowVariables } from 'direktiv-react-hooks';
 import React, { useState } from 'react';
-import { BsUpload } from 'react-icons/bs';
-import { IoMdLock } from 'react-icons/io';
-import { IoCloudDownloadOutline, IoEyeOutline, IoRefresh } from 'react-icons/io5';
-import { RiDeleteBin2Line } from 'react-icons/ri';
+
+import { VscVariableGroup, VscCloudDownload, VscCloudUpload,  VscEye, VscTrash } from 'react-icons/vsc';
+
 import AddValueButton from '../../../components/add-button';
 import Button from '../../../components/button';
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from '../../../components/content-panel';
@@ -11,7 +10,7 @@ import DirektivEditor from '../../../components/editor';
 import FlexBox from '../../../components/flexbox';
 import Modal, { ButtonDefinition } from '../../../components/modal';
 import Tabs from '../../../components/tabs';
-import { Config, CanPreviewMimeType } from '../../../util';
+import { Config, CanPreviewMimeType, MimeTypeFileExtension } from '../../../util';
 import { VariableFilePicker } from '../../settings/variables-panel';
 import { AutoSizer } from 'react-virtualized';
 import HelpIcon from "../../../components/help";
@@ -28,7 +27,7 @@ function AddWorkflowVariablePanel(props) {
 
     let wfVar = workflow.substring(1)
 
-    const {data, setWorkflowVariable, getWorkflowVariable, deleteWorkflowVariable} = useWorkflowVariables(Config.url, true, namespace, wfVar, localStorage.getItem("apikey"))
+    const {data, setWorkflowVariable, getWorkflowVariable, getWorkflowVariableBuffer, deleteWorkflowVariable} = useWorkflowVariables(Config.url, true, namespace, wfVar, localStorage.getItem("apikey"))
 
     if (data === null) {
         return <></>
@@ -43,7 +42,7 @@ function AddWorkflowVariablePanel(props) {
         <ContentPanel style={{width: "100%", height: "100%"}}>
             <ContentPanelTitle>
                 <ContentPanelTitleIcon>
-                    <IoMdLock/>
+                    <VscVariableGroup/>
                 </ContentPanelTitleIcon>
                 <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
                     <div>
@@ -86,7 +85,7 @@ function AddWorkflowVariablePanel(props) {
                     </Modal>
             </ContentPanelTitle>
             <ContentPanelBody>
-            <Variables namespace={namespace} deleteWorkflowVariable={deleteWorkflowVariable} setWorkflowVariable={setWorkflowVariable} getWorkflowVariable={getWorkflowVariable} variables={data}/>
+            <Variables namespace={namespace} deleteWorkflowVariable={deleteWorkflowVariable} setWorkflowVariable={setWorkflowVariable} getWorkflowVariable={getWorkflowVariable} getWorkflowVariableBuffer={getWorkflowVariableBuffer} variables={data}/>
             </ContentPanelBody>
         </ContentPanel>
     )
@@ -165,7 +164,7 @@ function AddVariablePanel(props) {
 
 function Variables(props) {
 
-    const {variables, namespace, getWorkflowVariable, setWorkflowVariable, deleteWorkflowVariable} = props;
+    const {variables, namespace, getWorkflowVariable, setWorkflowVariable, deleteWorkflowVariable, getWorkflowVariableBuffer} = props;
 
     return(
         <FlexBox>
@@ -175,7 +174,7 @@ function Variables(props) {
                     <tbody>
                         {variables.map((obj)=>{
                             return(
-                                <Variable namespace={namespace} obj={obj} getWorkflowVariable={getWorkflowVariable} deleteWorkflowVariable={deleteWorkflowVariable} setWorkflowVariable={setWorkflowVariable}/>
+                                <Variable namespace={namespace} obj={obj} getWorkflowVariableBuffer={getWorkflowVariableBuffer} getWorkflowVariable={getWorkflowVariable} deleteWorkflowVariable={deleteWorkflowVariable} setWorkflowVariable={setWorkflowVariable}/>
                             )
                         })}
                     </tbody>
@@ -187,7 +186,7 @@ function Variables(props) {
 }
 
 function Variable(props) {
-    const {obj, getWorkflowVariable, setWorkflowVariable, deleteWorkflowVariable} = props
+    const {obj, getWorkflowVariable, setWorkflowVariable, deleteWorkflowVariable, getWorkflowVariableBuffer} = props
     const [val, setValue] = useState("")
     const [mimeType, setType] = useState("")
     const [file, setFile] = useState(null)
@@ -197,26 +196,8 @@ function Variable(props) {
     if (uploading) {
         uploadingBtn += " btn-loading"
     }
-    let lang = ""
-    switch(mimeType){
-        case "application/json":
-            lang = "json"
-            break
-        case "application/x-sh":
-            lang = "shell"
-            break
-        case "text/html":
-            lang = "html"
-            break
-        case "text/css":
-            lang = "css"
-            break
-        case "application/yaml":
-            lang = "yaml"
-            break
-        default:
-            lang = "plain"
-        }
+
+    let lang = MimeTypeFileExtension(mimeType)
 
     return(
         <tr className="body-row" key={`${obj.node.name}${obj.node.size}`}>
@@ -242,7 +223,7 @@ function Variable(props) {
                     button={(
                         <Button className="reveal-btn small shadow">
                             <FlexBox className="gap">
-                                <IoEyeOutline className="auto-margin" />
+                                <VscEye className="auto-margin" />
                                 <div>
                                     Show <span className="hide-on-small">value</span>
                                 </div>
@@ -301,22 +282,15 @@ function Variable(props) {
                     {!downloading? 
                     <VariablesDownloadButton onClick={async()=>{
                         setDownloading(true)
-                        let resp = await getWorkflowVariable(obj.node.name)
-                        let b = new Blob([resp.data], {type:resp.contentType})
-                        let url = URL.createObjectURL(b)
-                        const a = document.createElement('a');
-                        a.href = url
-                        a.download = obj.node.name
 
-                        const clickHandler = () => {
-                            setTimeout(() => {
-                                URL.revokeObjectURL(url);
-                                a.removeEventListener('click', clickHandler);
-                            }, 150);
-                        };
+                        const variableData = await getWorkflowVariableBuffer(obj.node.name)
+                        const extension = MimeTypeFileExtension(variableData.contentType)
+                        const bitArray = btoa(String.fromCharCode.apply(null, new Uint8Array(variableData.data)))
 
-                        a.addEventListener('click', clickHandler, false);
-                        a.click();
+                        const a = document.createElement('a')
+                        a.href = `data:${variableData.contentType};base64,` + bitArray
+                        a.download = obj.node.name + `${extension ? `.${extension}`: ""}`
+                        a.click()
                         setDownloading(false)
                     }}/>:<VariablesDownloadingButton />}
                 </FlexBox>
@@ -383,7 +357,7 @@ function Variable(props) {
 function VariablesUploadButton() {
     return (
         <div className="secrets-delete-btn grey-text auto-margin" style={{display: "flex", alignItems: "center", height: "100%"}}>
-            <BsUpload className="auto-margin"/>
+            <VscCloudUpload className="auto-margin"/>
         </div>
     )
 }
@@ -393,7 +367,7 @@ function VariablesDownloadButton(props) {
 
     return (
         <div onClick={onClick} className="secrets-delete-btn grey-text auto-margin" style={{display: "flex", alignItems: "center", height: "100%"}}>
-            <IoCloudDownloadOutline/>
+            <VscCloudDownload/>
         </div>
     )
 }
@@ -402,7 +376,7 @@ function VariablesDownloadingButton(props) {
 
     return (
         <div className="secrets-delete-btn grey-text auto-margin" style={{display: "flex", alignItems: "center", height: "100%"}}>
-            <IoRefresh style={{animation: "spin 2s linear infinite"}}/>
+            <VscCloudUpload style={{animation: "spin 2s linear infinite"}}/>
         </div>
     )
 }
@@ -411,7 +385,7 @@ function VariablesDownloadingButton(props) {
 function VariablesDeleteButton() {
     return (
         <div className="secrets-delete-btn grey-text auto-margin red-text" style={{display: "flex", alignItems: "center", height: "100%"}}>
-            <RiDeleteBin2Line className="auto-margin"/>
+            <VscTrash className="auto-margin"/>
         </div>
     )
 }
