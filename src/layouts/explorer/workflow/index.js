@@ -608,7 +608,6 @@ function OverviewTab(props) {
 
     // fetch instances using the workflow hook from above
     useEffect(()=>{
-        console.log("CALLED fetch instances using the workflow hook from above load = ", load)
         async function listData() {
             if(load){
                 setLoad(false)
