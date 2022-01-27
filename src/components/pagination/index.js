@@ -38,7 +38,7 @@ function Pagination(props) {
     }, [pageInfo])
     
     const hasNext = pageInfo?.hasNextPage? 'arrow active': 'arrow'
-    const hasPrev = pageInfo?.hasNextPreviousPage? 'arrow active': 'arrow'
+    const hasPrev = pageInfo?.hasPreviousPage? 'arrow active': 'arrow'
 
     return(
         <FlexBox style={{justifyContent: "flex-end"}}>

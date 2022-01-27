@@ -193,6 +193,10 @@ function ExplorerList(props) {
     const [queryParams, setQueryParams] = useState([`first=${PAGE_SIZE}`])
     const {data, err, templates, pageInfo, createNode, deleteNode, renameNode, totalCount } = useNodes(Config.url, true, namespace, path, localStorage.getItem("apikey"), ...queryParams, `order.field=${orderFieldDictionary[orderFieldKey]}`)
 
+    function resetQueryParams() {
+        setQueryParams([`first=${PAGE_SIZE}`])
+    }
+
     // control loading icon todo work out how to display this error
     useEffect(()=>{
         if(data !== null || err !== null) {
@@ -428,7 +432,7 @@ function ExplorerList(props) {
                         <>
                         {data.children.edges.map((obj) => {
                             if (obj.node.type === "directory") {
-                                return (<DirListItem namespace={namespace} renameNode={renameNode} deleteNode={deleteNode} path={obj.node.path} key={GenerateRandomKey("explorer-item-")} name={obj.node.name} />)
+                                return (<DirListItem namespace={namespace} renameNode={renameNode} deleteNode={deleteNode} path={obj.node.path} key={GenerateRandomKey("explorer-item-")} name={obj.node.name} resetQueryParams={resetQueryParams}/>)
                             } else if (obj.node.type === "workflow") {
                                 return (<WorkflowListItem namespace={namespace} renameNode={renameNode} deleteNode={deleteNode} path={obj.node.path} key={GenerateRandomKey("explorer-item-")} name={obj.node.name} />)
                             }
@@ -448,7 +452,7 @@ function ExplorerList(props) {
 
 function DirListItem(props) {
 
-    let {name, path, deleteNode, renameNode, namespace} = props;
+    let {name, path, deleteNode, renameNode, namespace, resetQueryParams} = props;
 
     const navigate = useNavigate()
     const [renameValue, setRenameValue] = useState(path)
@@ -459,6 +463,7 @@ function DirListItem(props) {
     return(
         <div style={{cursor:"pointer"}} onClick={(e)=>{
             navigate(`/n/${namespace}/explorer/${path.substring(1)}`)
+            resetQueryParams()
         }} className="explorer-item">
             <FlexBox className="col">
                 <FlexBox className="explorer-item-container gap wrap">
