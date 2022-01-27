@@ -6,7 +6,6 @@
 }
 
 .pagination-btn {
-    cursor: pointer;
     user-select: none;
     color: #8797AD;
     width: 20px;
@@ -17,6 +16,7 @@
 }
 
 .arrow.active:hover {
+    cursor: pointer;
     background-color: rgba(0,0,0,0.1);
 }
 
