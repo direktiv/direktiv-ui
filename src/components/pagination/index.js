@@ -35,7 +35,7 @@ function Pagination(props) {
             default:   
                 return    
         }
-    }, [pageInfo])
+    }, [pageInfo, total, pageSize, updatePage])
     
     const hasNext = pageInfo?.hasNextPage? 'arrow active': 'arrow'
     const hasPrev = pageInfo?.hasPreviousPage? 'arrow active': 'arrow'

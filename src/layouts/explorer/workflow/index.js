@@ -566,7 +566,6 @@ function WorkflowInstances(props) {
                     <>
                     {instances.map((obj)=>{
 
-                    console.log(obj);
                     let state = obj.node.status;
                     if (obj.node.errorCode === "direktiv.cancels.api") {
                         state = "cancelled"
@@ -609,8 +608,10 @@ function OverviewTab(props) {
 
     // fetch instances using the workflow hook from above
     useEffect(()=>{
+        console.log("CALLED fetch instances using the workflow hook from above load = ", load)
         async function listData() {
             if(load){
+                setLoad(false)
                 // get the instances
                 try {
                     let resp = await getInstancesForWorkflow(...queryParams)
@@ -625,10 +626,10 @@ function OverviewTab(props) {
                     setErr(e)
                 }
             }
-            setLoad(false)
         }
+
         listData()
-    },[queryParams]) // removed dependency [load, getInstancesForWorkflow] // by aaron
+    },[queryParams, load, getInstancesForWorkflow])
 
     const updatePage = useCallback((newParam)=>{
         setLoad(true)
