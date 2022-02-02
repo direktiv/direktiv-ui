@@ -95,8 +95,8 @@ function InstancePage(props) {
 
     return (<>
         <FlexBox className="col gap" style={{paddingRight: "8px"}}>
-            <FlexBox className="gap wrap" style={{minHeight: "50%", flex: "1 0 0"}}>
-                <FlexBox style={{minWidth: "340px", flex: "5 0 0", }}>
+            <FlexBox className="gap wrap" style={{minHeight: "50%", flex: "1"}}>
+                <FlexBox style={{minWidth: "340px", flex: "5", }}>
                     <ContentPanel style={{width: "100%", minHeight: "40vh"}}>
                         <ContentPanelTitle>
                             <ContentPanelTitleIcon>
@@ -165,7 +165,7 @@ function InstancePage(props) {
                         <InstanceLogs setClipData={setClipData} clipData={clipData} namespace={namespace} instanceID={instanceID} follow={follow} setFollow={setFollow} width={width} />
                     </ContentPanel>
                 </FlexBox>
-                <FlexBox className="gap wrap" style={{minIoCopyHeight: "40%", minWidth: "300px", flex: "2 0 0 ", flexWrap: "wrap-reverse"}}>
+                <FlexBox className="gap wrap" style={{minIoCopyHeight: "40%", minWidth: "300px", flex: "2", flexWrap: "wrap-reverse"}}>
                     <FlexBox style={{minWidth: "300px"}}>
                         <ContentPanel style={{width: "100%", minHeight: "40vh"}}>
                         <ContentPanelTitle>
@@ -288,7 +288,7 @@ function InstanceLogs(props) {
 
     return (
         <>
-            <FlexBox className="col" style={{...paddingStyle,}}>
+            <FlexBox className="col" style={{...paddingStyle}}>
                 <FlexBox style={{ backgroundColor: "#002240", color: "white", borderRadius: "8px 8px 0px 0px", overflow: "hidden", padding: "8px" }}>
                     <Logs clipData={clipData} setClipData={setClipData} namespace={namespace} instanceID={instanceID} follow={follow} setFollow={setFollow} />
                 </FlexBox>
