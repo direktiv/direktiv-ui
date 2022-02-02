@@ -291,7 +291,7 @@ export default function DirektivEditor(props) {
     },[monaco, dlang, validate])
 
     function handleEditorChange(value, event) {
-        console.log(value)
+      setDValue(value)
     }
 
 
