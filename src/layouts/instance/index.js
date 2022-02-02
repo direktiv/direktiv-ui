@@ -373,15 +373,20 @@ function InstanceDiagram(props) {
 function Input(props) {
     const {getInput} = props
     
-    const [input, setInput] = useState("")
+    const [input, setInput] = useState(null)
+    const [load, setLoad] = useState(true)
 
     useEffect(()=>{
         async function get() {
-                let data = await getInput()
-                setInput(data)
+            let data = await getInput()
+            setInput(data)
         }
-        get()
-    },[input, getInput])
+
+        if (load && input === null && getInput) {
+            setLoad(false)
+            get()
+        }
+    },[input, getInput, load])
 
     return(
         <FlexBox style={{flexDirection:"column"}}>
@@ -404,38 +409,23 @@ function Output(props){
     const {getOutput, status} = props
 
     const [load, setLoad] = useState(true)
-    const [output, setOutput] = useState("")
+    const [output, setOutput] = useState(null)
 
     useEffect(()=>{
         async function get() {
-            if (load && status !== "pending"){
+            if (load && status !== "pending" && output === null && getOutput){
+                setLoad(false)
                 try {
                     let data = await getOutput()
                     let x = JSON.stringify(JSON.parse(data),null,2)
                     setOutput(x)
-                    setLoad(false)
                 } catch(e) {
                     console.log(e);
                 }
             }
         }
         get()
-    },[output, load, getOutput, status, setOutput])
-
-    useEffect(()=>{
-        async function reGetOutput() {
-            if(status !== "pending"){
-                try {
-                    let data = await getOutput()
-                    let x = JSON.stringify(JSON.parse(data),null,2)
-                    setOutput(x)
-                } catch(e) {
-                    console.log(e);
-                }
-            }
-        }
-       reGetOutput()
-    },[status, getOutput, setOutput])
+    },[output, load, getOutput, status])
 
     return(
         <FlexBox style={{flexDirection:"column"}}>
@@ -455,45 +445,34 @@ function Output(props){
 
 function Logs(props){ 
     const cache = new CellMeasurerCache({
-        fixedWidth: false,
-        defaultHeight: 20
+        fixedWidth: true,
+        fixedHeight: false
     })
 
     let {namespace, instanceID, follow, setClipData, clipData} = props;
-    // const [load, setLoad] = useState(true)
-    // const [logs, setLogs] = useState([])
+    const [logLength, setLogLength] = useState(0)
     let {data, err} = useInstanceLogs(Config.url, true, namespace, instanceID, localStorage.getItem("apikey"))
     useEffect(()=>{
         if(data !== null) {
             if(clipData === null) {
+
                 let cd = ""
                 for(let i=0; i < data.length; i++) {
                     cd += `[${dayjs.utc(data[i].node.t).local().format("HH:mm:ss.SSS")}] ${data[i].node.msg}\n`
                 }
                 setClipData(cd)
-            }
-            if(clipData !== data){
-                let cd = ""
-                for(let i=0; i < data.length; i++) {
+                setLogLength(data.length)
+            } else if (data.length !== logLength) {
+                let cd = clipData
+                for(let i=logLength-1; i < data.length; i++) {
                     cd += `[${dayjs.utc(data[i].node.t).local().format("HH:mm:ss.SSS")}] ${data[i].node.msg}\n`
 
                 }
                 setClipData(cd)
+                setLogLength(data.length)
             }
         }
-    },[data, clipData, setClipData])
-    // useEffect(()=>{
-    //     if(load && data !== null){
-    //         setLogs(data)
-    //         setLoad(false)
-    //     }
-    // },[load])
-
-    // useEffect(()=>{
-    //     if(data !== null) {
-    //         setLogs(logs + data)
-    //     }
-    // },[data, logs])
+    },[data, clipData, setClipData, logLength])
 
 
     if (!data) {
@@ -534,31 +513,6 @@ function Logs(props){
         );
     }
       
-
-    // return (
-    //     <WindowScroller>
-    //         {({height, isScrolling, registerChild, scrollTop}) => {
-    //             return (
-    //                 <AutoSizer disableHeight>
-    //                     {({ width }) => {
-    //                         return (
-    //                             <List 
-    //                                 autoHeight
-    //                                 height={height}
-    //                                 isScrolling={isScrolling}
-    //                                 rowCount={data.length}
-    //                                 rowHeight={20}
-    //                                 rowRenderer={rowRenderer}
-    //                                 scrollTop={scrollTop}
-    //                                 width={width}
-    //                             />
-    //                         )
-    //                     }}
-    //                 </AutoSizer>
-    //             )
-    //         }}
-    //     </WindowScroller>
-    // )
 
     return(
         <div style={{flex:"1 1 auto", lineHeight: "20px"}}>
