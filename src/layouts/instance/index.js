@@ -95,8 +95,8 @@ function InstancePage(props) {
 
     return (<>
         <FlexBox className="col gap" style={{paddingRight: "8px"}}>
-            <FlexBox className="gap wrap" style={{minHeight: "50%", flex: "1"}}>
-                <FlexBox style={{minWidth: "340px", flex: "5"}}>
+            <FlexBox className="gap wrap" style={{minHeight: "50%", flex: "1 0 0"}}>
+                <FlexBox style={{minWidth: "340px", flex: "5 0 0", }}>
                     <ContentPanel style={{width: "100%", minHeight: "40vh"}}>
                         <ContentPanelTitle>
                             <ContentPanelTitleIcon>
@@ -157,7 +157,7 @@ function InstancePage(props) {
                                         ButtonDefinition("Close", () => {}, "small light", ()=>{}, true, false)
                                     ]}
                                 >
-                                    <InstanceLogs setClipData={setClipData} clipData={clipData} noPadding namespace={namespace} instanceID={instanceID} follow={follow} setFollow={setFollow} width={width}/>
+                                    <InstanceLogs clipData={clipData} noPadding namespace={namespace} instanceID={instanceID} follow={follow} setFollow={setFollow} width={width}/>
                                 </Modal>
                                 </FlexBox>
                             </FlexBox>
@@ -165,7 +165,7 @@ function InstancePage(props) {
                         <InstanceLogs setClipData={setClipData} clipData={clipData} namespace={namespace} instanceID={instanceID} follow={follow} setFollow={setFollow} width={width} />
                     </ContentPanel>
                 </FlexBox>
-                <FlexBox className="gap wrap" style={{minIoCopyHeight: "40%", minWidth: "300px", flex: "2", flexWrap: "wrap-reverse"}}>
+                <FlexBox className="gap wrap" style={{minIoCopyHeight: "40%", minWidth: "300px", flex: "2 0 0 ", flexWrap: "wrap-reverse"}}>
                     <FlexBox style={{minWidth: "300px"}}>
                         <ContentPanel style={{width: "100%", minHeight: "40vh"}}>
                         <ContentPanelTitle>
@@ -212,7 +212,7 @@ function InstancePage(props) {
                 </FlexBox>
             </FlexBox>
             <FlexBox className="gap wrap" style={{minHeight: "40%", flex: "1"}}>
-                <FlexBox style={{minWidth: "300px", flex: "5"}}>
+                <FlexBox style={{minWidth: "300px", flex: "5", width:"800px", minWidth:"800px"}}>
                     <ContentPanel style={{width: "100%", minHeight: "40vh"}}>
                         <ContentPanelTitle>
                             <ContentPanelTitleIcon>
@@ -288,7 +288,7 @@ function InstanceLogs(props) {
 
     return (
         <>
-            <FlexBox className="col" style={{...paddingStyle}}>
+            <FlexBox className="col" style={{...paddingStyle,}}>
                 <FlexBox style={{ backgroundColor: "#002240", color: "white", borderRadius: "8px 8px 0px 0px", overflow: "hidden", padding: "8px" }}>
                     <Logs clipData={clipData} setClipData={setClipData} namespace={namespace} instanceID={instanceID} follow={follow} setFollow={setFollow} />
                 </FlexBox>
@@ -453,7 +453,13 @@ function Logs(props){
     const [logLength, setLogLength] = useState(0)
     let {data, err} = useInstanceLogs(Config.url, true, namespace, instanceID, localStorage.getItem("apikey"))
     useEffect(()=>{
+        if (!setClipData) {
+            // Skip ClipData if unset
+            return 
+        }
+
         if(data !== null) {
+            // console.log("clipData = ", clipData)
             if(clipData === null) {
 
                 let cd = ""
@@ -496,7 +502,7 @@ function Logs(props){
             columnIndex={0}
             rowIndex={index}
         >
-          <div style={style}>
+          <div style={{...style, minWidth:"800px", width:"800px"}}>
             <div style={{display:"inline-block",minWidth:"112px", color:"#b5b5b5"}}>
                 <div className="log-timestamp">
                     <div>[</div>
@@ -504,7 +510,7 @@ function Logs(props){
                     <div>]</div>
                 </div>
             </div> 
-            <span style={{marginLeft:"5px"}}>
+            <span style={{marginLeft:"5px", whiteSpace:"pre-wrap"}}>
                 {data[index].node.msg}
             </span>
             <div style={{height: `fit-content`}}></div>
@@ -514,23 +520,20 @@ function Logs(props){
     }
       
 
-    return(
-        <div style={{flex:"1 1 auto", lineHeight: "20px"}}>
+    return (
+        <div style={{ flex: "1 1 auto", lineHeight: "20px" }}>
             <AutoSizer>
-                {({height, width})=>(
-                    <div style={{height: "100%", minHeight: "100%"}}>
-                    <List
-                    width={width}
-                    height={height}
-                        // style={{
-                        //     minHeight: "100%"
-                        //     // maxHeight: "100%"
-                        // }}
-                        rowRenderer={rowRenderer}
-                        deferredMeasurementCache={cache}
-                        scrollToIndex={follow ? data.length - 1: 0}
-                        rowCount={data.length}
-                        rowHeight={cache.rowHeight}
+                {({ height, width }) => (
+                    <div style={{ height: "100%", minHeight: "100%" }}>
+                        <List
+                            width={width}
+                            height={height}
+                            rowRenderer={rowRenderer}
+                            deferredMeasurementCache={cache}
+                            scrollToIndex={follow ? data.length - 1 : 0}
+                            rowCount={data.length}
+                            rowHeight={cache.rowHeight}
+                            scrollToAlignment={"start"}
                         />
                     </div>
                 )}
