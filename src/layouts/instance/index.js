@@ -212,7 +212,7 @@ function InstancePage(props) {
                 </FlexBox>
             </FlexBox>
             <FlexBox className="gap wrap" style={{minHeight: "40%", flex: "1"}}>
-                <FlexBox style={{minWidth: "300px", flex: "5", width:"800px", minWidth:"800px"}}>
+                <FlexBox style={{minWidth: "300px", flex: "5"}}>
                     <ContentPanel style={{width: "100%", minHeight: "40vh"}}>
                         <ContentPanelTitle>
                             <ContentPanelTitleIcon>
