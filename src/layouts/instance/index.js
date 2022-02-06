@@ -379,7 +379,12 @@ function Input(props) {
     useEffect(()=>{
         async function get() {
             let data = await getInput()
-            setInput(data)
+            try {
+                let x = JSON.stringify(JSON.parse(data),null,2)
+                setInput(x)
+            } catch(e) {
+                setInput(data)
+            }
         }
 
         if (load && input === null && getInput) {
