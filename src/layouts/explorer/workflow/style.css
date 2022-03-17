@@ -106,8 +106,8 @@
 }
 
 .tabbed-btns {
-    max-width: 160px;
-    min-width: 160px;
+    max-width: 220px;
+    min-width: 220px;
     font-size: 10px;
     border: solid 1px var(--theme-subtle-border);
     border-radius: 4px;
@@ -119,6 +119,7 @@
     align-items: center;
     cursor: pointer;
     user-select: none;
+    line-height: 28px;
 }
 
 .tabbed-btns > div:hover {
@@ -132,6 +133,18 @@
 .active-tab-btn {
     color: var(--theme-brand-blue);
     background-color: rgba(62, 148, 197, 0.04);
+}
+
+.tab-btn.disable {
+    /* pointer-events: none; */
+    cursor: unset;
+    color: var(--theme-grey-light-blue);
+}
+
+.tab-btn.disable:hover {
+    background-color: unset;
+    cursor: unset;
+    color: var(--theme-grey-light-blue);
 }
 
 .tabbed-btns > div:not(:last-of-type) {

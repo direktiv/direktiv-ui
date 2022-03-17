@@ -12,12 +12,9 @@ import { VscClose } from 'react-icons/vsc';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css'
 
-
-function Modal(props) {
-
-    let {maximised, noPadding, titleIcon, title, children, button, withCloseButton, activeOverlay, label, buttonDisabled} = props;
-    let {modalStyle, style, actionButtons, keyDownActions, escapeToCancel, onClose, onOpen, requiredFields } = props;
-    const [visible, setVisible] = useState(false);
+export function ModalHeadless(props) {
+    let {maximised, noPadding, titleIcon, title, children, withCloseButton, activeOverlay, label} = props;
+    let {modalStyle, actionButtons, keyDownActions, escapeToCancel, onClose, onOpen, requiredFields, visible, setVisible } = props;
 
     if (!title) {
         title = "Modal Title"
@@ -60,10 +57,40 @@ function Modal(props) {
                     />)
     }
 
+    return (<>{overlay}</>)
+
+
+}
+
+function Modal(props) {
+
+    let {maximised, noPadding, titleIcon, title, children, button, withCloseButton, activeOverlay, label, buttonDisabled} = props;
+    let {modalStyle, style, actionButtons, keyDownActions, escapeToCancel, onClose, onOpen, requiredFields } = props;
+    const [visible, setVisible] = useState(false);
     if (!button) {
         return(
             <div>
-                {overlay}
+                 <ModalHeadless 
+        setVisible={setVisible}
+        visible={visible}
+        maximised={maximised}
+        noPadding={noPadding}
+        titleIcon={titleIcon}
+        title={title}
+        children={children}
+        button={button}
+        withCloseButton={withCloseButton}
+        activeOverlay={activeOverlay}
+        label={label}
+        buttonDisabled={buttonDisabled}
+        modalStyle={modalStyle}
+        style={style}
+        actionButtons={actionButtons}
+        keyDownActions={keyDownActions}
+        escapeToCancel={escapeToCancel}
+        onClose={onClose}
+        onOpen={onOpen}
+        requiredFields={requiredFields}/>
                 <Button style={{pointerEvents: buttonDisabled ? "none" : ""}} onClick={(ev) => {
                     setVisible(true)
                     ev.stopPropagation()
@@ -76,7 +103,28 @@ function Modal(props) {
 
     return (
         <>
-        {overlay}
+        
+        <ModalHeadless 
+        setVisible={setVisible}
+        visible={visible}
+        maximised={maximised}
+        noPadding={noPadding}
+        titleIcon={titleIcon}
+        title={title}
+        children={children}
+        button={button}
+        withCloseButton={withCloseButton}
+        activeOverlay={activeOverlay}
+        label={label}
+        buttonDisabled={buttonDisabled}
+        modalStyle={modalStyle}
+        style={style}
+        actionButtons={actionButtons}
+        keyDownActions={keyDownActions}
+        escapeToCancel={escapeToCancel}
+        onClose={onClose}
+        onOpen={onOpen}
+        requiredFields={requiredFields}/>
         <FlexBox style={{...style}}>
             <div style={{width: "100%", display:'flex', justifyContent: "center", pointerEvents: buttonDisabled ? "none" : ""}} onClick={async(ev) => {
                 if(onOpen){
@@ -90,8 +138,7 @@ function Modal(props) {
         </FlexBox>
         </>
     )
-}
-
+        }
 export default Modal;
 
 
