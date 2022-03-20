@@ -912,20 +912,33 @@ export const SchemaMap = {
     "specialSchemaError": SpecialSchemaError,
 }
 
-export function GetSchema(schemaKey, functionList, varList) {
-    let selectedSchema = SchemaMap[schemaKey]
-    if (schemaKey !== "stateSchemaAction") {
+function functionListToActionEnum(functionList) {
+     let availableFunctions = []
+     for (let i = 0; i < functionList.length; i++) {
+         const f = functionList[i];
+         availableFunctions.push(f.id)
+     }
+
+     return availableFunctions
+}
+
+export function getSchemaDefault(schemaKey) {
+    return SchemaMap[schemaKey]
+}
+export const getSchemaCallbackMap = {
+    "stateSchemaAction": (schemaKey, functionList, varList) => {
+        let selectedSchema = SchemaMap[schemaKey]
+        selectedSchema.properties.action.properties.function.enum = functionListToActionEnum(functionList)
         return selectedSchema
+    },
+    "stateSchemaForeach": (schemaKey, functionList, varList) => {
+        let selectedSchema = SchemaMap[schemaKey]
+        selectedSchema.properties.action.properties.function.enum = functionListToActionEnum(functionList)
+        return selectedSchema
+    },
+    "Default": (schemaKey, functionList, varList) => {
+        return getSchemaDefault(schemaKey)
     }
-
-    let availableFunctions = []
-    for (let i = 0; i < functionList.length; i++) {
-        const f = functionList[i];
-        availableFunctions.push(f.id)
-    }
-
-    selectedSchema.properties.action.properties.function.enum = availableFunctions
-    return selectedSchema
 }
 
 

@@ -12,7 +12,7 @@ import YAML from "json-to-pretty-yaml"
 import styleDrawflow from 'drawflow/dist/drawflow.min.css'
 
 
-import { GenerateFunctionSchemaWithEnum, GetSchema } from "../../components/diagram-editor/jsonSchema"
+import { GenerateFunctionSchemaWithEnum, GetSchema, getSchemaCallbackMap, getSchemaDefault } from "../../components/diagram-editor/jsonSchema"
 import Form from '@rjsf/core';
 import { CreateNode, DefaultValidateSubmitCallbackMap, onSubmitCallbackMap, setConnections } from '../../components/diagram-editor/util';
 import { AutoSizer, CellMeasurer, CellMeasurerCache, List } from 'react-virtualized';
@@ -372,8 +372,12 @@ export default function DiagramEditor(props) {
 
     useEffect(() => {
         if (selectedNode) {
-            // Update Selected Schema
-            setSelectedNodeSchema(GetSchema(selectedNode.data.schemaKey, functionList))
+            const getSchema = getSchemaCallbackMap[selectedNode.data.schemaKey]
+            if (getSchema) {
+                setSelectedNodeSchema(getSchema(selectedNode.data.schemaKey, functionList))
+            } else {                                    
+                setSelectedNodeSchema(getSchemaDefault(selectedNode.data.schemaKey))
+            }
         }
     }, [selectedNode, functionList])
 
@@ -715,6 +719,7 @@ export default function DiagramEditor(props) {
 
                                     // Preflight custom formData
                                     DefaultValidateSubmitCallbackMap(selectedNodeFormData)
+
 
                                     // Update form data into node
                                     diagramEditor.updateNodeDataFromId(updatedNode.id, updatedNode.data)
