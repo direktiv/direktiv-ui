@@ -302,13 +302,14 @@ function isFirstConnection(nodeID, previousNodeID, rawData) {
 
 export function DefaultValidateSubmitCallbackMap(formData) {
     console.log("formData.transform = ", formData.transform)
-    if (formData.transform && formData.transform.selectionType === "YAML" && formData.transform.rawYAML !== "") {
+    if (formData.transform && formData.transform.selectionType && formData.transform.selectionType === "YAML" && formData.transform.rawYAML !== "") {
         try {
             console.log("attempting to load yaml")
             let test = YAML.load(formData.transform.rawYAML)
             console.log("attempting to load yaml post = ", test)
         } catch (e) {
             console.log("FAILED TO LOAD YAML = ", e)
+            throw Error(`Invalid Raw YAML: ${e.reason}`)
         }
     }
 }
