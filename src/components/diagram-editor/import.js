@@ -1,5 +1,7 @@
 import { ActionsNodes, NodeErrorBlock, NodeStartBlock } from "./nodes";
 import YAML from 'js-yaml'
+import prettyYAML from "json-to-pretty-yaml"
+
 
 
 export const exampleWorkflow2 =
@@ -289,6 +291,8 @@ const importConnectionsCallbackMap = {
     // }
 }
 
+const objectDepth = (o) => Object (o) === o ? 1 + Math .max (-1, ... Object .values(o) .map (objectDepth)) : 0
+
 function importDefaultProcessTransformCallback(state, transformKey) {
     const oldTransform = state[transformKey]
     if (!oldTransform) {
@@ -297,9 +301,18 @@ function importDefaultProcessTransformCallback(state, transformKey) {
     } else if (typeof state[transformKey] === "object") {
         delete state[transformKey]
 
-        state[transformKey] = {
-            selectionType: "Key Value",
-            "keyValue": oldTransform
+        // check depth
+        const transformDepth = objectDepth(oldTransform)
+        if (transformDepth > 1) {
+            state[transformKey] = {
+                selectionType: "YAML",
+                "rawYAML":  prettyYAML.stringify(oldTransform)
+            }
+        } else {
+            state[transformKey] = {
+                selectionType: "Key Value",
+                "keyValue":  oldTransform
+            }
         }
     } else {
         state[transformKey] = {

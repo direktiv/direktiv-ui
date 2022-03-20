@@ -15,13 +15,18 @@ function processTransform(stateData, transformKey) {
     const selectionType = stateData[transformKey]["selectionType"]
     const keyValue = stateData[transformKey]["keyValue"] ? stateData[transformKey]["keyValue"] : {}
     const jqQuery = stateData[transformKey]["jqQuery"] ? stateData[transformKey]["jqQuery"] : ""
+    const rawYAML = stateData[transformKey]["rawYAML"] ? stateData[transformKey]["rawYAML"] : ""
+    console.log("stateData[transformKey] = ", stateData[transformKey])
     
     delete stateData[transformKey]["keyValue"]
     delete stateData[transformKey]["jqQuery"]
     delete stateData[transformKey]["selectionType"]
+    delete stateData[transformKey]["rawYAML"]
 
     if (selectionType && selectionType === "Key Value") {
         stateData[transformKey] = {...keyValue}
+    }   else if (selectionType && selectionType === "YAML") {
+        stateData[transformKey] = YAML.load(rawYAML)
     } else if (selectionType && selectionType === "JQ Query") {
         stateData[transformKey] = jqQuery
     }
