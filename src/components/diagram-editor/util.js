@@ -301,11 +301,29 @@ function isFirstConnection(nodeID, previousNodeID, rawData) {
 }
 
 export function DefaultValidateSubmitCallbackMap(formData) {
-    console.log("formData.transform = ", formData.transform)
-    if (formData.transform && formData.transform.selectionType && formData.transform.selectionType === "YAML" && formData.transform.rawYAML !== "") {
+    validateFormTransform(formData.transform)
+    // console.log("formData.transform = ", formData.transform)
+    // if (formData.transform && formData.transform.selectionType && formData.transform.selectionType === "YAML" && formData.transform.rawYAML !== "") {
+    //     try {
+    //         console.log("attempting to load yaml")
+    //         let test = YAML.load(formData.transform.rawYAML)
+    //         console.log("attempting to load yaml post = ", test)
+    //     } catch (e) {
+    //         console.log("FAILED TO LOAD YAML = ", e)
+    //         throw Error(`Invalid Raw YAML: ${e.reason}`)
+    //     }
+    // }
+}
+
+function validateFormTransform(formTransformData) {
+    if (!formTransformData) {
+        return
+    }
+
+    if (formTransformData.selectionType && formTransformData.selectionType === "YAML" && formTransformData.rawYAML !== "") {
         try {
             console.log("attempting to load yaml")
-            let test = YAML.load(formData.transform.rawYAML)
+            let test = YAML.load(formTransformData.rawYAML)
             console.log("attempting to load yaml post = ", test)
         } catch (e) {
             console.log("FAILED TO LOAD YAML = ", e)
@@ -315,7 +333,30 @@ export function DefaultValidateSubmitCallbackMap(formData) {
 }
 
 export const onValidateSubmitCallbackMap = {
-    "Default": DefaultValidateSubmitCallbackMap
+    "Default": DefaultValidateSubmitCallbackMap,
+    "StateEventXor": (formData) => {
+        for (let i = 0; i < formData.events.length; i++) {
+            validateFormTransform(formData.events[i].transform)
+        }
+    },
+    "StateGenerateEvent": (formData) => {
+        validateFormTransform(formData.event.data)
+        validateFormTransform(formData.transform)
+    },
+    "StateSetter": (formData) => {
+        for (let i = 0; i < formData.variables.length; i++) {
+            validateFormTransform(formData.variables[i].value)
+        }
+        validateFormTransform(formData.transform)
+    },
+    "StateAction": (formData) => {
+        validateFormTransform(formData.transform)
+        validateFormTransform(formData.action.input)
+    },
+    "StateForeach": (formData) => {
+        validateFormTransform(formData.transform)
+        validateFormTransform(formData.action.input)
+    }
 }
 
 export const onSubmitCallbackMap = {
