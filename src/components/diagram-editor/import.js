@@ -30,8 +30,8 @@ export function importFromYAML(diagramEditor, setFunctions, wfYAML) {
         // Offset X
         pos.x += 220
 
-        // Add Node to Diagram
-        let newNode = result[0]
+        // Add Node to Diagram (DEEP COPY to avoid references changes)
+        let newNode = JSON.parse(JSON.stringify(result[0]))
 
         // Create nodeData from state
         let newNodeData = Object.assign({}, state)
@@ -57,7 +57,7 @@ export function importFromYAML(diagramEditor, setFunctions, wfYAML) {
         if (state.catch) {
             pos.x += 220
             // TODO: make sure this only gets created once
-            let errorNode = NodeErrorBlock
+            let errorNode = JSON.parse(JSON.stringify(NodeErrorBlock))
             const generatedPseudoCatchID = `SPECIAL-ERROR: `+state.id
             errorNode.data.id = generatedPseudoCatchID
             errorNode.data.formData = state.catch
