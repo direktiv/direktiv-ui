@@ -610,3 +610,8 @@ td > code {
 
 
 /* PLEASE MOE TO ANOTHER FILE */
+
+#builder-page textarea {
+    resize: vertical;
+    height: 80px;
+}

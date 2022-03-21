@@ -292,7 +292,20 @@ const connectionsCallbackMap = {
 
         // Default connections logic
         processConnection(nodeID, rawData, state, wfData)
-    }
+    },
+    "StateValidate": (nodeID, previousNodeID, previousState, rawData, wfData) => {
+        // Stop recursive walk if previous node is not first connections
+        // If we dont do this we'll there is a chance that we create the same state multiple times
+        if (!isFirstConnection(nodeID, previousNodeID, rawData)) {
+            return
+        }
+
+        let state = { id: rawData[nodeID].data.id, type: rawData[nodeID].data.type, ...rawData[nodeID].data.formData }
+        state.schema = YAML.load(state.schema)
+
+        // Default connections logic
+        processConnection(nodeID, rawData, state, wfData)
+    },
 }
 
 // isFirstConnection : Returns true if the previous node is the current nodes first connection
@@ -356,7 +369,14 @@ export const onValidateSubmitCallbackMap = {
     "StateForeach": (formData) => {
         validateFormTransform(formData.transform)
         validateFormTransform(formData.action.input)
-    }
+    },
+    "StateValidate": (formData) => {
+        try {
+            YAML.load(formData.schema)
+        } catch (e){
+            throw Error(`Validate Schema Invalid: ${e.reason}`)
+        }
+    },
 }
 
 export const onSubmitCallbackMap = {

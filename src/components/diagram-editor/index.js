@@ -12,9 +12,9 @@ import YAML from "json-to-pretty-yaml"
 import styleDrawflow from 'drawflow/dist/drawflow.min.css'
 
 
-import { GenerateFunctionSchemaWithEnum, GetSchema, getSchemaCallbackMap, getSchemaDefault } from "../../components/diagram-editor/jsonSchema"
+import { DefaultSchemaUI, GenerateFunctionSchemaWithEnum, GetSchema, getSchemaCallbackMap, getSchemaDefault, SchemaUIMap } from "../../components/diagram-editor/jsonSchema"
 import Form from '@rjsf/core';
-import { CreateNode, DefaultValidateSubmitCallbackMap, onSubmitCallbackMap, setConnections } from '../../components/diagram-editor/util';
+import { CreateNode, DefaultValidateSubmitCallbackMap, onSubmitCallbackMap, onValidateSubmitCallbackMap, setConnections } from '../../components/diagram-editor/util';
 import { AutoSizer, CellMeasurer, CellMeasurerCache, List } from 'react-virtualized';
 import Fuse from 'fuse.js';
 import { ActionsNodes, NodeStateAction } from "../../components/diagram-editor/nodes";
@@ -26,16 +26,6 @@ import Modal, { ButtonDefinition, ModalHeadless } from '../modal';
 
 import Ajv from "ajv"
 
-const uiSchema = {
-    "transform": {
-        "jqQuery": {
-            "ui:widget": "textarea"
-        },
-        "rawYAML": {
-            "ui:widget": "textarea"
-        }
-    }
-}
 
 const actionsNodesFuse = new Fuse(ActionsNodes, {
     keys: ['name']
@@ -365,6 +355,7 @@ export default function DiagramEditor(props) {
     const [selectedNodeFormData, setSelectedNodeFormData] = useState({})
     const [oldSelectedNodeFormData, setOldSelectedNodeFormData] = useState({})
     const [selectedNodeSchema, setSelectedNodeSchema] = useState({})
+    const [selectedNodeSchemaUI, setSelectedNodeSchemaUI] = useState({})
 
     const [showContextMenu, setShowContextMenu] = useState(false);
     const [contextMenuAnchorPoint, setContextMenuAnchorPoint] = useState({ x: 0, y: 0 });
@@ -377,6 +368,16 @@ export default function DiagramEditor(props) {
                 setSelectedNodeSchema(getSchema(selectedNode.data.schemaKey, functionList))
             } else {                                    
                 setSelectedNodeSchema(getSchemaDefault(selectedNode.data.schemaKey))
+            }
+
+            //  Apply custom schema UI
+            //  https://react-jsonschema-form.readthedocs.io/en/latest/usage/widgets/
+            const schemaUI = SchemaUIMap[selectedNode.data.schemaKey]
+            if (schemaUI) {
+                setSelectedNodeSchemaUI(schemaUI)
+            } else {                                
+                // Clear UI schema  
+                setSelectedNodeSchemaUI(DefaultSchemaUI)
             }
         }
     }, [selectedNode, functionList])
@@ -718,7 +719,12 @@ export default function DiagramEditor(props) {
                                     }}
 
                                     // Preflight custom formData
-                                    DefaultValidateSubmitCallbackMap(selectedNodeFormData)
+                                    let onSubmitValidateCallback = onValidateSubmitCallbackMap[updatedNode.name]
+                                    if (onSubmitValidateCallback) {
+                                        onSubmitValidateCallback(selectedNodeFormData)
+                                    } else {                                    
+                                        DefaultValidateSubmitCallbackMap(selectedNodeFormData)
+                                    }
 
 
                                     // Update form data into node
@@ -745,7 +751,7 @@ export default function DiagramEditor(props) {
                                     id={"builder-form"}
                                     onSubmit={(form) => {}}
                                     schema={selectedNodeSchema}
-                                    uiSchema={uiSchema}
+                                    uiSchema={selectedNodeSchemaUI}
                                     formData={selectedNodeFormData}
                                     onChange={(e) => {
                                         setSelectedNodeFormData(e.formData)

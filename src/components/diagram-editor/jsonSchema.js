@@ -151,6 +151,9 @@ const CommonSchemaDefinitionAction = {
     "type": "object",
     "title": "Action Definition",
     "description": "Action to perform.",
+    "required": [
+        "function",
+    ],
     "properties": {
         "function": {
             "enum": [
@@ -293,7 +296,6 @@ export const StateSchemaForeach = {
     "type": "object",
     "required": [
         "action",
-        "args"
     ],
     "properties": {
         "array": {
@@ -941,4 +943,117 @@ export const getSchemaCallbackMap = {
     }
 }
 
+// UI Schemas
+export const SchemaUIMap = {
+    // States
+    // "stateSchemaNoop": StateSchemaNoop,
+    "stateSchemaAction": {
+        "action": {
+            "input": {
+                "rawYAML": {
+                    "ui:widget": "textarea"
+                },
+            },
+            "function": {
+                "ui:placeholder": "Select Function"
+            }
+        },
+        "transform": {
+            "rawYAML": {
+                "ui:widget": "textarea"
+            },
+        }
+    },
+    // "stateSchemaSwitch": StateSchemaSwitch,
+    // "stateSchemaConsumeEvent": StateSchemaConsumeEvent,
+    // "stateSchemaDelay": StateSchemaDelay,
+    // "stateSchemaError": StateSchemaError,
+    // "stateSchemaEventAnd": StateSchemaEventAnd,
+    "stateSchemaEventXor": {
+        "events": {
+            "items":{
+                "transform": {
+                    "rawYAML": {
+                        "ui:widget": "textarea"
+                    },
+                }
+            }
+        },
+        "transform": {
+            "rawYAML": {
+                "ui:widget": "textarea"
+            },
+        }
+    },
+    "stateSchemaForeach": {
+        "action": {
+            "input": {
+                "rawYAML": {
+                    "ui:widget": "textarea"
+                },
+            },
+            "function": {
+                "ui:placeholder": "Select Function"
+            }
+        },
+        "transform": {
+            "rawYAML": {
+                "ui:widget": "textarea"
+            },
+        }
+    },
+    "stateSchemaGenerateEvent": {
+        "event": {
+            "data": {
+                "rawYAML": {
+                    "ui:widget": "textarea"
+                }
+            }
+        },
+        "transform": {
+            "rawYAML": {
+                "ui:widget": "textarea"
+            },
+        }
+    },
+    // "stateSchemaGetter": StateSchemaGetter,
+    "stateSchemaSetter": {
+        "variables": {
+            "items":{
+                "value": {
+                    "rawYAML": {
+                        "ui:widget": "textarea"
+                    },
+                }
+            }
+        },
+        "transform": {
+            "rawYAML": {
+                "ui:widget": "textarea"
+            },
+        }
+    },
+    "stateSchemaValidate": {
+        "schema": {
+            "ui:widget": "textarea"
+        }
+    },
 
+    // Functions
+    // "functionSchemaGlobal": FunctionSchemaGlobal,
+    // "functionSchemaNamespace": FunctionSchemaNamespace,
+    // "functionSchemaReusable": FunctionSchemaReusable,
+    // "functionSchemaSubflow": FunctionSchemaSubflow,
+    // "functionSchema": FunctionSchema,
+
+    // Special
+    "specialSchemaError": SpecialSchemaError,
+}
+
+export const DefaultSchemaUI = {
+    "transform": {
+        "rawYAML": {
+            "ui:widget": "textarea"
+        }
+    }
+}
