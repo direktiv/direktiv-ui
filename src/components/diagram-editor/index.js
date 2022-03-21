@@ -387,11 +387,42 @@ export default function DiagramEditor(props) {
         // if (!diagramEditor) {
         let editor = new Drawflow(id)
         editor.start()
+        editor.force_first_input = true
         editor.on('nodeSelected', function (id) {
             const node = editor.getNodeFromId(id)
             setSelectedNode(node)
             setSelectedNodeFormData(node.data.formData)
             setOldSelectedNodeFormData(node.data.formData)
+        })
+
+        editor.on("connectionCreated", function(ev){
+            // Handle Special cases where we need to remove or adjust connections
+            // INFO: Connections are created from output to input
+            // E.g. {[input_1]NodeA[output_1]}--->{[input_1]NodeB[output_1]}
+            const outNode = editor.getNodeFromId(ev.output_id)
+            const inNode = editor.getNodeFromId(ev.input_id)
+            let errorOutput = 'output_2'
+            const outputIsPrimitive = outNode.class.includes("primitive")
+
+            // XOR has no default transition so output_1 will be used for errors
+            // TODO: It might be worth generating error output class from "output" + node.info.output
+            if (outNode.name ==="StateEventXor") {
+                errorOutput = "output_1"
+            }
+
+            if (outputIsPrimitive) {
+                if (ev.output_class === errorOutput && inNode.name !== "ErrorBlock") {
+                    // Remove connection if pirimtive node Erorr output is going to non-errorblock
+                    editor.removeSingleConnection(ev.output_id, ev.input_id, ev.output_class, ev.input_class)
+                } else if (ev.output_class !== errorOutput && inNode.name === "ErrorBlock"){
+                    // Remove connection if pirimtive node transition output is going to errorblock
+                    editor.removeSingleConnection(ev.output_id, ev.input_id, ev.output_class, ev.input_class)
+                }
+            } else if (inNode.name === "ErrorBlock" && !outputIsPrimitive){
+                // Remove connection in input is error block, but output is primitive
+                editor.removeSingleConnection(ev.output_id, ev.input_id, ev.output_class, ev.input_class)
+            }
+
         })
 
         editor.on('nodeCreated', function (id) {

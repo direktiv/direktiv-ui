@@ -27,6 +27,7 @@
     --connector-size: 6px;
     --connector-background: #FFFFFF;
     --connector-border: 1.5px solid #3E94C5;
+    --connector-error-border: 1.5px solid #EC4F79;
     --connector-box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.07);
 
 }
@@ -294,6 +295,18 @@
     top: 0px;
     margin-bottom: 4px;
     margin-top: 4px;
+}
+
+#builder-page .node.primitive .outputs div:nth-of-type(2) {
+    border: var(--connector-error-border);
+}
+
+#builder-page .node.primitive.type-eventXor .outputs div:nth-of-type(1) {
+    border: var(--connector-error-border);
+}
+
+#builder-page .node.type-error .inputs div:nth-of-type(1) {
+    border: var(--connector-error-border);
 }
 
 /* #builder-page .node .inputs {
