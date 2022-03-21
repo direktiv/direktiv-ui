@@ -1,6 +1,7 @@
 import { ActionsNodes, NodeErrorBlock, NodeStartBlock } from "./nodes";
 import YAML from 'js-yaml'
 import prettyYAML from "json-to-pretty-yaml"
+import { CreateNode } from "./util";
 
 export function importFromYAML(diagramEditor, setFunctions, wfYAML) {
     const wfData = YAML.load(wfYAML)
@@ -14,19 +15,7 @@ export function importFromYAML(diagramEditor, setFunctions, wfYAML) {
     }
 
     // Add StartNode
-    let newNodeHTML = `
-    <div class="node-labels">
-        <div>
-            <span class="label-type">${NodeStartBlock.html}</span>
-        </div>
-    </div>
-    `
-    const startNodeID = diagramEditor.addNode(NodeStartBlock.name, NodeStartBlock.connections.input, NodeStartBlock.connections.output, pos.x, pos.y, `node ${NodeStartBlock.family} type-${NodeStartBlock.type}`, {
-        family: NodeStartBlock.family,
-        type: NodeStartBlock.type,
-        formData: {},
-        schemaKey: NodeStartBlock.data.schemaKey
-    }, newNodeHTML, false)
+    const startNodeID = CreateNode(diagramEditor, NodeStartBlock, pos.x, pos.y, true)
 
     // Iterate over states
     for (let i = 0; i < wfData.states.length; i++) {
@@ -42,17 +31,14 @@ export function importFromYAML(diagramEditor, setFunctions, wfYAML) {
         pos.x += 220
 
         // Add Node to Diagram
-        const newNode = result[0]
+        let newNode = result[0]
 
         // Create nodeData from state
         let newNodeData = Object.assign({}, state)
-        console.log("1state.id = ", state.id)
 
         delete newNodeData["type"]
         delete newNodeData["id"]
         delete newNodeData["catch"]
-        console.log("2state.id = ", state.id)
-
         // Convert transform
 
         const transformCallback = importProcessTransformCallback[newNode.name]
@@ -63,59 +49,20 @@ export function importFromYAML(diagramEditor, setFunctions, wfYAML) {
             defaultCallback(newNodeData)
         }
 
-        console.log("newNodeData = ", newNodeData)
-        console.log("IMPORT newNode = ", newNode)
-        console.log("state = ", state)
-
-        let newNodeHTML = `
-        <div class="node-labels">
-            <div>
-                ID: <span class="label-id">${state.id}</span>
-            </div>
-            <div>
-                Type: <span class="label-type">${newNode.html}</span>
-            </div>
-        </div>
-        <div class="node-actions">
-            <span id="node-btn" class="node-btn">
-                ...
-            </span>
-        </div>
-        `
-
-        const nodeID = diagramEditor.addNode(newNode.name, newNode.connections.input, newNode.connections.output, pos.x, pos.y, `node ${newNode.family} type-${newNode.type}`, {
-            family: newNode.family,
-            type: newNode.type,
-            id: state.id,
-            formData: newNodeData,
-            schemaKey: newNode.data.schemaKey
-        }, newNodeHTML, false)
+        newNode.data.id = state.id
+        newNode.data.formData = newNodeData
+        const nodeID = CreateNode(diagramEditor, newNode, pos.x, pos.y, true)
 
         // Add Catch Node
         if (state.catch) {
             pos.x += 220
             // TODO: make sure this only gets created once
-            const errorNode = NodeErrorBlock
+            let errorNode = NodeErrorBlock
             const generatedPseudoCatchID = `SPECIAL-ERROR: `+state.id
-            let newNodeHTML = `
-            <div class="node-labels">
-                <div>
-                    <span class="label-type">${errorNode.html}</span>
-                </div>
-            </div>
-            <div class="node-actions">
-                <span id="node-btn" class="node-btn">
-                    ...
-                </span>
-            </div>
-            `
-            const catchNodeID = diagramEditor.addNode(errorNode.name, errorNode.connections.input, state.catch.length, pos.x, pos.y+80, `node ${errorNode.family} type-${errorNode.type}`, {
-                family: errorNode.family,
-                type: errorNode.type,
-                id: generatedPseudoCatchID,
-                formData: state.catch,
-                schemaKey: "specialSchemaError"
-            },newNodeHTML, false)
+            errorNode.data.id = generatedPseudoCatchID
+            errorNode.data.formData = state.catch
+            errorNode.connections.output = state.catch.length
+            const catchNodeID = CreateNode(diagramEditor, errorNode, pos.x, pos.y, true)
             nodeIDToStateIDMap[generatedPseudoCatchID] = catchNodeID
 
             catchNodes.push({id: catchNodeID, catch: state.catch})
@@ -165,8 +112,6 @@ export function importFromYAML(diagramEditor, setFunctions, wfYAML) {
             diagramEditor.addConnection(catchNode.id, nextNodeID, `output_${j+1}`, 'input_1')
         }
     }
-
-
     // TODO: Sort with dagrejs
 
 }

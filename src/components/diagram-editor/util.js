@@ -432,10 +432,19 @@ export const onSubmitCallbackMap = {
 }
 
 
-export function CreateNode(diagramEditor, node, clientX, clientY) {
+export function CreateNode(diagramEditor, node, clientX, clientY, rawXY) {
     var newNodeHTML
-    const posX = clientX * (diagramEditor.precanvas.clientWidth / (diagramEditor.precanvas.clientWidth * diagramEditor.zoom)) - (diagramEditor.precanvas.getBoundingClientRect().x * (diagramEditor.precanvas.clientWidth / (diagramEditor.precanvas.clientWidth * diagramEditor.zoom)));
-    const posY = clientY * (diagramEditor.precanvas.clientHeight / (diagramEditor.precanvas.clientHeight * diagramEditor.zoom)) - (diagramEditor.precanvas.getBoundingClientRect().y * (diagramEditor.precanvas.clientHeight / (diagramEditor.precanvas.clientHeight * diagramEditor.zoom)));
+    console.log("node = ", node)
+
+    let posX = clientX
+    let posY = clientY
+
+    // Optional Coordinates processing.
+    if (!rawXY){
+        posX = clientX * (diagramEditor.precanvas.clientWidth / (diagramEditor.precanvas.clientWidth * diagramEditor.zoom)) - (diagramEditor.precanvas.getBoundingClientRect().x * (diagramEditor.precanvas.clientWidth / (diagramEditor.precanvas.clientWidth * diagramEditor.zoom)));
+        posY = clientY * (diagramEditor.precanvas.clientHeight / (diagramEditor.precanvas.clientHeight * diagramEditor.zoom)) - (diagramEditor.precanvas.getBoundingClientRect().y * (diagramEditor.precanvas.clientHeight / (diagramEditor.precanvas.clientHeight * diagramEditor.zoom)));
+    
+    }
 
     // Generate HTML
     switch (node.family) {
@@ -476,5 +485,5 @@ export function CreateNode(diagramEditor, node, clientX, clientY) {
     }
 
 
-    diagramEditor.addNode(node.name, node.connections.input, node.connections.output, posX, posY, `node ${node.family} type-${node.type}`, { family: node.family, type: node.type, ...node.data }, newNodeHTML, false)
+    return diagramEditor.addNode(node.name, node.connections.input, node.connections.output, posX, posY, `node ${node.family} type-${node.type}`, { family: node.family, type: node.type, ...node.data }, newNodeHTML, false)
 }

@@ -357,9 +357,29 @@ export default function DiagramEditor(props) {
     const [selectedNodeSchema, setSelectedNodeSchema] = useState({})
     const [selectedNodeSchemaUI, setSelectedNodeSchemaUI] = useState({})
 
+    // Track whether all nodes have been init'd
+    // If all nodes are init (valid form submited) then diagram can compile
+    const [nodeInitTracker, setNodeInitTracker] = useState({})
+    const [canCompile, setCanCompile] = useState(true)
+
+
     const [showContextMenu, setShowContextMenu] = useState(false);
     const [contextMenuAnchorPoint, setContextMenuAnchorPoint] = useState({ x: 0, y: 0 });
     const [contextMenuResults, setContextMenuResults] = useState(ActionsNodes)
+    
+    useEffect(()=> {
+        console.log("nodeInitTracker = ", nodeInitTracker)
+        for (var key in nodeInitTracker) {
+            if (nodeInitTracker.hasOwnProperty(key)) {
+                if (nodeInitTracker[key] === false) {
+                    setCanCompile(false)
+                    return
+                }
+            }
+        }
+
+        setCanCompile(true)
+    }, [nodeInitTracker])
 
     useEffect(() => {
         if (selectedNode) {
@@ -520,7 +540,13 @@ export default function DiagramEditor(props) {
                         onKeyDown={(ev) => {
                             if (ev.key === 'Enter' && contextMenuResults.length > 0) {
                                 const newNode = contextMenuResults[0].item ? contextMenuResults[0].item : contextMenuResults[0]
-                                CreateNode(diagramEditor, newNode, contextMenuAnchorPoint.x, contextMenuAnchorPoint.y)
+                                const newNodeID = CreateNode(diagramEditor, newNode, contextMenuAnchorPoint.x, contextMenuAnchorPoint.y)
+                                setNodeInitTracker((old) => {
+                                    old[newNodeID] = false
+                                    return {
+                                        ...old
+                                    }
+                                })
                                 setShowContextMenu(false)
 
                             }
@@ -532,7 +558,13 @@ export default function DiagramEditor(props) {
                                 return (
                                     <li onClick={() => {
                                         const newNode = obj.item ? obj.item : obj
-                                        CreateNode(diagramEditor, newNode, contextMenuAnchorPoint.x, contextMenuAnchorPoint.y)
+                                        const newNodeID = CreateNode(diagramEditor, newNode, contextMenuAnchorPoint.x, contextMenuAnchorPoint.y)
+                                        setNodeInitTracker((old) => {
+                                            old[newNodeID] = false
+                                            return {
+                                                ...old
+                                            }
+                                        })
                                         setShowContextMenu(false)
                                     }}>
                                         {obj.name ? obj.name : obj.item.name}
@@ -599,7 +631,7 @@ export default function DiagramEditor(props) {
                             console.warn("updateWorkflow callback missing")
                         }
                     }}>
-                        <VscGear style={{ fontSize: "256px", width: "48px" }} />
+                        <VscGear style={{ fontSize: "256px", width: "48px", color: canCompile ? "green": "red" }} />
                         <div>Compile</div>
                     </div>
                     <div className='toolbar-btn' onClick={() => {
@@ -718,7 +750,13 @@ export default function DiagramEditor(props) {
                                     newNode = ActionsNodes[nodeIndex]
                                 }
 
-                                CreateNode(diagramEditor, newNode, ev.clientX, ev.clientY)
+                                const newNodeID = CreateNode(diagramEditor, newNode, ev.clientX, ev.clientY)
+                                setNodeInitTracker((old) => {
+                                    old[newNodeID] = false
+                                    return {
+                                        ...old
+                                    }
+                                })
                             }}
                             onContextMenu={(ev) => {
                                 ev.preventDefault()
@@ -769,6 +807,13 @@ export default function DiagramEditor(props) {
                                         // Update SelectedNode state to updated state
                                         setSelectedNode(updatedNode)
                                     }
+
+                                    setNodeInitTracker((old) => {
+                                        old[selectedNode.id] = true
+                                        return {
+                                            ...old
+                                        }
+                                    })
 
                                     setOldSelectedNodeFormData(selectedNodeFormData)
                                 }, "small light", () => { }, true, false),
