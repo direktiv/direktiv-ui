@@ -306,6 +306,26 @@ export const ActionsNodes = [
         },
         html: 'Switch State'
     },
+    {
+        name: 'StateParallel',
+        family: "primitive",
+        type: "parallel",
+        info: {
+        actions: true,
+            description: "The Switch State is used to perform conditional transitions based on the current state information",
+            longDescription: ``,
+            link: "https://docs.direktiv.io/v0.6.0/specification/#parallelstate"
+        },
+        data: {
+            schemaKey: 'stateSchemaParallel',
+            formData: {}
+        },
+        connections: {
+            input: 1,
+            output: 2
+        },
+        html: 'Parallel State'
+    },
     NodeStartBlock,
     NodeErrorBlock
 ]

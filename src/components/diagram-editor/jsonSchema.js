@@ -309,6 +309,34 @@ export const StateSchemaForeach = {
     }
 }
 
+export const StateSchemaParallel = {
+    "type": "object",
+    "required": [
+        "actions",
+    ],
+    "properties": {
+        "mode": {
+            "title": "Mode",
+            "description": "Option types on how to complete branch execution",
+            "default": "and",
+            "enum": [
+                "and",
+                "or"
+            ],
+        },
+        "actions": {
+            "type": "array",
+            "description": "List of actions to perform.",
+            "title":"Actions",
+            "items": {
+                ...CommonSchemaDefinitionAction,
+            }
+        },
+        "timeout": CommonSchemaDefinitionTimeout,
+        ...CommonSchemaDefinitionStateFields,
+    }
+}
+
 export const StateSchemaGenerateEvent = {
     "type": "object",
     "required": [
@@ -898,6 +926,7 @@ export const SchemaMap = {
     "stateSchemaEventAnd": StateSchemaEventAnd,
     "stateSchemaEventXor": StateSchemaEventXor,
     "stateSchemaForeach": StateSchemaForeach,
+    "stateSchemaParallel": StateSchemaParallel,
     "stateSchemaGenerateEvent": StateSchemaGenerateEvent,
     "stateSchemaGetter": StateSchemaGetter,
     "stateSchemaSetter": StateSchemaSetter,
@@ -936,6 +965,11 @@ export const getSchemaCallbackMap = {
     "stateSchemaForeach": (schemaKey, functionList, varList) => {
         let selectedSchema = SchemaMap[schemaKey]
         selectedSchema.properties.action.properties.function.enum = functionListToActionEnum(functionList)
+        return selectedSchema
+    },
+    "stateSchemaParallel": (schemaKey, functionList, varList) => {
+        let selectedSchema = SchemaMap[schemaKey]
+        selectedSchema.properties.actions.items.properties.function.enum = functionListToActionEnum(functionList)
         return selectedSchema
     },
     "Default": (schemaKey, functionList, varList) => {
@@ -983,6 +1017,15 @@ export const SchemaUIMap = {
             "rawYAML": {
                 "ui:widget": "textarea"
             },
+        }
+    },
+    "stateSchemaParallel": {
+        "actions": {
+            "items":{
+                "function": {
+                    "ui:placeholder": "Select Function"
+                }
+            }
         }
     },
     "stateSchemaForeach": {

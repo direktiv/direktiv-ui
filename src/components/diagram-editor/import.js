@@ -2,69 +2,6 @@ import { ActionsNodes, NodeErrorBlock, NodeStartBlock } from "./nodes";
 import YAML from 'js-yaml'
 import prettyYAML from "json-to-pretty-yaml"
 
-
-
-export const exampleWorkflow2 =
-    `
-description: A simple 'switch' state that checks whether the age provided is older than 18.
-states:
-- id: data
-  type: noop
-  transform:
-    age: 27
-  transition: check
-- id: check
-  type: switch
-  conditions:
-  - condition: 'jq(.age > 18)'
-    transition: olderthan18
-  defaultTransition: youngerthan18
-- id: olderthan18
-  type: noop
-  transform: 
-    result: "You are older than 18."
-- id: youngerthan18
-  type: noop
-  transform: 
-    result: "You are younger than 18."
-`
-export const exampleWorkflow =
-    `
-functions:
-- id: greeter
-  image: direktiv/greeting:v1
-  type: reusable
-- id: solve2
-  image: direktiv/solve:v1
-  type: reusable
-description: A simple 'eventXor' that waits for events to be received.
-states:
-- id: event-xor
-  type: eventXor
-  timeout: PT1H
-  events:
-  - event: 
-      type: solveexpressioncloudevent
-    transition: solve
-  - event: 
-      type: greetingcloudevent
-    transition: greet
-- id: greet
-  type: action
-  action:
-    function: greeter
-    input: jq(.greetingcloudevent.data)
-  transform: 
-    greeting: jq(.return.greeting)
-- id: solve
-  type: action
-  action:
-    function: solve2
-    input: jq(.solveexpressioncloudevent.data)
-  transform: 
-    solvedexpression: jq(.return)
-`
-
 export function importFromYAML(diagramEditor, setFunctions, wfYAML) {
     const wfData = YAML.load(wfYAML)
     let nodeIDToStateIDMap = {}
