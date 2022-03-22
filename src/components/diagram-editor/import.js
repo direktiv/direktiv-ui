@@ -58,12 +58,11 @@ export function importFromYAML(diagramEditor, setFunctions, wfYAML) {
             pos.x += 220
             // TODO: make sure this only gets created once
             let errorNode = JSON.parse(JSON.stringify(NodeErrorBlock))
-            const generatedPseudoCatchID = `SPECIAL-ERROR: `+state.id
-            errorNode.data.id = generatedPseudoCatchID
+            const catchNodeRef = `SPECIAL-ERROR: `+state.id
             errorNode.data.formData = state.catch
             errorNode.connections.output = state.catch.length
             const catchNodeID = CreateNode(diagramEditor, errorNode, pos.x, pos.y, true)
-            nodeIDToStateIDMap[generatedPseudoCatchID] = catchNodeID
+            nodeIDToStateIDMap[catchNodeRef] = catchNodeID
 
             catchNodes.push({id: catchNodeID, catch: state.catch})
         }
@@ -75,7 +74,7 @@ export function importFromYAML(diagramEditor, setFunctions, wfYAML) {
     for (let i = 0; i < wfData.states.length; i++) {
         const state = wfData.states[i];
         const nodeID = nodeIDToStateIDMap[state.id]
-        const pseudoCatchID = `SPECIAL-ERROR: `+state.id
+        const catchNodeRef = `SPECIAL-ERROR: `+state.id
         const node = diagramEditor.getNodeFromId(nodeID)
 
         // Connect Start Node to first state
@@ -84,7 +83,7 @@ export function importFromYAML(diagramEditor, setFunctions, wfYAML) {
         }
 
         if (state.catch) {
-            const catchNodeID = nodeIDToStateIDMap[pseudoCatchID]
+            const catchNodeID = nodeIDToStateIDMap[catchNodeRef]
             diagramEditor.addConnection(nodeID, catchNodeID, 'output_2', 'input_1')
         }
 

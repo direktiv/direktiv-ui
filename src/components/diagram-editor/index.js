@@ -452,10 +452,15 @@ export default function DiagramEditor(props) {
 
         editor.on('nodeCreated', function (id) {
             let node = editor.getNodeFromId(id)
-
             // If node was created without id, geneate one
             if (!node.data.id) {
-                node.data.id = `node-${id}-${node.data.type}`
+                if (node.data.family === "special") {
+                    // Manually set id if its a special block
+                    // Since this is not a state, we dont need unique ids for special
+                    node.data.id = `${node.data.type}-block`
+                } else {
+                    node.data.id = `node-${id}-${node.data.type}`
+                }
                 editor.updateNodeDataFromId(id, node.data)
             }
         })
@@ -844,7 +849,7 @@ export default function DiagramEditor(props) {
                         <ModalHeadless
                             visible={nodeDetailsVisible}
                             setVisible={setNodeDetailsVisible}
-                            title={`TODO:`}
+                            title={`Node Details: ${selectedNode ? selectedNode.data.id : ""}`}
                             actionButtons={[
                                 ButtonDefinition("Submit", () => {
                                     formRef.click()
