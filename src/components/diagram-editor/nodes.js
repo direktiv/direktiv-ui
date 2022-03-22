@@ -4,7 +4,7 @@ export const NodeStartBlock = {
     type: "start",
     info: {
         requiresInit: false,
-        actions: false,
+        actions: true,
         description: "DEBUG",
         longDescription: `DEBUG`,
         link: ""
@@ -342,6 +342,5 @@ export const ActionsNodes = [
         },
         html: 'Parallel State'
     },
-    NodeStartBlock,
     NodeErrorBlock
 ]
