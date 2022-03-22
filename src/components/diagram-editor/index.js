@@ -107,67 +107,30 @@ function FunctionsList(props) {
     const [formData, setFormData] = useState({})
     // const {data} = useNamespaceServices(Config.url, false, namespace, localStorage.getItem("apikey"))
 
-    // console.log("useNamespaceServices data = ", data)
 
     const namespaceServiceHook = useNamespaceServices(Config.url, false, namespace, localStorage.getItem("apikey"))
     const globalServiceHook = useGlobalServices(Config.url, false, localStorage.getItem("apikey"))
     // const namespaceVariableHook = useNamespaceVariables(Config.url, false, namespace, localStorage.getItem("apikey"))
-
-    // console.log("namespaceServiceHook data = ", namespaceServiceHook.data)
-    // console.log("globalServiceHook data = ", globalServiceHook.data)
-    // console.log("namespaceVariableHook data = ", namespaceVariableHook.data)
 
     useEffect(() => {
         console.log("mounting functions list")
         return () => { console.log("unmounting functions list") };
     }, [])
 
-    // TODO: hook this up
-    // const checkFunctionList = useCallback(()=>{
-    //     console.log("formData = ", formData)
-    //     if (!formData || !formData.type) {
-    //         return {tip:"", value:"valid"}
-    //     }
-
-    //     switch (formData.type) {
-    //         case "knative-namespace":
-    //             if (namespaceServiceHook.data && !namespaceServiceHook.data.length >0 ){
-    //                 return {tip:"No Namespace Services", value:""}
-    //             }
-    //             break;
-    //         case "knative-global":
-    //             if (globalServiceHook.data && !globalServiceHook.data.length >0 ){
-    //                 return {tip:"No Global Services", value:""}
-    //             }
-    //             break;
-    //         default:
-    //     }
-    //     return {tip:"", value:"valid"}
-    // }, [formData])
-
     if (namespaceServiceHook.data === null || globalServiceHook.data === null) {
         return <></>
     }
 
     const ajv = new Ajv()
-    const schema = GenerateFunctionSchemaWithEnum(namespaceServiceHook.data.map(a => a.serviceName), (globalServiceHook.data.map(a => a.serviceName)))
-    const validate = ajv.compile(schema)
+    const functionSchemas = GenerateFunctionSchemaWithEnum(namespaceServiceHook.data.map(a => a.serviceName), (globalServiceHook.data.map(a => a.serviceName)))
+    const validate = ajv.compile(functionSchemas.schema)
 
-
-
-
-
-
-    // useEffect(()=>{
-    //     const newfMap = functionsList.reduce(function(result, item, index, array) {
-    //         result[item.id] = item;
-    //         return result;
-    //       }, {}) 
-
-    //       console.log("updating function map to =", newfMap)
-    //     setFunctionMap({...newfMap})
-    //     console.log()
-    // },[functionsList])
+    // Set uischema to global or namespace depending on the type
+    // It does not matter if global uiSchema is used for reusable or subflow since the dont have the service field
+    let uiSchema = functionSchemas.uiSchema['knative-global']
+    if (functionSchemas.schema && formData && formData.type === "knative-namespace") {
+        uiSchema = functionSchemas.uiSchema['knative-namespace']
+    }
 
     const cache = new CellMeasurerCache({
         fixedWidth: false,
@@ -185,41 +148,21 @@ function FunctionsList(props) {
             >
                 <div style={{ ...style, minHeight: "6px", height: "84px", cursor: "move", userSelect: "none", display: "flex" }}>
                     <div className={`function`} draggable={true} function-index={index} onDragStart={(ev) => {
-                        // console.log("onDragStart = ", ev);
-                        // console.log("ev.target.getAttribute(node-index) = ", ev.target.getAttribute("node-index"))
                         ev.dataTransfer.setData("functionIndex", ev.target.getAttribute("function-index"));
                     }}>
-                        <div class="node-labels" style={{display:"flex", gap:"4px", flexDirection:"column", marginLeft: "5px"}}>
-            <div>
-                ID: <span class="label-id">{functionList[index].id}</span>
-            </div>
-            <div>
-                Type: <span class="label-type">{functionList[index].type}</span>
-            </div>
-            <div>
-                Image: <span class="label-type">{functionList[index].service ? `${functionList[index].service}` : ""}
-                                {functionList[index].image ? `${functionList[index].image}` : ""}
-                                {functionList[index].workflow ? `${functionList[index].workflow}` : ""}</span>
-            </div>
-        </div>
-
-                        {/* <div style={{ marginLeft: "5px" }}>
-                            <div style={{ display: "flex", borderBottom: "1px solid #e5e5e5", justifyContent: "space-between" }}>
-                                <span style={{ whiteSpace: "pre-wrap", cursor: "move", fontSize: "13px" }}>
-                                    ID: {functionList[index].id}
-                                </span>
-                                <div style={{ whiteSpace: "pre-wrap", cursor: "pointer", fontSize: "11px", paddingRight: "3px" }}>
-                                    Edit
-                                </div>
+                        <div class="node-labels" style={{ display: "flex", gap: "4px", flexDirection: "column", marginLeft: "5px" }}>
+                            <div>
+                                ID: <span class="label-id">{functionList[index].id}</span>
                             </div>
-                            <div style={{ fontSize: "10px", lineHeight: "10px", paddingTop: "2px" }}>
-                                Type: {functionList[index].type}
+                            <div>
+                                Type: <span class="label-type">{functionList[index].type}</span>
                             </div>
-                            <div style={{ fontSize: "10px", lineHeight: "10px", paddingTop: "2px" }}>
-                                
+                            <div>
+                                Image: <span class="label-type">{functionList[index].service ? `${functionList[index].service}` : ""}
+                                    {functionList[index].image ? `${functionList[index].image}` : ""}
+                                    {functionList[index].workflow ? `${functionList[index].workflow}` : ""}</span>
                             </div>
-                        </div> */}
-
+                        </div>
                     </div>
                 </div>
             </CellMeasurer>
@@ -236,15 +179,18 @@ function FunctionsList(props) {
                 onClose={() => {
                     setFormData({})
                 }}
-                requiredFields={[
-                    // checkFunctionList(),
-                ]}
                 actionButtons={[
                     ButtonDefinition("Create Function", async () => {
                         newFunctionFormRef.click()
 
                         // Check if form data is valid
                         if (!validate(formData)) {
+                            if (formData.type === "knative-namespace" && namespaceServiceHook.data.length === 0) {
+                                throw Error("Invalid Function: No Namespace Services Exist")
+                            } else if (formData.type === "knative-global" && globalServiceHook.data.length === 0) {
+                                throw Error("Invalid Function: No Global Services Exist")
+                            }
+
                             throw Error("Invalid Function")
                         }
 
@@ -272,24 +218,12 @@ function FunctionsList(props) {
             >
                 <FlexBox className="col" style={{ height: "45vh", width: "35vw", minWidth: "250px", minHeight: "200px", justifyContent: "space-between" }}>
                     <div style={{ overflow: "auto" }}>
-                        {/* <label style={{fontSize: "11px", lineHeight: "13px", fontWeight: "bold"}}>
-                            Choose Function Type*
-                        </label>
-                        <p style={{fontSize: "9px", lineHeight: "12px", margin: "0px 0px 4px 0px"}}>
-                            Function type of new service
-                        </p>
-                        <select style={{width:"100%"}} defaultValue={newServiceType} onChange={(e)=>setNewServiceType(e.target.value)} style={{marginBottom:"4px", height:"26px", lineHeight:"20px", padding:"0px"}}>
-                            <option value="reusable">Reusable</option>
-                            <option value="knative-namespace">Namespace Service</option>
-                            <option value="knative-global">Global Service</option>
-                            <option value="subflow">Subflow</option>
-                        </select> */}
-
                         <Form
                             id={"builder-form"}
                             onSubmit={(form) => {
                             }}
-                            schema={schema}
+                            schema={functionSchemas.schema}
+                            uiSchema={uiSchema}
                             formData={formData}
                             onChange={(e) => {
                                 setFormData(e.formData)
@@ -298,14 +232,6 @@ function FunctionsList(props) {
                             <button ref={setNewFunctionFormRef} style={{ display: "none" }} />
                         </Form>
                     </div>
-                    {/* <div style={{minWidth: "28px"}}>
-                        <div className="btn" onClick={()=>{
-                            console.log(newFunctionFormRef.click())
-                        }}>
-                            Create Function
-                        </div>
-                    </div> */}
-
                 </FlexBox>
             </Modal>
             {functionList.length > 0 ? (

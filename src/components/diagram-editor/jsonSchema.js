@@ -772,81 +772,111 @@ export const FunctionSchemaSubflow = {
     }
 }
 
+//  GenerateFunctionSchemaWithEnum : Generates schema to used for creating new funciton
+//  Automatically injects global and namespace service list as enums from arguments
+//  Also creates ui-schemas which sets placeholder and whether or not field is readonly (if no services exist)
 export function GenerateFunctionSchemaWithEnum(namespaceServices, globalServices) {
+    console.log("namespaceServices = ", namespaceServices)
     let nsFuncSchema = FunctionSchemaNamespace
     let globalFuncSchema = FunctionSchemaGlobal
-    // console.log("namespaceServices = ", namespaceServices)
-    // console.log("globalServices = ", globalServices)
+    let uiSchema = {
+        "knative-namespace": {
+            "service": {
 
-    if (nsFuncSchema && nsFuncSchema.length > 0) {
-        nsFuncSchema.properties.service.enum = namespaceServices
+            }
+        },
+        "knative-global": {
+            "service": {
+
+            }
+        }
     }
 
-    if (globalServices && globalServices.length > 0) {
-        globalFuncSchema.properties.service.enum = globalServices
+    if (namespaceServices) {
+        if (namespaceServices.length > 0) {
+            nsFuncSchema.properties.service.enum = namespaceServices
+            uiSchema["knative-namespace"]["service"]["ui:placeholder"] = "Select Service :P"
+        } else {
+            delete nsFuncSchema.properties.service.enum
+            uiSchema["knative-namespace"]["service"]["ui:placeholder"] = "No Services"
+            uiSchema["knative-namespace"]["service"]["ui:readonly"] = true
+        }
+    }
 
+    if (globalServices) {
+        if (globalServices.length > 0) {
+            globalFuncSchema.properties.service.enum = globalServices
+            uiSchema["knative-global"]["service"]["ui:placeholder"] = "Select Service"
+        } else {
+            delete globalFuncSchema.properties.service.enum
+            uiSchema["knative-global"]["service"]["ui:placeholder"] = "No Services"
+            uiSchema["knative-global"]["service"]["ui:readonly"] = true
+        }
     }
 
     return {
-        "type": "object",
-        "required": [
-            "type"
-        ],
-        "properties": {
-            "type": {
-                "enum": [
-                    "reusable",
-                    "knative-namespace",
-                    "knative-global",
-                    "subflow"
-                ],
-                "default": "reusable",
-                "title": "Service Type",
-                "description": "Function type of new service"
-            }
+        schema: {
+            "type": "object",
+            "required": [
+                "type"
+            ],
+            "properties": {
+                "type": {
+                    "enum": [
+                        "reusable",
+                        "knative-namespace",
+                        "knative-global",
+                        "subflow"
+                    ],
+                    "default": "reusable",
+                    "title": "Service Type",
+                    "description": "Function type of new service"
+                }
+            },
+            "allOf": [
+                {
+                    "if": {
+                        "properties": {
+                            "type": {
+                                "const": "reusable"
+                            }
+                        }
+                    },
+                    "then": FunctionSchemaReusable
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "type": {
+                                "const": "knative-namespace"
+                            }
+                        }
+                    },
+                    "then": nsFuncSchema
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "type": {
+                                "const": "knative-global"
+                            }
+                        }
+                    },
+                    "then": globalFuncSchema
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "type": {
+                                "const": "subflow"
+                            }
+                        }
+                    },
+                    "then": FunctionSchemaSubflow
+                }
+            ]
         },
-        "allOf": [
-            {
-                "if": {
-                    "properties": {
-                        "type": {
-                            "const": "reusable"
-                        }
-                    }
-                },
-                "then": FunctionSchemaReusable
-            },
-            {
-                "if": {
-                    "properties": {
-                        "type": {
-                            "const": "knative-namespace"
-                        }
-                    }
-                },
-                "then": nsFuncSchema
-            },
-            {
-                "if": {
-                    "properties": {
-                        "type": {
-                            "const": "knative-global"
-                        }
-                    }
-                },
-                "then": globalFuncSchema
-            },
-            {
-                "if": {
-                    "properties": {
-                        "type": {
-                            "const": "subflow"
-                        }
-                    }
-                },
-                "then": FunctionSchemaSubflow
-            }
-        ]
+        uiSchema: uiSchema
     }
 }
 
