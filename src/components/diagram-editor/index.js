@@ -541,12 +541,16 @@ export default function DiagramEditor(props) {
                             if (ev.key === 'Enter' && contextMenuResults.length > 0) {
                                 const newNode = contextMenuResults[0].item ? contextMenuResults[0].item : contextMenuResults[0]
                                 const newNodeID = CreateNode(diagramEditor, newNode, contextMenuAnchorPoint.x, contextMenuAnchorPoint.y)
-                                setNodeInitTracker((old) => {
-                                    old[newNodeID] = false
-                                    return {
-                                        ...old
-                                    }
-                                })
+
+                                // Track that node has not data
+                                if (newNode.info.requiresInit) {
+                                    setNodeInitTracker((old) => {
+                                        old[newNodeID] = false
+                                        return {
+                                            ...old
+                                        }
+                                    })
+                                }
                                 setShowContextMenu(false)
 
                             }
@@ -559,12 +563,15 @@ export default function DiagramEditor(props) {
                                     <li onClick={() => {
                                         const newNode = obj.item ? obj.item : obj
                                         const newNodeID = CreateNode(diagramEditor, newNode, contextMenuAnchorPoint.x, contextMenuAnchorPoint.y)
-                                        setNodeInitTracker((old) => {
-                                            old[newNodeID] = false
-                                            return {
-                                                ...old
-                                            }
-                                        })
+                                        // Track that node has not data
+                                        if (newNode.info.requiresInit) {
+                                            setNodeInitTracker((old) => {
+                                                old[newNodeID] = false
+                                                return {
+                                                    ...old
+                                                }
+                                            })
+                                        }
                                         setShowContextMenu(false)
                                     }}>
                                         {obj.name ? obj.name : obj.item.name}
@@ -751,12 +758,15 @@ export default function DiagramEditor(props) {
                                 }
 
                                 const newNodeID = CreateNode(diagramEditor, newNode, ev.clientX, ev.clientY)
-                                setNodeInitTracker((old) => {
-                                    old[newNodeID] = false
-                                    return {
-                                        ...old
-                                    }
-                                })
+                                // Track that node has not data
+                                if (newNode.info.requiresInit) {
+                                    setNodeInitTracker((old) => {
+                                        old[newNodeID] = false
+                                        return {
+                                            ...old
+                                        }
+                                    })
+                                }
                             }}
                             onContextMenu={(ev) => {
                                 ev.preventDefault()
@@ -808,12 +818,15 @@ export default function DiagramEditor(props) {
                                         setSelectedNode(updatedNode)
                                     }
 
-                                    setNodeInitTracker((old) => {
-                                        old[selectedNode.id] = true
-                                        return {
-                                            ...old
-                                        }
-                                    })
+                                    // Track that node has not data
+                                    if (selectedNode.info.requiresInit) {
+                                        setNodeInitTracker((old) => {
+                                            old[selectedNode.id] = true
+                                            return {
+                                                ...old
+                                            }
+                                        })
+                                    }
 
                                     setOldSelectedNodeFormData(selectedNodeFormData)
                                 }, "small light", () => { }, true, false),

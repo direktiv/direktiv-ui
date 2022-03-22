@@ -3,6 +3,7 @@ export const NodeStartBlock = {
     family: "special",
     type: "start",
     info: {
+        requiresInit: false,
         actions: false,
         description: "DEBUG",
         longDescription: `DEBUG`,
@@ -24,6 +25,7 @@ export const NodeErrorBlock = {
     family: "special",
     type: "error",
     info: {
+        requiresInit: false,
         actions: true,
         description: "DEBUG",
         longDescription: `DEBUG`,
@@ -46,6 +48,7 @@ export const NodeStateAction = {
     family: "primitive",
     type: "action",
     info: {
+        requiresInit: true,
         actions: true,
         description: "The Action State runs another workflow as a subflow, or a function as defined in the forms action definition",
         longDescription: ``,
@@ -70,6 +73,7 @@ export const ActionsNodes = [
         family: "primitive",
         type: "noop",
         info: {
+        requiresInit: true,
         actions: true,
             description: "The No-op State exists for when nothing more than generic state functionality is required.",
             longDescription: `The No-op State exists for when nothing more than generic state functionality is required. A common use-case would be to perform a jq operation on the state data without performing another operation.`,
@@ -90,6 +94,7 @@ export const ActionsNodes = [
         family: "primitive",
         type: "consumeEvent",
         info: {
+        requiresInit: true,
         actions: true,
             description: "todo",
             longDescription: `todo`,
@@ -110,6 +115,7 @@ export const ActionsNodes = [
         family: "primitive",
         type: "delay",
         info: {
+        requiresInit: true,
         actions: true,
             description: "todo",
             longDescription: `todo`,
@@ -130,6 +136,7 @@ export const ActionsNodes = [
         family: "primitive",
         type: "error",
         info: {
+        requiresInit: true,
         actions: true,
             description: "todo",
             longDescription: `todo`,
@@ -150,6 +157,7 @@ export const ActionsNodes = [
         family: "primitive",
         type: "eventAnd",
         info: {
+        requiresInit: true,
         actions: true,
             description: "todo",
             longDescription: `todo`,
@@ -170,6 +178,7 @@ export const ActionsNodes = [
         family: "primitive",
         type: "eventXor",
         info: {
+        requiresInit: true,
         actions: true,
             description: "todo",
             longDescription: `todo`,
@@ -190,6 +199,7 @@ export const ActionsNodes = [
         family: "primitive",
         type: "foreach",
         info: {
+        requiresInit: true,
         actions: true,
             description: "todo",
             longDescription: `todo`,
@@ -210,6 +220,7 @@ export const ActionsNodes = [
         family: "primitive",
         type: "generateEvent",
         info: {
+        requiresInit: true,
         actions: true,
             description: "todo",
             longDescription: `todo`,
@@ -230,6 +241,7 @@ export const ActionsNodes = [
         family: "primitive",
         type: "getter",
         info: {
+        requiresInit: true,
         actions: true,
             description: "todo",
             longDescription: `todo`,
@@ -250,6 +262,7 @@ export const ActionsNodes = [
         family: "primitive",
         type: "setter",
         info: {
+        requiresInit: true,
         actions: true,
             description: "todo",
             longDescription: `todo`,
@@ -271,6 +284,7 @@ export const ActionsNodes = [
         family: "primitive",
         type: "validate",
         info: {
+        requiresInit: true,
         actions: true,
             description: "todo",
             longDescription: `todo`,
@@ -291,6 +305,7 @@ export const ActionsNodes = [
         family: "primitive",
         type: "switch",
         info: {
+        requiresInit: true,
         actions: true,
             description: "The Switch State is used to perform conditional transitions based on the current state information",
             longDescription: ``,
@@ -311,6 +326,7 @@ export const ActionsNodes = [
         family: "primitive",
         type: "parallel",
         info: {
+        requiresInit: true,
         actions: true,
             description: "The Switch State is used to perform conditional transitions based on the current state information",
             longDescription: ``,
