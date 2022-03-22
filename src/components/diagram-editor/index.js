@@ -352,6 +352,8 @@ export default function DiagramEditor(props) {
     const [functionList, setFunctionList] = useState([])
 
     const [nodeDetailsVisible, setNodeDetailsVisible] = useState(false)
+    const [nodeIDModalVisible, setNodeIDModalVisible] = useState(false)
+    const [newNodeID, setNewNodeID] = useState("")
     const [selectedNodeFormData, setSelectedNodeFormData] = useState({})
     const [oldSelectedNodeFormData, setOldSelectedNodeFormData] = useState({})
     const [selectedNodeSchema, setSelectedNodeSchema] = useState({})
@@ -619,8 +621,17 @@ export default function DiagramEditor(props) {
                         <li onClick={() => {
                             setNodeDetailsVisible(true)
                         }}>
-                            Edit
+                            Edit Values
                         </li>
+                        {/* Only show delete option if selected node is not a start node */}
+                        {selectedNode && selectedNode.data.family !== "special" ?
+                            <li onClick={() => {
+                                setNodeIDModalVisible(true)
+                            }}>
+                                Edit ID
+                            </li>
+                            : <></>
+                        }
                         {/* Only show delete option if selected node is not a start node */}
                         {selectedNode && selectedNode.data.type !== "start" ?
                             <li onClick={() => {
@@ -898,7 +909,7 @@ export default function DiagramEditor(props) {
                                     })
 
                                     setOldSelectedNodeFormData(selectedNodeFormData)
-                                }, "small light", () => { }, true, false),
+                                }, "small blue", () => { }, true, false),
                                 ButtonDefinition("Cancel", async () => {
                                     setSelectedNodeFormData(oldSelectedNodeFormData)
                                 }, "small light", () => { }, true, false)
@@ -919,7 +930,47 @@ export default function DiagramEditor(props) {
                                 </Form>
                             </div>
                         </ModalHeadless>
+                        <ModalHeadless
+                            visible={nodeIDModalVisible}
+                            setVisible={setNodeIDModalVisible}
+                            title={`Node Details: ${selectedNode ? selectedNode.data.id : ""}`}
+                            actionButtons={[
+                                ButtonDefinition("Save", () => {
+                                    // TODO: New node id validation
 
+                                    // Update id to node data
+                                    const updatedNode = {
+                                        ...selectedNode,
+                                        data: {
+                                        ...selectedNode.data,
+                                        formData: selectedNodeFormData
+                                    }}
+
+                                    updatedNode.data.id = newNodeID
+
+                                    // Update form data into node
+                                    diagramEditor.updateNodeDataFromId(updatedNode.id, updatedNode.data)
+
+
+                                    setNewNodeID("")
+                                }, "small blue", () => { }, true, false),
+                                ButtonDefinition("Cancel", async () => {
+                                    setNewNodeID("")
+                                }, "small light", () => { }, true, false)
+                            ]}
+                        >
+                                <FlexBox className="col center" style={{ margin: "8px 16px 8px 16px"}}>
+                                    <FlexBox className="row center">
+                                        <span style={{whiteSpace: "nowrap", paddingRight:"6px"}}>
+                                            Node ID:
+                                        </span>
+                                        <input type="text" className='nodeid-input' value={newNodeID} onChange={((e)=>{
+                                            setNewNodeID(e.target.value)
+                                        })}>
+                                        </input>
+                                    </FlexBox>
+                                </FlexBox>
+                        </ModalHeadless>
                     </div>
                 </FlexBox>
                 {/* </div> */}

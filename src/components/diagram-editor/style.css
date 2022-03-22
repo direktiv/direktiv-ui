@@ -567,7 +567,7 @@ td > code {
     margin: 0px;
 }
 
-#builder-page fieldset input[type="text"]{
+#builder-page fieldset input[type="text"], .nodeid-input{
     height: calc(33px - (0.65*2px));
     line-height: 17px;
     padding-top: 0px;
