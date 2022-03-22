@@ -5,13 +5,9 @@ import Button from '../../components/button';
 import Alert from '../../components/alert';
 import FlexBox from '../../components/flexbox';
 import { Config } from '../../util';
-import './style.css';
 import Drawflow from 'drawflow';
 import { Resizable } from 're-resizable';
 import YAML from "json-to-pretty-yaml"
-import styleDrawflow from 'drawflow/dist/drawflow.min.css'
-
-
 import { DefaultSchemaUI, GenerateFunctionSchemaWithEnum, GetSchema, getSchemaCallbackMap, getSchemaDefault, SchemaUIMap } from "../../components/diagram-editor/jsonSchema"
 import Form from '@rjsf/core';
 import { CreateNode, DefaultValidateSubmitCallbackMap, onSubmitCallbackMap, onValidateSubmitCallbackMap, setConnections } from '../../components/diagram-editor/util';
@@ -19,7 +15,11 @@ import { AutoSizer, CellMeasurer, CellMeasurerCache, List } from 'react-virtuali
 import Fuse from 'fuse.js';
 import { ActionsNodes, NodeStateAction } from "../../components/diagram-editor/nodes";
 
-
+// Import Styles
+import './styles/form.css';
+import './styles/node.css';
+import './styles/style.css';
+import 'drawflow/dist/drawflow.min.css'
 
 import { importFromYAML } from '../../components/diagram-editor/import';
 import Modal, { ButtonDefinition, ModalHeadless } from '../modal';

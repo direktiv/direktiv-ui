@@ -1,0 +1,185 @@
+#builder-page fieldset .form-group.field.field-string > .row {
+    display: flex;
+}
+
+/* Key Value: multi-row style */
+#builder-page fieldset .form-group.field.field-string > .row > .form-additional{
+    flex:1;
+    align-self: end;
+    width: 10%;
+    min-width: 100px;
+    max-width: 400px;
+}
+
+/* Key Value: Value Column */
+#builder-page fieldset .form-group.field.field-string > .row > .form-group.form-additional{
+    flex:4;
+    align-self: end;
+}
+
+/* Key Value: Hide Labels */
+#builder-page fieldset .form-group.field.field-string > .row label{
+    display: none;
+}
+
+/* Key Value: UnHide First Label Set*/
+#builder-page fieldset > .form-group.field.field-string:first-of-type  > .row label{
+    display: unset;
+    visibility: hidden;
+    position: relative;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+/* Key Value: Change First Label Set Label to 'Key' */
+#builder-page fieldset > .form-group.field.field-string:first-of-type  > .row  .form-additional label:after{
+    visibility: visible;
+    position: absolute;
+    top: 0;
+    left: 0;
+    content:'Key';
+}
+
+/* Key Value: Change First Label Set Label to 'Value' */
+#builder-page fieldset > .form-group.field.field-string:first-of-type  > .row  .form-group.form-additional label:after{
+    visibility: visible;
+    position: absolute;
+    top: 0;
+    left: 0;
+    content:'Value';
+}
+
+/* Key Value: Align Remove Button to bottom of row*/
+#builder-page fieldset > .form-group.field.field-string:first-of-type  > .row > div:last-of-type{
+    display: flex;
+    justify-content: end;
+    align-items: end;
+}
+
+/* Key Value: Remove Button content*/
+#builder-page fieldset .form-group.field.field-string > div .glyphicon-remove::before{
+    content: "X";
+}
+
+/* Key Value: Remove Button Wrapper height*/
+#builder-page fieldset .form-group.field.field-string > div .btn.btn-danger{
+    height:33px;
+}
+
+/* TODO: Check if used anywhere */
+/* td > code {
+    white-space: nowrap;
+} */
+
+/* Form Input Field: Add Button Content*/
+#builder-page fieldset .glyphicon-plus::before{
+    content: "+ Add Items";    
+    color: #3E94C5;
+    font-size: 14px;
+}
+
+/* Form Input Field: Add Button Wrapper*/
+#builder-page fieldset .btn-add{
+    width: 100%;
+    border: 1px solid #D4E6F0;
+    background: rgba(62, 148, 197, 0.03);
+    box-shadow: 2px 2px 6px rgba(44, 57, 75, 0.04);
+    border-radius: 4px;
+    padding: 12px 3px 12px 3px;
+    height: 33px;
+    line-height: 17px;
+}
+
+/* Form Input Field: Set gap between buttons in a single row*/
+#builder-page fieldset .btn-group{
+    gap: 16px;
+}
+
+/* Form Input Field: Set gap between array elements*/
+#builder-page fieldset .row.array-item-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+#builder-page fieldset div.field{
+    padding-bottom: 12px;
+}
+
+#builder-page fieldset div.field.field-object{
+    padding-bottom: 0px;
+}
+
+#builder-page fieldset div.row > p{
+    margin: 0px;
+}
+
+#builder-page fieldset div.row > p{
+    margin: 0px;
+}
+
+/* Form Input Field: text input styling. This style is also used on the edit nodeid-input*/
+#builder-page fieldset input[type="text"], .nodeid-input{
+    height: calc(33px - (0.65*2px));
+    line-height: 17px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
+/* Form Input Field: dropdown style*/
+#builder-page fieldset select{
+    height: 33px;
+    line-height: 17px;
+}
+
+/* Form Input Field: Remove Button Wrapper*/
+#builder-page fieldset .btn-group .btn-danger{
+    width: 100%;
+    background: rgba(236, 79, 121, 0.02);
+    border: 1px solid #FFDFE7;
+    box-shadow: 2px 2px 6px rgba(44, 57, 75, 0.04);
+    box-shadow: 2px 2px 6px rgba(44, 57, 75, 0.04);
+    border-radius: 4px;
+    padding: 12px 3px 12px 3px;
+    height: 33px;
+    line-height: 17px;
+}
+
+#builder-page fieldset .glyphicon-arrow-up::before{
+    color:  #566875;
+}
+
+#builder-page fieldset .glyphicon-arrow-down::before{
+    color:  #566875;
+}
+
+/* Form Input Field: Default Button Wrapper*/
+#builder-page fieldset .btn-default{
+    width: 100%;
+    background: #FFFFFF;
+    border: 1px solid #DBE2EA;
+    box-sizing: border-box;
+    box-shadow: 2px 2px 6px rgba(44, 57, 75, 0.04);
+    border-radius: 4px;
+    padding: 12px 3px 12px 3px;
+    height: 33px;
+    line-height: 17px;
+}
+
+/* Form Input Field: Remove Button Style*/
+#builder-page fieldset .btn-group .btn-danger .glyphicon-remove::before{
+    color: #EC4F79;
+    font-size: 14px;
+}
+
+/* Form Input Field: Add padding to the bottom of array elements to create a gap between buttons and array*/
+#builder-page fieldset div.row.array-item-list > .array-item:last-of-type {
+    padding-bottom: 12px;
+}
+
+
+/* Form Input Field: Text area style*/
+#builder-page textarea {
+    resize: vertical;
+    height: 80px;
+}
