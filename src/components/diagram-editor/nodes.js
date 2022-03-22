@@ -21,9 +21,9 @@ export const NodeStartBlock = {
 }
 
 export const NodeErrorBlock = {
-    name: 'ErrorBlock',
+    name: 'CatchError',
     family: "special",
-    type: "error",
+    type: "catch",
     info: {
         requiresInit: false,
         actions: true,
@@ -39,7 +39,7 @@ export const NodeErrorBlock = {
         input: 1,
         output: 0
     },
-    html: 'Catch Block'
+    html: 'Catch Error'
 }
 
 

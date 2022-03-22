@@ -46,7 +46,7 @@
     --border: 1px solid #CFDAE1;
 }
 
-.node.special.type-error{
+.node.special.type-catch{
     --background: #ffeebc ;
     --box-shadow: 1px 2px 5px rgba(86, 104, 117, 0.11);
     --border: 1px solid #e1e1cf;
@@ -305,7 +305,7 @@
     border: var(--connector-error-border);
 }
 
-#builder-page .node.type-error .inputs div:nth-of-type(1) {
+#builder-page .node.type-catch .inputs div:nth-of-type(1) {
     border: var(--connector-error-border);
 }
 

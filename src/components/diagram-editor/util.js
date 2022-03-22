@@ -114,7 +114,7 @@ function processConnection(nodeID, rawData, state, wfData) {
 
 // connectionsCallbackMap : Map of functions to be used in setConnections function
 const connectionsCallbackMap = {
-    "ErrorBlock": (nodeID, previousNodeID, previousState, rawData, wfData) => {
+    "CatchError": (nodeID, previousNodeID, previousState, rawData, wfData) => {
         let stateCatch = rawData[nodeID].data.formData
         const outputKeys = Object.keys(rawData[nodeID].outputs)
 
@@ -413,7 +413,7 @@ export const onSubmitCallbackMap = {
         }
         
     },
-    "ErrorBlock": (nodeID, diagramEditor) => {
+    "CatchError": (nodeID, diagramEditor) => {
         const node = diagramEditor.getNodeFromId(nodeID)
         let errorsLength = node.data.formData ? node.data.formData.length : 0
         const outputLen = Object.keys(node.outputs).length

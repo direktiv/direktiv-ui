@@ -436,14 +436,14 @@ export default function DiagramEditor(props) {
             }
 
             if (outputIsPrimitive) {
-                if (ev.output_class === errorOutput && inNode.name !== "ErrorBlock") {
+                if (ev.output_class === errorOutput && inNode.name !== "CatchError") {
                     // Remove connection if pirimtive node Erorr output is going to non-errorblock
                     editor.removeSingleConnection(ev.output_id, ev.input_id, ev.output_class, ev.input_class)
-                } else if (ev.output_class !== errorOutput && inNode.name === "ErrorBlock"){
+                } else if (ev.output_class !== errorOutput && inNode.name === "CatchError"){
                     // Remove connection if pirimtive node transition output is going to errorblock
                     editor.removeSingleConnection(ev.output_id, ev.input_id, ev.output_class, ev.input_class)
                 }
-            } else if (inNode.name === "ErrorBlock" && !outputIsPrimitive){
+            } else if (inNode.name === "CatchError" && !outputIsPrimitive){
                 // Remove connection in input is error block, but output is primitive
                 editor.removeSingleConnection(ev.output_id, ev.input_id, ev.output_class, ev.input_class)
             }
