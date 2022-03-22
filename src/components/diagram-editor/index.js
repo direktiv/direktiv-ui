@@ -363,10 +363,15 @@ export default function DiagramEditor(props) {
     const [canCompile, setCanCompile] = useState(true)
 
 
-    const [showContextMenu, setShowContextMenu] = useState(false);
+    // Context menu to add nodes
     const [contextMenuAnchorPoint, setContextMenuAnchorPoint] = useState({ x: 0, y: 0 });
+
+    const [showContextMenu, setShowContextMenu] = useState(false);
     const [contextMenuResults, setContextMenuResults] = useState(ActionsNodes)
-    
+
+    // Context menu to edit nodes
+    const [showNodeContextMenu, setShowNodeContextMenu] = useState(false);    
+
     useEffect(()=> {
         console.log("nodeInitTracker = ", nodeInitTracker)
         for (var key in nodeInitTracker) {
@@ -463,21 +468,6 @@ export default function DiagramEditor(props) {
             setSelectedNode(null)
         })
 
-        editor.on('mouseUp', function (e) {
-            // Handlers for mouse up on flowchart
-            if (e && e.target && e.target.id) {
-                switch (e.target.id) {
-                    case "node-btn":
-                        // Edit button was clicked on node
-                        // We can assume that a node is selected
-                        setNodeDetailsVisible(true)
-                        break;
-                    default:
-                        break;
-                }
-            }
-        })
-
         setDiagramEditor(editor)
     }, [])
 
@@ -509,8 +499,30 @@ export default function DiagramEditor(props) {
 
 
     // Hide Context Menu if user clicks somewhere else
+    // Show node context menu when clicking on node `node-btn` div
     // FIXME: Might cause problems for users who try to click on context-menu searchbar
-    const handleClick = useCallback(() => (showContextMenu ? setShowContextMenu(false) : null), [showContextMenu]);
+    const handleClick = useCallback((ev) => {
+        if (showContextMenu) {
+            setShowContextMenu(false)
+        }
+
+        if (ev && ev.target && ev.target.id) {
+            switch (ev.target.id) {
+                case "node-btn":
+                    // Edit button was clicked on node
+                    // We can assume that a node is selected
+                    setContextMenuAnchorPoint({ x: ev.pageX, y: ev.pageY })
+                    setShowNodeContextMenu(true)
+                    break;
+                default:
+                    break;
+            }
+        } else if (showNodeContextMenu) {
+            setShowNodeContextMenu(false)
+        }
+
+        
+    }, [showContextMenu, showNodeContextMenu]);
     useEffect(() => {
         document.addEventListener("click", handleClick);
         return () => {
@@ -552,6 +564,7 @@ export default function DiagramEditor(props) {
                                     })
                                 }
                                 setShowContextMenu(false)
+                                setShowNodeContextMenu(false)
 
                             }
                         }}
@@ -573,12 +586,52 @@ export default function DiagramEditor(props) {
                                             })
                                         }
                                         setShowContextMenu(false)
+                                        setShowNodeContextMenu(false)
                                     }}>
                                         {obj.name ? obj.name : obj.item.name}
                                     </li>
                                 )
                             })
                         }
+                    </ul>
+                </div>
+            ) : (
+                <> </>
+            )}
+            {showNodeContextMenu ? (
+                <div
+                    id='context-menu'
+                    className="context-menu"
+                    style={{
+                        top: contextMenuAnchorPoint.y,
+                        left: contextMenuAnchorPoint.x
+                    }}
+                >
+                    <div style={{ textAlign: "center", padding: "2px" }}>
+                        Node Options
+                    </div>
+                    <ul >
+                        <li onClick={() => {
+                            setNodeDetailsVisible(true)
+                        }}>
+                            Edit
+                        </li>
+                        {/* Only show delete option if selected node is not a start node */}
+                        {selectedNode && selectedNode.data.type !== "start" ?
+                            <li onClick={() => {
+                                diagramEditor.removeNodeId(`node-${selectedNode.id}`)
+                                setNodeInitTracker((old) => {
+                                    delete old[selectedNode.id]
+                                    return {
+                                        ...old
+                                    }
+                                })
+                            }}>
+                                Delete
+                            </li>
+                            : <></>
+                        }
+
                     </ul>
                 </div>
             ) : (
@@ -770,8 +823,21 @@ export default function DiagramEditor(props) {
                             }}
                             onContextMenu={(ev) => {
                                 ev.preventDefault()
+                                console.log("onContextMenu ev.target = ", ev.target)
+                                console.log("onContextMenu ev.target.offsetParent = ", ev.target.offsetParent)
                                 setContextMenuAnchorPoint({ x: ev.pageX, y: ev.pageY })
-                                setShowContextMenu(true)
+
+                                const parentIsNode = ev.target.offsetParent.className.includes("drawflow-node")
+                                const targetIsNode = ev.target.className.includes("drawflow-node")
+
+                                if (parentIsNode || targetIsNode) {
+                                    // If Context menu event in on node div element
+                                    setShowContextMenu(false)
+                                    setShowNodeContextMenu(true)
+                                } else {
+                                    setShowContextMenu(true)
+                                    setShowNodeContextMenu(false)
+                                }
                             }}
                         >
                         </div>
@@ -818,15 +884,13 @@ export default function DiagramEditor(props) {
                                         setSelectedNode(updatedNode)
                                     }
 
-                                    // Track that node has not data
-                                    if (selectedNode.info.requiresInit) {
-                                        setNodeInitTracker((old) => {
-                                            old[selectedNode.id] = true
-                                            return {
-                                                ...old
-                                            }
-                                        })
-                                    }
+                                    // Track that node has data set
+                                    setNodeInitTracker((old) => {
+                                        old[selectedNode.id] = true
+                                        return {
+                                            ...old
+                                        }
+                                    })
 
                                     setOldSelectedNodeFormData(selectedNodeFormData)
                                 }, "small light", () => { }, true, false),
