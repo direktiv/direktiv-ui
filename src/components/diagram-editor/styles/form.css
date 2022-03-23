@@ -183,3 +183,9 @@
     resize: vertical;
     height: 80px;
 }
+
+/* Extra padding on objects inside array. Can be seen in switch case */
+/* TODO:  Make sure this doesnt break anything*/
+#builder-page .array-item div div.field-object {
+    padding-bottom: 6px !important;
+}

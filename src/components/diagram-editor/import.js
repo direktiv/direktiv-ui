@@ -256,6 +256,12 @@ const importProcessTransformCallback = {
         importConvertObjectToArray(state.action, "retries")
         importDefaultProcessTransformCallback(state, "transform")
     },
+    "StateSwitch": (state) => {
+        importDefaultProcessTransformCallback(state, "defaultTransform")
+        for (let i = 0; i < state.conditions.length; i++) {
+            importDefaultProcessTransformCallback(state.conditions[i], "transform")
+        }
+    },
     "StateValidate": (state) => {
         // Convert schema to string
         state.schema = prettyYAML.stringify(state.schema ? state.schema : {})

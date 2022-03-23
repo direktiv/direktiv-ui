@@ -532,11 +532,7 @@ export const StateSchemaSwitch = {
                         "title": "Condition",
                         "description": "jq command evaluated against state data. True if results are not empty."
                     },
-                    "transform": {
-                        "title": "Transform",
-                        "description": "jq command to transform the state's data output.",
-                        "type": "string"
-                    }
+                    "transform": CommonSchemaDefinitionStateFields.transform
                 }
             }
         },

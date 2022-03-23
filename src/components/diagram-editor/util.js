@@ -168,7 +168,7 @@ const connectionsCallbackMap = {
         }
 
         let state = { id: rawData[nodeID].data.id, type: rawData[nodeID].data.type, ...rawData[nodeID].data.formData }
-        processTransform(state, "transform")
+        processTransform(state, "defaultTransform")
 
         const outputKeys = Object.keys(rawData[nodeID].outputs)
         for (let i = 0; i < outputKeys.length; i++) {
@@ -187,7 +187,8 @@ const connectionsCallbackMap = {
                         state.conditions[i - 2].transition = nextNode.data.id
                     }
 
-                    // FIXME: Is this right???
+                    processTransform(state.conditions[i], "transform")
+                    
                     setConnections(output.connections[0].node, nodeID, state, rawData, wfData)
                 }
             }
