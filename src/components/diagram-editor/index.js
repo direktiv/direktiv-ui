@@ -606,13 +606,41 @@ export default function DiagramEditor(props) {
                         //TODO: Export to non-destructive json ✓
                         let rawExport = diagramEditor.export()
                         let rawData = rawExport.drawflow.Home.data
-                        let wfData = { functions: functionList, states: [] }
-                        //TODO: 
-                        // - Find Start Block ✓
-                        // - Check if there are multiple start blocks
+                        let wfData = { start: {}, functions: functionList, states: [] }
+
+                        // Delete empty functions from workflow YAML
+                        if (functionList.length === 0) {
+                            delete wfData["functions"]
+                        }
+
+                        // Find Start Block
                         const startBlockIDs = diagramEditor.getNodesFromName("StartBlock")
                         let startBlock = rawData[startBlockIDs[0]];
                         let startState
+
+                        // Setup Workflow Start State
+                        wfData.start.type = startBlock.data.formData.type
+                        switch (startBlock.data.formData.type) {
+                            case "default":
+                                break;
+                            case "scheduled":
+                                wfData.start.cron = startBlock.data.formData.cron
+                                break;
+                            case "event":
+                                wfData.start.event = startBlock.data.formData.event
+                                break;
+                            case "eventsAnd":
+                                wfData.start.events = startBlock.data.formData.events
+                                wfData.start.lifespan = startBlock.data.formData.lifespan
+                                wfData.start.correlate = startBlock.data.formData.correlate
+                                break;
+                            case "eventsXor":
+                                wfData.start.events = startBlock.data.formData.events
+                                break;
+                            default:
+                                wfData.start.type = "default"
+                                break;
+                        }
 
                         // Find Start State
                         for (const outputID in startBlock.outputs) {
@@ -626,6 +654,7 @@ export default function DiagramEditor(props) {
                                     return
                                 }
                                 startState = rawData[output.connections[0].node]
+                                wfData.start.state = startState.data.id
                                 console.log("--> Found startState = ", startState)
                                 break
                             }
@@ -687,7 +716,7 @@ export default function DiagramEditor(props) {
                             setFunctionDrawerWidth(0)
                         }
                     }}>
-                        {actionDrawerMinWidth === 0 ?
+                        {functionDrawerMinWidth === 0 ?
                             <>
                                 <VscSymbolEvent style={{ fontSize: "256px", width: "48px" }} />
                                 <div>Show Functions</div>
@@ -710,7 +739,7 @@ export default function DiagramEditor(props) {
                         }}
                     >
                         <Resizable
-                            style={{ ...resizeStyle, pointerEvents: actionDrawerWidth === 0 ? "none" : "", opacity: actionDrawerWidth === 0 ? 0 : 100 }}
+                            style={{ ...resizeStyle, pointerEvents: actionDrawerWidth === 0 ? "none" : "", visibility: actionDrawerWidth === 0 ? "hidden" : "visible" }}
                             size={{ width: actionDrawerWidth, height: "100%" }}
                             onResizeStop={(e, direction, ref, d) => {
                                 setActionDrawerWidthOld(actionDrawerWidth + d.width)
@@ -727,7 +756,7 @@ export default function DiagramEditor(props) {
                             </div>
                         </Resizable>
                         <Resizable
-                            style={{ ...resizeStyle, pointerEvents: functionDrawerWidth === 0 ? "none" : "", opacity: functionDrawerWidth === 0 ? 0 : 100 }}
+                            style={{ ...resizeStyle, pointerEvents: functionDrawerWidth === 0 ? "none" : "", visibility: functionDrawerWidth === 0 ? "hidden" : "visible" }}
                             size={{ width: functionDrawerWidth, height: "100%" }}
                             onResizeStop={(e, direction, ref, d) => {
                                 setActionDrawerWidthOld(functionDrawerWidth + d.width)
@@ -862,6 +891,7 @@ export default function DiagramEditor(props) {
                                     uiSchema={selectedNodeSchemaUI}
                                     formData={selectedNodeFormData}
                                     onChange={(e) => {
+                                        console.log("!!! FORMDATA e = ", e.formData)
                                         setSelectedNodeFormData(e.formData)
                                     }}
                                 >

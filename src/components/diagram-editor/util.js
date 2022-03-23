@@ -132,7 +132,10 @@ const connectionsCallbackMap = {
 
         }
 
-        previousState.catch = stateCatch
+        // Only set non-empty catches
+        if (Object.keys(stateCatch).length > 0) {
+            previousState.catch = stateCatch
+        }
 
         // Stop recursive walk if previous node is not first connections
         // If we dont do this we'll there is a chance that we create the same state multiple times

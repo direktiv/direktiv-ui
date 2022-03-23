@@ -10,7 +10,7 @@ export const NodeStartBlock = {
         link: ""
     },
     data: {
-        schemaKey: 'stateSchemaSwitch',
+        schemaKey: 'specialStartBlock',
         formData: {}
     },
     connections: {

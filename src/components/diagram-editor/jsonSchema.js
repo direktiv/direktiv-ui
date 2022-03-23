@@ -567,6 +567,209 @@ const SpecialSchemaError = {
     }
 }
 
+export const SpecialSchemaScheduledStart = {
+    "type": "object",
+    "required": [
+
+    ],
+    "properties": {
+        "cron": {
+            "type": "string",
+            "title": "Cron Expression",
+            "description": "Cron expression to schedule workflow."
+        }
+    }
+}
+
+export const SpecialSchemaEventStart = {
+    "type": "object",
+    "required": [
+        "event"
+    ],
+    "properties": {
+        "event": {
+            "type": "object",
+            "title": "Event",
+            "description": "Event to listen for, which can trigger the workflow.",
+            "required": [
+                "type"
+            ],
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "title": "Cloud Event",
+                    "description": "CloudEvent type."
+                },
+                "filters": {
+                    "type": "string",
+                    "title": "Filters",
+                    "description": "Key-value regex pairs for CloudEvent context values that must match."
+                    
+                }
+            }
+        }
+    }
+}
+
+export const SpecialSchemaEventsXorStart = {
+    "type": "object",
+    "required": [
+        "events"
+    ],
+    "properties": {
+        "events": {
+            "type": "array",
+            "title": "Events",
+            "description": "Events to listen for, which can trigger the workflow.",
+            "items": {
+                "type": "object",
+                "required": [
+                    "type"
+                ],
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "title": "Cloud Event",
+                        "description": "CloudEvent type."
+                    },
+                    "filters": {
+                        "type": "string",
+                        "title": "Filters",
+                        "description": "Key-value regex pairs for CloudEvent context values that must match."
+                    }
+                }
+            }
+        }
+    }
+}
+
+export const SpecialSchemaEventsAndStart = {
+    "type": "object",
+    "required": [
+        "events"
+    ],
+    "properties": {
+        "events": {
+            "type": "array",
+            "title": "Events",
+            "description": "Events to listen for, which can trigger the workflow.",
+            "items": {
+                "type": "object",
+                "required": [
+                    "type"
+                ],
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "title": "Cloud Event",
+                        "description": "CloudEvent type."
+                    },
+                    "filters": {
+                        "type": "string",
+                        "title": "Filters",
+                        "description": "Key-value regex pairs for CloudEvent context values that must match."
+                    }
+                }
+            }
+        },
+        "lifespan":{
+            "type": "string",
+            "title": "Lifespan",
+            "description": "Maximum duration an event can be stored before being discarded while waiting for other events (ISO8601).",
+        },
+        "correlate": {
+            "type": "array",
+            "title": "Correlate",
+            "description": "Context keys that must exist on every event and have matching values to be grouped together.",
+            "items": {
+                "type": "string"
+            }
+        },
+    }
+}
+
+export const SpecialSchemaDefaultStart = {
+    "type": "object",
+    "required": [
+
+    ],
+    "properties": {
+        
+    }
+}
+
+const SpecialSchemaStart = {
+    "type": "object",
+    "required": [
+        "type"
+    ],
+    "properties": {
+        "type": {
+            "enum": [
+                "default",
+                "scheduled",
+                "event",
+                "eventsAnd",
+                "eventsXor"
+            ],
+            "default": "default",
+            "title": "Start Type"
+        }
+    },
+    "allOf": [
+        {
+            "if": {
+                "properties": {
+                    "type": {
+                        "const": "default"
+                    }
+                }
+            },
+            "then": SpecialSchemaDefaultStart
+        },
+        {
+            "if": {
+                "properties": {
+                    "type": {
+                        "const": "scheduled"
+                    }
+                }
+            },
+            "then": SpecialSchemaScheduledStart
+        },
+        {
+            "if": {
+                "properties": {
+                    "type": {
+                        "const": "event"
+                    }
+                }
+            },
+            "then": SpecialSchemaEventStart
+        },
+        {
+            "if": {
+                "properties": {
+                    "type": {
+                        "const": "eventsAnd"
+                    }
+                }
+            },
+            "then": SpecialSchemaEventsAndStart
+        },
+        {
+            "if": {
+                "properties": {
+                    "type": {
+                        "const": "eventsXor"
+                    }
+                }
+            },
+            "then": SpecialSchemaEventsXorStart
+        }
+    ]
+}
+
 // Functions Schemas
 export const FunctionSchemaGlobal = {
     "type": "object",
@@ -978,6 +1181,7 @@ export const SchemaMap = {
 
     // Special
     "specialSchemaError": SpecialSchemaError,
+    "specialStartBlock": SpecialSchemaStart,
 }
 
 function functionListToActionEnum(functionList) {

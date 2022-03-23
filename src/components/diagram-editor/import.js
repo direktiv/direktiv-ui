@@ -1,6 +1,6 @@
 import { ActionsNodes, NodeErrorBlock, NodeStartBlock } from "./nodes";
 import YAML from 'js-yaml'
-import prettyYAML from "json-to-pretty-yaml"
+import prettyYAML, { stringify } from "json-to-pretty-yaml"
 import { CreateNode } from "./util";
 
 export function importFromYAML(diagramEditor, setFunctions, wfYAML) {
@@ -15,7 +15,12 @@ export function importFromYAML(diagramEditor, setFunctions, wfYAML) {
     }
 
     // Add StartNode
-    const startNodeID = CreateNode(diagramEditor, NodeStartBlock, pos.x, pos.y, true)
+    let startNode = JSON.parse(JSON.stringify((NodeStartBlock)))
+    if (wfData.start) {
+        startNode.data.formData = wfData.start
+    }
+
+    const startNodeID = CreateNode(diagramEditor, startNode, pos.x, pos.y, true)
 
     // Iterate over states
     for (let i = 0; i < wfData.states.length; i++) {
@@ -70,17 +75,22 @@ export function importFromYAML(diagramEditor, setFunctions, wfYAML) {
         nodeIDToStateIDMap[state.id] = nodeID
     }
 
+    
+    // Connect Start Node to first state
+    if (startNode.data.formData.state) {
+        const firstNodeID = nodeIDToStateIDMap[startNode.data.formData.state]
+        diagramEditor.addConnection(startNodeID, firstNodeID, 'output_1', 'input_1')
+    } else {
+        const firstNodeID = nodeIDToStateIDMap[wfData.states[0].id]
+        diagramEditor.addConnection(startNodeID, firstNodeID, 'output_1', 'input_1')
+    }
+
     // Iterate over states again and create connections
     for (let i = 0; i < wfData.states.length; i++) {
         const state = wfData.states[i];
         const nodeID = nodeIDToStateIDMap[state.id]
         const catchNodeRef = `SPECIAL-ERROR: `+state.id
         const node = diagramEditor.getNodeFromId(nodeID)
-
-        // Connect Start Node to first state
-        if (i === 0) {
-            diagramEditor.addConnection(startNodeID, nodeID, 'output_1', 'input_1')
-        }
 
         if (state.catch) {
             const catchNodeID = nodeIDToStateIDMap[catchNodeRef]
