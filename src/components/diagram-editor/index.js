@@ -358,6 +358,7 @@ export default function DiagramEditor(props) {
             const inNode = editor.getNodeFromId(ev.input_id)
             let errorOutput = 'output_2'
             const outputIsPrimitive = outNode.class.includes("primitive")
+            let isInvalidConnection = false
 
             // XOR has no default transition so output_1 will be used for errors
             // TODO: It might be worth generating error output class from "output" + node.info.output
@@ -368,14 +369,24 @@ export default function DiagramEditor(props) {
             if (outputIsPrimitive) {
                 if (ev.output_class === errorOutput && inNode.name !== "CatchError") {
                     // Remove connection if pirimtive node Erorr output is going to non-errorblock
-                    editor.removeSingleConnection(ev.output_id, ev.input_id, ev.output_class, ev.input_class)
+                    isInvalidConnection = true
                 } else if (ev.output_class !== errorOutput && inNode.name === "CatchError"){
                     // Remove connection if pirimtive node transition output is going to errorblock
-                    editor.removeSingleConnection(ev.output_id, ev.input_id, ev.output_class, ev.input_class)
+                    isInvalidConnection = true
                 }
             } else if (inNode.name === "CatchError" && !outputIsPrimitive){
                 // Remove connection in input is error block, but output is primitive
+                isInvalidConnection = true
+            }
+
+            if (isInvalidConnection) {
                 editor.removeSingleConnection(ev.output_id, ev.input_id, ev.output_class, ev.input_class)
+            } else {
+                // If output connection already existed before creation, delete first connection and keep new one.
+                if(outNode.outputs[ev.output_class].connections.length > 1) {
+                    const removeConnection = outNode.outputs[ev.output_class].connections[0];
+                    editor.removeSingleConnection(ev.output_id, removeConnection.node, ev.output_class, removeConnection.output);
+                }
             }
 
         })
