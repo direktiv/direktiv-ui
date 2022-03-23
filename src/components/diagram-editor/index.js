@@ -1,4 +1,4 @@
-import { useGlobalServices, useNamespaceVariables, useNamespaceServices } from 'direktiv-react-hooks';
+import { useGlobalServices, useNamespaceVariables, useNamespaceServices, useNodes } from 'direktiv-react-hooks';
 import { useCallback, useEffect, useState } from 'react';
 import { VscGear, VscListUnordered, VscSymbolEvent } from 'react-icons/vsc';
 import Button from '../../components/button';
@@ -110,6 +110,8 @@ function FunctionsList(props) {
 
     const namespaceServiceHook = useNamespaceServices(Config.url, false, namespace, localStorage.getItem("apikey"))
     const globalServiceHook = useGlobalServices(Config.url, false, localStorage.getItem("apikey"))
+    const namespaceNodesHook = useNodes(Config.url, false, namespace, "/", localStorage.getItem("apikey"), "first=20")
+
     // const namespaceVariableHook = useNamespaceVariables(Config.url, false, namespace, localStorage.getItem("apikey"))
 
     useEffect(() => {
@@ -117,12 +119,12 @@ function FunctionsList(props) {
         return () => { console.log("unmounting functions list") };
     }, [])
 
-    if (namespaceServiceHook.data === null || globalServiceHook.data === null) {
+    if (namespaceServiceHook.data === null || globalServiceHook.data === null || namespaceNodesHook.data === null) {
         return <></>
     }
 
     const ajv = new Ajv()
-    const functionSchemas = GenerateFunctionSchemaWithEnum(namespaceServiceHook.data.map(a => a.serviceName), (globalServiceHook.data.map(a => a.serviceName)))
+    const functionSchemas = GenerateFunctionSchemaWithEnum(namespaceServiceHook.data.map(a => a.serviceName), (globalServiceHook.data.map(a => a.serviceName)), namespaceNodesHook.data.children.edges)
     const validate = ajv.compile(functionSchemas.schema)
 
     // Set uischema to global or namespace depending on the type

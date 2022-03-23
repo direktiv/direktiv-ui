@@ -775,10 +775,10 @@ export const FunctionSchemaSubflow = {
 //  GenerateFunctionSchemaWithEnum : Generates schema to used for creating new funciton
 //  Automatically injects global and namespace service list as enums from arguments
 //  Also creates ui-schemas which sets placeholder and whether or not field is readonly (if no services exist)
-export function GenerateFunctionSchemaWithEnum(namespaceServices, globalServices) {
-    console.log("namespaceServices = ", namespaceServices)
+export function GenerateFunctionSchemaWithEnum(namespaceServices, globalServices, nodes) {
     let nsFuncSchema = FunctionSchemaNamespace
     let globalFuncSchema = FunctionSchemaGlobal
+    let subflowFuncSchema = FunctionSchemaSubflow
     let uiSchema = {
         "knative-namespace": {
             "service": {
@@ -811,6 +811,13 @@ export function GenerateFunctionSchemaWithEnum(namespaceServices, globalServices
             delete globalFuncSchema.properties.service.enum
             uiSchema["knative-global"]["service"]["ui:placeholder"] = "No Services"
             uiSchema["knative-global"]["service"]["ui:readonly"] = true
+        }
+    }
+
+    subflowFuncSchema.properties.workflow.examples = []
+    for (let i = 0; i < nodes.length; i++) {
+        if (nodes[i].node.type === "workflow") {
+            subflowFuncSchema.properties.workflow.examples.push(nodes[i].node.path)
         }
     }
 
