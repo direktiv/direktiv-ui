@@ -1,7 +1,7 @@
 import { useWorkflowVariables } from 'direktiv-react-hooks';
 import React, { useState } from 'react';
 
-import { VscVariableGroup, VscCloudDownload, VscCloudUpload,  VscEye, VscTrash } from 'react-icons/vsc';
+import { VscVariableGroup, VscCloudDownload, VscCloudUpload,  VscEye, VscTrash, VscLoading } from 'react-icons/vsc';
 
 import AddValueButton from '../../../components/add-button';
 import Button from '../../../components/button';
@@ -375,7 +375,7 @@ function VariablesDownloadingButton(props) {
 
     return (
         <div className="secrets-delete-btn grey-text auto-margin" style={{display: "flex", alignItems: "center", height: "100%"}}>
-            <VscCloudUpload style={{animation: "spin 2s linear infinite"}}/>
+            <VscLoading style={{animation: "spin 2s linear infinite"}}/>
         </div>
     )
 }
