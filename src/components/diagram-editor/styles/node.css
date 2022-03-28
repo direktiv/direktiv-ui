@@ -93,6 +93,7 @@
     line-height: inherit;
     background: none;
     pointer-events: none;
+    text-overflow: ellipsis;
 }
 
 #builder-page .node-labels .label-type{
@@ -126,7 +127,7 @@
 
 #builder-page .parent-drawflow{
     background-size: 25px 25px;
-    background-image: linear-gradient(to right, #f1f1f1 1px, transparent 1px), linear-gradient(to bottom, #f1f1f1 1px, transparent 1px);
+    background-image: linear-gradient(to right, #E7EAED 1px, transparent 1px), linear-gradient(to bottom, #E7EAED 1px, transparent 1px);
 }
 
 

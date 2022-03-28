@@ -680,7 +680,7 @@ export default function DiagramEditor(props) {
                     </div>
                     <div className='toolbar-btn' onClick={() => {
                         if (actionDrawerMinWidth === 0) {
-                            setActionDrawerMinWidth(20)
+                            setActionDrawerMinWidth(180)
                             setActionDrawerWidth(actionDrawerWidthOld)
 
                             // Hide Functions
@@ -749,7 +749,7 @@ export default function DiagramEditor(props) {
                             minWidth={actionDrawerMinWidth}
                         >
                             <div className={"panel left"} style={{ display: "flex" }}>
-                                <div style={{ width: "100%", margin: "10px" }}>
+                                <div style={{ width: "100%", margin: "2px 0px 2px 10px" }}>
                                     <Actions />
                                 </div>
 
@@ -762,7 +762,7 @@ export default function DiagramEditor(props) {
                                 setActionDrawerWidthOld(functionDrawerWidth + d.width)
                                 setFunctionDrawerWidth(functionDrawerWidth + d.width)
                             }}
-                            maxWidth="40%"
+                            maxWidth="500px"
                             minWidth={functionDrawerMinWidth}
                         >
                             <div className={"panel left"} style={{ display: "flex" }}>
