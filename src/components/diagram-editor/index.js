@@ -1,6 +1,6 @@
 import { useGlobalServices, useNamespaceVariables, useNamespaceServices, useNodes } from 'direktiv-react-hooks';
 import { useCallback, useEffect, useState } from 'react';
-import { VscGear, VscListUnordered, VscSymbolEvent } from 'react-icons/vsc';
+import { VscGear, VscListUnordered, VscSymbolEvent, VscInfo } from 'react-icons/vsc';
 import Button from '../../components/button';
 import Alert from '../../components/alert';
 import FlexBox from '../../components/flexbox';
@@ -58,12 +58,14 @@ function Actions(props) {
 
 
                     }}>
-                        <div style={{ marginLeft: "5px" }}>
+                        <div style={{ marginLeft: "5px", marginRight: "2px" }}>
                             <div style={{ display: "flex", borderBottom: "1px solid #e5e5e5", justifyContent: "space-between" }}>
-                                <span style={{ whiteSpace: "pre-wrap", cursor: "move", fontSize: "13px" }}>
+                                <span style={{ whiteSpace: "pre-wrap", cursor: "move", fontSize: "13px", overflow:"hidden", textOverflow: "ellipsis" }}>
                                     {ActionsNodes[index].name}
                                 </span>
-                                <a style={{ whiteSpace: "pre-wrap", cursor: "pointer", fontSize: "11px", paddingRight: "3px" }} href={`${ActionsNodes[index].info.link}`} target="_blank" rel="noreferrer">More Info</a>
+                                <a style={{ whiteSpace: "nowrap", cursor: "pointer", fontSize: "11px", paddingRight: "3px", display:"flex", alignItems:"center", justifyContent:"center" }} href={`${ActionsNodes[index].info.link}`} target="_blank" rel="noreferrer">
+                                <VscInfo/>
+                                </a>
 
                             </div>
                             <div style={{ fontSize: "10px", lineHeight: "10px", paddingTop: "2px" }}>
@@ -100,7 +102,7 @@ function Actions(props) {
 }
 
 function FunctionsList(props) {
-    const { functionList, setFunctionList, namespace } = props
+    const { functionList, setFunctionList, namespace, functionDrawerWidth } = props
 
     // const [functionList, setFunctionList] = useState([])
     const [newFunctionFormRef, setNewFunctionFormRef] = useState(null)
@@ -154,15 +156,20 @@ function FunctionsList(props) {
                     }}>
                         <div class="node-labels" style={{ display: "flex", gap: "4px", flexDirection: "column", marginLeft: "5px" }}>
                             <div>
-                                ID: <span class="label-id">{functionList[index].id}</span>
+                                ID: <span class="label-id" style={{maxWidth: functionDrawerWidth-50}}>{functionList[index].id}</span>
                             </div>
                             <div>
                                 Type: <span class="label-type">{functionList[index].type}</span>
                             </div>
                             <div>
-                                Image: <span class="label-type">{functionList[index].service ? `${functionList[index].service}` : ""}
+                                {functionList[index].service ? `Service:` : ""}
+                                {functionList[index].image ? `Image:` : ""}
+                                {functionList[index].workflow ? `Workflow:` : ""}
+                                <span style={{maxWidth: functionDrawerWidth-80}} class="label-type">
+                                    {functionList[index].service ? `${functionList[index].service}` : ""}
                                     {functionList[index].image ? `${functionList[index].image}` : ""}
-                                    {functionList[index].workflow ? `${functionList[index].workflow}` : ""}</span>
+                                    {functionList[index].workflow ? `${functionList[index].workflow}` : ""}
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -261,6 +268,8 @@ function FunctionsList(props) {
     )
 }
 
+const MaxDrawerSize = 180
+
 export default function DiagramEditor(props) {
     const { workflow, namespace, updateWorkflow } = props
 
@@ -272,7 +281,7 @@ export default function DiagramEditor(props) {
     const [error, setError] = useState(null)
 
     const [actionDrawerWidth, setActionDrawerWidth] = useState(0)
-    const [actionDrawerWidthOld, setActionDrawerWidthOld] = useState(200)
+    const [actionDrawerWidthOld, setActionDrawerWidthOld] = useState(MaxDrawerSize)
     const [actionDrawerMinWidth, setActionDrawerMinWidth] = useState(0)
 
     const [functionDrawerWidth, setFunctionDrawerWidth] = useState(0)
@@ -680,7 +689,7 @@ export default function DiagramEditor(props) {
                     </div>
                     <div className='toolbar-btn' onClick={() => {
                         if (actionDrawerMinWidth === 0) {
-                            setActionDrawerMinWidth(180)
+                            setActionDrawerMinWidth(MaxDrawerSize)
                             setActionDrawerWidth(actionDrawerWidthOld)
 
                             // Hide Functions
@@ -705,7 +714,7 @@ export default function DiagramEditor(props) {
                     </div>
                     <div className='toolbar-btn' onClick={() => {
                         if (functionDrawerMinWidth === 0) {
-                            setFunctionDrawerMinWidth(20)
+                            setFunctionDrawerMinWidth(MaxDrawerSize)
                             setFunctionDrawerWidth(actionDrawerWidthOld)
 
                             // Hide Node Actions
@@ -745,11 +754,11 @@ export default function DiagramEditor(props) {
                                 setActionDrawerWidthOld(actionDrawerWidth + d.width)
                                 setActionDrawerWidth(actionDrawerWidth + d.width)
                             }}
-                            maxWidth="40%"
+                            maxWidth="60%"
                             minWidth={actionDrawerMinWidth}
                         >
                             <div className={"panel left"} style={{ display: "flex" }}>
-                                <div style={{ width: "100%", margin: "2px 0px 2px 10px" }}>
+                                <div style={{ width: "100%", margin: "2px 0px 2px 4px" }}>
                                     <Actions />
                                 </div>
 
@@ -762,12 +771,12 @@ export default function DiagramEditor(props) {
                                 setActionDrawerWidthOld(functionDrawerWidth + d.width)
                                 setFunctionDrawerWidth(functionDrawerWidth + d.width)
                             }}
-                            maxWidth="500px"
+                            maxWidth="900"
                             minWidth={functionDrawerMinWidth}
                         >
                             <div className={"panel left"} style={{ display: "flex" }}>
-                                <div style={{ width: "100%", margin: "10px" }}>
-                                    <FunctionsList functionList={functionList} setFunctionList={setFunctionList} namespace={namespace} />
+                                <div style={{ width: "100%", margin: "2px 0px 2px 4px" }}>
+                                    <FunctionsList functionDrawerWidth={functionDrawerWidth} functionList={functionList} setFunctionList={setFunctionList} namespace={namespace} />
                                 </div>
                             </div>
                         </Resizable>

@@ -94,10 +94,14 @@
     background: none;
     pointer-events: none;
     text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 #builder-page .node-labels .label-type{
     color: #082032;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 
@@ -201,7 +205,7 @@
 /* Function Drawer */
 
 #builder-page .function {
-    margin: 6px;
+    margin: 5px;
     display: flex;
     justify-content: start;
     align-items: center;
