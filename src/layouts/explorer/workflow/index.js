@@ -333,26 +333,23 @@ function WorkingRevision(props) {
         }
     },[oldWf, wf, pushOpLoadingState])
 
-    let saveFn = (newWf, oldWf) => {
-
-        return () => {
-            if (newWf === oldWf) {
-                setErrors(["Can't save - no changes have been made."])
-                setShowErrors(true)
-                pushOpLoadingState("Save", false)
-                return
-            }
-            setErrors([])
-            pushOpLoadingState("Save", true)
-            updateWorkflow(newWf).then(()=>{
-                setShowErrors(false)
-            }).catch((opError) => {
-                setErrors([opError.message])
-                setShowErrors(true)
-                pushOpLoadingState("Save", false)
-            })
+    const saveFn = useCallback(()=>{
+        if (workflow === oldWf) {
+            setErrors(["Can't save - no changes have been made."])
+            setShowErrors(true)
+            pushOpLoadingState("Save", false)
+            return
         }
-    }
+        setErrors([])
+        pushOpLoadingState("Save", true)
+        updateWorkflow(workflow).then(()=>{
+            setShowErrors(false)
+        }).catch((opError) => {
+            setErrors([opError.message])
+            setShowErrors(true)
+            pushOpLoadingState("Save", false)
+        })
+    }, [oldWf, workflow, pushOpLoadingState, updateWorkflow])
 
     return(
         <FlexBox style={{width:"100%"}}>
@@ -373,7 +370,7 @@ function WorkingRevision(props) {
                 {tabBtn === 0 ?
                     <FlexBox className="col" style={{ overflow: "hidden" }}>
                         <FlexBox>
-                            <DirektivEditor saveFn={saveFn(workflow, oldWf)} style={{borderRadius: "0px"}} dlang="yaml" value={workflow} dvalue={oldWf} setDValue={setWorkflow} disableBottomRadius={true} />
+                            <DirektivEditor saveFn={saveFn} style={{borderRadius: "0px"}} dlang="yaml" value={workflow} dvalue={oldWf} setDValue={setWorkflow} disableBottomRadius={true} />
                         </FlexBox>
                         <FlexBox className="gap editor-footer">
                             <WorkingRevisionErrorBar errors={errors} showErrors={showErrors}/>

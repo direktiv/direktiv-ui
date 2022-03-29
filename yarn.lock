@@ -5523,10 +5523,10 @@ dir-glob@^3.0.1:
   dependencies:
     path-type "^4.0.0"
 
-direktiv-react-hooks@^0.0.241:
-  version "0.0.241"
-  resolved "https://registry.yarnpkg.com/direktiv-react-hooks/-/direktiv-react-hooks-0.0.241.tgz#414f0fa5af3673b32c26f184d5f7603e8d152548"
-  integrity sha512-ugBtOSqOlce4jEfKrrlfEpsRUr2hhxbAgyT9yoYWPczRu1bc5f9TqbpKcXkHfirzy4oNuFq3/VShbeQkAHX3Jw==
+direktiv-react-hooks@^0.0.246:
+  version "0.0.246"
+  resolved "https://registry.yarnpkg.com/direktiv-react-hooks/-/direktiv-react-hooks-0.0.246.tgz#6922f8d48f30d713a76c13ae89361ed2f1524c1b"
+  integrity sha512-PKsBiq6sZGmwTPpczHwD4IVc8DprKUZxGaH/6xDzoCH6y49DFTEykJbMEFihZrhmylhax9DWiM8P6dnKiv8a+A==
   dependencies:
     "@types/event-source-polyfill" "^1.0.0"
     cross-fetch "^3.1.4"
@@ -6463,6 +6463,11 @@ file-loader@6.1.1:
   dependencies:
     loader-utils "^2.0.0"
     schema-utils "^3.0.0"
+
+file-saver@^2.0.5:
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/file-saver/-/file-saver-2.0.5.tgz#d61cfe2ce059f414d899e9dd6d4107ee25670c38"
+  integrity sha512-P9bmyZ3h/PRG+Nzga+rbdI4OEpNDzAVyy74uVO9ATgzLK6VtAsYybF/+TOCvrc0MO793d6+42lLyZTw7/ArVzA==
 
 file-selector@^0.2.2:
   version "0.2.4"
