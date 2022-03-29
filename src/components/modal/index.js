@@ -275,7 +275,7 @@ function ModalOverlay(props) {
                     <div style={{ display: "flex", width: "100%", justifyContent: "center", ...modalStyle }} className="modal-body auto-margin" onClick={(e) => {
                         e.stopPropagation()
                     }}>
-                        <ContentPanel style={panelStyle}>
+                        <ContentPanel style={{...panelStyle, width: "100%"}}>
                             <ContentPanelTitle>
                                 <FlexBox style={{ maxWidth: "18px" }}>
                                     <ContentPanelTitleIcon>
@@ -295,25 +295,23 @@ function ModalOverlay(props) {
                                     {closeButton}
                                 </FlexBox>
                             </ContentPanelTitle>
-                            <FlexBox className="col gap">
-                                <ContentPanelBody style={{...contentBodyStyle, flex: "auto"}}>
-                                    <FlexBox className="col gap">
-                                        { displayAlert ?
-                                        <Alert  className="critical">{alertMessage}</Alert>
-                                        : <></> }
-                                        {children}
+                            <ContentPanelBody style={{...contentBodyStyle, overflow: "auto"}}>
+                                <FlexBox className="col gap">
+                                    { displayAlert ?
+                                    <Alert  className="critical">{alertMessage}</Alert>
+                                    : <></> }
+                                    {children}
+                                </FlexBox>
+                            </ContentPanelBody>
+                            { buttons ? 
+                            <div>
+                                <ContentPanelFooter>
+                                    <FlexBox className="gap modal-buttons-container" style={{flexDirection: "row-reverse"}}>
+                                        {buttons}
                                     </FlexBox>
-                                </ContentPanelBody>
-                                { buttons ? 
-                                <div>
-                                    <ContentPanelFooter>
-                                        <FlexBox className="gap modal-buttons-container" style={{flexDirection: "row-reverse"}}>
-                                            {buttons}
-                                        </FlexBox>
-                                    </ContentPanelFooter>
-                                </div>
-                                :<></>}
-                            </FlexBox>
+                                </ContentPanelFooter>
+                            </div>
+                            :<></>}
                         </ContentPanel>
                     </div>
                 </FlexBox>

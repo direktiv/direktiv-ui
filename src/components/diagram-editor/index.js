@@ -853,6 +853,7 @@ export default function DiagramEditor(props) {
                         <ModalHeadless
                             visible={nodeDetailsVisible}
                             setVisible={setNodeDetailsVisible}
+                            modalStyle={{width: "60vw"}}
                             title={`Node Details: ${selectedNode ? selectedNode.data.id : ""}`}
                             actionButtons={[
                                 ButtonDefinition("Submit", () => {
@@ -908,26 +909,24 @@ export default function DiagramEditor(props) {
                                 }, "small light", () => { }, true, false)
                             ]}
                         >
-                            <div style={{ flexDirection: "column", minWidth: "260px", width: "60vw", maxWidth: "640px" }}>
-                                <Form
-                                    id={"builder-form"}
-                                    onSubmit={(form) => {}}
-                                    schema={selectedNodeSchema}
-                                    uiSchema={selectedNodeSchemaUI}
-                                    formData={selectedNodeFormData}
-                                    onChange={(e) => {
-                                        console.log("!!! FORMDATA e = ", e.formData)
-                                        setSelectedNodeFormData(e.formData)
-                                    }}
-                                >
-                                    <button ref={setFormRef} style={{ display: "none" }} />
-                                </Form>
-                            </div>
+                            <Form
+                                id={"builder-form"}
+                                onSubmit={(form) => {}}
+                                schema={selectedNodeSchema}
+                                uiSchema={selectedNodeSchemaUI}
+                                formData={selectedNodeFormData}
+                                onChange={(e) => {
+                                    setSelectedNodeFormData(e.formData)
+                                }}
+                            >
+                                <button ref={setFormRef} style={{ display: "none" }} />
+                            </Form>
                         </ModalHeadless>
                         <ModalHeadless
                             visible={nodeIDModalVisible}
                             setVisible={setNodeIDModalVisible}
                             title={`Node Details: ${selectedNode ? selectedNode.data.id : ""}`}
+                            modalStyle={{width: "20vw"}}
                             actionButtons={[
                                 ButtonDefinition("Save", () => {
                                     // TODO: New node id validation
