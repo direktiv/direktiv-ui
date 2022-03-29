@@ -10,7 +10,7 @@ import { Resizable } from 're-resizable';
 import YAML from "json-to-pretty-yaml"
 import { DefaultSchemaUI, GenerateFunctionSchemaWithEnum, GetSchema, getSchemaCallbackMap, getSchemaDefault, SchemaUIMap } from "../../components/diagram-editor/jsonSchema"
 import Form from '@rjsf/core';
-import { CreateNode, DefaultValidateSubmitCallbackMap, onSubmitCallbackMap, onValidateSubmitCallbackMap, setConnections } from '../../components/diagram-editor/util';
+import { CreateNode, DefaultValidateSubmitCallbackMap, nodeGetInputConnections, onSubmitCallbackMap, onValidateSubmitCallbackMap, setConnections } from '../../components/diagram-editor/util';
 import { AutoSizer, CellMeasurer, CellMeasurerCache, List } from 'react-virtualized';
 import Fuse from 'fuse.js';
 import { ActionsNodes, NodeStateAction } from "../../components/diagram-editor/nodes";
@@ -624,6 +624,7 @@ export default function DiagramEditor(props) {
 
                         // Find Start Block
                         const startBlockIDs = diagramEditor.getNodesFromName("StartBlock")
+                        rawData[startBlockIDs[0]].compiled = true
                         let startBlock = rawData[startBlockIDs[0]];
                         let startState
 
@@ -662,6 +663,7 @@ export default function DiagramEditor(props) {
                                     setError("Start Node is not connected to any node")
                                     return
                                 }
+                                rawData[output.connections[0].node].compiled = true
                                 startState = rawData[output.connections[0].node]
                                 wfData.start.state = startState.data.id
                                 console.log("--> Found startState = ", startState)
@@ -669,14 +671,28 @@ export default function DiagramEditor(props) {
                             }
                         }
 
-                        // Set Transitions
+                        // Set Transitions for main state flow
                         console.log(" rawData = ", rawData)
                         setConnections(startState.id, startBlock.id, null, rawData, wfData)
                         wfData.states.reverse()
-
                         console.log("wfData = ", wfData)
                         console.log("---- Workflow ---")
                         console.log(YAML.stringify(wfData))
+
+
+                        
+
+                        // Create States for disconnected nodes
+                        for (const nodeID in rawData) {
+                            const rawNode  = rawData[nodeID]
+
+                            // Add primitive states with no input connections
+                            if (!rawNode.compiled && rawNode.data.family === "primitive" && !nodeGetInputConnections(rawNode)) {
+                                setConnections(rawNode.id, null, null, rawData, wfData)
+                            }
+                        }
+
+
 
                         if (updateWorkflow) {
                             updateWorkflow(wfData)

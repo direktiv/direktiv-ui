@@ -1,5 +1,50 @@
 import YAML from 'js-yaml'
 
+export function nodeGetInputConnections(node){
+    let inputs = {}
+
+    if (node) {
+        return undefined
+    }
+
+    if (node.inputs){
+        return undefined
+    }
+
+    for (const inputKey of Object.keys(node.inputs)) {
+        if (node.inputs[inputKey].connections.length > 0) {
+            inputs[inputKey] = node.inputs[inputKey].connections
+        }
+    }
+
+    if (Object.keys(inputs).length === 0) {
+        return undefined
+    }
+
+    return inputs
+}
+
+export function insertHangingNodes(nodeID, previousNodeID, previousState, rawData, wfData) {
+    // Use Custom connection callback logic if it exists for data type
+    rawData[nodeID].compiled = true
+    let currentNode = rawData[nodeID]
+    let connCallback = connectionsCallbackMap[currentNode.name]
+    if (connCallback) {
+        connCallback(nodeID, previousNodeID, previousState, rawData, wfData)
+        return
+    }
+
+
+
+    let state = { id: currentNode.data.id, type: currentNode.data.type, ...currentNode.data.formData }
+    processTransform(state, "transform")
+
+    // Default connections logic
+    processConnection(nodeID, rawData, state, wfData)
+
+    return
+}
+
 //  processTransform : Converts json schema form to direktiv yaml on the properties that accept jq.
 //  Because we support both a jq string a key value json schema input, we need to process these values into
 //  something direkitv yaml can use. 
@@ -61,11 +106,13 @@ export function setConnections(nodeID, previousNodeID, previousState, rawData, w
     // Stop recursive walk if previous node is not first connections
     // If we dont do this we'll there is a chance that we create the same state multiple times
     if (!isFirstConnection(nodeID, previousNodeID, rawData)) {
+        console.log("returning???")
         return
     }
 
     // Use Custom connection callback logic if it exists for data type
     console.log("rawData[nodeID].name = ", rawData[nodeID].name)
+    rawData[nodeID].compiled = true
     let currentNode = rawData[nodeID]
     let connCallback = connectionsCallbackMap[currentNode.name]
     if (connCallback) {
@@ -314,6 +361,9 @@ const connectionsCallbackMap = {
 
 // isFirstConnection : Returns true if the previous node is the current nodes first connection
 function isFirstConnection(nodeID, previousNodeID, rawData) {
+    if (!previousNodeID) {
+        return true
+    }
     return (rawData[nodeID].inputs["input_1"].connections[0].node === `${previousNodeID}`)
 }
 
