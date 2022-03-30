@@ -153,9 +153,9 @@ export const ActionsNodes = [
         html: 'Error State'
     },
     {
-        name: 'StateEventAnd',
+        name: 'StateEventsAnd',
         family: "primitive",
-        type: "eventAnd",
+        type: "eventsAnd",
         info: {
             requiresInit: true,
             actions: true,
@@ -164,14 +164,14 @@ export const ActionsNodes = [
             link: ""
         },
         data: {
-            schemaKey: 'stateSchemaEventAnd',
+            schemaKey: 'stateSchemaEventsAnd',
             formData: {}
         },
         connections: {
             input: 1,
             output: 2
         },
-        html: 'EventAnd State'
+        html: 'EventsAnd State'
     },
     {
         name: 'StateEventXor',

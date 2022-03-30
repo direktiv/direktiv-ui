@@ -4,6 +4,9 @@ const CommonSchemaDefinitionConsumeEvent = {
     "type": "object",
     "title": "Event Definition",
     "description": "Event to consume.",
+    "required": [
+        "type"
+    ],
     "properties": {
         "type": {
             "type": "string",
@@ -17,6 +20,47 @@ const CommonSchemaDefinitionConsumeEvent = {
             "additionalProperties": {
                 "type": "string"
             },
+        }
+    }
+}
+
+const CommonSchemaDefinitionFiles = {
+    "type": "array",
+    "minItems": 0,
+    "title": "Files",
+    "description": "Action file definitions.",
+    "items": {
+        "type": "object",
+        "required": [
+            "key"
+        ],
+        "properties": {
+            "key": {
+                "type": "string",
+                "title": "Key",
+                "description": "Key used to select variable."
+            },
+            "scope": {
+                "title": "Scope",
+                "description": "Scope used to select variable. Defaults to 'instance', but can be 'workflow' or 'namespace'.",
+                "type": "string",
+                "enum": [
+                    "instance",
+                    "workflow",
+                    "namespace"
+                ],
+                "default": "workflow"
+            },
+            "as": {
+                "title": "As",
+                "description": "Set the filename of the file. The default is the same as the key.",
+                "type": "string"
+            },
+            "type": {
+                "title": "Type",
+                "description": "How to treat the file. Options include 'plain', 'base64', 'tar', 'tar.gz'.",
+                "type": "string"
+            }
         }
     }
 }
@@ -175,6 +219,7 @@ const CommonSchemaDefinitionAction = {
                 "type": "string"
             }
         },
+        "files": CommonSchemaDefinitionFiles,
         "retries": CommonSchemaDefinitionRetry
     }
 }
@@ -241,7 +286,7 @@ export const StateSchemaError = {
     }
 }
 
-export const StateSchemaEventAnd = {
+export const StateSchemaEventsAnd = {
     "type": "object",
     "required": [
         "events",
@@ -253,13 +298,7 @@ export const StateSchemaEventAnd = {
             "title": "Events",
             "description": "Events to consume.",
             "items": {
-                "type": "object",
-                "required": [
-                    "event"
-                ],
-                "properties": {
-                    "event": CommonSchemaDefinitionConsumeEvent,
-                }
+                ...CommonSchemaDefinitionConsumeEvent,
             }
         },
         ...CommonSchemaDefinitionStateFields,
@@ -596,11 +635,13 @@ export const SpecialSchemaEventStart = {
                     "title": "Cloud Event",
                     "description": "CloudEvent type."
                 },
-                "filters": {
-                    "type": "string",
-                    "title": "Filters",
-                    "description": "Key-value regex pairs for CloudEvent context values that must match."
-
+                "context": {
+                    "type": "object",
+                    "title": "Context",
+                    "description": "Key value pairs for CloudEvent context values that must match.",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
                 }
             }
         }
@@ -628,10 +669,13 @@ export const SpecialSchemaEventsXorStart = {
                         "title": "Cloud Event",
                         "description": "CloudEvent type."
                     },
-                    "filters": {
-                        "type": "string",
-                        "title": "Filters",
-                        "description": "Key-value regex pairs for CloudEvent context values that must match."
+                    "context": {
+                        "type": "object",
+                        "title": "Context",
+                        "description": "Key value pairs for CloudEvent context values that must match.",
+                        "additionalProperties": {
+                            "type": "string"
+                        },
                     }
                 }
             }
@@ -660,10 +704,13 @@ export const SpecialSchemaEventsAndStart = {
                         "title": "Cloud Event",
                         "description": "CloudEvent type."
                     },
-                    "filters": {
-                        "type": "string",
-                        "title": "Filters",
-                        "description": "Key-value regex pairs for CloudEvent context values that must match."
+                    "context": {
+                        "type": "object",
+                        "title": "Context",
+                        "description": "Key value pairs for CloudEvent context values that must match.",
+                        "additionalProperties": {
+                            "type": "string"
+                        },
                     }
                 }
             }
@@ -783,41 +830,7 @@ export const FunctionSchemaGlobal = {
             "type": "string",
             "title": "Service",
             "description": "The service being referenced."
-        },
-        "files": {
-            "type": "array",
-            "minItems": 0,
-            "title": "Files",
-            "description": "Workflow file definition.",
-            "items": {
-                "type": "object",
-                "required": [
-                    "key"
-                ],
-                "properties": {
-                    "key": {
-                        "type": "string",
-                        "title": "Key",
-                        "description": "Key used to select variable."
-                    },
-                    "scope": {
-                        "title": "Scope",
-                        "description": "Scope used to select variable. Defaults to 'instance', but can be 'workflow' or 'namespace'.",
-                        "type": "string"
-                    },
-                    "as": {
-                        "title": "As",
-                        "description": "Set the filename of the file. The default is the same as the key.",
-                        "type": "string"
-                    },
-                    "type": {
-                        "title": "Type",
-                        "description": "How to treat the file. Options include 'plain', 'base64', 'tar', 'tar.gz'.",
-                        "type": "string"
-                    }
-                }
-            }
-        },
+        }
     }
 }
 
@@ -837,41 +850,7 @@ export const FunctionSchemaNamespace = {
             "type": "string",
             "title": "Service",
             "description": "The service being referenced."
-        },
-        "files": {
-            "type": "array",
-            "minItems": 0,
-            "title": "Files",
-            "description": "Workflow file definition.",
-            "items": {
-                "type": "object",
-                "required": [
-                    "key"
-                ],
-                "properties": {
-                    "key": {
-                        "type": "string",
-                        "title": "Key",
-                        "description": "Key used to select variable."
-                    },
-                    "scope": {
-                        "title": "Scope",
-                        "description": "Scope used to select variable. Defaults to 'instance', but can be 'workflow' or 'namespace'.",
-                        "type": "string"
-                    },
-                    "as": {
-                        "title": "As",
-                        "description": "Set the filename of the file. The default is the same as the key.",
-                        "type": "string"
-                    },
-                    "type": {
-                        "title": "Type",
-                        "description": "How to treat the file. Options include 'plain', 'base64', 'tar', 'tar.gz'.",
-                        "type": "string"
-                    }
-                }
-            }
-        },
+        }
     }
 }
 
@@ -913,41 +892,7 @@ export const FunctionSchemaReusable = {
             "type": "integer",
             "title": "Scale",
             "description": "Minimum number of instances"
-        },
-        "files": {
-            "type": "array",
-            "minItems": 0,
-            "title": "Files",
-            "description": "Workflow file definition.",
-            "items": {
-                "type": "object",
-                "required": [
-                    "key"
-                ],
-                "properties": {
-                    "key": {
-                        "type": "string",
-                        "title": "Key",
-                        "description": "Key used to select variable."
-                    },
-                    "scope": {
-                        "title": "Scope",
-                        "description": "Scope used to select variable. Defaults to 'instance', but can be 'workflow' or 'namespace'.",
-                        "type": "string"
-                    },
-                    "as": {
-                        "title": "As",
-                        "description": "Set the filename of the file. The default is the same as the key.",
-                        "type": "string"
-                    },
-                    "type": {
-                        "title": "Type",
-                        "description": "How to treat the file. Options include 'plain', 'base64', 'tar', 'tar.gz'.",
-                        "type": "string"
-                    }
-                }
-            }
-        },
+        }
     }
 }
 
@@ -1159,7 +1104,7 @@ export const SchemaMap = {
     "stateSchemaConsumeEvent": StateSchemaConsumeEvent,
     "stateSchemaDelay": StateSchemaDelay,
     "stateSchemaError": StateSchemaError,
-    "stateSchemaEventAnd": StateSchemaEventAnd,
+    "stateSchemaEventsAnd": StateSchemaEventsAnd,
     "stateSchemaEventXor": StateSchemaEventXor,
     "stateSchemaForeach": StateSchemaForeach,
     "stateSchemaParallel": StateSchemaParallel,
@@ -1239,7 +1184,7 @@ export const SchemaUIMap = {
     // "stateSchemaConsumeEvent": StateSchemaConsumeEvent,
     // "stateSchemaDelay": StateSchemaDelay,
     // "stateSchemaError": StateSchemaError,
-    // "stateSchemaEventAnd": StateSchemaEventAnd,
+    // "stateSchemaEventsAnd": StateSchemaEventsAnd,
     "stateSchemaEventXor": {
         "events": {
             "items": {
