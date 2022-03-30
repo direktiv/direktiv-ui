@@ -205,7 +205,7 @@ function Variable(props) {
         <td className="muted-text show-variable">
             {obj.node.size <= 2500000 ? 
                 <Modal
-                    modalStyle={{width: "600px"}}
+                    modalStyle={{height: "90vh",width: "600px"}}
                     escapeToCancel
                     style={{
                         flexDirection: "row-reverse",
@@ -241,7 +241,7 @@ function Variable(props) {
                         ]
                     } 
                 >
-                    <FlexBox className="col gap" style={{fontSize: "12px", width: "580px", minHeight: "500px"}}>
+                    <FlexBox className="col gap" style={{fontSize: "12px",minHeight: "500px"}}>
                         <FlexBox className="gap" style={{flexGrow: 1}}>
                             <FlexBox style={{overflow:"hidden"}}>
                             {CanPreviewMimeType(mimeType) ?   
