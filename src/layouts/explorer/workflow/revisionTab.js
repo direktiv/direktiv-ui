@@ -99,8 +99,8 @@ function RevisionTab(props) {
                                         <Modal 
                                             style={{ justifyContent: "center" }}
                                             className="run-workflow-modal"
-                                            modalStyle={{color: "black"}}
-                                            title="Run Workflow"
+                                            modalStyle={{color: "black", width: "600px", minWidth:"30vw"}}
+                                            title="Run Workflow?"
                                             onClose={()=>{
                                                 setInput("{\n\t\n}")
                                                 setTabIndex(0)
@@ -137,7 +137,7 @@ function RevisionTab(props) {
                                                 </div>
                                             )}
                                         >
-                                        <FlexBox style={{ height: "45vh", width: "35vw", minWidth: "250px", minHeight: "200px" }}>
+                                        <FlexBox style={{ height: "45vh", minWidth: "250px", minHeight: "160px", overflow:"hidden" }}>
                                             <Tabs
                                                 id={"wf-execute-input"}
                                                 key={"inputForm"}
@@ -524,6 +524,7 @@ export function RevisionSelectorTab(props) {
                                         <FlexBox className="gap">
                                             {tags !== null && tags[obj.node.name] ? 
                                                 <Modal
+                                                    modalStyle={{width: "400px"}}
                                                     escapeToCancel
                                                     style={{
                                                         flexDirection: "row-reverse",
@@ -560,6 +561,7 @@ export function RevisionSelectorTab(props) {
                                                     style={{
                                                         flexDirection: "row-reverse",
                                                     }}
+                                                    modalStyle={{width: "400px"}}
                                                     title="Delete a revision"
                                                     button={(
                                                         <Button className="small light bold" title="Delete Revision">
@@ -595,6 +597,7 @@ export function RevisionSelectorTab(props) {
                                                     style={{
                                                         flexDirection: "row-reverse",
                                                     }}
+                                                    modalStyle={{width: "400px"}}
                                                     title={`Revert to ${obj.node.name}`}
                                                     button={(
                                                         <Button className="small light bold" >
@@ -662,6 +665,7 @@ function TagRevisionBtn(props) {
                 flexDirection: "row-reverse",
                 marginRight: "8px"
             }}
+            modalStyle={{width: "400px"}}
             title="Tag" 
             onClose={()=>{
                 setTag("")

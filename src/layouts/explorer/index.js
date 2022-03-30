@@ -289,6 +289,7 @@ function ExplorerList(props) {
                 <FlexBox className="gap" style={{flexDirection: "row-reverse"}}>
                     <ContentPanelHeaderButton className="explorer-action-btn">
                         <Modal title="New Workflow" 
+                            modalStyle={{width: "600px"}}
                             escapeToCancel
                             button={(
                                 <div style={{display:"flex"}}>
@@ -361,6 +362,7 @@ function ExplorerList(props) {
                     <ContentPanelHeaderButton className="explorer-action-btn">
                         <div>
                             <Modal title="New Directory" 
+                                modalStyle={{width: "240px"}}
                                 escapeToCancel
                                 button={(
                                     <div style={{display:"flex"}}>
@@ -534,6 +536,7 @@ function DirListItem(props) {
 
                         <Modal
                                 escapeToCancel
+                                modalStyle={{width: "240px"}}
                                 style={{
                                     flexDirection: "row-reverse",
                                 }}
@@ -637,6 +640,7 @@ function WorkflowListItem(props) {
                             <FlexBox onClick={(ev)=>ev.stopPropagation()}>
 
                                 <Modal
+                                        modalStyle={{width: "400px"}}
                                         escapeToCancel
                                         style={{
                                             flexDirection: "row-reverse",

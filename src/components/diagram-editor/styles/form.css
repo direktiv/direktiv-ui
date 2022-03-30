@@ -52,8 +52,8 @@
 /* Key Value: Align Remove Button to bottom of row*/
 #builder-page fieldset > .form-group.field.field-string:first-of-type  > .row > div:last-of-type{
     display: flex;
-    justify-content: end;
-    align-items: end;
+    justify-content: flex-end;
+    align-items: flex-end;
 }
 
 /* Key Value: Remove Button content*/

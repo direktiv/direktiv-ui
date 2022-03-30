@@ -393,7 +393,7 @@ function WorkingRevision(props) {
                                 : <Modal 
                                     style={{ justifyContent: "center" }}
                                     className="run-workflow-modal"
-                                    modalStyle={{color: "black"}}
+                                    modalStyle={{color: "black", width: "600px", minWidth:"30vw"}}
                                     title={`Run Workflow`}
                                     buttonDisabled={opLoadingStates["IsLoading"]}
                                     onClose={()=>{
@@ -432,7 +432,7 @@ function WorkingRevision(props) {
                                             </div>
                                     )}
                                 >
-                                    <FlexBox style={{ height: "45vh", width: "35vw", minWidth: "250px", minHeight: "200px" }}>
+                                    <FlexBox style={{ height: "45vh", minWidth: "250px", minHeight: "160px", overflow:"hidden" }}>
                                         <Tabs
                                             id={"wf-execute-input"}
                                             key={"inputForm"}

@@ -76,7 +76,7 @@
 
 #builder-page .node-labels > div{
     display: flex;
-    justify-content: start;
+    justify-content: flex-start;
     align-items: center;
     gap: 4px;
 }
@@ -118,7 +118,7 @@
     font-size: large;
     display: flex;
     justify-content: center;
-    align-items: end;
+    align-items: flex-end;
     height: 15px;
     width: 6px;
     padding: 4px;
@@ -207,7 +207,7 @@
 #builder-page .function {
     margin: 5px;
     display: flex;
-    justify-content: start;
+    justify-content: flex-start;
     align-items: center;
     border-radius: 4px;
     width: 100%;
