@@ -27,9 +27,9 @@ export const NodeErrorBlock = {
     info: {
         requiresInit: false,
         actions: true,
-        description: "DEBUG",
+        description: "Catches errors and routes the flow of the workflow depending on the error type.",
         longDescription: `DEBUG`,
-        link: ""
+        link: null
     },
     data: {
         schemaKey: 'specialSchemaError',
@@ -77,7 +77,7 @@ export const ActionsNodes = [
             actions: true,
             description: "The No-op State exists for when nothing more than generic state functionality is required.",
             longDescription: `The No-op State exists for when nothing more than generic state functionality is required. A common use-case would be to perform a jq operation on the state data without performing another operation.`,
-            link: ""
+            link: "https://docs.direktiv.io/v0.6.0/specification/#noopstate"
         },
         data: {
             schemaKey: 'stateSchemaNoop',
@@ -96,9 +96,9 @@ export const ActionsNodes = [
         info: {
             requiresInit: true,
             actions: true,
-            description: "todo",
+            description: "The ConsumeEvent State is the simplest state you can use to listen for CloudEvents in the middle of a workflow.",
             longDescription: `todo`,
-            link: ""
+            link: "https://docs.direktiv.io/v0.6.0/specification/#consumeeventstate"
         },
         data: {
             schemaKey: 'stateSchemaConsumeEvent',
@@ -111,15 +111,15 @@ export const ActionsNodes = [
         html: 'Consume Event State'
     },
     {
-        name: 'StateSchemaDelay',
+        name: 'StateDelay',
         family: "primitive",
         type: "delay",
         info: {
             requiresInit: true,
             actions: true,
-            description: "todo",
+            description: "The Delay State pauses execution of the workflow for a predefined length of time.",
             longDescription: `todo`,
-            link: ""
+            link: "https://docs.direktiv.io/v0.6.0/specification/#delaystate"
         },
         data: {
             schemaKey: 'stateSchemaDelay',
@@ -138,9 +138,9 @@ export const ActionsNodes = [
         info: {
             requiresInit: true,
             actions: true,
-            description: "todo",
+            description: "The Error State allows a subflow to throw an error, catchable by the calling workflow.",
             longDescription: `todo`,
-            link: ""
+            link: "https://docs.direktiv.io/v0.6.0/specification/#errorstate"
         },
         data: {
             schemaKey: 'stateSchemaError',
@@ -159,9 +159,9 @@ export const ActionsNodes = [
         info: {
             requiresInit: true,
             actions: true,
-            description: "todo",
+            description: "Halts execution until it receives a matching event for every event in defined in its events.",
             longDescription: `todo`,
-            link: ""
+            link: "https://docs.direktiv.io/v0.6.0/specification/#eventandstate"
         },
         data: {
             schemaKey: 'stateSchemaEventsAnd',
@@ -180,9 +180,9 @@ export const ActionsNodes = [
         info: {
             requiresInit: true,
             actions: true,
-            description: "todo",
+            description: "Halts execution until it receives any matching event defined in its events.",
             longDescription: `todo`,
-            link: ""
+            link: "https://docs.direktiv.io/v0.6.0/specification/#eventxorstate"
         },
         data: {
             schemaKey: 'stateSchemaEventXor',
@@ -201,9 +201,9 @@ export const ActionsNodes = [
         info: {
             requiresInit: true,
             actions: true,
-            description: "todo",
+            description: "The ForeachState can be used to split up state data into an array and then perform an action on each element in parallel.",
             longDescription: `todo`,
-            link: ""
+            link: "https://docs.direktiv.io/v0.6.0/specification/#foreachstate"
         },
         data: {
             schemaKey: 'stateSchemaForeach',
@@ -222,9 +222,9 @@ export const ActionsNodes = [
         info: {
             requiresInit: true,
             actions: true,
-            description: "todo",
+            description: "The GenerateEvent State will produce an event that other workflows could listen for.",
             longDescription: `todo`,
-            link: ""
+            link: "https://docs.direktiv.io/v0.6.0/specification/#generateeventstate"
         },
         data: {
             schemaKey: 'stateSchemaGenerateEvent',
@@ -243,9 +243,9 @@ export const ActionsNodes = [
         info: {
             requiresInit: true,
             actions: true,
-            description: "todo",
+            description: "The getter state is used to retrieve persistent data.",
             longDescription: `todo`,
-            link: ""
+            link: "https://docs.direktiv.io/v0.6.0/specification/#getterstate"
         },
         data: {
             schemaKey: 'stateSchemaGetter',
@@ -264,9 +264,9 @@ export const ActionsNodes = [
         info: {
             requiresInit: true,
             actions: true,
-            description: "todo",
+            description: "The setter state is used to store persistent data. ",
             longDescription: `todo`,
-            link: ""
+            link: "https://docs.direktiv.io/v0.6.0/specification/#setterstate"
         },
         data: {
             schemaKey: 'stateSchemaSetter',
@@ -286,9 +286,9 @@ export const ActionsNodes = [
         info: {
             requiresInit: true,
             actions: true,
-            description: "todo",
+            description: "The Validate State can be used to validate the structure of the state's data using a JSON schema.",
             longDescription: `todo`,
-            link: ""
+            link: "https://docs.direktiv.io/v0.6.0/specification/#validatestate"
         },
         data: {
             schemaKey: 'stateSchemaValidate',

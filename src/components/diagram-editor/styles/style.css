@@ -43,6 +43,9 @@
     height: 48px;
     display: flex;
     gap: 6px;
+
+    border-bottom: 0.6px solid #E9ECEF;
+    border-top: 0.6px solid #E9ECEF;
 }
 
 #builder-page .toolbar-btn {
@@ -80,6 +83,7 @@
     /* overflow: auto; */
     box-shadow: 0px 4px 12px rgba(8, 32, 50, 0.12);
     background: #FFFFFF;
+    border-top: 0.6px solid #E9ECEF;
 }
 
 #builder-page .panel.left {
@@ -129,13 +133,21 @@
 /* CONTEXT MENU */
 
 .context-menu {
-    font-size: 14px;
+    font-size: 13px;
     background-color: #fff;
     border-radius: 2px;
-    padding: 0px 2px 5px 2px;
-    width: 150px;
+    padding: 0px 4px 5px 4px;
+    width: 160px;
     height: auto;
-    margin: 0;
+    margin: 0px;
+    
+    background: #FFFFFF;
+    border: 1px solid #E9ECEF;
+    box-sizing: border-box;
+    box-shadow: 4px 4px 56px rgba(44, 57, 75, 0.12);
+    border-radius: 4px;
+
+
     /* use absolute positioning  */
     position: absolute;
     list-style: none;

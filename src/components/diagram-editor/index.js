@@ -55,10 +55,14 @@ function Actions(props) {
                                 <span style={{ whiteSpace: "pre-wrap", cursor: "move", fontSize: "13px", overflow: "hidden", textOverflow: "ellipsis" }}>
                                     {ActionsNodes[index].name}
                                 </span>
-                                <a style={{ whiteSpace: "nowrap", cursor: "pointer", fontSize: "11px", paddingRight: "3px", display: "flex", alignItems: "center", justifyContent: "center" }} href={`${ActionsNodes[index].info.link}`} target="_blank" rel="noreferrer">
-                                    <VscInfo />
-                                </a>
-
+                                {
+                                    ActionsNodes[index].info.link ?
+                                    <a style={{ whiteSpace: "nowrap", cursor: "pointer", fontSize: "11px", paddingRight: "3px", display: "flex", alignItems: "center", justifyContent: "center" }} href={`${ActionsNodes[index].info.link}`} target="_blank" rel="noreferrer">
+                                        <VscInfo />
+                                    </a>
+                                    :
+                                    <></>
+                                }
                             </div>
                             <div style={{ fontSize: "10px", lineHeight: "10px", paddingTop: "2px" }}>
                                 <p style={{ whiteSpace: "pre-wrap", cursor: "move", margin: "0px" }}>
@@ -473,7 +477,7 @@ export default function DiagramEditor(props) {
                         left: contextMenuAnchorPoint.x
                     }}
                 >
-                    <div style={{ textAlign: "center", padding: "2px" }}>
+                    <div style={{ textAlign: "center", padding: "4px 2px 4px 2px", fontWeight:"bold"}}>
                         Add Node
                     </div>
                     <input autoFocus type="search" id="fname" name="fname" onChange={(ev) => {
@@ -519,7 +523,7 @@ export default function DiagramEditor(props) {
                         left: contextMenuAnchorPoint.x
                     }}
                 >
-                    <div style={{ textAlign: "center", padding: "2px" }}>
+                    <div style={{ textAlign: "center", padding: "4px 2px 4px 2px", fontWeight:"bold" }}>
                         Node Options
                     </div>
                     <ul >
@@ -897,6 +901,8 @@ export default function DiagramEditor(props) {
 
                                     // Update form data into node
                                     diagramEditor.updateNodeDataFromId(updatedNode.id, updatedNode.data)
+
+                                    setSelectedNode(updatedNode)
 
                                     // Track that node has data set
                                     setNodeInitTracker((old) => {
