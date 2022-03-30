@@ -663,7 +663,6 @@ export default function DiagramEditor(props) {
                                     setError("Start Node is not connected to any node")
                                     return
                                 }
-                                rawData[output.connections[0].node].compiled = true
                                 startState = rawData[output.connections[0].node]
                                 wfData.start.state = startState.data.id
                                 console.log("--> Found startState = ", startState)
@@ -672,12 +671,8 @@ export default function DiagramEditor(props) {
                         }
 
                         // Set Transitions for main state flow
-                        console.log(" rawData = ", rawData)
                         setConnections(startState.id, startBlock.id, null, rawData, wfData)
                         wfData.states.reverse()
-                        console.log("wfData = ", wfData)
-                        console.log("---- Workflow ---")
-                        console.log(YAML.stringify(wfData))
 
 
                         

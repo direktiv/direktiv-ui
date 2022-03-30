@@ -103,15 +103,13 @@ function processArrayToObject(stateData, objectKey) {
 // Recursively walk through nodes and sets transitions of each state
 export function setConnections(nodeID, previousNodeID, previousState, rawData, wfData) {
 
-    // Stop recursive walk if previous node is not first connections
+    // Stop recursive walk node has already been compiled
     // If we dont do this we'll there is a chance that we create the same state multiple times
-    if (!isFirstConnection(nodeID, previousNodeID, rawData)) {
-        console.log("returning???")
+    if (rawData[nodeID].compiled) {
         return
     }
 
     // Use Custom connection callback logic if it exists for data type
-    console.log("rawData[nodeID].name = ", rawData[nodeID].name)
     rawData[nodeID].compiled = true
     let currentNode = rawData[nodeID]
     let connCallback = connectionsCallbackMap[currentNode.name]
@@ -186,9 +184,9 @@ const connectionsCallbackMap = {
 
         // Stop recursive walk if previous node is not first connections
         // If we dont do this we'll there is a chance that we create the same state multiple times
-        if (!isFirstConnection(nodeID, previousNodeID, rawData)) {
-            return
-        }
+        // if (!isFirstConnection(nodeID, previousNodeID, rawData)) {
+        //     return
+        // }
 
         console.log("outputKeys = ", outputKeys)
         console.log("rawData[nodeID] = ", rawData[nodeID])
@@ -210,9 +208,9 @@ const connectionsCallbackMap = {
     "StateSwitch": (nodeID, previousNodeID, previousState, rawData, wfData) => {
         // Stop recursive walk if previous node is not first connections
         // If we dont do this we'll there is a chance that we create the same state multiple times
-        if (!isFirstConnection(nodeID, previousNodeID, rawData)) {
-            return
-        }
+        // if (!isFirstConnection(nodeID, previousNodeID, rawData)) {
+        //     return
+        // }
 
         let state = { id: rawData[nodeID].data.id, type: rawData[nodeID].data.type, ...rawData[nodeID].data.formData }
         processTransform(state, "defaultTransform")
@@ -247,9 +245,9 @@ const connectionsCallbackMap = {
     "StateEventXor": (nodeID, previousNodeID, previousState, rawData, wfData) => {
         // Stop recursive walk if previous node is not first connections
         // If we dont do this we'll there is a chance that we create the same state multiple times
-        if (!isFirstConnection(nodeID, previousNodeID, rawData)) {
-            return
-        }
+        // if (!isFirstConnection(nodeID, previousNodeID, rawData)) {
+        //     return
+        // }
 
         let state = { id: rawData[nodeID].data.id, type: rawData[nodeID].data.type, ...rawData[nodeID].data.formData }
 
@@ -281,9 +279,9 @@ const connectionsCallbackMap = {
     "StateGenerateEvent": (nodeID, previousNodeID, previousState, rawData, wfData) => {
         // Stop recursive walk if previous node is not first connections
         // If we dont do this we'll there is a chance that we create the same state multiple times
-        if (!isFirstConnection(nodeID, previousNodeID, rawData)) {
-            return
-        }
+        // if (!isFirstConnection(nodeID, previousNodeID, rawData)) {
+        //     return
+        // }
 
         let state = { id: rawData[nodeID].data.id, type: rawData[nodeID].data.type, ...rawData[nodeID].data.formData }
 
@@ -297,9 +295,9 @@ const connectionsCallbackMap = {
     "StateSetter": (nodeID, previousNodeID, previousState, rawData, wfData) => {
         // Stop recursive walk if previous node is not first connections
         // If we dont do this we'll there is a chance that we create the same state multiple times
-        if (!isFirstConnection(nodeID, previousNodeID, rawData)) {
-            return
-        }
+        // if (!isFirstConnection(nodeID, previousNodeID, rawData)) {
+        //     return
+        // }
 
         let state = { id: rawData[nodeID].data.id, type: rawData[nodeID].data.type, ...rawData[nodeID].data.formData }
 
@@ -315,9 +313,9 @@ const connectionsCallbackMap = {
     "StateAction": (nodeID, previousNodeID, previousState, rawData, wfData) => {
         // Stop recursive walk if previous node is not first connections
         // If we dont do this we'll there is a chance that we create the same state multiple times
-        if (!isFirstConnection(nodeID, previousNodeID, rawData)) {
-            return
-        }
+        // if (!isFirstConnection(nodeID, previousNodeID, rawData)) {
+        //     return
+        // }
 
         let state = { id: rawData[nodeID].data.id, type: rawData[nodeID].data.type, ...rawData[nodeID].data.formData }
 
@@ -331,9 +329,9 @@ const connectionsCallbackMap = {
     "StateForeach": (nodeID, previousNodeID, previousState, rawData, wfData) => {
         // Stop recursive walk if previous node is not first connections
         // If we dont do this we'll there is a chance that we create the same state multiple times
-        if (!isFirstConnection(nodeID, previousNodeID, rawData)) {
-            return
-        }
+        // if (!isFirstConnection(nodeID, previousNodeID, rawData)) {
+        //     return
+        // }
 
         let state = { id: rawData[nodeID].data.id, type: rawData[nodeID].data.type, ...rawData[nodeID].data.formData }
 
@@ -347,9 +345,9 @@ const connectionsCallbackMap = {
     "StateValidate": (nodeID, previousNodeID, previousState, rawData, wfData) => {
         // Stop recursive walk if previous node is not first connections
         // If we dont do this we'll there is a chance that we create the same state multiple times
-        if (!isFirstConnection(nodeID, previousNodeID, rawData)) {
-            return
-        }
+        // if (!isFirstConnection(nodeID, previousNodeID, rawData)) {
+        //     return
+        // }
 
         let state = { id: rawData[nodeID].data.id, type: rawData[nodeID].data.type, ...rawData[nodeID].data.formData }
         state.schema = YAML.load(state.schema)
