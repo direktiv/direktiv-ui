@@ -419,7 +419,7 @@ export default function DiagramEditor(props) {
         justifyContent: "flex-start",
         flexDirection: "column",
         background: "#f0f0f0",
-        zIndex: 30,
+        zIndex: 10,
     };
 
     // Update Context Menu results
