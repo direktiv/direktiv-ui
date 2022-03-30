@@ -314,18 +314,6 @@ function WorkingRevision(props) {
     },[wf, workflow, load])
 
     useEffect(()=>{
-        console.log("wf changed = ", wf)
-    },[workflow])
-
-    useEffect(()=>{
-        console.log("oldWf changed = ", oldWf)
-    },[oldWf])
-
-    useEffect(()=>{
-        console.log("wf changed = ", wf)
-    },[oldWf])
-   
-    useEffect(()=>{
         if (oldWf !== wf) {
             setWorkflow(wf)
             setOldWf(wf)

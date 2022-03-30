@@ -39,8 +39,8 @@
 }
 
 /* Special Node Type[CATCH] Variables */
-.node.special.type-catch{
-    --background: #ffeebc ;
+.node.special.type-catch {
+    --background: #ffeebc;
     --box-shadow: 1px 2px 5px rgba(86, 104, 117, 0.11);
     --border: 1px solid #e1e1cf;
 }
@@ -52,8 +52,8 @@
     border: var(--border);
 
     border-radius: 4px;
-    font-size:  var(--font-size);
-    line-height:  var(--line-height);
+    font-size: var(--font-size);
+    line-height: var(--line-height);
 
     width: var(--width);
     min-height: var(--height);
@@ -74,14 +74,14 @@
     gap: 4px;
 }
 
-#builder-page .node-labels > div{
+#builder-page .node-labels>div {
     display: flex;
     justify-content: flex-start;
     align-items: center;
     gap: 4px;
 }
 
-#builder-page .node-labels .label-id{
+#builder-page .node-labels .label-id {
     color: #3E94C5;
     font-weight: 700;
 
@@ -97,7 +97,7 @@
     overflow: hidden;
 }
 
-#builder-page .node-labels .label-type{
+#builder-page .node-labels .label-type {
     color: #082032;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -111,7 +111,7 @@
     align-items: center;
 }
 
-#builder-page .node-actions .node-btn{
+#builder-page .node-actions .node-btn {
     color: #566875;
     font-weight: bolder;
     writing-mode: vertical-rl;
@@ -125,11 +125,11 @@
     cursor: pointer;
 }
 
-#builder-page .node-actions .node-btn:hover{
+#builder-page .node-actions .node-btn:hover {
     color: #7a94a7;
 }
 
-#builder-page .parent-drawflow{
+#builder-page .parent-drawflow {
     background-size: 25px 25px;
     background-image: linear-gradient(to right, #E7EAED 1px, transparent 1px), linear-gradient(to bottom, #E7EAED 1px, transparent 1px);
 }
@@ -137,12 +137,12 @@
 
 /* NODE CONNECTIONS */
 
-#builder-page .connection .main-path{
+#builder-page .connection .main-path {
     stroke: var(--connection-path-colour);
     stroke-width: var(--connection-path-width);
 }
 
-#builder-page .connection .main-path:hover{
+#builder-page .connection .main-path:hover {
     stroke: #a3a3a3;
 }
 
@@ -215,8 +215,8 @@
     background: var(--background);
     box-shadow: var(--box-shadow);
     border: var(--border);
-    font-size:  var(--font-size);
-    line-height:  var(--line-height);
+    font-size: var(--font-size);
+    line-height: var(--line-height);
 }
 
 

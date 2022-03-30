@@ -1,13 +1,13 @@
 import YAML from 'js-yaml'
 
-export function nodeGetInputConnections(node){
+export function nodeGetInputConnections(node) {
     let inputs = {}
 
     if (node) {
         return undefined
     }
 
-    if (node.inputs){
+    if (node.inputs) {
         return undefined
     }
 
@@ -61,25 +61,24 @@ function processTransform(stateData, transformKey) {
     const keyValue = stateData[transformKey]["keyValue"] ? stateData[transformKey]["keyValue"] : {}
     const jqQuery = stateData[transformKey]["jqQuery"] ? stateData[transformKey]["jqQuery"] : ""
     const rawYAML = stateData[transformKey]["rawYAML"] ? stateData[transformKey]["rawYAML"] : ""
-    console.log("stateData[transformKey] = ", stateData[transformKey])
-    
+
     delete stateData[transformKey]["keyValue"]
     delete stateData[transformKey]["jqQuery"]
     delete stateData[transformKey]["selectionType"]
     delete stateData[transformKey]["rawYAML"]
 
     if (selectionType && selectionType === "Key Value") {
-        stateData[transformKey] = {...keyValue}
-    }   else if (selectionType && selectionType === "YAML") {
+        stateData[transformKey] = { ...keyValue }
+    } else if (selectionType && selectionType === "YAML") {
         stateData[transformKey] = YAML.load(rawYAML)
     } else if (selectionType && selectionType === "JQ Query") {
         stateData[transformKey] = jqQuery
     }
 
-    if (stateData[transformKey] === "" || stateData[transformKey] === {}){
+    if (stateData[transformKey] === "" || stateData[transformKey] === {}) {
         delete stateData[transformKey]
     }
-    
+
     return
 }
 
@@ -94,9 +93,9 @@ function processArrayToObject(stateData, objectKey) {
     } else if (Array.isArray(oldArray)) {
         delete stateData[objectKey]
 
-        stateData[objectKey] = {...oldArray[0]}
+        stateData[objectKey] = { ...oldArray[0] }
     }
-    
+
     return
 }
 
@@ -133,7 +132,7 @@ export function setConnections(nodeID, previousNodeID, previousState, rawData, w
 function processConnection(nodeID, rawData, state, wfData) {
     const currentNode = rawData[nodeID]
     const outputKeys = Object.keys(rawData[nodeID].outputs)
-    
+
     // Default connections logic
     for (let i = 0; i < outputKeys.length; i++) {
         const outputID = outputKeys[i];
@@ -141,11 +140,10 @@ function processConnection(nodeID, rawData, state, wfData) {
         if (Object.hasOwnProperty.call(currentNode.outputs, outputID)) {
             const output = currentNode.outputs[outputID];
             if (output.connections.length > 0) {
-                console.log("output.connections = ", output.connections)
                 const nextNode = rawData[output.connections[0].node]
 
                 // Only use first node output connection for transition
-                if (i === 0){
+                if (i === 0) {
                     state.transition = nextNode.data.id
                 }
 
@@ -166,7 +164,7 @@ const connectionsCallbackMap = {
         // Add transitions to catched errors if connections are set
         for (let i = 0; i < outputKeys.length; i++) {
             const outputID = outputKeys[i];
-            
+
             if (Object.hasOwnProperty.call(rawData[nodeID].outputs, outputID)) {
                 const output = rawData[nodeID].outputs[outputID];
                 if (output.connections.length > 0) {
@@ -182,19 +180,10 @@ const connectionsCallbackMap = {
             previousState.catch = stateCatch
         }
 
-        // Stop recursive walk if previous node is not first connections
-        // If we dont do this we'll there is a chance that we create the same state multiple times
-        // if (!isFirstConnection(nodeID, previousNodeID, rawData)) {
-        //     return
-        // }
-
-        console.log("outputKeys = ", outputKeys)
-        console.log("rawData[nodeID] = ", rawData[nodeID])
         for (let i = 0; i < outputKeys.length; i++) {
             const outputID = outputKeys[i];
             if (Object.hasOwnProperty.call(rawData[nodeID].outputs, outputID)) {
                 const output = rawData[nodeID].outputs[outputID];
-                console.log("output = ", output)
 
                 if (output.connections.length > 0) {
                     setConnections(output.connections[0].node, nodeID, previousState, rawData, wfData)
@@ -206,12 +195,6 @@ const connectionsCallbackMap = {
 
     },
     "StateSwitch": (nodeID, previousNodeID, previousState, rawData, wfData) => {
-        // Stop recursive walk if previous node is not first connections
-        // If we dont do this we'll there is a chance that we create the same state multiple times
-        // if (!isFirstConnection(nodeID, previousNodeID, rawData)) {
-        //     return
-        // }
-
         let state = { id: rawData[nodeID].data.id, type: rawData[nodeID].data.type, ...rawData[nodeID].data.formData }
         processTransform(state, "defaultTransform")
 
@@ -233,7 +216,7 @@ const connectionsCallbackMap = {
                     }
 
                     processTransform(state.conditions[i], "transform")
-                    
+
                     setConnections(output.connections[0].node, nodeID, state, rawData, wfData)
                 }
             }
@@ -243,12 +226,6 @@ const connectionsCallbackMap = {
         wfData.states.push(state)
     },
     "StateEventXor": (nodeID, previousNodeID, previousState, rawData, wfData) => {
-        // Stop recursive walk if previous node is not first connections
-        // If we dont do this we'll there is a chance that we create the same state multiple times
-        // if (!isFirstConnection(nodeID, previousNodeID, rawData)) {
-        //     return
-        // }
-
         let state = { id: rawData[nodeID].data.id, type: rawData[nodeID].data.type, ...rawData[nodeID].data.formData }
 
         for (let i = 0; i < state.events.length; i++) {
@@ -277,15 +254,8 @@ const connectionsCallbackMap = {
         wfData.states.push(state)
     },
     "StateGenerateEvent": (nodeID, previousNodeID, previousState, rawData, wfData) => {
-        // Stop recursive walk if previous node is not first connections
-        // If we dont do this we'll there is a chance that we create the same state multiple times
-        // if (!isFirstConnection(nodeID, previousNodeID, rawData)) {
-        //     return
-        // }
-
         let state = { id: rawData[nodeID].data.id, type: rawData[nodeID].data.type, ...rawData[nodeID].data.formData }
 
-        console.log("state.event.data = ", state.event)
         processTransform(state.event, "data")
         processTransform(state, "transform")
 
@@ -293,12 +263,6 @@ const connectionsCallbackMap = {
         processConnection(nodeID, rawData, state, wfData)
     },
     "StateSetter": (nodeID, previousNodeID, previousState, rawData, wfData) => {
-        // Stop recursive walk if previous node is not first connections
-        // If we dont do this we'll there is a chance that we create the same state multiple times
-        // if (!isFirstConnection(nodeID, previousNodeID, rawData)) {
-        //     return
-        // }
-
         let state = { id: rawData[nodeID].data.id, type: rawData[nodeID].data.type, ...rawData[nodeID].data.formData }
 
         for (let i = 0; i < state.variables.length; i++) {
@@ -311,12 +275,6 @@ const connectionsCallbackMap = {
         processConnection(nodeID, rawData, state, wfData)
     },
     "StateAction": (nodeID, previousNodeID, previousState, rawData, wfData) => {
-        // Stop recursive walk if previous node is not first connections
-        // If we dont do this we'll there is a chance that we create the same state multiple times
-        // if (!isFirstConnection(nodeID, previousNodeID, rawData)) {
-        //     return
-        // }
-
         let state = { id: rawData[nodeID].data.id, type: rawData[nodeID].data.type, ...rawData[nodeID].data.formData }
 
         processArrayToObject(state.action, "retries")
@@ -327,12 +285,6 @@ const connectionsCallbackMap = {
         processConnection(nodeID, rawData, state, wfData)
     },
     "StateForeach": (nodeID, previousNodeID, previousState, rawData, wfData) => {
-        // Stop recursive walk if previous node is not first connections
-        // If we dont do this we'll there is a chance that we create the same state multiple times
-        // if (!isFirstConnection(nodeID, previousNodeID, rawData)) {
-        //     return
-        // }
-
         let state = { id: rawData[nodeID].data.id, type: rawData[nodeID].data.type, ...rawData[nodeID].data.formData }
 
         processArrayToObject(state.action, "retries")
@@ -343,12 +295,6 @@ const connectionsCallbackMap = {
         processConnection(nodeID, rawData, state, wfData)
     },
     "StateValidate": (nodeID, previousNodeID, previousState, rawData, wfData) => {
-        // Stop recursive walk if previous node is not first connections
-        // If we dont do this we'll there is a chance that we create the same state multiple times
-        // if (!isFirstConnection(nodeID, previousNodeID, rawData)) {
-        //     return
-        // }
-
         let state = { id: rawData[nodeID].data.id, type: rawData[nodeID].data.type, ...rawData[nodeID].data.formData }
         state.schema = YAML.load(state.schema)
 
@@ -357,27 +303,8 @@ const connectionsCallbackMap = {
     },
 }
 
-// isFirstConnection : Returns true if the previous node is the current nodes first connection
-function isFirstConnection(nodeID, previousNodeID, rawData) {
-    if (!previousNodeID) {
-        return true
-    }
-    return (rawData[nodeID].inputs["input_1"].connections[0].node === `${previousNodeID}`)
-}
-
 export function DefaultValidateSubmitCallbackMap(formData) {
     validateFormTransform(formData.transform)
-    // console.log("formData.transform = ", formData.transform)
-    // if (formData.transform && formData.transform.selectionType && formData.transform.selectionType === "YAML" && formData.transform.rawYAML !== "") {
-    //     try {
-    //         console.log("attempting to load yaml")
-    //         let test = YAML.load(formData.transform.rawYAML)
-    //         console.log("attempting to load yaml post = ", test)
-    //     } catch (e) {
-    //         console.log("FAILED TO LOAD YAML = ", e)
-    //         throw Error(`Invalid Raw YAML: ${e.reason}`)
-    //     }
-    // }
 }
 
 function validateFormTransform(formTransformData) {
@@ -387,11 +314,8 @@ function validateFormTransform(formTransformData) {
 
     if (formTransformData.selectionType && formTransformData.selectionType === "YAML" && formTransformData.rawYAML !== "") {
         try {
-            console.log("attempting to load yaml")
-            let test = YAML.load(formTransformData.rawYAML)
-            console.log("attempting to load yaml post = ", test)
+            YAML.load(formTransformData.rawYAML)
         } catch (e) {
-            console.log("FAILED TO LOAD YAML = ", e)
             throw Error(`Invalid Raw YAML: ${e.reason}`)
         }
     }
@@ -425,7 +349,7 @@ export const onValidateSubmitCallbackMap = {
     "StateValidate": (formData) => {
         try {
             YAML.load(formData.schema)
-        } catch (e){
+        } catch (e) {
             throw Error(`Validate Schema Invalid: ${e.reason}`)
         }
     },
@@ -447,7 +371,7 @@ export const onSubmitCallbackMap = {
         for (let i = conditionsLength; i < outputLen; i++) {
             diagramEditor.removeNodeOutput(node.id, `output_${i + 2}`)
         }
-        
+
     },
     "StateEventXor": (nodeID, diagramEditor) => {
         const node = diagramEditor.getNodeFromId(nodeID)
@@ -463,7 +387,7 @@ export const onSubmitCallbackMap = {
         for (let i = eventsLength; i < outputLen; i++) {
             diagramEditor.removeNodeOutput(node.id, `output_${i + 1}`)
         }
-        
+
     },
     "CatchError": (nodeID, diagramEditor) => {
         const node = diagramEditor.getNodeFromId(nodeID)
@@ -479,23 +403,21 @@ export const onSubmitCallbackMap = {
         for (let i = errorsLength; i < outputLen; i++) {
             diagramEditor.removeNodeOutput(node.id, `output_${i}`)
         }
-        
+
     }
 }
 
 
 export function CreateNode(diagramEditor, node, clientX, clientY, rawXY) {
     var newNodeHTML
-    console.log("node = ", node)
-
     let posX = clientX
     let posY = clientY
 
     // Optional Coordinates processing.
-    if (!rawXY){
+    if (!rawXY) {
         posX = clientX * (diagramEditor.precanvas.clientWidth / (diagramEditor.precanvas.clientWidth * diagramEditor.zoom)) - (diagramEditor.precanvas.getBoundingClientRect().x * (diagramEditor.precanvas.clientWidth / (diagramEditor.precanvas.clientWidth * diagramEditor.zoom)));
         posY = clientY * (diagramEditor.precanvas.clientHeight / (diagramEditor.precanvas.clientHeight * diagramEditor.zoom)) - (diagramEditor.precanvas.getBoundingClientRect().y * (diagramEditor.precanvas.clientHeight / (diagramEditor.precanvas.clientHeight * diagramEditor.zoom)));
-    
+
     }
 
     // Generate HTML

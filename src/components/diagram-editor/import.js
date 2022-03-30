@@ -1,6 +1,6 @@
 import { ActionsNodes, NodeErrorBlock, NodeStartBlock } from "./nodes";
 import YAML from 'js-yaml'
-import prettyYAML, { stringify } from "json-to-pretty-yaml"
+import prettyYAML from "json-to-pretty-yaml"
 import { CreateNode } from "./util";
 
 export function importFromYAML(diagramEditor, setFunctions, wfYAML) {
@@ -64,20 +64,20 @@ export function importFromYAML(diagramEditor, setFunctions, wfYAML) {
         if (state.catch) {
             pos.x += 220
             let errorNode = JSON.parse(JSON.stringify(NodeErrorBlock))
-            const catchNodeRef = `SPECIAL-ERROR: `+state.id
+            const catchNodeRef = `SPECIAL-ERROR: ` + state.id
             errorNode.data.formData = state.catch
             errorNode.connections.output = state.catch.length
             errorNode.data.init = true
             const catchNodeID = CreateNode(diagramEditor, errorNode, pos.x, pos.y, true)
             nodeIDToStateIDMap[catchNodeRef] = catchNodeID
 
-            catchNodes.push({id: catchNodeID, catch: state.catch})
+            catchNodes.push({ id: catchNodeID, catch: state.catch })
         }
 
         nodeIDToStateIDMap[state.id] = nodeID
     }
 
-    
+
     // Connect Start Node to first state
     if (startNode.data.formData.state) {
         const firstNodeID = nodeIDToStateIDMap[startNode.data.formData.state]
@@ -91,7 +91,7 @@ export function importFromYAML(diagramEditor, setFunctions, wfYAML) {
     for (let i = 0; i < wfData.states.length; i++) {
         const state = wfData.states[i];
         const nodeID = nodeIDToStateIDMap[state.id]
-        const catchNodeRef = `SPECIAL-ERROR: `+state.id
+        const catchNodeRef = `SPECIAL-ERROR: ` + state.id
         const node = diagramEditor.getNodeFromId(nodeID)
 
         if (state.catch) {
@@ -108,19 +108,16 @@ export function importFromYAML(diagramEditor, setFunctions, wfYAML) {
         // Default Add Connections
         if (state.transition) {
             const nextNodeID = nodeIDToStateIDMap[state.transition]
-            console.log("nextNodeID = ", nodeIDToStateIDMap)
             diagramEditor.addConnection(nodeID, nextNodeID, 'output_1', 'input_1')
         }
     }
 
     for (let i = 0; i < catchNodes.length; i++) {
         const catchNode = catchNodes[i]
-        console.log("catchNode = ", catchNode)
         for (let j = 0; j < catchNode.catch.length; j++) {
             const err = catchNode.catch[j];
             const nextNodeID = nodeIDToStateIDMap[err.transition]
-            console.log("nextNodeID = ", nextNodeID)
-            diagramEditor.addConnection(catchNode.id, nextNodeID, `output_${j+1}`, 'input_1')
+            diagramEditor.addConnection(catchNode.id, nextNodeID, `output_${j + 1}`, 'input_1')
         }
     }
     // TODO: Sort with dagrejs
@@ -184,7 +181,7 @@ const importConnectionsCallbackMap = {
     // }
 }
 
-const objectDepth = (o) => Object (o) === o ? 1 + Math .max (-1, ... Object .values(o) .map (objectDepth)) : 0
+const objectDepth = (o) => Object(o) === o ? 1 + Math.max(-1, ...Object.values(o).map(objectDepth)) : 0
 
 function importDefaultProcessTransformCallback(state, transformKey) {
     const oldTransform = state[transformKey]
@@ -199,12 +196,12 @@ function importDefaultProcessTransformCallback(state, transformKey) {
         if (transformDepth > 1) {
             state[transformKey] = {
                 selectionType: "YAML",
-                "rawYAML":  prettyYAML.stringify(oldTransform)
+                "rawYAML": prettyYAML.stringify(oldTransform)
             }
         } else {
             state[transformKey] = {
                 selectionType: "Key Value",
-                "keyValue":  oldTransform
+                "keyValue": oldTransform
             }
         }
     } else {

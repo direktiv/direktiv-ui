@@ -1,10 +1,10 @@
-#builder-page fieldset .form-group.field.field-string > .row {
+#builder-page fieldset .form-group.field.field-string>.row {
     display: flex;
 }
 
 /* Key Value: multi-row style */
-#builder-page fieldset .form-group.field.field-string > .row > .form-additional{
-    flex:1;
+#builder-page fieldset .form-group.field.field-string>.row>.form-additional {
+    flex: 1;
     align-self: end;
     width: 10%;
     min-width: 100px;
@@ -12,18 +12,18 @@
 }
 
 /* Key Value: Value Column */
-#builder-page fieldset .form-group.field.field-string > .row > .form-group.form-additional{
-    flex:4;
+#builder-page fieldset .form-group.field.field-string>.row>.form-group.form-additional {
+    flex: 4;
     align-self: end;
 }
 
 /* Key Value: Hide Labels */
-#builder-page fieldset .form-group.field.field-string > .row label{
+#builder-page fieldset .form-group.field.field-string>.row label {
     display: none;
 }
 
 /* Key Value: UnHide First Label Set*/
-#builder-page fieldset > .form-group.field.field-string:first-of-type  > .row label{
+#builder-page fieldset>.form-group.field.field-string:first-of-type>.row label {
     display: unset;
     visibility: hidden;
     position: relative;
@@ -32,49 +32,49 @@
 }
 
 /* Key Value: Change First Label Set Label to 'Key' */
-#builder-page fieldset > .form-group.field.field-string:first-of-type  > .row  .form-additional label:after{
+#builder-page fieldset>.form-group.field.field-string:first-of-type>.row .form-additional label:after {
     visibility: visible;
     position: absolute;
     top: 0;
     left: 0;
-    content:'Key';
+    content: 'Key';
 }
 
 /* Key Value: Change First Label Set Label to 'Value' */
-#builder-page fieldset > .form-group.field.field-string:first-of-type  > .row  .form-group.form-additional label:after{
+#builder-page fieldset>.form-group.field.field-string:first-of-type>.row .form-group.form-additional label:after {
     visibility: visible;
     position: absolute;
     top: 0;
     left: 0;
-    content:'Value';
+    content: 'Value';
 }
 
 /* Key Value: Align Remove Button to bottom of row*/
-#builder-page fieldset > .form-group.field.field-string:first-of-type  > .row > div:last-of-type{
+#builder-page fieldset>.form-group.field.field-string:first-of-type>.row>div:last-of-type {
     display: flex;
     justify-content: flex-end;
     align-items: flex-end;
 }
 
 /* Key Value: Remove Button content*/
-#builder-page fieldset .form-group.field.field-string > div .glyphicon-remove::before{
+#builder-page fieldset .form-group.field.field-string>div .glyphicon-remove::before {
     content: "X";
 }
 
 /* Key Value: Remove Button Wrapper height*/
-#builder-page fieldset .form-group.field.field-string > div .btn.btn-danger{
-    height:33px;
+#builder-page fieldset .form-group.field.field-string>div .btn.btn-danger {
+    height: 33px;
 }
 
 /* Form Input Field: Add Button Content*/
-#builder-page fieldset .glyphicon-plus::before{
-    content: "+ Add Items";    
+#builder-page fieldset .glyphicon-plus::before {
+    content: "+ Add Items";
     color: #3E94C5;
     font-size: 14px;
 }
 
 /* Form Input Field: Add Button Wrapper*/
-#builder-page fieldset .btn-add{
+#builder-page fieldset .btn-add {
     width: 100%;
     border: 1px solid #D4E6F0;
     background: rgba(62, 148, 197, 0.03);
@@ -86,7 +86,7 @@
 }
 
 /* Form Input Field: Set gap between buttons in a single row*/
-#builder-page fieldset .btn-group{
+#builder-page fieldset .btn-group {
     gap: 16px;
 }
 
@@ -97,24 +97,24 @@
     gap: 12px;
 }
 
-#builder-page fieldset div.field{
+#builder-page fieldset div.field {
     padding-bottom: 12px;
 }
 
-#builder-page fieldset div.field.field-object{
+#builder-page fieldset div.field.field-object {
     padding-bottom: 0px;
 }
 
-#builder-page fieldset div.row > p{
+#builder-page fieldset div.row>p {
     margin: 0px;
 }
 
-#builder-page fieldset div.row > p{
+#builder-page fieldset div.row>p {
     margin: 0px;
 }
 
 /* Form Input Field: text input styling. This style is also used on the edit nodeid-input*/
-#builder-page fieldset input[type="text"], .nodeid-input{
+#builder-page fieldset input[type="text"], .nodeid-input {
     height: calc(33px - (0.65*2px));
     line-height: 17px;
     padding-top: 0px;
@@ -122,13 +122,13 @@
 }
 
 /* Form Input Field: dropdown style*/
-#builder-page fieldset select{
+#builder-page fieldset select {
     height: 33px;
     line-height: 17px;
 }
 
 /* Form Input Field: Remove Button Wrapper*/
-#builder-page fieldset .btn-group .btn-danger{
+#builder-page fieldset .btn-group .btn-danger {
     width: 100%;
     background: rgba(236, 79, 121, 0.02);
     border: 1px solid #FFDFE7;
@@ -140,16 +140,16 @@
     line-height: 17px;
 }
 
-#builder-page fieldset .glyphicon-arrow-up::before{
-    color:  #566875;
+#builder-page fieldset .glyphicon-arrow-up::before {
+    color: #566875;
 }
 
-#builder-page fieldset .glyphicon-arrow-down::before{
-    color:  #566875;
+#builder-page fieldset .glyphicon-arrow-down::before {
+    color: #566875;
 }
 
 /* Form Input Field: Default Button Wrapper*/
-#builder-page fieldset .btn-default{
+#builder-page fieldset .btn-default {
     width: 100%;
     background: #FFFFFF;
     border: 1px solid #DBE2EA;
@@ -162,13 +162,13 @@
 }
 
 /* Form Input Field: Remove Button Style*/
-#builder-page fieldset .btn-group .btn-danger .glyphicon-remove::before{
+#builder-page fieldset .btn-group .btn-danger .glyphicon-remove::before {
     color: #EC4F79;
     font-size: 14px;
 }
 
 /* Form Input Field: Add padding to the bottom of array elements to create a gap between buttons and array*/
-#builder-page fieldset div.row.array-item-list > .array-item:last-of-type {
+#builder-page fieldset div.row.array-item-list>.array-item:last-of-type {
     padding-bottom: 12px;
 }
 

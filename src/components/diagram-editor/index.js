@@ -1,14 +1,12 @@
-import { useGlobalServices, useNamespaceVariables, useNamespaceServices, useNodes } from 'direktiv-react-hooks';
+import { useGlobalServices, useNamespaceServices, useNodes } from 'direktiv-react-hooks';
 import { useCallback, useEffect, useState } from 'react';
 import { VscGear, VscListUnordered, VscSymbolEvent, VscInfo } from 'react-icons/vsc';
-import Button from '../../components/button';
 import Alert from '../../components/alert';
 import FlexBox from '../../components/flexbox';
 import { Config } from '../../util';
 import Drawflow from 'drawflow';
 import { Resizable } from 're-resizable';
-import YAML from "json-to-pretty-yaml"
-import { DefaultSchemaUI, GenerateFunctionSchemaWithEnum, GetSchema, getSchemaCallbackMap, getSchemaDefault, SchemaUIMap } from "../../components/diagram-editor/jsonSchema"
+import { DefaultSchemaUI, GenerateFunctionSchemaWithEnum, getSchemaCallbackMap, getSchemaDefault, SchemaUIMap } from "../../components/diagram-editor/jsonSchema"
 import Form from '@rjsf/core';
 import { CreateNode, DefaultValidateSubmitCallbackMap, nodeGetInputConnections, onSubmitCallbackMap, onValidateSubmitCallbackMap, setConnections } from '../../components/diagram-editor/util';
 import { AutoSizer, CellMeasurer, CellMeasurerCache, List } from 'react-virtualized';
@@ -50,21 +48,15 @@ function Actions(props) {
                 <div style={{ ...style, minHeight: "90px", height: "90px", cursor: "move", userSelect: "none", display: "flex" }}>
                     <div className={`action ${ActionsNodes[index].family} action-${ActionsNodes[index].type}`} draggable={true} node-index={index} onDragStart={(ev) => {
                         ev.stopPropagation();
-
-                        console.log("onDragStart = ", ev);
-                        console.log("ev.target.getAttribute(node-index) = ", ev.target.getAttribute("node-index"))
                         ev.dataTransfer.setData("nodeIndex", ev.target.getAttribute("node-index"));
-                        // ev.preventDefault();
-
-
                     }}>
                         <div style={{ marginLeft: "5px", marginRight: "2px" }}>
                             <div style={{ display: "flex", borderBottom: "1px solid #e5e5e5", justifyContent: "space-between" }}>
-                                <span style={{ whiteSpace: "pre-wrap", cursor: "move", fontSize: "13px", overflow:"hidden", textOverflow: "ellipsis" }}>
+                                <span style={{ whiteSpace: "pre-wrap", cursor: "move", fontSize: "13px", overflow: "hidden", textOverflow: "ellipsis" }}>
                                     {ActionsNodes[index].name}
                                 </span>
-                                <a style={{ whiteSpace: "nowrap", cursor: "pointer", fontSize: "11px", paddingRight: "3px", display:"flex", alignItems:"center", justifyContent:"center" }} href={`${ActionsNodes[index].info.link}`} target="_blank" rel="noreferrer">
-                                <VscInfo/>
+                                <a style={{ whiteSpace: "nowrap", cursor: "pointer", fontSize: "11px", paddingRight: "3px", display: "flex", alignItems: "center", justifyContent: "center" }} href={`${ActionsNodes[index].info.link}`} target="_blank" rel="noreferrer">
+                                    <VscInfo />
                                 </a>
 
                             </div>
@@ -104,22 +96,13 @@ function Actions(props) {
 function FunctionsList(props) {
     const { functionList, setFunctionList, namespace, functionDrawerWidth } = props
 
-    // const [functionList, setFunctionList] = useState([])
     const [newFunctionFormRef, setNewFunctionFormRef] = useState(null)
     const [formData, setFormData] = useState({})
-    // const {data} = useNamespaceServices(Config.url, false, namespace, localStorage.getItem("apikey"))
-
 
     const namespaceServiceHook = useNamespaceServices(Config.url, false, namespace, localStorage.getItem("apikey"))
     const globalServiceHook = useGlobalServices(Config.url, false, localStorage.getItem("apikey"))
     const namespaceNodesHook = useNodes(Config.url, false, namespace, "/", localStorage.getItem("apikey"), "first=20")
 
-    // const namespaceVariableHook = useNamespaceVariables(Config.url, false, namespace, localStorage.getItem("apikey"))
-
-    useEffect(() => {
-        console.log("mounting functions list")
-        return () => { console.log("unmounting functions list") };
-    }, [])
 
     if (namespaceServiceHook.data === null || globalServiceHook.data === null || namespaceNodesHook.data === null) {
         return <></>
@@ -156,7 +139,7 @@ function FunctionsList(props) {
                     }}>
                         <div class="node-labels" style={{ display: "flex", gap: "4px", flexDirection: "column", marginLeft: "5px" }}>
                             <div>
-                                ID: <span class="label-id" style={{maxWidth: functionDrawerWidth-50}}>{functionList[index].id}</span>
+                                ID: <span class="label-id" style={{ maxWidth: functionDrawerWidth - 50 }}>{functionList[index].id}</span>
                             </div>
                             <div>
                                 Type: <span class="label-type">{functionList[index].type}</span>
@@ -165,7 +148,7 @@ function FunctionsList(props) {
                                 {functionList[index].service ? `Service:` : ""}
                                 {functionList[index].image ? `Image:` : ""}
                                 {functionList[index].workflow ? `Workflow:` : ""}
-                                <span style={{maxWidth: functionDrawerWidth-80}} class="label-type">
+                                <span style={{ maxWidth: functionDrawerWidth - 80 }} class="label-type">
                                     {functionList[index].service ? `${functionList[index].service}` : ""}
                                     {functionList[index].image ? `${functionList[index].image}` : ""}
                                     {functionList[index].workflow ? `${functionList[index].workflow}` : ""}
@@ -309,14 +292,14 @@ export default function DiagramEditor(props) {
     const [contextMenuResults, setContextMenuResults] = useState(ActionsNodes)
 
     // Context menu to edit nodes
-    const [showNodeContextMenu, setShowNodeContextMenu] = useState(false);    
+    const [showNodeContextMenu, setShowNodeContextMenu] = useState(false);
 
     useEffect(() => {
         if (selectedNode) {
             const getSchema = getSchemaCallbackMap[selectedNode.data.schemaKey]
             if (getSchema) {
                 setSelectedNodeSchema(getSchema(selectedNode.data.schemaKey, functionList))
-            } else {                                    
+            } else {
                 setSelectedNodeSchema(getSchemaDefault(selectedNode.data.schemaKey))
             }
 
@@ -325,7 +308,7 @@ export default function DiagramEditor(props) {
             const schemaUI = SchemaUIMap[selectedNode.data.schemaKey]
             if (schemaUI) {
                 setSelectedNodeSchemaUI(schemaUI)
-            } else {                                
+            } else {
                 // Clear UI schema  
                 setSelectedNodeSchemaUI(DefaultSchemaUI)
             }
@@ -345,7 +328,7 @@ export default function DiagramEditor(props) {
             setOldSelectedNodeFormData(node.data.formData)
         })
 
-        editor.on("connectionCreated", function(ev){
+        editor.on("connectionCreated", function (ev) {
             // Handle Special cases where we need to remove or adjust connections
             // INFO: Connections are created from output to input
             // E.g. {[input_1]NodeA[output_1]}--->{[input_1]NodeB[output_1]}
@@ -357,7 +340,7 @@ export default function DiagramEditor(props) {
 
             // XOR has no default transition so output_1 will be used for errors
             // TODO: It might be worth generating error output class from "output" + node.info.output
-            if (outNode.name ==="StateEventXor") {
+            if (outNode.name === "StateEventXor") {
                 errorOutput = "output_1"
             }
 
@@ -365,11 +348,11 @@ export default function DiagramEditor(props) {
                 if (ev.output_class === errorOutput && inNode.name !== "CatchError") {
                     // Remove connection if pirimtive node Erorr output is going to non-errorblock
                     isInvalidConnection = true
-                } else if (ev.output_class !== errorOutput && inNode.name === "CatchError"){
+                } else if (ev.output_class !== errorOutput && inNode.name === "CatchError") {
                     // Remove connection if pirimtive node transition output is going to errorblock
                     isInvalidConnection = true
                 }
-            } else if (inNode.name === "CatchError" && !outputIsPrimitive){
+            } else if (inNode.name === "CatchError" && !outputIsPrimitive) {
                 // Remove connection in input is error block, but output is primitive
                 isInvalidConnection = true
             }
@@ -378,7 +361,7 @@ export default function DiagramEditor(props) {
                 editor.removeSingleConnection(ev.output_id, ev.input_id, ev.output_class, ev.input_class)
             } else {
                 // If output connection already existed before creation, delete first connection and keep new one.
-                if(outNode.outputs[ev.output_class].connections.length > 1) {
+                if (outNode.outputs[ev.output_class].connections.length > 1) {
                     const removeConnection = outNode.outputs[ev.output_class].connections[0];
                     editor.removeSingleConnection(ev.output_id, removeConnection.node, ev.output_class, removeConnection.output);
                 }
@@ -388,7 +371,6 @@ export default function DiagramEditor(props) {
 
         editor.on('nodeCreated', function (id) {
             let node = editor.getNodeFromId(id)
-            console.log("nodeJON", node)
             // If node was created without id, geneate one
             if (!node.data.id) {
                 if (node.data.family === "special") {
@@ -403,7 +385,7 @@ export default function DiagramEditor(props) {
 
             // Track node init state
             setNodeInitTracker((old) => {
-                old[id] = {init: node.data.init, stateID: node.data.id}
+                old[id] = { init: node.data.init, stateID: node.data.id }
                 return {
                     ...old
                 }
@@ -471,7 +453,7 @@ export default function DiagramEditor(props) {
             setShowNodeContextMenu(false)
         }
 
-        
+
     }, [showContextMenu, showNodeContextMenu]);
     useEffect(() => {
         document.addEventListener("click", handleClick);
@@ -495,14 +477,12 @@ export default function DiagramEditor(props) {
                         Add Node
                     </div>
                     <input autoFocus type="search" id="fname" name="fname" onChange={(ev) => {
-                        console.log("ev search = ", ev.target.value)
                         setContextMenuResults(actionsNodesFuse.search(ev.target.value))
-                        console.log(contextMenuResults)
                     }}
                         onKeyDown={(ev) => {
                             if (ev.key === 'Enter' && contextMenuResults.length > 0) {
                                 const newNode = contextMenuResults[0].item ? contextMenuResults[0].item : contextMenuResults[0]
-                                const newNodeID = CreateNode(diagramEditor, newNode, contextMenuAnchorPoint.x, contextMenuAnchorPoint.y)
+                                CreateNode(diagramEditor, newNode, contextMenuAnchorPoint.x, contextMenuAnchorPoint.y)
 
                                 setShowContextMenu(false)
                                 setShowNodeContextMenu(false)
@@ -516,7 +496,7 @@ export default function DiagramEditor(props) {
                                 return (
                                     <li onClick={() => {
                                         const newNode = obj.item ? obj.item : obj
-                                        const newNodeID = CreateNode(diagramEditor, newNode, contextMenuAnchorPoint.x, contextMenuAnchorPoint.y)
+                                        CreateNode(diagramEditor, newNode, contextMenuAnchorPoint.x, contextMenuAnchorPoint.y)
                                         setShowContextMenu(false)
                                         setShowNodeContextMenu(false)
                                     }}>
@@ -580,7 +560,7 @@ export default function DiagramEditor(props) {
             )}
             <FlexBox id="builder-page" className="col" style={{ paddingRight: "8px" }}>
                 {error ?
-                    <Alert className="critical" style={{ flex: "0", margin:"3px" }}>{error} </Alert>
+                    <Alert className="critical" style={{ flex: "0", margin: "3px" }}>{error} </Alert>
                     :
                     <></>
                 }
@@ -591,10 +571,7 @@ export default function DiagramEditor(props) {
 
                         // Check if any nodes are have not been initialized
                         let nonInitNodes = []
-                        for (const n of Object.keys(nodeInitTracker)){
-                            console.log("nodeInitTracker[n] = ???", nodeInitTracker)
-                            console.log("nodeInitTracker[n] = ???", nodeInitTracker[`${n}`])
-                            console.log("n = ", n)
+                        for (const n of Object.keys(nodeInitTracker)) {
                             if (!nodeInitTracker[`${n}`].init) {
                                 nonInitNodes.push(nodeInitTracker[`${n}`].stateID)
                             }
@@ -650,16 +627,12 @@ export default function DiagramEditor(props) {
                         for (const outputID in startBlock.outputs) {
                             if (Object.hasOwnProperty.call(startBlock.outputs, outputID)) {
                                 const output = startBlock.outputs[outputID];
-                                console.log("--> Found output = ", output)
-                                // TODO: handle to connections in start
-                                console.log("output.connections = ", output.connections)
                                 if (output.connections.length === 0) {
                                     setError("Start Node is not connected to any node")
                                     return
                                 }
                                 startState = rawData[output.connections[0].node]
                                 wfData.start.state = startState.data.id
-                                console.log("--> Found startState = ", startState)
                                 break
                             }
                         }
@@ -669,11 +642,11 @@ export default function DiagramEditor(props) {
                         wfData.states.reverse()
 
 
-                        
+
 
                         // Create States for disconnected nodes
                         for (const nodeID in rawData) {
-                            const rawNode  = rawData[nodeID]
+                            const rawNode = rawData[nodeID]
 
                             // Add primitive states with no input connections
                             if (!rawNode.compiled && rawNode.data.family === "primitive" && !nodeGetInputConnections(rawNode)) {
@@ -786,11 +759,10 @@ export default function DiagramEditor(props) {
                             </div>
                         </Resizable>
                         <div id="drawflow" style={{ height: "100%", width: "100%" }}
-                            onDragOver={(ev)=>{
+                            onDragOver={(ev) => {
                                 ev.preventDefault();
                             }}
                             onDrop={(ev) => {
-                                console.log("on drop event tirggered")
                                 ev.preventDefault();
                                 const nodeIndex = ev.dataTransfer.getData("nodeIndex");
                                 const functionIndex = ev.dataTransfer.getData("functionIndex");
@@ -808,12 +780,10 @@ export default function DiagramEditor(props) {
                                     newNode = ActionsNodes[nodeIndex]
                                 }
 
-                                const newNodeID = CreateNode(diagramEditor, newNode, ev.clientX, ev.clientY)
+                               CreateNode(diagramEditor, newNode, ev.clientX, ev.clientY)
                             }}
                             onContextMenu={(ev) => {
                                 ev.preventDefault()
-                                console.log("onContextMenu ev.target = ", ev.target)
-                                console.log("onContextMenu ev.target.offsetParent = ", ev.target.offsetParent)
                                 setContextMenuAnchorPoint({ x: ev.pageX, y: ev.pageY })
 
                                 const parentIsNode = ev.target.offsetParent.className.includes("drawflow-node")
@@ -835,7 +805,7 @@ export default function DiagramEditor(props) {
                         <ModalHeadless
                             visible={nodeDetailsVisible}
                             setVisible={setNodeDetailsVisible}
-                            modalStyle={{width: "60vw"}}
+                            modalStyle={{ width: "60vw" }}
                             title={`Node Details: ${selectedNode ? selectedNode.data.id : ""}`}
                             actionButtons={[
                                 ButtonDefinition("Submit", () => {
@@ -851,16 +821,17 @@ export default function DiagramEditor(props) {
                                     const updatedNode = {
                                         ...selectedNode,
                                         data: {
-                                        ...selectedNode.data,
-                                        formData: selectedNodeFormData,
-                                        init: true
-                                    }}
+                                            ...selectedNode.data,
+                                            formData: selectedNodeFormData,
+                                            init: true
+                                        }
+                                    }
 
                                     // Preflight custom formData
                                     let onSubmitValidateCallback = onValidateSubmitCallbackMap[updatedNode.name]
                                     if (onSubmitValidateCallback) {
                                         onSubmitValidateCallback(selectedNodeFormData)
-                                    } else {                                    
+                                    } else {
                                         DefaultValidateSubmitCallbackMap(selectedNodeFormData)
                                     }
 
@@ -872,14 +843,14 @@ export default function DiagramEditor(props) {
                                     let onSubmitCallback = onSubmitCallbackMap[updatedNode.name]
                                     if (onSubmitCallback) {
                                         onSubmitCallback(updatedNode.id, diagramEditor)
-                                    } else {                                    
+                                    } else {
                                         // Update SelectedNode state to updated state
                                         setSelectedNode(updatedNode)
                                     }
 
                                     // Track that node has data set
                                     setNodeInitTracker((old) => {
-                                        old[selectedNode.id] = {init: updatedNode.data.init, stateID: updatedNode.data.id}
+                                        old[selectedNode.id] = { init: updatedNode.data.init, stateID: updatedNode.data.id }
                                         return {
                                             ...old
                                         }
@@ -894,7 +865,7 @@ export default function DiagramEditor(props) {
                         >
                             <Form
                                 id={"builder-form"}
-                                onSubmit={(form) => {}}
+                                onSubmit={(form) => { }}
                                 schema={selectedNodeSchema}
                                 uiSchema={selectedNodeSchemaUI}
                                 formData={selectedNodeFormData}
@@ -909,7 +880,7 @@ export default function DiagramEditor(props) {
                             visible={nodeIDModalVisible}
                             setVisible={setNodeIDModalVisible}
                             title={`Node Details: ${selectedNode ? selectedNode.data.id : ""}`}
-                            modalStyle={{width: "20vw"}}
+                            modalStyle={{ width: "20vw" }}
                             actionButtons={[
                                 ButtonDefinition("Save", () => {
                                     setError(null)
@@ -917,9 +888,10 @@ export default function DiagramEditor(props) {
                                     const updatedNode = {
                                         ...selectedNode,
                                         data: {
-                                        ...selectedNode.data,
-                                        formData: selectedNodeFormData
-                                    }}
+                                            ...selectedNode.data,
+                                            formData: selectedNodeFormData
+                                        }
+                                    }
 
                                     updatedNode.data.id = newNodeID
 
@@ -928,7 +900,7 @@ export default function DiagramEditor(props) {
 
                                     // Track that node has data set
                                     setNodeInitTracker((old) => {
-                                        old[selectedNode.id] = {init: updatedNode.data.init, stateID: updatedNode.data.id}
+                                        old[selectedNode.id] = { init: updatedNode.data.init, stateID: updatedNode.data.id }
                                         return {
                                             ...old
                                         }
@@ -941,17 +913,17 @@ export default function DiagramEditor(props) {
                                 }, "small light", () => { }, true, false)
                             ]}
                         >
-                                <FlexBox className="col center" style={{ margin: "8px 16px 8px 16px"}}>
-                                    <FlexBox className="row center">
-                                        <span style={{whiteSpace: "nowrap", paddingRight:"6px"}}>
-                                            Node ID:
-                                        </span>
-                                        <input type="text" className='nodeid-input' value={newNodeID} onChange={((e)=>{
-                                            setNewNodeID(e.target.value)
-                                        })}>
-                                        </input>
-                                    </FlexBox>
+                            <FlexBox className="col center" style={{ margin: "8px 16px 8px 16px" }}>
+                                <FlexBox className="row center">
+                                    <span style={{ whiteSpace: "nowrap", paddingRight: "6px" }}>
+                                        Node ID:
+                                    </span>
+                                    <input type="text" className='nodeid-input' value={newNodeID} onChange={((e) => {
+                                        setNewNodeID(e.target.value)
+                                    })}>
+                                    </input>
                                 </FlexBox>
+                            </FlexBox>
                         </ModalHeadless>
                     </div>
                 </FlexBox>

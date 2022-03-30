@@ -327,7 +327,7 @@ export const StateSchemaParallel = {
         "actions": {
             "type": "array",
             "description": "List of actions to perform.",
-            "title":"Actions",
+            "title": "Actions",
             "items": {
                 ...CommonSchemaDefinitionAction,
             }
@@ -600,7 +600,7 @@ export const SpecialSchemaEventStart = {
                     "type": "string",
                     "title": "Filters",
                     "description": "Key-value regex pairs for CloudEvent context values that must match."
-                    
+
                 }
             }
         }
@@ -668,7 +668,7 @@ export const SpecialSchemaEventsAndStart = {
                 }
             }
         },
-        "lifespan":{
+        "lifespan": {
             "type": "string",
             "title": "Lifespan",
             "description": "Maximum duration an event can be stored before being discarded while waiting for other events (ISO8601).",
@@ -690,7 +690,7 @@ export const SpecialSchemaDefaultStart = {
 
     ],
     "properties": {
-        
+
     }
 }
 
@@ -1181,13 +1181,13 @@ export const SchemaMap = {
 }
 
 function functionListToActionEnum(functionList) {
-     let availableFunctions = []
-     for (let i = 0; i < functionList.length; i++) {
-         const f = functionList[i];
-         availableFunctions.push(f.id)
-     }
+    let availableFunctions = []
+    for (let i = 0; i < functionList.length; i++) {
+        const f = functionList[i];
+        availableFunctions.push(f.id)
+    }
 
-     return availableFunctions
+    return availableFunctions
 }
 
 export function getSchemaDefault(schemaKey) {
@@ -1242,7 +1242,7 @@ export const SchemaUIMap = {
     // "stateSchemaEventAnd": StateSchemaEventAnd,
     "stateSchemaEventXor": {
         "events": {
-            "items":{
+            "items": {
                 "transform": {
                     "rawYAML": {
                         "ui:widget": "textarea"
@@ -1258,7 +1258,7 @@ export const SchemaUIMap = {
     },
     "stateSchemaParallel": {
         "actions": {
-            "items":{
+            "items": {
                 "function": {
                     "ui:placeholder": "Select Function"
                 }
@@ -1299,7 +1299,7 @@ export const SchemaUIMap = {
     // "stateSchemaGetter": StateSchemaGetter,
     "stateSchemaSetter": {
         "variables": {
-            "items":{
+            "items": {
                 "value": {
                     "rawYAML": {
                         "ui:widget": "textarea"
