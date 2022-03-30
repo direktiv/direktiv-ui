@@ -18,6 +18,7 @@ export function importFromYAML(diagramEditor, setFunctions, wfYAML) {
     let startNode = JSON.parse(JSON.stringify((NodeStartBlock)))
     if (wfData.start) {
         startNode.data.formData = wfData.start
+        startNode.data.init = true
     }
 
     const startNodeID = CreateNode(diagramEditor, startNode, pos.x, pos.y, true)
@@ -56,16 +57,17 @@ export function importFromYAML(diagramEditor, setFunctions, wfYAML) {
 
         newNode.data.id = state.id
         newNode.data.formData = newNodeData
+        newNode.data.init = true
         const nodeID = CreateNode(diagramEditor, newNode, pos.x, pos.y, true)
 
         // Add Catch Node
         if (state.catch) {
             pos.x += 220
-            // TODO: make sure this only gets created once
             let errorNode = JSON.parse(JSON.stringify(NodeErrorBlock))
             const catchNodeRef = `SPECIAL-ERROR: `+state.id
             errorNode.data.formData = state.catch
             errorNode.connections.output = state.catch.length
+            errorNode.data.init = true
             const catchNodeID = CreateNode(diagramEditor, errorNode, pos.x, pos.y, true)
             nodeIDToStateIDMap[catchNodeRef] = catchNodeID
 

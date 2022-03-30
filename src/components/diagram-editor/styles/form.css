@@ -66,11 +66,6 @@
     height:33px;
 }
 
-/* TODO: Check if used anywhere */
-/* td > code {
-    white-space: nowrap;
-} */
-
 /* Form Input Field: Add Button Content*/
 #builder-page fieldset .glyphicon-plus::before{
     content: "+ Add Items";    

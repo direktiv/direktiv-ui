@@ -537,5 +537,5 @@ export function CreateNode(diagramEditor, node, clientX, clientY, rawXY) {
     }
 
 
-    return diagramEditor.addNode(node.name, node.connections.input, node.connections.output, posX, posY, `node ${node.family} type-${node.type}`, { family: node.family, type: node.type, ...node.data }, newNodeHTML, false)
+    return diagramEditor.addNode(node.name, node.connections.input, node.connections.output, posX, posY, `node ${node.family} type-${node.type}`, { family: node.family, type: node.type, init: !node.info.requiresInit, ...node.data }, newNodeHTML, false)
 }

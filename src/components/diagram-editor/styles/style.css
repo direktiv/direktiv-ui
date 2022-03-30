@@ -162,3 +162,7 @@
 #context-menu input {
     height: 24px;
 }
+
+#builder-page .alert {
+    min-height: unset;
+}

@@ -230,3 +230,8 @@
 #builder-page .node-btn-edit:hover {
     font-weight: bold;
 }
+
+#builder-page .node .drawflow-delete {
+    pointer-events: none;
+    visibility: hidden;
+}

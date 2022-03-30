@@ -299,7 +299,7 @@ export default function DiagramEditor(props) {
     // Track whether all nodes have been init'd
     // If all nodes are init (valid form submited) then diagram can compile
     const [nodeInitTracker, setNodeInitTracker] = useState({})
-    const [canCompile, setCanCompile] = useState(true)
+    // const [canCompile, setCanCompile] = useState(true)
 
 
     // Context menu to add nodes
@@ -310,20 +310,6 @@ export default function DiagramEditor(props) {
 
     // Context menu to edit nodes
     const [showNodeContextMenu, setShowNodeContextMenu] = useState(false);    
-
-    useEffect(()=> {
-        console.log("nodeInitTracker = ", nodeInitTracker)
-        for (var key in nodeInitTracker) {
-            if (nodeInitTracker.hasOwnProperty(key)) {
-                if (nodeInitTracker[key] === false) {
-                    setCanCompile(false)
-                    return
-                }
-            }
-        }
-
-        setCanCompile(true)
-    }, [nodeInitTracker])
 
     useEffect(() => {
         if (selectedNode) {
@@ -402,6 +388,7 @@ export default function DiagramEditor(props) {
 
         editor.on('nodeCreated', function (id) {
             let node = editor.getNodeFromId(id)
+            console.log("nodeJON", node)
             // If node was created without id, geneate one
             if (!node.data.id) {
                 if (node.data.family === "special") {
@@ -413,6 +400,14 @@ export default function DiagramEditor(props) {
                 }
                 editor.updateNodeDataFromId(id, node.data)
             }
+
+            // Track node init state
+            setNodeInitTracker((old) => {
+                old[id] = {init: node.data.init, stateID: node.data.id}
+                return {
+                    ...old
+                }
+            })
         })
 
         editor.on('nodeUnselected', function (e) {
@@ -509,15 +504,6 @@ export default function DiagramEditor(props) {
                                 const newNode = contextMenuResults[0].item ? contextMenuResults[0].item : contextMenuResults[0]
                                 const newNodeID = CreateNode(diagramEditor, newNode, contextMenuAnchorPoint.x, contextMenuAnchorPoint.y)
 
-                                // Track that node has not data
-                                if (newNode.info.requiresInit) {
-                                    setNodeInitTracker((old) => {
-                                        old[newNodeID] = false
-                                        return {
-                                            ...old
-                                        }
-                                    })
-                                }
                                 setShowContextMenu(false)
                                 setShowNodeContextMenu(false)
 
@@ -531,15 +517,6 @@ export default function DiagramEditor(props) {
                                     <li onClick={() => {
                                         const newNode = obj.item ? obj.item : obj
                                         const newNodeID = CreateNode(diagramEditor, newNode, contextMenuAnchorPoint.x, contextMenuAnchorPoint.y)
-                                        // Track that node has not data
-                                        if (newNode.info.requiresInit) {
-                                            setNodeInitTracker((old) => {
-                                                old[newNodeID] = false
-                                                return {
-                                                    ...old
-                                                }
-                                            })
-                                        }
                                         setShowContextMenu(false)
                                         setShowNodeContextMenu(false)
                                     }}>
@@ -603,7 +580,7 @@ export default function DiagramEditor(props) {
             )}
             <FlexBox id="builder-page" className="col" style={{ paddingRight: "8px" }}>
                 {error ?
-                    <Alert className="critical" style={{ flex: "0" }}>{error} </Alert>
+                    <Alert className="critical" style={{ flex: "0", margin:"3px" }}>{error} </Alert>
                     :
                     <></>
                 }
@@ -611,8 +588,25 @@ export default function DiagramEditor(props) {
                 <div className='toolbar'>
                     <div className='toolbar-btn' onClick={() => {
                         setError(null)
-                        //TODO: Split into another function
-                        //TODO: Export to non-destructive json ✓
+
+                        // Check if any nodes are have not been initialized
+                        let nonInitNodes = []
+                        for (const n of Object.keys(nodeInitTracker)){
+                            console.log("nodeInitTracker[n] = ???", nodeInitTracker)
+                            console.log("nodeInitTracker[n] = ???", nodeInitTracker[`${n}`])
+                            console.log("n = ", n)
+                            if (!nodeInitTracker[`${n}`].init) {
+                                nonInitNodes.push(nodeInitTracker[`${n}`].stateID)
+                            }
+                        }
+
+                        if (nonInitNodes.length > 0) {
+                            setError(`Failed - Node not initialized: ${nonInitNodes.join(", ")}`)
+                            return
+                        }
+
+
+                        // Export Nodes to an object so we can convert it to a workflow yaml
                         let rawExport = diagramEditor.export()
                         let rawData = rawExport.drawflow.Home.data
                         let wfData = { start: {}, functions: functionList, states: [] }
@@ -695,7 +689,7 @@ export default function DiagramEditor(props) {
                             console.warn("updateWorkflow callback missing")
                         }
                     }}>
-                        <VscGear style={{ fontSize: "256px", width: "48px", color: canCompile ? "green": "red" }} />
+                        <VscGear style={{ fontSize: "256px", width: "48px" }} />
                         <div>Compile</div>
                     </div>
                     <div className='toolbar-btn' onClick={() => {
@@ -815,15 +809,6 @@ export default function DiagramEditor(props) {
                                 }
 
                                 const newNodeID = CreateNode(diagramEditor, newNode, ev.clientX, ev.clientY)
-                                // Track that node has not data
-                                if (newNode.info.requiresInit) {
-                                    setNodeInitTracker((old) => {
-                                        old[newNodeID] = false
-                                        return {
-                                            ...old
-                                        }
-                                    })
-                                }
                             }}
                             onContextMenu={(ev) => {
                                 ev.preventDefault()
@@ -842,6 +827,8 @@ export default function DiagramEditor(props) {
                                     setShowContextMenu(true)
                                     setShowNodeContextMenu(false)
                                 }
+
+                                ev.stopPropagation()
                             }}
                         >
                         </div>
@@ -865,7 +852,8 @@ export default function DiagramEditor(props) {
                                         ...selectedNode,
                                         data: {
                                         ...selectedNode.data,
-                                        formData: selectedNodeFormData
+                                        formData: selectedNodeFormData,
+                                        init: true
                                     }}
 
                                     // Preflight custom formData
@@ -891,7 +879,7 @@ export default function DiagramEditor(props) {
 
                                     // Track that node has data set
                                     setNodeInitTracker((old) => {
-                                        old[selectedNode.id] = true
+                                        old[selectedNode.id] = {init: updatedNode.data.init, stateID: updatedNode.data.id}
                                         return {
                                             ...old
                                         }
@@ -924,8 +912,7 @@ export default function DiagramEditor(props) {
                             modalStyle={{width: "20vw"}}
                             actionButtons={[
                                 ButtonDefinition("Save", () => {
-                                    // TODO: New node id validation
-
+                                    setError(null)
                                     // Update id to node data
                                     const updatedNode = {
                                         ...selectedNode,
@@ -939,6 +926,13 @@ export default function DiagramEditor(props) {
                                     // Update form data into node
                                     diagramEditor.updateNodeDataFromId(updatedNode.id, updatedNode.data)
 
+                                    // Track that node has data set
+                                    setNodeInitTracker((old) => {
+                                        old[selectedNode.id] = {init: updatedNode.data.init, stateID: updatedNode.data.id}
+                                        return {
+                                            ...old
+                                        }
+                                    })
 
                                     setNewNodeID("")
                                 }, "small blue", () => { }, true, false),
