@@ -170,7 +170,7 @@ function FunctionsList(props) {
             <Modal
                 style={{ justifyContent: "center" }}
                 className="run-workflow-modal"
-                modalStyle={{ color: "black" }}
+                modalStyle={{ color: "black", width: "600px" }}
                 title={`Create Function`}
                 onClose={() => {
                     setFormData({})
@@ -212,7 +212,7 @@ function FunctionsList(props) {
 
                 )}
             >
-                <FlexBox className="col" style={{ height: "45vh", width: "35vw", minWidth: "250px", minHeight: "200px", justifyContent: "space-between" }}>
+                <FlexBox className="col" style={{ height: "45vh", minWidth: "250px", minHeight: "200px", justifyContent: "space-between" }}>
                     <div style={{ overflow: "auto" }}>
                         <Form
                             id={"builder-form"}
