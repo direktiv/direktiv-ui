@@ -1,13 +1,56 @@
 import YAML from 'js-yaml'
+import dagre from "dagre"
+
+
+export function sortNodes(diagramEditor) {
+    let allNodes = diagramEditor.export()
+
+    // Create a new directed graph 
+    var g = new dagre.graphlib.Graph({ordering: "out"});
+    g.setGraph({});
+    g.setDefaultEdgeLabel(function() { return {}; });
+    g.graph().rankdir = "LR"
+
+   for (const nodeKey in allNodes.drawflow.Home.data) {
+       if (Object.hasOwnProperty.call(allNodes.drawflow.Home.data, nodeKey)) {
+           const node = allNodes.drawflow.Home.data[nodeKey];
+           g.setNode(`node_${nodeKey}`, { label: node.name,  nodeID: nodeKey, width: 144, height: 100});
+       }
+   }
+
+   for (const nodeKey in allNodes.drawflow.Home.data) {
+       if (Object.hasOwnProperty.call(allNodes.drawflow.Home.data, nodeKey)) {
+           const node = allNodes.drawflow.Home.data[nodeKey];
+           const outputs = nodeGetOutputConnections(node)
+           if (outputs) {
+               for (const key in outputs) {
+                   for (const outputConnections of outputs[key]) {
+                       g.setEdge(`node_${nodeKey}`, `node_${outputConnections.node}`);
+                   }
+               }
+           }
+       }
+   }
+
+   dagre.layout(g);
+
+   g.nodes().forEach(function(v) {
+       const gNode = g.node(v)
+       allNodes.drawflow.Home.data[gNode.nodeID]["pos_x"] = gNode.x
+       allNodes.drawflow.Home.data[gNode.nodeID]["pos_y"] = gNode.y
+  });
+
+  diagramEditor.import(allNodes)
+}
 
 export function nodeGetInputConnections(node) {
     let inputs = {}
 
-    if (node) {
+    if (!node) {
         return undefined
     }
 
-    if (node.inputs) {
+    if (!node.inputs) {
         return undefined
     }
 
@@ -22,6 +65,30 @@ export function nodeGetInputConnections(node) {
     }
 
     return inputs
+}
+
+export function nodeGetOutputConnections(node) {
+    let outputs = {}
+
+    if (!node) {
+        return undefined
+    }
+
+    if (!node.outputs) {
+        return undefined
+    }
+
+    for (const outputKey of Object.keys(node.outputs)) {
+        if (node.outputs[outputKey].connections.length > 0) {
+            outputs[outputKey] = node.outputs[outputKey].connections
+        }
+    }
+
+    if (Object.keys(outputs).length === 0) {
+        return undefined
+    }
+
+    return outputs
 }
 
 export function insertHangingNodes(nodeID, previousNodeID, previousState, rawData, wfData) {

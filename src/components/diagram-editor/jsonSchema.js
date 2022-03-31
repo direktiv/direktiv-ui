@@ -974,12 +974,12 @@ export function GenerateFunctionSchemaWithEnum(namespaceServices, globalServices
             "properties": {
                 "type": {
                     "enum": [
-                        "reusable",
+                        "knative-workflow",
                         "knative-namespace",
                         "knative-global",
                         "subflow"
                     ],
-                    "default": "reusable",
+                    "default": "knative-workflow",
                     "title": "Service Type",
                     "description": "Function type of new service"
                 }
@@ -989,7 +989,7 @@ export function GenerateFunctionSchemaWithEnum(namespaceServices, globalServices
                     "if": {
                         "properties": {
                             "type": {
-                                "const": "reusable"
+                                "const": "knative-workflow"
                             }
                         }
                     },
@@ -1039,12 +1039,12 @@ export const FunctionSchema = {
     "properties": {
         "type": {
             "enum": [
-                "reusable",
+                "knative-workflow",
                 "knative-namespace",
                 "knative-global",
                 "subflow"
             ],
-            "default": "reusable",
+            "default": "knative-workflow",
             "title": "Service Type",
             "description": "Function type of new service"
         }
@@ -1054,7 +1054,7 @@ export const FunctionSchema = {
             "if": {
                 "properties": {
                     "type": {
-                        "const": "reusable"
+                        "const": "knative-workflow"
                     }
                 }
             },

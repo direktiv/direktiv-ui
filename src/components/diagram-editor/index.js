@@ -1,6 +1,6 @@
 import { useGlobalServices, useNamespaceServices, useNodes } from 'direktiv-react-hooks';
 import { useCallback, useEffect, useState } from 'react';
-import { VscGear, VscListUnordered, VscSymbolEvent, VscInfo } from 'react-icons/vsc';
+import { VscGear, VscListUnordered, VscSymbolEvent, VscInfo, VscFileCode } from 'react-icons/vsc';
 import Alert from '../../components/alert';
 import FlexBox from '../../components/flexbox';
 import { Config } from '../../util';
@@ -8,7 +8,7 @@ import Drawflow from 'drawflow';
 import { Resizable } from 're-resizable';
 import { DefaultSchemaUI, GenerateFunctionSchemaWithEnum, getSchemaCallbackMap, getSchemaDefault, SchemaUIMap } from "../../components/diagram-editor/jsonSchema"
 import Form from '@rjsf/core';
-import { CreateNode, DefaultValidateSubmitCallbackMap, nodeGetInputConnections, onSubmitCallbackMap, onValidateSubmitCallbackMap, setConnections } from '../../components/diagram-editor/util';
+import { CreateNode, DefaultValidateSubmitCallbackMap, nodeGetInputConnections, onSubmitCallbackMap, onValidateSubmitCallbackMap, setConnections, sortNodes } from '../../components/diagram-editor/util';
 import { AutoSizer, CellMeasurer, CellMeasurerCache, List } from 'react-virtualized';
 import Fuse from 'fuse.js';
 import { ActionsNodes, NodeStateAction } from "../../components/diagram-editor/nodes";
@@ -718,6 +718,12 @@ export default function DiagramEditor(props) {
                                 <div>Hide Functions</div>
                             </>
                         }
+                    </div>
+                    <div className='toolbar-btn' onClick={() => {
+                        sortNodes(diagramEditor)
+                    }}>
+                        <VscFileCode style={{ fontSize: "256px", width: "48px" }} />
+                        <div>Format Nodes</div>
                     </div>
                 </div>
                 <FlexBox style={{ overflow: "hidden" }}>

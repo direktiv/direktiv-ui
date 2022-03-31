@@ -1,7 +1,7 @@
 import { ActionsNodes, NodeErrorBlock, NodeStartBlock } from "./nodes";
 import YAML from 'js-yaml'
 import prettyYAML from "json-to-pretty-yaml"
-import { CreateNode } from "./util";
+import { CreateNode, sortNodes } from "./util";
 
 export function importFromYAML(diagramEditor, setFunctions, wfYAML) {
     const wfData = YAML.load(wfYAML)
@@ -120,8 +120,8 @@ export function importFromYAML(diagramEditor, setFunctions, wfYAML) {
             diagramEditor.addConnection(catchNode.id, nextNodeID, `output_${j + 1}`, 'input_1')
         }
     }
-    // TODO: Sort with dagrejs
 
+    sortNodes(diagramEditor)
 }
 
 const importConnectionsCallbackMap = {
