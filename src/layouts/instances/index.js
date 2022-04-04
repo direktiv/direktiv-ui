@@ -15,6 +15,7 @@ import utc from "dayjs/plugin/utc"
 import { useNavigate } from 'react-router-dom';
 import Loader from '../../components/loader';
 import Tippy from '@tippyjs/react';
+import Button from '../../components/button';
 
 const PAGE_SIZE = 10
 
@@ -40,7 +41,11 @@ function InstancesTable(props) {
     const [load, setLoad] = useState(true)
     
     const [queryParams, setQueryParams] = useState([`first=${PAGE_SIZE}`])
-    const {data, err, pageInfo, totalCount} = useInstances(Config.url, true, namespace, localStorage.getItem("apikey"), ...queryParams)
+    const [queryFilters, setQueryFilters] = useState([])
+    const [currentFilterType, setCurrentFilterType] = useState("STATUS")
+    const [currentFilterVal, setCurrentFilterVal] = useState("")
+
+    const {data, err, pageInfo, totalCount} = useInstances(Config.url, true, namespace, localStorage.getItem("apikey"), ...queryParams, ...queryFilters)
 
     const updatePage = useCallback((newParam)=>{
         setQueryParams(newParam)
@@ -64,6 +69,47 @@ function InstancesTable(props) {
                     Instances
                 </div>
                 <HelpIcon msg={"A list of recently executed instances."} />
+                <FlexBox className="gap" style={{justifyContent: "flex-end", alignItems: "center", paddingRight:"8px"}}>
+                    {queryFilters.map((obj)=>{
+                    return(
+                        <div style={{borderRadius:"12px", background: "rgb(219, 219, 219) none repeat scroll 0% 0%", fontSize: "10px", lineHeight:"30px"}}>
+                            {obj}
+                        </div>
+                    )})}
+                    <div style={{borderLeft:"1px solid grey", paddingLeft:"10px"}}>
+                    Add Filter Type:
+                    </div>
+                    <select style={{ width: "180px", height:"33px", lineHeight:"10px" }} defaultValue={currentFilterType} onChange={(e)=>setCurrentFilterType(e.target.value)}>
+                            <option value="">Choose Filter Type</option>
+                            <option value="STATUS">state</option>
+                            <option value="AS">name</option>
+                            <option value="AFTER">created after</option>
+                            <option value="BEFORE">created before</option>
+                    </select>
+                    <div>
+                    Value:
+                    </div>
+                    {/* filter.field=AS&filter.type=CONTAINS&filter.val=for&filter.field=STATUS&filter.type=MATCH&filter.val=complete */}
+                    <input style={{ width: "180px", height:"33px" }} value={currentFilterVal} onChange={e=>setCurrentFilterVal(e.target.value)}/>
+                    <Button className="small light" onClick={()=>{
+                        setQueryFilters((filters)=>{
+                            switch (currentFilterType) {
+                                case "STATUS":
+                                    filters.push(`filter.field=STATUS&filter.type=MATCH&filter.val=${currentFilterVal}`)
+                                    break;
+                                case "AS":
+                                    filters.push(`filter.field=AS&filter.type=CONTAINS&filter.val=${currentFilterVal}`)
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            return[...filters]
+                        })
+                    }}>
+                        Add
+                    </Button>
+                </FlexBox>
             </FlexBox>
         </ContentPanelTitle>
         <ContentPanelBody>
