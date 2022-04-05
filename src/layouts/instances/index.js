@@ -56,6 +56,7 @@ function InstancesTable(props) {
             setLoad(false)
         }
     },[data, err])
+
     return(
         <Loader load={load} timer={3000}>
 
@@ -70,16 +71,13 @@ function InstancesTable(props) {
                 </div>
                 <HelpIcon msg={"A list of recently executed instances."} />
                 <FlexBox className="gap" style={{justifyContent: "flex-end", alignItems: "center", paddingRight:"8px"}}>
-                    {queryFilters.map((obj)=>{
-                    return(
-                        <div style={{borderRadius:"12px", background: "rgb(219, 219, 219) none repeat scroll 0% 0%", fontSize: "10px", lineHeight:"30px"}}>
-                            {obj}
-                        </div>
-                    )})}
-                    <div style={{borderLeft:"1px solid grey", paddingLeft:"10px"}}>
+                    <div>
                     Add Filter Type:
                     </div>
-                    <select style={{ width: "180px", height:"33px", lineHeight:"10px" }} defaultValue={currentFilterType} onChange={(e)=>setCurrentFilterType(e.target.value)}>
+                    <select style={{ width: "180px", height:"33px", lineHeight:"10px" }} defaultValue={currentFilterType} onChange={(e)=>{
+                        setCurrentFilterVal("")
+                        setCurrentFilterType(e.target.value)
+                        }}>
                             <option value="">Choose Filter Type</option>
                             <option value="STATUS">state</option>
                             <option value="AS">name</option>
@@ -89,9 +87,25 @@ function InstancesTable(props) {
                     <div>
                     Value:
                     </div>
-                    {/* filter.field=AS&filter.type=CONTAINS&filter.val=for&filter.field=STATUS&filter.type=MATCH&filter.val=complete */}
-                    <input style={{ width: "180px", height:"33px" }} value={currentFilterVal} onChange={e=>setCurrentFilterVal(e.target.value)}/>
-                    <Button className="small light" onClick={()=>{
+
+                    {currentFilterType === "STATUS" ? 
+                    <select style={{ width: "180px", height:"33px", lineHeight:"10px" }} defaultValue={currentFilterVal} onChange={(e)=>setCurrentFilterVal(e.target.value)}>
+                        <option value="">Choose State Type</option>
+                        <option value="complete">complete</option>
+                        <option value="failed">failed</option>
+                        <option value="pending">pending</option>
+                    </select>
+                    :<></>}
+                    {currentFilterType === "AFTER" || currentFilterType === "BEFORE"  ? 
+                    <input type="datetime-local" style={{ width: "180px", height:"33px" }} value={currentFilterVal} onChange={e=>{
+                         setCurrentFilterVal(e.target.value)
+                    }}/>
+                    :<></>}
+                    {currentFilterType === "AS" ? 
+                    <input key={"filter-text-input"} style={{ width: "180px", height:"33px" }} value={currentFilterVal} onChange={e=>setCurrentFilterVal(e.target.value)}/>
+                    :<></>}
+                    
+                    <Button className={`small light ${currentFilterVal ==="" ? "disabled" : ""}`} onClick={()=>{
                         setQueryFilters((filters)=>{
                             switch (currentFilterType) {
                                 case "STATUS":
@@ -99,6 +113,12 @@ function InstancesTable(props) {
                                     break;
                                 case "AS":
                                     filters.push(`filter.field=AS&filter.type=CONTAINS&filter.val=${currentFilterVal}`)
+                                    break;
+                                case "AFTER":
+                                    filters.push(`filter.field=CREATED&filter.type=AFTER&filter.val=${encodeURIComponent(new Date(currentFilterVal).toISOString())}`)
+                                    break;
+                                case "BEFORE":
+                                    filters.push(`filter.field=CREATED&filter.type=BEFORE&filter.val=${encodeURIComponent(new Date(currentFilterVal).toISOString())}`)
                                     break;
                                 default:
                                     break;
@@ -112,6 +132,21 @@ function InstancesTable(props) {
                 </FlexBox>
             </FlexBox>
         </ContentPanelTitle>
+        <ContentPanelTitle style={{maxHeight: "unset"}}>
+        <FlexBox className="gap" style={{ alignItems: "center",padding:"5px", flexWrap: "wrap" }}>
+            {queryFilters.map((obj, i)=>{
+                    return(
+                        <div key={`filter-${i}`} style={{borderRadius:"12px", background: "rgb(219, 219, 219) none repeat scroll 0% 0%", fontSize: "10px", lineHeight:"14px", padding:"3px", cursor:"pointer"}} onClick={()=>{
+                            setQueryFilters((filters)=>{
+                                filters.splice(i, 1)
+                                return [...filters]
+                            })
+                        }}>
+                            {obj}
+                        </div>
+                    )})}
+            </FlexBox>
+            </ContentPanelTitle>
         <ContentPanelBody>
         <>
         {
