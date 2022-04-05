@@ -29,6 +29,24 @@ function InstancesPage(props) {
     }
     return(
         <div style={{ paddingRight: "8px" }}>
+            <FlexBox className="gap instance-filter" style={{justifyContent: "space-between", alignItems: "center", paddingBottom: "8px"}}>
+                <FlexBox className="col gap">
+                    Filter Name
+                    <input type="text" placeholder="Instance Name"/>
+                </FlexBox>
+                <FlexBox className="col gap" >
+                    Filter Created
+                    <input placeholder="Date and time"/>
+                </FlexBox>
+                <FlexBox className="col gap" >
+                    Filter Invoker
+                    <input placeholder="Choose filter option"/>
+                </FlexBox>
+                <FlexBox className="col gap" >
+                    Filter State
+                    <input placeholder="Choose state"/>
+                </FlexBox>
+            </FlexBox>
             <InstancesTable namespace={namespace}/>
         </div>
     );
@@ -72,7 +90,7 @@ export function InstancesTable(props) {
                     Instances
                 </div>
                 <HelpIcon msg={"A list of recently executed instances."} />
-                <FlexBox className="gap" style={{justifyContent: "flex-end", alignItems: "center", paddingRight:"8px"}}>
+                {/* <FlexBox className="gap" style={{justifyContent: "flex-end", alignItems: "center", paddingRight:"8px"}}>
                     <div>
                     Add Filter Type:
                     </div>
@@ -131,12 +149,12 @@ export function InstancesTable(props) {
                     }}>
                         Add
                     </Button>
-                </FlexBox>
+                </FlexBox> */}
             </FlexBox>
         </ContentPanelTitle>
-        <ContentPanelTitle style={{maxHeight: "unset"}}>
-        <FlexBox className="gap" style={{ alignItems: "center",padding:"5px", flexWrap: "wrap" }}>
-            {queryFilters.map((obj, i)=>{
+        {/* <ContentPanelTitle style={{maxHeight: "unset"}}>
+            <FlexBox className="gap" style={{ alignItems: "center",padding:"5px", flexWrap: "wrap" }}>
+                {queryFilters.map((obj, i)=>{
                     return(
                         <div key={`filter-${i}`} style={{borderRadius:"12px", background: "rgb(219, 219, 219) none repeat scroll 0% 0%", fontSize: "10px", lineHeight:"14px", padding:"3px", cursor:"pointer"}} onClick={()=>{
                             setQueryFilters((filters)=>{
@@ -146,10 +164,10 @@ export function InstancesTable(props) {
                         }}>
                             {obj}
                         </div>
-                    )})}
+                )})}
             </FlexBox>
-        </ContentPanelTitle></>
-        }
+        </ContentPanelTitle> */}
+        </>}
         <ContentPanelBody style={{...bodyStyle}}>
         {
             data !== null && data.length === 0 ? 

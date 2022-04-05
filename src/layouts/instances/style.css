@@ -49,3 +49,21 @@
         margin: auto;
     }
 }
+
+.instance-filter {
+    padding-left: 1px;
+    padding-right: 1px;
+}
+
+.instance-filter > div {
+    font-weight: bold;
+}
+
+.instance-filter > div > input{
+    background: #FFFFFF;
+    border: 1px solid #D6DCE2;
+    box-sizing: border-box;
+    box-shadow: 2px 2px 6px rgba(44, 57, 75, 0.04);
+    border-radius: 4px;
+    height: 41px;
+}
