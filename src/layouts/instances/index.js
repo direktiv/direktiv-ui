@@ -36,12 +36,12 @@ function InstancesPage(props) {
 
 export default InstancesPage;
 
-function InstancesTable(props) {
-    const {namespace} = props
+export function InstancesTable(props) {
+    const {namespace, mini, hideTitle, panelStyle, bodyStyle, filter} = props
     const [load, setLoad] = useState(true)
     
     const [queryParams, setQueryParams] = useState([`first=${PAGE_SIZE}`])
-    const [queryFilters, setQueryFilters] = useState([])
+    const [queryFilters, setQueryFilters] = useState(filter ? filter : [] )
     const [currentFilterType, setCurrentFilterType] = useState("STATUS")
     const [currentFilterVal, setCurrentFilterVal] = useState("")
 
@@ -60,7 +60,9 @@ function InstancesTable(props) {
     return(
         <Loader load={load} timer={3000}>
 
-        <ContentPanel>
+        <ContentPanel style={{...panelStyle}}>
+        {hideTitle ?<></>:
+        <>
         <ContentPanelTitle>
             <ContentPanelTitleIcon>
                 <VscVmRunning/>
@@ -146,9 +148,9 @@ function InstancesTable(props) {
                         </div>
                     )})}
             </FlexBox>
-            </ContentPanelTitle>
-        <ContentPanelBody>
-        <>
+        </ContentPanelTitle></>
+        }
+        <ContentPanelBody style={{...bodyStyle}}>
         {
             data !== null && data.length === 0 ? 
                 <div style={{paddingLeft:"10px", fontSize:"10pt"}}>No instances have been recently executed. Recent instances will appear here.</div>
@@ -156,21 +158,12 @@ function InstancesTable(props) {
                 <table className="instances-table" style={{width: "100%"}}>
                     <thead>
                         <tr>
-                            <th className="center-align" style={{maxWidth: "120px", minWidth: "120px", width: "120px"}}>
-                                State
-                            </th>
-                            <th className="center-align">
-                                Name
-                            </th>
-                            <th className="center-align">
-                                Revision ID
-                            </th>
-                            <th className="center-align">
-                                Started <span className="hide-on-med">at</span>
-                            </th>
-                            <th className="center-align">
-                                <span className="hide-on-med">Last</span> Updated
-                            </th>
+                            
+                            <th className="center-align" style={{maxWidth: "120px", minWidth: "120px", width: "120px"}}>State</th>
+                            <th className="center-align">Name</th>
+                            {mini ? <></>:<th className="center-align">Revision ID</th>}
+                            <th className="center-align">Started <span className="hide-on-med">at</span></th>
+                            {mini ? <></>:<th className="center-align"><span className="hide-on-med">Last</span> Updated</th>}
                         </tr>
                     </thead>
                     <tbody>
@@ -180,6 +173,7 @@ function InstancesTable(props) {
                             {data.map((obj)=>{
                             return(
                                 <InstanceRow 
+                                    mini={mini}
                                     key={GenerateRandomKey()}
                                     namespace={namespace}
                                     state={obj.node.status} 
@@ -197,7 +191,6 @@ function InstancesTable(props) {
                     </tbody>
                 </table>
         }
-        </>
         </ContentPanelBody>
     </ContentPanel>
     <FlexBox>
@@ -216,7 +209,7 @@ const cancelled = "cancelled";
 const running = "pending";
 
 export function InstanceRow(props) {
-    let {state, name, wf, startedDate,  finishedDate, startedTime, finishedTime,  id, namespace} = props;
+    let {state, name, wf, startedDate,  finishedDate, startedTime, finishedTime,  id, namespace,mini} = props;
     const navigate = useNavigate()
 
     let label;
@@ -260,17 +253,17 @@ export function InstanceRow(props) {
             
         </td>
         </Tippy>: ""}
-        <td title={revStr} style={{ fontSize: "12px", lineHeight: "20px", textOverflow:"ellipsis", overflow:"hidden", color: revStr !== undefined ? "" : "var(--theme-dark-gray-text)" }} className="center-align">
+        {mini ? <></>:<td title={revStr} style={{ fontSize: "12px", lineHeight: "20px", textOverflow:"ellipsis", overflow:"hidden", color: revStr !== undefined ? "" : "var(--theme-dark-gray-text)" }} className="center-align">
             {revStr !== undefined ? revStr : "ROUTER"}
-        </td>
+        </td>}
         <td className="center-align">
             <span className="hide-on-800">{startedDate}, </span>
             {startedTime}
         </td>
-        <td className="center-align">
+        {mini ? <></>:<td className="center-align">
             <span className="hide-on-800">{finishedDate}, </span>
             {finishedTime}
-        </td>
+        </td>}
     </tr>
     )
 }
