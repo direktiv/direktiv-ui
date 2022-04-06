@@ -40,7 +40,7 @@ function TabbedButtons(props) {
     let {tabBtn, setTabBtn, setSearchParams} = props;
 
     let tabBtns = [];
-    let tabBtnLabels = ["Instances", "Diagram"];
+    let tabBtnLabels = ["Flow Graph", "Child Instances"];
 
     for (let i = 0; i < tabBtnLabels.length; i++) {
         let key = GenerateRandomKey();
@@ -265,11 +265,11 @@ function InstancePage(props) {
                                 <VscSourceControl />
                             </ContentPanelTitleIcon>
                             <FlexBox className="gap" style={{alignItems:"center"}}>
-                                <div style={{flex: "1"}}>
-                                    {`${tabBtn === 0 ? "Child Instances" : "Logical Flow Graph"}`}
+                                <div style={{flex: "1", whiteSpace: "nowrap"}}>
+                                    {`${tabBtn === 0 ? "Flow Graph" : "Child Instances"}`}
                                 </div>
-                                {data.invoker.startsWith("instance:") ?
-                                    <Link to={`/n/${namespace}/instances/${data.invoker.replace("instance:", "")}`}>
+                                {tabBtn === 1 && data.invoker.startsWith("instance:") ?
+                                    <Link to={`/n/${namespace}/instances/${data.invoker.replace("instance:", "")}`} reloadDocument>
                                     <Button className="small light">
                                         <span className="hide-on-small">View</span> Parent
                                     </Button>
@@ -280,8 +280,8 @@ function InstancePage(props) {
                                 <TabbedButtons setSearchParams={setSearchParams} searchParams={searchParams} tabBtn={tabBtn} setTabBtn={setTabBtn} />
                             </FlexBox>
                         </ContentPanelTitle>
-                        {tabBtn === 0 ?<InstancesTable namespace={namespace} mini={true} hideTitle={true} panelStyle={{border: "unset"}} filter={[`filter.field=TRIGGER&filter.type=MATCH&filter.val=instance:${instanceID}`]}/>:<></>}
-                        {tabBtn === 1 ?<ContentPanelBody><InstanceDiagram status={data.status} namespace={namespace} wfpath={wfpath} rev={rev} instRef={ref} flow={data.flow}/></ContentPanelBody>:<></>}
+                        {tabBtn === 0 ?<ContentPanelBody><InstanceDiagram status={data.status} namespace={namespace} wfpath={wfpath} rev={rev} instRef={ref} flow={data.flow}/></ContentPanelBody>:<></>}
+                        {tabBtn === 1 ?<InstancesTable namespace={namespace} mini={true} hideTitle={true} panelStyle={{border: "unset"}} filter={[`filter.field=TRIGGER&filter.type=MATCH&filter.val=instance:${instanceID}`]}/>:<></>}
                     </ContentPanel>
                 </FlexBox>
                 <FlexBox style={{minWidth: "300px", flex: "2"}}>
