@@ -143,7 +143,7 @@ function processTransform(stateData, transformKey) {
     } else if (selectionType && selectionType === "JQ Query") {
         stateData[transformKey] = jqQuery
     } else if (selectionType && selectionType === "Javascript") {
-        stateData[transformKey] = `jq(\n${js}\n)`
+        stateData[transformKey] = `js(\n${js}\n)`
     }
 
     if (stateData[transformKey] === "" || stateData[transformKey] === {}) {
@@ -531,4 +531,41 @@ export function CreateNode(diagramEditor, node, clientX, clientY, rawXY) {
 
 
     return diagramEditor.addNode(node.name, node.connections.input, node.connections.output, posX, posY, `node ${node.family} type-${node.type}`, { family: node.family, type: node.type, init: !node.info.requiresInit, ...node.data }, newNodeHTML, false)
+}
+
+//  unescapeJSStrings : Accepts a line string that has an escaped js string value and then unescapes the string and converts it to a multi-line YAML string.
+//  Example: 
+//      Input: 
+//        transform: "js(var ret = new Array();\nb = data['ping'].concat(data['resolve']);)"
+//      Output:
+//        transform: |
+//          js(
+//            var ret = new Array();
+//            b = data['ping'].concat(data['resolve']);
+//          )
+export function unescapeJSStrings(str) {
+    const symbol = `"js(`
+    let newWorkflowStr = ""
+
+    str.split("\n").forEach(lineStr => {
+        const replaceIndex = lineStr.indexOf(symbol)
+        if (replaceIndex > 0) {
+            const jsStr = lineStr.slice(replaceIndex+1, -2).trim()
+
+            // Count leading whitespaces
+            let whiteSpaceCount = 0
+            for (;  lineStr[whiteSpaceCount] === " "; whiteSpaceCount++) {}
+
+            // Split javascript into multiline YAML string
+            newWorkflowStr += lineStr.slice(0, replaceIndex-1) + " |\n"
+            jsStr.split("\\n").forEach(jsLineStr => {
+                const test = jsLineStr.replaceAll(`\\`, ``)
+                newWorkflowStr += " ".repeat(whiteSpaceCount)+ "    " + test + "\n"
+            });
+        } else {
+            newWorkflowStr += lineStr + "\n"
+        }
+    });
+
+    return newWorkflowStr
 }

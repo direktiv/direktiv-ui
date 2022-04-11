@@ -1,7 +1,7 @@
 import { ActionsNodes, NodeErrorBlock, NodeStartBlock } from "./nodes";
 import YAML from 'js-yaml'
 import prettyYAML from "json-to-pretty-yaml"
-import { CreateNode, sortNodes } from "./util";
+import { CreateNode, sortNodes, unescapeJSStrings } from "./util";
 
 export function importFromYAML(diagramEditor, setFunctions, wfYAML) {
     const wfData = YAML.load(wfYAML)
@@ -194,9 +194,10 @@ function importDefaultProcessTransformCallback(state, transformKey) {
         // check depth
         const transformDepth = objectDepth(oldTransform)
         if (transformDepth > 1) {
+            const yamlString = unescapeJSStrings(prettyYAML.stringify(oldTransform))
             state[transformKey] = {
                 selectionType: "YAML",
-                "rawYAML": prettyYAML.stringify(oldTransform)
+                "rawYAML": yamlString
             }
         } else {
             state[transformKey] = {
@@ -204,6 +205,19 @@ function importDefaultProcessTransformCallback(state, transformKey) {
                 "keyValue": oldTransform
             }
         }
+    }  else if (oldTransform.trim().startsWith(`js(`) && oldTransform.trim().endsWith(")")){
+        let javascriptString = ""
+        let oldTransformArr = oldTransform.split("\n")
+        for (let i = 1; i < oldTransformArr.length-1; i++) {
+            const line = oldTransformArr[i].startsWith("  ") ? oldTransformArr[i].slice(2) : oldTransformArr[i];
+            javascriptString += line + "\n"
+        }
+
+        state[transformKey] = {
+            selectionType: "Javascript",
+            "js": javascriptString
+        }
+
     } else {
         state[transformKey] = {
             selectionType: "JQ Query",

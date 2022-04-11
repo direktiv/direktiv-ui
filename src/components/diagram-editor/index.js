@@ -8,7 +8,7 @@ import Drawflow from 'drawflow';
 import { Resizable } from 're-resizable';
 import { DefaultSchemaUI, GenerateFunctionSchemaWithEnum, getSchemaCallbackMap, getSchemaDefault, SchemaUIMap } from "../../components/diagram-editor/jsonSchema"
 import Form from '@rjsf/core';
-import { CreateNode, DefaultValidateSubmitCallbackMap, nodeGetInputConnections, onSubmitCallbackMap, onValidateSubmitCallbackMap, setConnections, sortNodes } from '../../components/diagram-editor/util';
+import { CreateNode, DefaultValidateSubmitCallbackMap, nodeGetInputConnections, onSubmitCallbackMap, onValidateSubmitCallbackMap, setConnections, sortNodes, unescapeJSStrings } from '../../components/diagram-editor/util';
 import { AutoSizer, CellMeasurer, CellMeasurerCache, List } from 'react-virtualized';
 import Fuse from 'fuse.js';
 import { ActionsNodes, NodeStateAction } from "../../components/diagram-editor/nodes";
@@ -664,35 +664,8 @@ export default function DiagramEditor(props) {
 
 
                         if (updateWorkflow) {
-                            const workflowStr = PrettyYAML.stringify(wfData)
-                            let newWorkflowStr = ""
-                            
-                            // Handle Javascript blocks
-                            // TODO: Split into own function
-                            workflowStr.split("\n").forEach(lineStr => {
-                                const symbol = `"jq(`
-                                const replaceIndex = lineStr.indexOf(symbol)
-                                if (replaceIndex > 0) {
-                                    const jsStr = lineStr.slice(replaceIndex+symbol.length, -2).trim()
-
-                                    // Count leading whitespaces
-                                    let whiteSpaceCount = 0
-                                    for (;  lineStr[whiteSpaceCount] === " "; whiteSpaceCount++) {}
-
-                                    // Split javascript into multiline YAML string
-                                    newWorkflowStr += lineStr.slice(0, replaceIndex-1) + " |\n"
-                                    newWorkflowStr += " ".repeat(whiteSpaceCount) + "  jq(\n"
-
-                                    jsStr.split("\\n").forEach(jsLineStr => {
-                                        const test = jsLineStr.replace(`\\`, ``)
-                                        newWorkflowStr += " ".repeat(whiteSpaceCount)+ "    " + test + "\n"
-                                    });
-                                } else {
-                                    newWorkflowStr += lineStr + "\n"
-                                }
-                            });
-
-                            updateWorkflow(newWorkflowStr)
+                            const workflowStr = unescapeJSStrings(PrettyYAML.stringify(wfData))
+                            updateWorkflow(workflowStr)
                         } else {
                             console.warn("updateWorkflow callback missing")
                         }
