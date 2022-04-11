@@ -12,6 +12,8 @@ import { CreateNode, DefaultValidateSubmitCallbackMap, nodeGetInputConnections, 
 import { AutoSizer, CellMeasurer, CellMeasurerCache, List } from 'react-virtualized';
 import Fuse from 'fuse.js';
 import { ActionsNodes, NodeStateAction } from "../../components/diagram-editor/nodes";
+import PrettyYAML from "json-to-pretty-yaml"
+
 
 // Import Styles
 import './styles/form.css';
@@ -23,7 +25,7 @@ import { importFromYAML } from '../../components/diagram-editor/import';
 import Modal, { ButtonDefinition, ModalHeadless } from '../modal';
 
 import Ajv from "ajv"
-
+import { CustomWidgets } from './widgets';
 
 const actionsNodesFuse = new Fuse(ActionsNodes, {
     keys: ['name']
@@ -221,6 +223,7 @@ function FunctionsList(props) {
                             schema={functionSchemas.schema}
                             uiSchema={uiSchema}
                             formData={formData}
+                            widgets={CustomWidgets}
                             onChange={(e) => {
                                 setFormData(e.formData)
                             }}
@@ -661,7 +664,35 @@ export default function DiagramEditor(props) {
 
 
                         if (updateWorkflow) {
-                            updateWorkflow(wfData)
+                            const workflowStr = PrettyYAML.stringify(wfData)
+                            let newWorkflowStr = ""
+                            
+                            // Handle Javascript blocks
+                            // TODO: Split into own function
+                            workflowStr.split("\n").forEach(lineStr => {
+                                const symbol = `"jq(`
+                                const replaceIndex = lineStr.indexOf(symbol)
+                                if (replaceIndex > 0) {
+                                    const jsStr = lineStr.slice(replaceIndex+symbol.length, -2).trim()
+
+                                    // Count leading whitespaces
+                                    let whiteSpaceCount = 0
+                                    for (;  lineStr[whiteSpaceCount] === " "; whiteSpaceCount++) {}
+
+                                    // Split javascript into multiline YAML string
+                                    newWorkflowStr += lineStr.slice(0, replaceIndex-1) + " |\n"
+                                    newWorkflowStr += " ".repeat(whiteSpaceCount) + "  jq(\n"
+
+                                    jsStr.split("\\n").forEach(jsLineStr => {
+                                        const test = jsLineStr.replace(`\\`, ``)
+                                        newWorkflowStr += " ".repeat(whiteSpaceCount)+ "    " + test + "\n"
+                                    });
+                                } else {
+                                    newWorkflowStr += lineStr + "\n"
+                                }
+                            });
+
+                            updateWorkflow(newWorkflowStr)
                         } else {
                             console.warn("updateWorkflow callback missing")
                         }
@@ -879,6 +910,7 @@ export default function DiagramEditor(props) {
                                 schema={selectedNodeSchema}
                                 uiSchema={selectedNodeSchemaUI}
                                 formData={selectedNodeFormData}
+                                widgets={CustomWidgets}
                                 onChange={(e) => {
                                     setSelectedNodeFormData(e.formData)
                                 }}

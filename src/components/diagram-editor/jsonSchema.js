@@ -81,7 +81,8 @@ export const CommonSchemaDefinitionStateFields = {
                 "enum": [
                     "JQ Query",
                     "Key Value",
-                    "YAML"
+                    "YAML",
+                    "Javascript"
                 ],
                 "default": "JQ Query"
             }
@@ -117,6 +118,24 @@ export const CommonSchemaDefinitionStateFields = {
                             "title": "YAML",
                             "type": "string",
                             "description": "Raw YAML object representation of data.",
+                        }
+                    }
+                }
+            },
+            {
+                "if": {
+                    "properties": {
+                        "selectionType": {
+                            "const": "Javascript"
+                        }
+                    }
+                },
+                "then": {
+                    "properties": {
+                        "js": {
+                            "title": "Javascript",
+                            "type": "string",
+                            "description": "TODO: Javascript",
                         }
                     }
                 }
@@ -1167,8 +1186,11 @@ export const SchemaUIMap = {
         "action": {
             "input": {
                 "rawYAML": {
-                    "ui:widget": "textarea"
+                    "ui:widget": "textAreaWidgetYAML"
                 },
+                "js": {
+                    "ui:widget": "textAreaWidgetJS"
+                }
             },
             "function": {
                 "ui:placeholder": "Select Function"
@@ -1176,8 +1198,11 @@ export const SchemaUIMap = {
         },
         "transform": {
             "rawYAML": {
-                "ui:widget": "textarea"
+                "ui:widget": "textAreaWidgetYAML"
             },
+            "js": {
+                "ui:widget": "textAreaWidgetJS"
+            }
         }
     },
     // "stateSchemaSwitch": StateSchemaSwitch,
@@ -1190,15 +1215,21 @@ export const SchemaUIMap = {
             "items": {
                 "transform": {
                     "rawYAML": {
-                        "ui:widget": "textarea"
+                        "ui:widget": "textAreaWidgetYAML"
                     },
+                    "js": {
+                        "ui:widget": "textAreaWidgetJS"
+                    }
                 }
             }
         },
         "transform": {
             "rawYAML": {
-                "ui:widget": "textarea"
+                "ui:widget": "textAreaWidgetYAML"
             },
+            "js": {
+                "ui:widget": "textAreaWidgetJS"
+            }
         }
     },
     "stateSchemaParallel": {
@@ -1214,8 +1245,11 @@ export const SchemaUIMap = {
         "action": {
             "input": {
                 "rawYAML": {
-                    "ui:widget": "textarea"
+                    "ui:widget": "textAreaWidgetYAML"
                 },
+                "js": {
+                    "ui:widget": "textAreaWidgetJS"
+                }
             },
             "function": {
                 "ui:placeholder": "Select Function"
@@ -1223,22 +1257,31 @@ export const SchemaUIMap = {
         },
         "transform": {
             "rawYAML": {
-                "ui:widget": "textarea"
+                "ui:widget": "textAreaWidgetYAML"
             },
+            "js": {
+                "ui:widget": "textAreaWidgetJS"
+            }
         }
     },
     "stateSchemaGenerateEvent": {
         "event": {
             "data": {
                 "rawYAML": {
-                    "ui:widget": "textarea"
+                    "ui:widget": "textAreaWidgetYAML"
+                },
+                "js": {
+                    "ui:widget": "textAreaWidgetJS"
                 }
             }
         },
         "transform": {
             "rawYAML": {
-                "ui:widget": "textarea"
+                "ui:widget": "textAreaWidgetYAML"
             },
+            "js": {
+                "ui:widget": "textAreaWidgetJS"
+            }
         }
     },
     // "stateSchemaGetter": StateSchemaGetter,
@@ -1247,20 +1290,29 @@ export const SchemaUIMap = {
             "items": {
                 "value": {
                     "rawYAML": {
-                        "ui:widget": "textarea"
+                        "ui:widget": "textAreaWidgetYAML"
                     },
+                    "js": {
+                        "ui:widget": "textAreaWidgetJS"
+                    }
                 }
             }
         },
         "transform": {
             "rawYAML": {
-                "ui:widget": "textarea"
+                "ui:widget": "textAreaWidgetYAML"
             },
+            "js": {
+                "ui:widget": "textAreaWidgetJS"
+            }
         }
     },
     "stateSchemaValidate": {
         "schema": {
-            "ui:widget": "textarea"
+            "ui:widget": "textAreaWidgetYAML"
+        },
+        "js": {
+            "ui:widget": "textAreaWidgetJS"
         }
     },
 
@@ -1278,7 +1330,10 @@ export const SchemaUIMap = {
 export const DefaultSchemaUI = {
     "transform": {
         "rawYAML": {
-            "ui:widget": "textarea"
+            "ui:widget": "textAreaWidgetYAML"
+        },
+        "js": {
+            "ui:widget": "textAreaWidgetJS"
         }
     }
 }

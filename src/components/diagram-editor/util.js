@@ -128,11 +128,13 @@ function processTransform(stateData, transformKey) {
     const keyValue = stateData[transformKey]["keyValue"] ? stateData[transformKey]["keyValue"] : {}
     const jqQuery = stateData[transformKey]["jqQuery"] ? stateData[transformKey]["jqQuery"] : ""
     const rawYAML = stateData[transformKey]["rawYAML"] ? stateData[transformKey]["rawYAML"] : ""
+    const js = stateData[transformKey]["js"] ? stateData[transformKey]["js"] : ""
 
     delete stateData[transformKey]["keyValue"]
     delete stateData[transformKey]["jqQuery"]
     delete stateData[transformKey]["selectionType"]
     delete stateData[transformKey]["rawYAML"]
+    delete stateData[transformKey]["js"]
 
     if (selectionType && selectionType === "Key Value") {
         stateData[transformKey] = { ...keyValue }
@@ -140,6 +142,8 @@ function processTransform(stateData, transformKey) {
         stateData[transformKey] = YAML.load(rawYAML)
     } else if (selectionType && selectionType === "JQ Query") {
         stateData[transformKey] = jqQuery
+    } else if (selectionType && selectionType === "Javascript") {
+        stateData[transformKey] = `jq(\n${js}\n)`
     }
 
     if (stateData[transformKey] === "" || stateData[transformKey] === {}) {

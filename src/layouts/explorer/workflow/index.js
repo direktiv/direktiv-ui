@@ -23,7 +23,6 @@ import AddWorkflowVariablePanel from './variables';
 import { RevisionSelectorTab, TabbedButtons } from './revisionTab';
 import DependencyDiagram from '../../../components/dependency-diagram';
 import YAML from 'js-yaml'
-import PrettyYAML from "json-to-pretty-yaml"
 
 import WorkflowDiagram from '../../../components/diagram';
 
@@ -513,7 +512,30 @@ function WorkingRevision(props) {
                         </FlexBox>
                     </FlexBox>:""}
                     {tabBtn === 1 ? <DiagramEditor workflow={oldWf} namespace={namespace} updateWorkflow={(data)=>{
-                        setWorkflow(PrettyYAML.stringify(data))
+                        // const workflowStr = PrettyYAML.stringify(data)
+                        // let newWorkflowStr = ""
+                        
+
+                        // workflowStr.split("\n").forEach(lineStr => {
+                        //     let whiteSpaceCount = 0
+                        //     for (;  lineStr[whiteSpaceCount] === " "; whiteSpaceCount++) {}
+                        //     let processedLineStr = lineStr.slice(whiteSpaceCount).trim().slice(0, -1)
+                        //     console.log("processedLineStr = ", processedLineStr)
+                        //     if (processedLineStr.startsWith(`transform:`)) {
+                        //         const jsStr = processedLineStr.slice(whiteSpaceCount+`transform: "jq(`.length)
+                        //         newWorkflowStr += " ".repeat(whiteSpaceCount) + "transform: |\n"
+                        //         newWorkflowStr += " ".repeat(whiteSpaceCount) + "  js(" + "\n"
+                        //         jsStr.split("\\n").forEach(jsLineStr => {
+                        //             newWorkflowStr += " ".repeat(whiteSpaceCount) + "    " + jsLineStr + "\n"
+                        //         });
+                        //         newWorkflowStr += " ".repeat(whiteSpaceCount) + "  )" + "\n"
+                        //     } else {
+                        //         newWorkflowStr += lineStr + "\n"
+                        //     }
+                        // });
+
+                        setWorkflow(data)
+
                         setTabBtn(0)
                     }}/>:""}
                     {tabBtn === 2 ? <WorkflowDiagram disabled={true} workflow={YAML.load(workflow)}/>:""}
