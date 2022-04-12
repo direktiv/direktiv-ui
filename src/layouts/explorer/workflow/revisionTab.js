@@ -22,6 +22,7 @@ import { ApiFragment } from '..';
 import Form from "@rjsf/core";
 import  Tabs  from '../../../components/tabs';
 import Tippy from '@tippyjs/react';
+import { windowBlocker } from '../../../components/diagram-editor/usePrompt';
 
 function RevisionTab(props) {
 
@@ -193,7 +194,7 @@ function RevisionTab(props) {
 export default RevisionTab;
 export function TabbedButtons(props) {
 
-    let {tabBtn, setTabBtn, searchParams, setSearchParams, revision, enableDiagramEditor} = props;
+    let {tabBtn, setTabBtn, searchParams, setSearchParams, revision, enableDiagramEditor, setBlock, block, blockMsg} = props;
 
     let tabBtns = [];
     let tabBtnLabels = ["YAML", "Diagram", "Sankey"];
@@ -224,7 +225,16 @@ export function TabbedButtons(props) {
         }
 
         tabBtns.push(
-            <FlexBox key={key} className={classes} onClick={() => {
+            <FlexBox key={key} className={classes} onClick={(e) => {
+                if (block) {
+                    e.stopPropagation();
+                    if (!windowBlocker(blockMsg)) {
+                        return
+                    }
+
+                    setBlock(false)
+                }
+
                 setTabBtn(i)
                 setSearchParams({
                     tab: searchParams.get('tab'),

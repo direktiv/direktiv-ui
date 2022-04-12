@@ -14,7 +14,6 @@ import Fuse from 'fuse.js';
 import { ActionsNodes, NodeStateAction } from "../../components/diagram-editor/nodes";
 import PrettyYAML from "json-to-pretty-yaml"
 
-
 // Import Styles
 import './styles/form.css';
 import './styles/node.css';
@@ -26,6 +25,7 @@ import Modal, { ButtonDefinition, ModalHeadless } from '../modal';
 
 import Ajv from "ajv"
 import { CustomWidgets } from './widgets';
+import usePrompt from './usePrompt';
 
 const actionsNodesFuse = new Fuse(ActionsNodes, {
     keys: ['name']
@@ -261,7 +261,7 @@ function FunctionsList(props) {
 const MaxDrawerSize = 180
 
 export default function DiagramEditor(props) {
-    const { workflow, namespace, updateWorkflow } = props
+    const { workflow, namespace, updateWorkflow, block, setBlock } = props
 
     const [diagramEditor, setDiagramEditor] = useState(null);
     const [load, setLoad] = useState(true);
@@ -469,6 +469,11 @@ export default function DiagramEditor(props) {
         };
     });
 
+    // usePrompt(
+    //     "Warning Unsaved Changes. Are you sure you want to leave?",
+    //     block
+    // )
+
     return (
         <>
             {showContextMenu ? (
@@ -489,6 +494,7 @@ export default function DiagramEditor(props) {
                         onKeyDown={(ev) => {
                             if (ev.key === 'Enter' && contextMenuResults.length > 0) {
                                 const newNode = contextMenuResults[0].item ? contextMenuResults[0].item : contextMenuResults[0]
+                                setBlock(true)
                                 CreateNode(diagramEditor, newNode, contextMenuAnchorPoint.x, contextMenuAnchorPoint.y)
 
                                 setShowContextMenu(false)
@@ -503,6 +509,7 @@ export default function DiagramEditor(props) {
                                 return (
                                     <li onClick={() => {
                                         const newNode = obj.item ? obj.item : obj
+                                        setBlock(true)
                                         CreateNode(diagramEditor, newNode, contextMenuAnchorPoint.x, contextMenuAnchorPoint.y)
                                         setShowContextMenu(false)
                                         setShowNodeContextMenu(false)
@@ -794,7 +801,8 @@ export default function DiagramEditor(props) {
                                     newNode = ActionsNodes[nodeIndex]
                                 }
 
-                               CreateNode(diagramEditor, newNode, ev.clientX, ev.clientY)
+                                setBlock(true)
+                                CreateNode(diagramEditor, newNode, ev.clientX, ev.clientY)
                             }}
                             onContextMenu={(ev) => {
                                 ev.preventDefault()
@@ -823,6 +831,8 @@ export default function DiagramEditor(props) {
                             title={`Node Details: ${selectedNode ? selectedNode.data.id : ""}`}
                             actionButtons={[
                                 ButtonDefinition("Submit", () => {
+                                    setBlock(true)
+
                                     formRef.click()
                                     const ajv = new Ajv()
                                     const validate = ajv.compile(selectedNodeSchema)
