@@ -1,36 +1,5 @@
 /* builder */
 
-#builder-form .field-description {
-    font-size: 9px;
-    line-height: 12px;
-    margin-bottom: 4px;
-}
-
-#builder-form .control-label {
-    font-size: 11px;
-    line-height: 13px;
-}
-
-#builder-form .checkbox label {
-    font-size: 11px;
-    line-height: 13px;
-    display: flex;
-}
-
-#builder-form #root__title {
-    margin-bottom: 9px;
-    font-size: 21px;
-}
-
-#builder-form legend {
-    margin-bottom: 6px;
-    font-size: 17px;
-}
-
-#builder-form input {
-    width: calc(100% - 15px);
-    line-height: 20px;
-}
 
 #builder-form {
     min-width: 190px;

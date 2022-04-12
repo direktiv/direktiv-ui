@@ -122,6 +122,13 @@ export function importFromYAML(diagramEditor, setFunctions, wfYAML) {
     }
 
     sortNodes(diagramEditor)
+
+    // Preserve and return any other unhandled data
+    delete wfData["functions"]
+    delete wfData["states"]
+    delete wfData["start"]
+
+    return wfData
 }
 
 const importConnectionsCallbackMap = {

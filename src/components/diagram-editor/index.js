@@ -274,6 +274,8 @@ export default function DiagramEditor(props) {
     const [actionDrawerWidthOld, setActionDrawerWidthOld] = useState(MaxDrawerSize)
     const [actionDrawerMinWidth, setActionDrawerMinWidth] = useState(0)
 
+    const [unhandledData, setUnhandledData] = useState({})
+
     const [functionDrawerWidth, setFunctionDrawerWidth] = useState(0)
     const [functionDrawerMinWidth, setFunctionDrawerMinWidth] = useState(0)
     const [functionList, setFunctionList] = useState([])
@@ -414,7 +416,7 @@ export default function DiagramEditor(props) {
     useEffect(() => {
         if (diagramEditor && workflow) {
             if (load) {
-                importFromYAML(diagramEditor, setFunctionList, workflow)
+                setUnhandledData(importFromYAML(diagramEditor, setFunctionList, workflow))
             }
             setLoad(false)
         }
@@ -671,6 +673,7 @@ export default function DiagramEditor(props) {
 
 
                         if (updateWorkflow) {
+                            wfData = {...unhandledData, ...wfData}
                             const workflowStr = unescapeJSStrings(PrettyYAML.stringify(wfData))
                             updateWorkflow(workflowStr)
                         } else {
