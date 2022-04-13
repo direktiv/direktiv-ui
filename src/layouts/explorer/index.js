@@ -1,9 +1,10 @@
 import React, {useEffect, useState, useCallback} from 'react';
 import './style.css';
+import './rainbow.css';
 
 import ContentPanel, { ContentPanelBody, ContentPanelHeaderButton, ContentPanelHeaderButtonIcon, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
 import FlexBox from '../../components/flexbox';
-import { VscAdd, VscClose,  VscSearch, VscEdit, VscTrash, VscFolderOpened, VscCode } from 'react-icons/vsc';
+import { VscAdd, VscClose,  VscSearch, VscEdit, VscTrash, VscFolderOpened, VscCode, VscRepo } from 'react-icons/vsc';
 import { Config, GenerateRandomKey } from '../../util';
 import { FiFolder } from 'react-icons/fi';
 import { FcWorkflow } from 'react-icons/fc';
@@ -189,10 +190,24 @@ function ExplorerList(props) {
     const [orderFieldKey, setOrderFieldKey] = useState(orderFieldKeys[0])
      
     const [queryParams, setQueryParams] = useState([`first=${PAGE_SIZE}`])
-    const {data, err, templates, pageInfo, createNode, deleteNode, renameNode, totalCount } = useNodes(Config.url, true, namespace, path, localStorage.getItem("apikey"), ...queryParams, `order.field=${orderFieldDictionary[orderFieldKey]}`, `filter.field=NAME`, `filter.val=${search}`, `filter.type=CONTAINS`)
+    const {data, err, templates, pageInfo, createNode, createMirrorNode, deleteNode, renameNode, getMirrorInfo, updateMirrorSettings, syncMirror, getMirrorActivityLogs, setLockMirror, totalCount } = useNodes(Config.url, true, namespace, path, localStorage.getItem("apikey"), ...queryParams, `order.field=${orderFieldDictionary[orderFieldKey]}`, `filter.field=NAME`, `filter.val=${search}`, `filter.type=CONTAINS`)
 
     const [wfData, setWfData] = useState(templates["noop"].data)
     const [wfTemplate, setWfTemplate] = useState("noop")
+
+
+    // Mirror
+    const [mirrorSettings, setMirrorSettings] = useState({
+        "url": {edit: false, value: ""},
+        "ref": {edit: false, value: ""},
+        "cron": {edit: false, value: ""},
+        "publicKey": {edit: false, value: ""},
+        "privateKey": {edit: false, value: ""},
+        "passphrase": {edit: false, value: ""}
+    })
+    const [mirrorInfo, setMirrorInfo] = useState({})
+    const [mirrorActivityLogs, setMirrorActivityLogs] = useState({})
+
 
     function resetQueryParams() {
         setQueryParams([`first=${PAGE_SIZE}`])
@@ -203,6 +218,12 @@ function ExplorerList(props) {
     useEffect(()=>{
         if(data !== null || err !== null) {
             setLoad(false)
+            if (data.node.expandedType === "git") {
+                getMirrorInfo().then((minfo) =>{
+                    console.log("MIRROR INFO =====", minfo)
+                    setMirrorInfo(minfo)
+                })
+            }
         }
     },[data, err])
 
@@ -270,6 +291,30 @@ function ExplorerList(props) {
                     </Modal>
                 </div>
                 
+            </FlexBox>
+            <FlexBox key="delete-me-1">
+                <div>
+                    <Modal
+                        titleIcon={<VscCode/>}
+                        button={
+                            <Button className="small light" style={{ display: "flex", minWidth: "120px" }}>
+                                <ContentPanelHeaderButtonIcon>
+                                    <VscCode style={{ maxHeight: "12px", marginRight: "4px" }} />
+                                </ContentPanelHeaderButtonIcon>
+                                <span className='rainbow-text'>Show Data</span>
+                            </Button>
+                        }
+                        escapeToCancel
+                        withCloseButton
+                        maximised
+                        title={"DELETE ME"}
+                    >
+                        <div>
+                            <DirektivEditor height={400} lang={"json"} value={data ? JSON.stringify(data, null, 2): "NO DATA"}/>
+                            
+                        </div>
+                    </Modal>
+                </div>
             </FlexBox>
             <FlexBox style={{flexDirection: "row-reverse"}}>
                 <SearchBar search={search} setSearch={setSearch}/>
@@ -373,7 +418,7 @@ function ExplorerList(props) {
                                 )}  
                                 onClose={()=>{
                                     setName("")
-                                
+                                    
                                 }}
                                 actionButtons={[
                                     ButtonDefinition("Add", async () => {
@@ -403,6 +448,241 @@ function ExplorerList(props) {
                             </Modal>
                         </div>
                     </ContentPanelHeaderButton>
+                    <ContentPanelHeaderButton className="explorer-action-btn">
+                        <div>
+                            <Modal title="New Mirror Directory" 
+                                escapeToCancel
+                                button={(
+                                    <div style={{display:"flex"}}>
+                                        <ContentPanelHeaderButtonIcon>
+                                            <VscAdd/>
+                                        </ContentPanelHeaderButtonIcon>
+                                        <span className="hide-on-small">Mirror Directory</span>
+                                        <span className="hide-on-medium-and-up">Dir</span>
+                                    </div>
+                                )}  
+                                onClose={()=>{
+                                    setMirrorSettings({
+                                        "url": {edit: false, value: ""},
+                                        "ref": {edit: false, value: ""},
+                                        "cron": {edit: false, value: ""},
+                                        "publicKey": {edit: false, value: ""},
+                                        "privateKey": {edit: false, value: ""},
+                                        "passphrase": {edit: false, value: ""}
+                                    })
+                                }}
+                                actionButtons={[
+                                    ButtonDefinition("Add", async () => {
+                                        let mSettings = {}
+                                        Object.entries(mirrorSettings).map(([key, value]) => {
+                                            mSettings[key] = value.value
+                                        })
+                                        await createMirrorNode(name, mSettings)
+                                    }, `small blue ${name.trim() ? "" : "disabled"}`, ()=>{}, true, false, true),
+                                    ButtonDefinition("Cancel", () => {
+                                    }, "small light", ()=>{}, true, false)
+                                ]}
+
+                                keyDownActions={[
+                                    KeyDownDefinition("Enter", async () => {
+                                        let mSettings = {}
+                                        Object.entries(mirrorSettings).map(([key, value]) => {
+                                            mSettings[key] = value.value
+                                        })
+                                        await createMirrorNode(name, mSettings)
+                                        setName("")
+                                    }, ()=>{}, true)
+                                ]}
+
+                                requiredFields={[
+                                    {tip: "directory name is required", value: name}
+                                ]}
+
+                            >
+                                <FlexBox  className="col gap" style={{fontSize: "12px"}}>
+                                    <div style={{width: "100%", paddingRight: "12px", display: "flex"}}>
+                                        <input value={name} onChange={(e)=>setName(e.target.value)} autoFocus placeholder="Enter a directory name" />
+                                    </div>
+                                    {Object.entries(mirrorSettings).map(([key, value]) => {
+                                        return(
+                                        <div style={{width: "100%", paddingRight: "12px", display: "flex"}}>
+                                            <input value={value.value} onChange={(e)=>{
+                                                const newSettings = mirrorSettings
+                                                newSettings[key].value = e.target.value
+                                                setMirrorSettings({...newSettings})
+                                            }} autoFocus placeholder={`Enter a mirror ${key}`}/>
+                                        </div>
+                                        )
+                                    })}
+                                </FlexBox>
+                            </Modal>
+                        </div>
+                    </ContentPanelHeaderButton>
+                    {
+                        data && data.node.expandedType === "git" ?
+                            <>
+                                <ContentPanelHeaderButton className="explorer-action-btn">
+                                    <div>
+                                        <Modal title="Mirror Activities"
+                                            escapeToCancel
+                                            button={(
+                                                <div style={{ display: "flex" }}>
+                                                    <ContentPanelHeaderButtonIcon>
+                                                        <VscRepo />
+                                                    </ContentPanelHeaderButtonIcon>
+                                                    <span className="hide-on-small rainbow-text">Activities</span>
+                                                    <span className="hide-on-medium-and-up">Activities</span>
+                                                </div>
+                                            )}
+                                            actionButtons={[
+                                                ButtonDefinition("Close", () => {
+                                                }, "small light", () => { }, true, false),
+                                                ButtonDefinition("Refresh", async () => {
+                                                    getMirrorInfo().then((minfo) => {
+                                                        console.log("MIRROR INFO =====", minfo)
+                                                        setMirrorInfo(minfo)
+                                                    })
+                                                }, "small blue", () => { }, true, false),
+
+                                            ]}
+                                        >
+                                            <FlexBox className="col gap" style={{ fontSize: "12px" }}>
+                                                { mirrorInfo && mirrorInfo.activities ?
+                                                    <>
+                                                    {
+                                                    mirrorInfo.activities.edges.map((obj)=>{
+                                                        return (
+                                                            <FlexBox className="row gap">
+                                                                <Button className="small" onClick={()=>{
+                                                                    getMirrorActivityLogs(obj.node.id)
+                                                                }}>
+                                                                    Show Logs
+                                                                </Button>
+                                                                <Button className="small" onClick={()=>{
+                                                                    getMirrorActivityLogs(obj.node.id)
+                                                                }}>
+                                                                    Cancel
+                                                                </Button>
+                                                                {Object.entries(obj.node).map(([key, value]) => {
+                                                                    return (
+                                                                        <div style={{fontWeight: "normal"}}>
+                                                                            <span  style={{fontWeight: "bold"}}>{key}:</span>
+                                                                            {value}
+                                                                        </div>
+                                                                    )
+                                                                    
+                                                                })}
+                                                            </FlexBox>
+                                                        )
+                                                    })
+                                                    }
+                                                    </>:<></>
+                                                }
+                                            </FlexBox>
+                                        </Modal>
+                                    </div>
+                                </ContentPanelHeaderButton>
+                                <ContentPanelHeaderButton className="explorer-action-btn">
+                                    <div>
+                                        <Modal title="Mirror Settings"
+                                            escapeToCancel
+                                            button={(
+                                                <div style={{ display: "flex" }}>
+                                                    <ContentPanelHeaderButtonIcon>
+                                                        <VscRepo />
+                                                    </ContentPanelHeaderButtonIcon>
+                                                    <span className="hide-on-small rainbow-text">Mirror Settings</span>
+                                                    <span className="hide-on-medium-and-up">Mirror</span>
+                                                </div>
+                                            )}
+                                            onClose={() => {
+                                                setMirrorSettings({
+                                                    "url": { edit: false, value: "" },
+                                                    "ref": { edit: false, value: "" },
+                                                    "cron": { edit: false, value: "" },
+                                                    "publicKey": { edit: false, value: "" },
+                                                    "privateKey": { edit: false, value: "" },
+                                                    "passphrase": { edit: false, value: "" }
+                                                })
+                                            }}
+                                            onOpen={() => {
+                                                let mSettings = mirrorSettings
+                                                Object.entries(mirrorInfo.info).map(([key, value]) => {
+                                                    if (mSettings[key] !== undefined) {
+                                                        mSettings[key].value = value
+                                                    }
+                                                })
+                                                setMirrorSettings({ ...mSettings })
+
+                                            }}
+                                            actionButtons={[
+                                                ButtonDefinition("Close", () => {
+                                                }, "small light", () => { }, true, false),
+                                                ButtonDefinition("Update Settings", async () => {
+                                                    let mSettings = {}
+                                                    Object.entries(mirrorSettings).map(([key, value]) => {
+                                                        if (value.edit) {
+                                                            mSettings[key] = value.value
+                                                        } else {
+                                                            mSettings[key] = "-"
+                                                        }
+                                                    })
+                                                    await updateMirrorSettings(mSettings)
+
+                                                    getMirrorInfo().then((minfo) => {
+                                                        console.log("MIRROR INFO =====", minfo)
+                                                        setMirrorInfo(minfo)
+                                                    })
+                                                }, "small blue", () => { }, true, false),
+                                                ButtonDefinition(`${mirrorInfo && mirrorInfo.info && mirrorInfo.info.locked ? "Unlock" : "Lock"}`, async () => {
+                                                    await setLockMirror(!mirrorInfo.info.locked)
+                                                    const minfo =  await getMirrorInfo()
+                                                    console.log("MIRROR INFO =====", minfo)
+                                                    setMirrorInfo(minfo)
+                                                }, "small blue", () => { }, false, false),
+                                                ButtonDefinition("Soft Sync", async () => {
+                                                    console.log("Soft Sync = ", await syncMirror())
+                                                }, "small blue", () => { }, true, false),
+                                                ButtonDefinition("Hard Sync", async () => {
+                                                    console.log("Soft Sync = ", await syncMirror(true))
+                                                }, "small blue", () => { }, true, false),
+
+                                            ]}
+
+                                            keyDownActions={[
+                                            ]}
+
+                                            requiredFields={[
+                                            ]}
+                                        >
+                                            <FlexBox className="col gap" style={{ fontSize: "12px" }}>
+                                                <div className='rainbow-text'>
+                                                    Click labels to edit
+                                                </div>
+                                                {Object.entries(mirrorSettings).map(([key, value]) => {
+                                                    return (
+                                                        <div style={{ width: "100%", paddingRight: "12px", display: "flex" }}>
+                                                            <label className={`${value.edit ? "rainbow-text" : ""}`} style={{ marginRight: "6px", cursor: "pointer" }} onClick={() => {
+                                                                const newSettings = mirrorSettings
+                                                                newSettings[key].edit = !newSettings[key].edit
+                                                                setMirrorSettings({ ...newSettings })
+                                                            }}>{key}:</label>
+                                                            <input value={value.value} onChange={(e) => {
+                                                                const newSettings = mirrorSettings
+                                                                newSettings[key].value = e.target.value
+                                                                setMirrorSettings({ ...newSettings })
+                                                            }} autoFocus readOnly={!value.edit} />
+                                                        </div>
+                                                    )
+                                                })}
+                                            </FlexBox>
+                                        </Modal>
+                                    </div>
+                                </ContentPanelHeaderButton>
+                            </>
+                            :
+                            <></>
+                    }
                     <div className="explorer-sort-by explorer-action-btn hide-on-small">
                     <FlexBox className="gap" style={{marginRight: "8px"}}>
                         <FlexBox className="center">
@@ -449,7 +729,7 @@ function ExplorerList(props) {
                         <>
                         {data.children.edges.map((obj) => {
                             if (obj.node.type === "directory") {
-                                return (<DirListItem namespace={namespace} renameNode={renameNode} deleteNode={deleteNode} path={obj.node.path} key={GenerateRandomKey("explorer-item-")} name={obj.node.name} resetQueryParams={resetQueryParams}/>)
+                                return (<DirListItem className={`${data && obj.node.expandedType === "git" ? "rainbow-text":""}`} namespace={namespace} renameNode={renameNode} deleteNode={deleteNode} path={obj.node.path} key={GenerateRandomKey("explorer-item-")} name={obj.node.name} resetQueryParams={resetQueryParams}/>)
                             } else if (obj.node.type === "workflow") {
                                 return (<WorkflowListItem namespace={namespace} renameNode={renameNode} deleteNode={deleteNode} path={obj.node.path} key={GenerateRandomKey("explorer-item-")} name={obj.node.name} />)
                             }
@@ -469,7 +749,7 @@ function ExplorerList(props) {
 
 function DirListItem(props) {
 
-    let {name, path, deleteNode, renameNode, namespace, resetQueryParams} = props;
+    let {name, path, deleteNode, renameNode, namespace, resetQueryParams, className} = props;
 
     const navigate = useNavigate()
     const [renameValue, setRenameValue] = useState(path)
@@ -481,7 +761,7 @@ function DirListItem(props) {
         <div style={{cursor:"pointer"}} onClick={(e)=>{
             resetQueryParams()
             navigate(`/n/${namespace}/explorer/${path.substring(1)}`)
-        }} className="explorer-item">
+        }} className={`explorer-item ${className ? className : ""}`}>
             <FlexBox className="col">
                 <FlexBox className="explorer-item-container gap wrap">
                     <FlexBox className="explorer-item-icon">
