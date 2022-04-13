@@ -25,6 +25,11 @@ import Pagination from '../../components/pagination';
 import Alert from '../../components/alert';
 import NotFound from '../notfound';
 
+import * as dayjs from "dayjs"
+import relativeTime from "dayjs/plugin/relativeTime";
+import utc from "dayjs/plugin/utc"
+
+
 const PAGE_SIZE = 10
 const apiHelps = (namespace) => {
     let url = window.location.origin
@@ -168,6 +173,9 @@ function SearchBar(props) {
     );
 }
 
+dayjs.extend(utc)
+dayjs.extend(relativeTime);
+
 const orderFieldDictionary = {
     "Name": "NAME", // Default
     "Created": "CREATED"
@@ -190,7 +198,7 @@ function ExplorerList(props) {
     const [orderFieldKey, setOrderFieldKey] = useState(orderFieldKeys[0])
      
     const [queryParams, setQueryParams] = useState([`first=${PAGE_SIZE}`])
-    const {data, err, templates, pageInfo, createNode, createMirrorNode, deleteNode, renameNode, getMirrorInfo, updateMirrorSettings, syncMirror, getMirrorActivityLogs, setLockMirror, totalCount } = useNodes(Config.url, true, namespace, path, localStorage.getItem("apikey"), ...queryParams, `order.field=${orderFieldDictionary[orderFieldKey]}`, `filter.field=NAME`, `filter.val=${search}`, `filter.type=CONTAINS`)
+    const {data, err, templates, pageInfo, createNode, createMirrorNode, deleteNode, renameNode, getMirrorInfo, updateMirrorSettings, syncMirror, getMirrorActivityLogs, cancelMirrorActivity, setLockMirror, totalCount } = useNodes(Config.url, true, namespace, path, localStorage.getItem("apikey"), ...queryParams, `order.field=${orderFieldDictionary[orderFieldKey]}`, `filter.field=NAME`, `filter.val=${search}`, `filter.type=CONTAINS`)
 
     const [wfData, setWfData] = useState(templates["noop"].data)
     const [wfTemplate, setWfTemplate] = useState("noop")
@@ -206,7 +214,7 @@ function ExplorerList(props) {
         "passphrase": {edit: false, value: ""}
     })
     const [mirrorInfo, setMirrorInfo] = useState({})
-    const [mirrorActivityLogs, setMirrorActivityLogs] = useState({})
+    const [mirrorActivityLogs, setMirrorActivityLogs] = useState([])
 
 
     function resetQueryParams() {
@@ -542,24 +550,32 @@ function ExplorerList(props) {
                                                         console.log("MIRROR INFO =====", minfo)
                                                         setMirrorInfo(minfo)
                                                     })
-                                                }, "small blue", () => { }, true, false),
+                                                }, "small blue", () => { }, false, false),
 
                                             ]}
                                         >
-                                            <FlexBox className="col gap" style={{ fontSize: "12px" }}>
+                                            <FlexBox className="col gap" style={{ fontSize: "12px", maxHeight:"30vh", overflow: "scroll" }}>
                                                 { mirrorInfo && mirrorInfo.activities ?
                                                     <>
                                                     {
                                                     mirrorInfo.activities.edges.map((obj)=>{
                                                         return (
                                                             <FlexBox className="row gap">
-                                                                <Button className="small" onClick={()=>{
-                                                                    getMirrorActivityLogs(obj.node.id)
+                                                                <Button className="small" onClick={async ()=>{
+                                                                    try {
+                                                                        const actLogs = await getMirrorActivityLogs(obj.node.id)
+                                                                        setMirrorActivityLogs(actLogs.edges)
+                                                                    } catch (e) {
+                                                                        console.log("e == ?", e)
+                                                                        alert(`got error when getting logs: ${e.message}`)
+                                                                    }
                                                                 }}>
-                                                                    Show Logs
+                                                                    Logs
                                                                 </Button>
                                                                 <Button className="small" onClick={()=>{
-                                                                    getMirrorActivityLogs(obj.node.id)
+                                                                    cancelMirrorActivity(obj.node.id).catch((e)=>{
+                                                                        alert(`got error when getting cancelling: ${e.message}`)
+                                                                    })
                                                                 }}>
                                                                     Cancel
                                                                 </Button>
@@ -567,7 +583,8 @@ function ExplorerList(props) {
                                                                     return (
                                                                         <div style={{fontWeight: "normal"}}>
                                                                             <span  style={{fontWeight: "bold"}}>{key}:</span>
-                                                                            {value}
+                                                                            {key ==="createdAt" || key ==="updatedAt"? 
+                                                                            `${dayjs.utc(value).local().format("DD MMM YY")} ${dayjs.utc(value).local().format("HH:mm a")}` : value}
                                                                         </div>
                                                                     )
                                                                     
@@ -577,6 +594,14 @@ function ExplorerList(props) {
                                                     })
                                                     }
                                                     </>:<></>
+                                                }
+                                            </FlexBox>
+                                            <FlexBox className="col gap" style={{ fontSize: "12px", maxHeight:"30vh", minHeight: "50px", backgroundColor:"#f0f0f0", overflow: "scroll" }}>
+                                                <div>LOGS: TotalCount {mirrorActivityLogs.length}</div>
+                                                {
+                                                    mirrorActivityLogs.map((obj)=>{
+                                                        <span>{obj}</span>
+                                                    })
                                                 }
                                             </FlexBox>
                                         </Modal>
