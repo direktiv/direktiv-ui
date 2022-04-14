@@ -470,14 +470,6 @@ function ExplorerList(props) {
                                     </div>
                                 )}  
                                 onClose={()=>{
-                                    setMirrorSettings({
-                                        "url": {edit: false, value: ""},
-                                        "ref": {edit: false, value: ""},
-                                        "cron": {edit: false, value: ""},
-                                        "publicKey": {edit: false, value: ""},
-                                        "privateKey": {edit: false, value: ""},
-                                        "passphrase": {edit: false, value: ""}
-                                    })
                                 }}
                                 actionButtons={[
                                     ButtonDefinition("Add", async () => {
