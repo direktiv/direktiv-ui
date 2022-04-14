@@ -514,7 +514,7 @@ function ExplorerList(props) {
                                     {Object.entries(mirrorSettings).map(([key, value]) => {
                                         return(
                                         <div style={{width: "100%", paddingRight: "12px", display: "flex"}}>
-                                            <input value={value.value} onChange={(e)=>{
+                                            <textarea style={{width:"100%"}} value={value.value} onChange={(e)=>{
                                                 const newSettings = mirrorSettings
                                                 newSettings[key].value = e.target.value
                                                 setMirrorSettings({...newSettings})
