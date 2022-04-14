@@ -180,6 +180,12 @@
     border: var(--connector-error-border);
 }
 
+/* Node output: set second output to back to normal border style when node is eventExor*/
+#builder-page .node.primitive.type-eventXor .outputs div:nth-of-type(2) {
+    border: var(--connector-border) !important;
+}
+
+
 /* Node output: set input to error style when node is catch block*/
 #builder-page .node.type-catch .inputs div:nth-of-type(1) {
     border: var(--connector-error-border);
