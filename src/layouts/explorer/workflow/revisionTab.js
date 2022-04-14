@@ -375,6 +375,7 @@ export function RevisionSelectorTab(props) {
                     {
                         apiHelps(namespace, workflowName).map((help)=>(
                             <ApiFragment
+                                key={`key-${help.type}`}
                                 description={help.description}
                                 url={help.url}
                                 method={help.method}

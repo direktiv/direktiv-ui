@@ -259,6 +259,7 @@ function ExplorerList(props) {
                         {
                             apiHelps(namespace).map((help)=>(
                                 <ApiFragment
+                                    key={`${help.type}-key`}
                                     description={help.description}
                                     url={help.url}
                                     method={help.method}
