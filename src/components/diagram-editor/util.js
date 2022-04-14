@@ -313,7 +313,7 @@ const connectionsCallbackMap = {
                     // skip first node connection (error catcher)
                     if (i > 0) {
                         const nextNode = rawData[nodeOutput.connections[0].node]
-                        state.events[i].transition = nextNode.data.id
+                        state.events[i-1].transition = nextNode.data.id
                     }
 
                     setConnections(nodeOutput.connections[0].node, nodeID, state, rawData, wfData)

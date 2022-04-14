@@ -4,6 +4,7 @@ import prettyYAML from "json-to-pretty-yaml"
 import { CreateNode, sortNodes, unescapeJSStrings } from "./util";
 
 export function importFromYAML(diagramEditor, setFunctions, wfYAML) {
+    console.log("diagramEditor = ", diagramEditor)
     const wfData = YAML.load(wfYAML)
     let nodeIDToStateIDMap = {}
     let catchNodes = []
@@ -92,6 +93,8 @@ export function importFromYAML(diagramEditor, setFunctions, wfYAML) {
         const state = wfData.states[i];
         const nodeID = nodeIDToStateIDMap[state.id]
         const catchNodeRef = `SPECIAL-ERROR: ` + state.id
+        console.log("nodeIDToStateIDMap = ", nodeIDToStateIDMap)
+        console.log("nodeID = ", nodeID)
         const node = diagramEditor.getNodeFromId(nodeID)
 
         if (state.catch) {
@@ -168,10 +171,7 @@ const importConnectionsCallbackMap = {
                 document.getElementById(`node-${nextNodeID}`).style.top = `${newPosY}px`;
                 diagramEditor.updateConnectionNodes(`node-${nextNodeID}`);
 
-                if (i > 0) {
-                    diagramEditor.addNodeOutput(nodeID)
-                }
-
+                diagramEditor.addNodeOutput(nodeID)
                 diagramEditor.addConnection(nodeID, nextNodeID, `output_${i + 2}`, 'input_1')
 
             }

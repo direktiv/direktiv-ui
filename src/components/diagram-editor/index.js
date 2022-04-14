@@ -25,7 +25,6 @@ import Modal, { ButtonDefinition, ModalHeadless } from '../modal';
 
 import Ajv from "ajv"
 import { CustomWidgets } from './widgets';
-import usePrompt from './usePrompt';
 
 const actionsNodesFuse = new Fuse(ActionsNodes, {
     keys: ['name']
@@ -261,7 +260,7 @@ function FunctionsList(props) {
 const MaxDrawerSize = 180
 
 export default function DiagramEditor(props) {
-    const { workflow, namespace, updateWorkflow, block, setBlock } = props
+    const { workflow, namespace, updateWorkflow, setBlock } = props
 
     const [diagramEditor, setDiagramEditor] = useState(null);
     const [load, setLoad] = useState(true);
@@ -470,11 +469,6 @@ export default function DiagramEditor(props) {
             document.removeEventListener("click", handleClick);
         };
     });
-
-    // usePrompt(
-    //     "Warning Unsaved Changes. Are you sure you want to leave?",
-    //     block
-    // )
 
     return (
         <>

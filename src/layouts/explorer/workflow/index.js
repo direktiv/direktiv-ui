@@ -356,7 +356,7 @@ function WorkingRevision(props) {
             setShowErrors(true)
             pushOpLoadingState("Save", false)
         })
-    }, [oldWf, workflow, pushOpLoadingState, updateWorkflow, canSave])
+    }, [workflow, pushOpLoadingState, updateWorkflow, canSave])
 
     return(
         <FlexBox style={{width:"100%"}}>

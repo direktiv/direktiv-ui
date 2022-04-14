@@ -14,7 +14,6 @@ export const TextAreaWidgetYAML = (props) => {
                 event.preventDefault();
                 const { selectionStart, selectionEnd } = event.target;
                 const oldValue = event.target.value
-                console.log("event.target.value, = ",event.target.value)
                 const newValue = oldValue.substring(0, selectionStart) +"  " +oldValue.substring(selectionEnd)
                 props.onChange(newValue)
             }
@@ -39,7 +38,6 @@ export const TextAreaWidgetJS = (props) => {
                 event.preventDefault();
                 const { selectionStart, selectionEnd } = event.target;
                 const oldValue = event.target.value
-                console.log("event.target.value, = ",event.target.value)
                 const newValue = oldValue.substring(0, selectionStart) +"  " +oldValue.substring(selectionEnd)
                 props.onChange(newValue)
             }

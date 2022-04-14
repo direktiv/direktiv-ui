@@ -155,7 +155,7 @@ export const ActionsNodes = [
     {
         name: 'StateEventsAnd',
         family: "primitive",
-        type: "eventsAnd",
+        type: "eventAnd",
         info: {
             requiresInit: true,
             actions: true,
