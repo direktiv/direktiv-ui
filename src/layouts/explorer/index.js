@@ -692,7 +692,7 @@ function ExplorerList(props) {
                                                                 newSettings[key].edit = !newSettings[key].edit
                                                                 setMirrorSettings({ ...newSettings })
                                                             }}>{key}:</label>
-                                                            <input value={value.value} onChange={(e) => {
+                                                            <textarea style={{width:"100%"}} value={value.value} onChange={(e) => {
                                                                 const newSettings = mirrorSettings
                                                                 newSettings[key].value = e.target.value
                                                                 setMirrorSettings({ ...newSettings })
