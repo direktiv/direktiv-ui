@@ -205,16 +205,29 @@ function ExplorerList(props) {
 
 
     // Mirror
+    function devGetPublicKey() {
+        return localStorage.getItem('dev-publicKey') ? localStorage.getItem('dev-publicKey') : ""
+    }
     const [mirrorSettings, setMirrorSettings] = useState({
         "url": {edit: false, value: ""},
         "ref": {edit: false, value: ""},
         "cron": {edit: false, value: ""},
-        "publicKey": {edit: false, value: ""},
+        "publicKey": {edit: false, value: devGetPublicKey()},
         "privateKey": {edit: false, value: ""},
         "passphrase": {edit: false, value: ""}
     })
     const [mirrorInfo, setMirrorInfo] = useState({})
     const [mirrorActivityLogs, setMirrorActivityLogs] = useState([])
+
+
+
+    function devSettingsSetPublicKey(settings) {
+        if (settings["publicKey"] && settings["publicKey"].value !== "") {
+            localStorage.setItem('dev-publicKey', settings["publicKey"].value)
+        }
+
+        return settings
+    }
 
 
     function resetQueryParams() {
@@ -507,8 +520,9 @@ function ExplorerList(props) {
                                         return(
                                         <div style={{width: "100%", paddingRight: "12px", display: "flex"}}>
                                             <textarea style={{width:"100%"}} value={value.value} onChange={(e)=>{
-                                                const newSettings = mirrorSettings
+                                                let newSettings = mirrorSettings
                                                 newSettings[key].value = e.target.value
+                                                newSettings = devSettingsSetPublicKey(newSettings)
                                                 setMirrorSettings({...newSettings})
                                             }} autoFocus placeholder={`Enter a mirror ${key}`}/>
                                         </div>
@@ -622,7 +636,7 @@ function ExplorerList(props) {
                                                     "url": { edit: false, value: "" },
                                                     "ref": { edit: false, value: "" },
                                                     "cron": { edit: false, value: "" },
-                                                    "publicKey": { edit: false, value: "" },
+                                                    "publicKey": { edit: false, value: devGetPublicKey() },
                                                     "privateKey": { edit: false, value: "" },
                                                     "passphrase": { edit: false, value: "" }
                                                 })
@@ -685,13 +699,15 @@ function ExplorerList(props) {
                                                     return (
                                                         <div style={{ width: "100%", paddingRight: "12px", display: "flex" }}>
                                                             <label className={`${value.edit ? "rainbow-text" : ""}`} style={{ marginRight: "6px", cursor: "pointer" }} onClick={() => {
-                                                                const newSettings = mirrorSettings
+                                                                let newSettings = mirrorSettings
                                                                 newSettings[key].edit = !newSettings[key].edit
+                                                                newSettings = devSettingsSetPublicKey(newSettings)
                                                                 setMirrorSettings({ ...newSettings })
                                                             }}>{key}:</label>
                                                             <textarea style={{width:"100%"}} value={value.value} onChange={(e) => {
-                                                                const newSettings = mirrorSettings
+                                                                let newSettings = mirrorSettings
                                                                 newSettings[key].value = e.target.value
+                                                                newSettings = devSettingsSetPublicKey(newSettings)
                                                                 setMirrorSettings({ ...newSettings })
                                                             }} autoFocus readOnly={!value.edit} />
                                                         </div>

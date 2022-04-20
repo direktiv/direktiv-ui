@@ -156,7 +156,7 @@ function MainLayout(props) {
  
     const [namespace, setNamespace] = useState(null)
     const [toggleResponsive, setToggleResponsive] = useState(false);
-    const {data, err, createNamespace, deleteNamespace} = useNamespaces(Config.url, true, akey)
+    const {data, err, createNamespace, createMirrorNamespace, deleteNamespace} = useNamespaces(Config.url, true, akey)
 
     // const [versions, setVersions] = useState(false)
     
@@ -191,7 +191,7 @@ function MainLayout(props) {
                 <Loader load={load} timer={1000} >
                     <BrowserRouter>
                         <FlexBox className="navigation-col">
-                        <NavBar akeyReq={akeyReq} footer={footer} extraNavigation={extraNavigation}  toggleResponsive={toggleResponsive} setToggleResponsive={setToggleResponsive} setNamespace={setNamespace} namespace={namespace} createNamespace={createNamespace} deleteNamespace={deleteNamespace} namespaces={data} />
+                        <NavBar akeyReq={akeyReq} footer={footer} extraNavigation={extraNavigation}  toggleResponsive={toggleResponsive} setToggleResponsive={setToggleResponsive} setNamespace={setNamespace} namespace={namespace} createNamespace={createNamespace} createMirrorNamespace={createMirrorNamespace} deleteNamespace={deleteNamespace} namespaces={data} />
                         </FlexBox>
                         <NamespaceNavigation  akey={akey} extraRoutes={extraRoutes} deleteNamespace={deleteNamespace} namespace={namespace} setNamespace={setNamespace} namespaces={data}/>
                     </BrowserRouter>

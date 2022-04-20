@@ -9,10 +9,11 @@ import { ButtonDefinition } from '../modal';
 import {VscAdd,  VscFolderOpened, VscGraph, VscLayers, VscServer,  VscSettingsGear,  VscSymbolEvent, VscVmRunning, VscPlayCircle} from 'react-icons/vsc';
 
 import { Link, matchPath, useLocation, useNavigate } from 'react-router-dom';
+import Tabs from '../tabs';
 
 function NavBar(props) {
 
-    let {onClick, style, footer,  className, createNamespace, namespace, namespaces, createErr, toggleResponsive, setToggleResponsive, extraNavigation} = props;
+    let {onClick, style, footer,  className, createNamespace, createMirrorNamespace, namespace, namespaces, createErr, toggleResponsive, setToggleResponsive, extraNavigation} = props;
     if (!className) {
         className = ""
     }
@@ -42,7 +43,7 @@ function NavBar(props) {
                             <NamespaceSelector pathname={pathname} toggleResponsive={setToggleResponsive} namespace={namespace} namespaces={namespaces}/>
                         </FlexBox>
                         <FlexBox>
-                            <NewNamespaceBtn createErr={createErr} createNamespace={createNamespace} />
+                            <NewNamespaceBtn createErr={createErr} createNamespace={createNamespace} createMirrorNamespace={createMirrorNamespace}/>
                         </FlexBox>
                         <NavItems extraNavigation={extraNavigation} pathname={pathname} toggleResponsive={setToggleResponsive} namespace={namespace} style={{ marginTop: "12px" }} />
                     </div>
@@ -61,7 +62,32 @@ function NavBar(props) {
 export default NavBar;
 
 function NewNamespaceBtn(props) {
-    const {createNamespace} = props
+    const {createNamespace, createMirrorNamespace} = props
+    
+    function devGetPublicKey() {
+        return localStorage.getItem('dev-publicKey') ? localStorage.getItem('dev-publicKey') : ""
+    }
+    const [tabIndex, setTabIndex] = useState(0)
+
+    const [mirrorSettings, setMirrorSettings] = useState({
+        "url": {edit: false, value: ""},
+        "ref": {edit: false, value: ""},
+        "cron": {edit: false, value: ""},
+        "publicKey": {edit: false, value: devGetPublicKey()},
+        "privateKey": {edit: false, value: ""},
+        "passphrase": {edit: false, value: ""}
+    })
+
+
+    function devSettingsSetPublicKey(settings) {
+        if (settings["publicKey"] && settings["publicKey"].value !== "") {
+            localStorage.setItem('dev-publicKey', settings["publicKey"].value)
+        }
+
+        return settings
+    }
+
+
 
     // createErr is filled when someone tries to create namespace but proceeded to error out
 
@@ -103,7 +129,15 @@ function NewNamespaceBtn(props) {
 
                actionButtons={[
                    ButtonDefinition("Add", async () => {
-                          await createNamespace(ns)
+                          if (tabIndex === 0) {
+                            await createNamespace(ns)
+                          } else {
+                            let mSettings = {}
+                            Object.entries(mirrorSettings).map(([key, value]) => {
+                                mSettings[key] = value.value
+                            })
+                            await createMirrorNamespace(ns, mSettings)
+                          }
                           setTimeout(()=>{
                             navigate(`/n/${ns}`)
                           },200)
@@ -118,9 +152,37 @@ function NewNamespaceBtn(props) {
                    {tip: "namespace is required", value: ns}
                ]}
         >
+            <Tabs
+                // TODO: change wf-execute-input => tabbed-form
+                id={"wf-execute-input"}
+                key={"inputForm"}
+                callback={setTabIndex}
+                tabIndex={tabIndex}
+                style={{minWidth: "280px"}}
+                headers={["Standard", "Mirror"]}
+                tabs={[(
             <FlexBox>
                 <input autoFocus value={ns} onChange={(e)=>setNs(e.target.value)} placeholder="Enter namespace name" />
+            </FlexBox>),(
+                <FlexBox  className="col gap" style={{fontSize: "12px"}}>
+                <div style={{width: "100%", paddingRight: "12px", display: "flex"}}>
+                    <input autoFocus value={ns} onChange={(e)=>setNs(e.target.value)} placeholder="Enter namespace name" />
+                </div>
+                {Object.entries(mirrorSettings).map(([key, value]) => {
+                    return(
+                    <div style={{width: "100%", paddingRight: "12px", display: "flex"}}>
+                        <textarea style={{width:"100%"}} value={value.value} onChange={(e)=>{
+                            let newSettings = mirrorSettings
+                            newSettings[key].value = e.target.value
+                            newSettings = devSettingsSetPublicKey(newSettings)
+                            setMirrorSettings({...newSettings})
+                        }} autoFocus placeholder={`Enter a mirror ${key}`}/>
+                    </div>
+                    )
+                })}
             </FlexBox>
+            )]}
+            />
         </Modal>
     );
 }
