@@ -546,53 +546,58 @@ function ExplorerList(props) {
 
                                             ]}
                                         >
-                                            <FlexBox className="col gap" style={{ fontSize: "12px", maxHeight:"30vh", overflow: "scroll" }}>
-                                                { mirrorInfo && mirrorInfo.activities ?
+                                            <FlexBox className="col gap" style={{ fontSize: "12px", maxHeight: "30vh", overflow: "scroll" }}>
+                                                {mirrorInfo && mirrorInfo.activities ?
                                                     <>
-                                                    {
-                                                    mirrorInfo.activities.edges.map((obj)=>{
-                                                        return (
-                                                            <FlexBox className="row gap">
-                                                                <Button className="small" onClick={async ()=>{
-                                                                    try {
-                                                                        const actLogs = await getMirrorActivityLogs(obj.node.id)
-                                                                        setMirrorActivityLogs(actLogs.edges)
-                                                                    } catch (e) {
-                                                                        console.log("e == ?", e)
-                                                                        alert(`got error when getting logs: ${e.message}`)
-                                                                    }
-                                                                }}>
-                                                                    Logs
-                                                                </Button>
-                                                                <Button className="small" onClick={()=>{
-                                                                    cancelMirrorActivity(obj.node.id).catch((e)=>{
-                                                                        alert(`got error when getting cancelling: ${e.message}`)
-                                                                    })
-                                                                }}>
-                                                                    Cancel
-                                                                </Button>
-                                                                {Object.entries(obj.node).map(([key, value]) => {
-                                                                    return (
-                                                                        <div style={{fontWeight: "normal"}}>
-                                                                            <span  style={{fontWeight: "bold"}}>{key}:</span>
-                                                                            {key ==="createdAt" || key ==="updatedAt"? 
-                                                                            `${dayjs.utc(value).local().format("DD MMM YY")} ${dayjs.utc(value).local().format("HH:mm a")}` : value}
-                                                                        </div>
-                                                                    )
-                                                                    
-                                                                })}
-                                                            </FlexBox>
-                                                        )
-                                                    })
-                                                    }
-                                                    </>:<></>
+                                                        {
+                                                            mirrorInfo.activities.edges.map((obj) => {
+                                                                return (
+                                                                    <FlexBox className="row gap">
+                                                                        <Button className="small" onClick={async () => {
+                                                                            try {
+                                                                                const actLogs = await getMirrorActivityLogs(obj.node.id)
+                                                                                setMirrorActivityLogs(actLogs.edges)
+                                                                            } catch (e) {
+                                                                                console.log("e == ?", e)
+                                                                                alert(`got error when getting logs: ${e.message}`)
+                                                                            }
+                                                                        }}>
+                                                                            Logs
+                                                                        </Button>
+                                                                        <Button className="small" onClick={() => {
+                                                                            cancelMirrorActivity(obj.node.id).catch((e) => {
+                                                                                alert(`got error when getting cancelling: ${e.message}`)
+                                                                            })
+                                                                        }}>
+                                                                            Cancel
+                                                                        </Button>
+                                                                        {Object.entries(obj.node).map(([key, value]) => {
+                                                                            return (
+                                                                                <div style={{ fontWeight: "normal" }}>
+                                                                                    <span style={{ fontWeight: "bold" }}>{key}:</span>
+                                                                                    {key === "createdAt" || key === "updatedAt" ?
+                                                                                        `${dayjs.utc(value).local().format("DD MMM YY")} ${dayjs.utc(value).local().format("HH:mm a")}` : value}
+                                                                                </div>
+                                                                            )
+
+                                                                        })}
+                                                                    </FlexBox>
+                                                                )
+                                                            })
+                                                        }
+                                                    </> : <></>
                                                 }
                                             </FlexBox>
-                                            <FlexBox className="col gap" style={{ fontSize: "12px", maxHeight:"30vh", minHeight: "50px", backgroundColor:"#f0f0f0", overflow: "scroll" }}>
+                                            <FlexBox className="col gap" style={{ fontSize: "12px", maxHeight: "30vh", minHeight: "50px", backgroundColor: "#f0f0f0", overflow: "scroll" }}>
                                                 <div>LOGS: TotalCount {mirrorActivityLogs.length}</div>
+                                                <div>
+                                                    {/* {JSON.stringify(mirrorActivityLogs)} */}
+                                                </div>
                                                 {
-                                                    mirrorActivityLogs.map((obj)=>{
-                                                        <span>{obj}</span>
+                                                    mirrorActivityLogs.map((obj) => {
+                                                        return (
+                                                            <span style={{ lineHeight: "12px" }}>{JSON.stringify(obj.node.msg)}</span>
+                                                        )
                                                     })
                                                 }
                                             </FlexBox>
