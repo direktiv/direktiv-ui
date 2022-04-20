@@ -772,13 +772,14 @@ function DirListItem(props) {
     const [renameValue, setRenameValue] = useState(path)
     const [rename, setRename] = useState(false)
     const [err, setErr] = useState("")
+    const [recursiveDelete, setRecursiveDelete] = useState(false)
 
 
     return(
         <div style={{cursor:"pointer"}} onClick={(e)=>{
             resetQueryParams()
             navigate(`/n/${namespace}/explorer/${path.substring(1)}`)
-        }} className={`explorer-item ${className ? className : ""}`}>
+        }} className={`explorer-item`}>
             <FlexBox className="col">
                 <FlexBox className="explorer-item-container gap wrap">
                     <FlexBox className="explorer-item-icon">
@@ -799,7 +800,7 @@ function DirListItem(props) {
                         }} onChange={(e)=>setRenameValue(e.target.value)} autoFocus/>
                      </FlexBox>
                     :
-                    <FlexBox className="explorer-item-name">
+                    <FlexBox className={`explorer-item-name ${className ? className : ""}`}>
                         {name}
                     </FlexBox>
                 }
@@ -845,7 +846,7 @@ function DirListItem(props) {
                                         ButtonDefinition("Delete", async () => {
                                             let p = path.split('/', -1);
                                             let pLast = p[p.length-1];
-                                            await deleteNode(pLast)
+                                            await deleteNode(pLast, recursiveDelete)
                                         }, "small red", ()=>{}, true, false),
                                         ButtonDefinition("Cancel", () => {
                                         }, "small light", ()=>{}, true, false)
@@ -853,6 +854,15 @@ function DirListItem(props) {
                                 } 
                             >
                                     <FlexBox className="col gap">
+                                <FlexBox className="center-y gap" style={{fontWeight:"bold"}}>
+                                    Recursive Delete:
+                                    <label className="switch">
+                                        <input onChange={()=>{
+                                            setRecursiveDelete(!recursiveDelete)
+                                        }} type="checkbox" checked={recursiveDelete}/>
+                                        <span className="slider-broadcast"></span>
+                                    </label>
+                                </FlexBox>
                                 <FlexBox >
                                     Are you sure you want to delete '{name}'?
                                     <br/>
@@ -949,7 +959,7 @@ function WorkflowListItem(props) {
                                                 ButtonDefinition("Delete", async () => {
                                                     let p = path.split('/', -1);
                                                     let pLast = p[p.length-1];
-                                                    await deleteNode(pLast)
+                                                    await deleteNode(pLast, false)
                                                 }, "small red", ()=>{}, true, false),
                                                 ButtonDefinition("Cancel", () => {
                                                 }, "small light", ()=>{}, true, false)
