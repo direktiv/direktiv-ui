@@ -670,8 +670,8 @@ function ExplorerList(props) {
                                                         setMirrorInfo(minfo)
                                                     })
                                                 }, "small blue", () => { }, true, false),
-                                                ButtonDefinition(`${mirrorInfo && mirrorInfo.info && mirrorInfo.info.locked ? "Unlock" : "Lock"}`, async () => {
-                                                    await setLockMirror(!mirrorInfo.info.locked)
+                                                ButtonDefinition(`${data && data.node && data.node.readOnly ? "Unlock" : "Lock"}`, async () => {
+                                                    await setLockMirror(!data.node.readOnly)
                                                     const minfo =  await getMirrorInfo()
                                                     console.log("MIRROR INFO =====", minfo)
                                                     setMirrorInfo(minfo)
