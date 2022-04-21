@@ -9,7 +9,7 @@ import { Config, GenerateRandomKey } from '../../util';
 import { FiFolder } from 'react-icons/fi';
 import { FcWorkflow } from 'react-icons/fc';
 import { HiOutlineTrash } from 'react-icons/hi';
-import { useNodes } from 'direktiv-react-hooks';
+import { useMirror, useNodes } from 'direktiv-react-hooks';
 import { useNavigate, useParams } from 'react-router';
 import Modal, {ButtonDefinition, KeyDownDefinition} from '../../components/modal'
 import DirektivEditor from '../../components/editor';
@@ -198,7 +198,10 @@ function ExplorerList(props) {
     const [orderFieldKey, setOrderFieldKey] = useState(orderFieldKeys[0])
      
     const [queryParams, setQueryParams] = useState([`first=${PAGE_SIZE}`])
-    const {data, err, templates, pageInfo, createNode, createMirrorNode, deleteNode, renameNode, getMirrorInfo, updateMirrorSettings, syncMirror, getMirrorActivityLogs, cancelMirrorActivity, setLockMirror, totalCount } = useNodes(Config.url, true, namespace, path, localStorage.getItem("apikey"), ...queryParams, `order.field=${orderFieldDictionary[orderFieldKey]}`, `filter.field=NAME`, `filter.val=${search}`, `filter.type=CONTAINS`)
+    const {data, err, templates, pageInfo, createNode, createMirrorNode, deleteNode, renameNode, totalCount } = useNodes(Config.url, true, namespace, path, localStorage.getItem("apikey"), ...queryParams, `order.field=${orderFieldDictionary[orderFieldKey]}`, `filter.field=NAME`, `filter.val=${search}`, `filter.type=CONTAINS`)
+
+    // Setup Hook if expanded node type is git
+    const {data: mirrorData, err: mirrorErr, getInfo, getActivityLogs, setLock, updateSettings, cancelActivity, sync} = useMirror(Config.url, false, namespace, data?.node?.expandedType === "git" ? path : undefined, localStorage.getItem("apikey"))
 
     const [wfData, setWfData] = useState(templates["noop"].data)
     const [wfTemplate, setWfTemplate] = useState("noop")
@@ -240,7 +243,7 @@ function ExplorerList(props) {
         if(data !== null || err !== null) {
             setLoad(false)
             if (data.node.expandedType === "git") {
-                getMirrorInfo().then((minfo) =>{
+                getInfo().then((minfo) =>{
                     console.log("MIRROR INFO =====", minfo)
                     setMirrorInfo(minfo)
                 })
@@ -552,7 +555,7 @@ function ExplorerList(props) {
                                                 ButtonDefinition("Close", () => {
                                                 }, "small light", () => { }, true, false),
                                                 ButtonDefinition("Refresh", async () => {
-                                                    getMirrorInfo().then((minfo) => {
+                                                    getInfo().then((minfo) => {
                                                         console.log("MIRROR INFO =====", minfo)
                                                         setMirrorInfo(minfo)
                                                     })
@@ -569,7 +572,7 @@ function ExplorerList(props) {
                                                                     <FlexBox className="row gap">
                                                                         <Button className="small" onClick={async () => {
                                                                             try {
-                                                                                const actLogs = await getMirrorActivityLogs(obj.node.id)
+                                                                                const actLogs = await getActivityLogs(obj.node.id)
                                                                                 setMirrorActivityLogs(actLogs.edges)
                                                                             } catch (e) {
                                                                                 console.log("e == ?", e)
@@ -579,7 +582,7 @@ function ExplorerList(props) {
                                                                             Logs
                                                                         </Button>
                                                                         <Button className="small" onClick={() => {
-                                                                            cancelMirrorActivity(obj.node.id).catch((e) => {
+                                                                            cancelActivity(obj.node.id).catch((e) => {
                                                                                 alert(`got error when getting cancelling: ${e.message}`)
                                                                             })
                                                                         }}>
@@ -663,24 +666,24 @@ function ExplorerList(props) {
                                                             mSettings[key] = "-"
                                                         }
                                                     })
-                                                    await updateMirrorSettings(mSettings)
+                                                    await updateSettings(mSettings)
 
-                                                    getMirrorInfo().then((minfo) => {
+                                                    getInfo().then((minfo) => {
                                                         console.log("MIRROR INFO =====", minfo)
                                                         setMirrorInfo(minfo)
                                                     })
                                                 }, "small blue", () => { }, true, false),
                                                 ButtonDefinition(`${data && data.node && data.node.readOnly ? "Unlock" : "Lock"}`, async () => {
-                                                    await setLockMirror(!data.node.readOnly)
-                                                    const minfo =  await getMirrorInfo()
+                                                    await setLock(!data.node.readOnly)
+                                                    const minfo =  await getInfo()
                                                     console.log("MIRROR INFO =====", minfo)
                                                     setMirrorInfo(minfo)
                                                 }, "small blue", () => { }, false, false),
                                                 ButtonDefinition("Soft Sync", async () => {
-                                                    console.log("Soft Sync = ", await syncMirror())
+                                                    console.log("Soft Sync = ", await sync())
                                                 }, "small blue", () => { }, true, false),
                                                 ButtonDefinition("Hard Sync", async () => {
-                                                    console.log("Soft Sync = ", await syncMirror(true))
+                                                    console.log("Soft Sync = ", await sync(true))
                                                 }, "small blue", () => { }, true, false),
 
                                             ]}
