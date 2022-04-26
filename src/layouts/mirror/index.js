@@ -54,10 +54,11 @@ function MirrorPage(props) {
 
     console.log("!!! path = ", path)
     console.log("!!! namespace = ", namespace)
-    const {data, err, getInfo, getActivityLogs, setLock, updateSettings, cancelActivity, sync} = useMirror(Config.url, false, namespace, path, localStorage.getItem("apikey"))
+    const {info, activities, err, getInfo, getActivityLogs, setLock, updateSettings, cancelActivity, sync} = useMirror(Config.url, false, "mirror", path, localStorage.getItem("apikey"))
 
-    console.log("data = ", data)
-    console.log("err = ", err)
+    console.log("info = ", info)
+    console.log("activities = ", activities)
+    // console.log("err = ", getInfo())
 
 
     if (!namespace) {
@@ -75,6 +76,9 @@ function MirrorPage(props) {
                         </ContentPanelTitleIcon>
                         <FlexBox className="gap" style={{ alignItems: "center" }}>Activity List</FlexBox>
                     </ContentPanelTitle>
+                    <ContentPanelBody>
+                        <ActivityTable activities={activities?.edges}/>
+                    </ContentPanelBody>
                 </ContentPanel>
                 <ContentPanel style={{ width: "100%", minHeight: "40vh" }}>
                     <ContentPanelTitle>
@@ -114,7 +118,7 @@ function MirrorPage(props) {
                     <FlexBox className="gap" style={{ alignItems: "center" }}>Activity Logs</FlexBox>
                 </ContentPanelTitle>
                 <ContentPanelBody>
-                    <ActivityTable activities={data?.activities?.edges}/>
+                    TODO
                 </ContentPanelBody>
             </ContentPanel>
 
@@ -197,8 +201,10 @@ export function ActivityTable(props) {
                             <tr>
 
                                 <th className="center-align" style={{ maxWidth: "120px", minWidth: "120px", width: "120px" }}>State</th>
-                                <th className="center-align">Name</th>
+                                <th className="center-align">ID</th>
+                                <th className="center-align">Type</th>
                                 <th className="center-align">Started <span className="hide-on-med">at</span></th>
+                                <th className="center-align">ACTIONS</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -211,9 +217,8 @@ export function ActivityTable(props) {
                                                     key={GenerateRandomKey()}
                                                     namespace={namespace}
                                                     state={obj.node.status}
-                                                    name={obj.node.as}
                                                     id={obj.node.id}
-                                                    invoker={obj.node.invoker}
+                                                    type={obj.node.type}
                                                     startedDate={dayjs.utc(obj.node.createdAt).local().format("DD MMM YY")}
                                                     startedTime={dayjs.utc(obj.node.createdAt).local().format("HH:mm a")}
                                                     finishedDate={dayjs.utc(obj.node.updatedAt).local().format("DD MMM YY")}
@@ -241,7 +246,7 @@ const cancelled = "cancelled";
 const running = "pending";
 
 export function ActivityRow(props) {
-    let { state, name, wf, startedDate, finishedDate, startedTime, finishedTime, id, namespace, invoker } = props;
+    let { state, startedDate, finishedDate, startedTime, finishedTime, id, namespace, type } = props;
     const navigate = useNavigate()
 
     let label;
@@ -255,13 +260,6 @@ export function ActivityRow(props) {
         label = <RunningState />
     }
 
-    let wfStr = name.split(':')[0]
-    let revStr = name.split(':')[1]
-
-    let pathwf = wfStr.split("/")
-    let wfname = pathwf[pathwf.length - 1]
-    pathwf.pop()
-
     return (
 
         <tr onClick={() => {
@@ -270,24 +268,25 @@ export function ActivityRow(props) {
             <td className="label-cell">
                 {label}
             </td>
-            {!wf ?
-                <Tippy content={`/${wfStr}`} trigger={'mouseenter focus'} zIndex={10}>
-                    <td className="center-align" style={{ fontSize: "12px", lineHeight: "20px", display: "flex", justifyContent: "center", marginTop: "12px", whiteSpace: "nowrap" }}>
-                        {pathwf.length > 0 ?
-                            <div style={{ marginLeft: "10px", textOverflow: "ellipsis", overflow: "hidden" }}>
-                                /{pathwf.join("/")}
-                            </div> :
-                            <></>
-                        }
-                        <div>
-                            /{wfname}
-                        </div>
-
-                    </td>
-                </Tippy> : ""}
+            <td className="center-align">
+                {id.split("-")[0]}
+            </td>
+            <td className="center-align">
+                {type}
+            </td>
             <td className="center-align">
                 <span className="hide-on-860">{startedDate}, </span>
                 {startedTime}
+            </td>
+            <td className="center-align">
+                <FlexBox className="center gap">
+                    <Button>
+                        Cancel
+                    </Button>
+                    <Button>
+                        Logs
+                    </Button>
+                </FlexBox>
             </td>
         </tr>
     )
