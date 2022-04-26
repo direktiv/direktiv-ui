@@ -26,6 +26,7 @@ import InstancePageWrapper from '../instance';
 // import PermissionsPageWrapper from '../permissions';
 import EventsPageWrapper from '../events';
 import Monitoring from '../monitoring';
+import MirrorPage from '../mirror';
 
 
 function NamespaceNavigation(props){
@@ -107,8 +108,8 @@ function NamespaceNavigation(props){
                     <Route path="/n/:namespace" element={<Explorer namespace={namespace} />} >
                         <Route path="explorer/*" element={<Explorer namespace={namespace} />} />
                     </Route>
-                   
-                
+
+                    <Route path="/n/:namespace/mirror/*" element={<MirrorPage namespace={namespace} />} />
 
                     <Route path="/n/:namespace/monitoring" element={<Monitoring namespace={namespace}/>}/>
                     {/* <Route path="/n/:namespace/builder" element={<WorkflowBuilder namespace={namespace}/>}/> */}

@@ -185,6 +185,8 @@ const orderFieldKeys = Object.keys(orderFieldDictionary)
 
 function ExplorerList(props) {
     const {namespace, path} = props
+    console.log("!!! path = ", path)
+
     const navigate= useNavigate()
     
     //api helper modal
@@ -569,7 +571,24 @@ function ExplorerList(props) {
                                                         {
                                                             mirrorInfo.activities.edges.map((obj) => {
                                                                 return (
-                                                                    <FlexBox className="row gap">
+                                                                    <FlexBox className="row gap" style={{border: "1px solid grey"}}>
+                                                                        {Object.entries(obj.node).map(([key, value]) => {
+                                                                            return (
+                                                                                <div style={{ fontWeight: "normal" }}>
+                                                                                    <span style={{ fontWeight: "bold" }}>{key}:</span>
+                                                                                    {key === "createdAt" || key === "updatedAt" ?
+                                                                                        `${dayjs.utc(value).local().format("DD MMM YY")} ${dayjs.utc(value).local().format("HH:mm a")}` : value}
+                                                                                </div>
+                                                                            )
+
+                                                                        })}
+                                                                        <Button className="small" onClick={() => {
+                                                                            cancelActivity(obj.node.id).catch((e) => {
+                                                                                alert(`got error when getting cancelling: ${e.message}`)
+                                                                            })
+                                                                        }}>
+                                                                            Cancel
+                                                                        </Button>
                                                                         <Button className="small" onClick={async () => {
                                                                             try {
                                                                                 const actLogs = await getActivityLogs(obj.node.id)
@@ -581,23 +600,6 @@ function ExplorerList(props) {
                                                                         }}>
                                                                             Logs
                                                                         </Button>
-                                                                        <Button className="small" onClick={() => {
-                                                                            cancelActivity(obj.node.id).catch((e) => {
-                                                                                alert(`got error when getting cancelling: ${e.message}`)
-                                                                            })
-                                                                        }}>
-                                                                            Cancel
-                                                                        </Button>
-                                                                        {Object.entries(obj.node).map(([key, value]) => {
-                                                                            return (
-                                                                                <div style={{ fontWeight: "normal" }}>
-                                                                                    <span style={{ fontWeight: "bold" }}>{key}:</span>
-                                                                                    {key === "createdAt" || key === "updatedAt" ?
-                                                                                        `${dayjs.utc(value).local().format("DD MMM YY")} ${dayjs.utc(value).local().format("HH:mm a")}` : value}
-                                                                                </div>
-                                                                            )
-
-                                                                        })}
                                                                     </FlexBox>
                                                                 )
                                                             })
