@@ -29,7 +29,6 @@ import * as dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime";
 import utc from "dayjs/plugin/utc"
 
-
 const PAGE_SIZE = 10
 const apiHelps = (namespace) => {
     let url = window.location.origin
@@ -246,8 +245,9 @@ function ExplorerList(props) {
             setLoad(false)
             if (data.node.expandedType === "git") {
                 getInfo().then((minfo) =>{
-                    console.log("MIRROR INFO =====", minfo)
                     setMirrorInfo(minfo)
+                }).catch((e)=>{
+                    console.warn("HELLO! could not get mirror info: ", e)
                 })
             }
         }

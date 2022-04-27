@@ -4,40 +4,18 @@ import './rainbow.css';
 
 import ContentPanel, { ContentPanelBody, ContentPanelHeaderButton, ContentPanelHeaderButtonIcon, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
 import FlexBox from '../../components/flexbox';
-import { VscAdd, VscClose, VscSearch, VscEdit, VscTrash, VscFolderOpened, VscCode, VscRepo, VscVmRunning } from 'react-icons/vsc';
+import { VscAdd, VscFolderOpened } from 'react-icons/vsc';
 import { Config, GenerateRandomKey } from '../../util';
-import { FiFolder } from 'react-icons/fi';
-import { FcWorkflow } from 'react-icons/fc';
-import { HiOutlineTrash } from 'react-icons/hi';
-import { useMirror, useNodes } from 'direktiv-react-hooks';
+import { useMirror, useMirrorLogs } from 'direktiv-react-hooks';
 import { useNavigate, useParams } from 'react-router';
-import Modal, { ButtonDefinition, KeyDownDefinition } from '../../components/modal'
-import DirektivEditor from '../../components/editor';
 import Button from '../../components/button';
-import HelpIcon from "../../components/help"
 import Loader from '../../components/loader';
-import { useSearchParams } from 'react-router-dom';
-import { AutoSizer } from 'react-virtualized';
 import Pagination from '../../components/pagination';
-import Alert from '../../components/alert';
-import NotFound from '../notfound';
 
 import * as dayjs from "dayjs"
-import relativeTime from "dayjs/plugin/relativeTime";
-import utc from "dayjs/plugin/utc"
 
 // import './style.css';
 import { BsDot } from 'react-icons/bs';
-// import HelpIcon from '../../components/help';
-import { useInstances } from 'direktiv-react-hooks';
-// import { Config, GenerateRandomKey } from '../../util';
-
-// import * as dayjs from "dayjs"
-// import relativeTime from "dayjs/plugin/relativeTime";
-// import utc from "dayjs/plugin/utc"
-// import { useNavigate } from 'react-router-dom';
-// import Loader from '../../components/loader';
-import Tippy from '@tippyjs/react';
 
 const PAGE_SIZE = 10
 
@@ -46,15 +24,16 @@ const PAGE_SIZE = 10
 function MirrorPage(props) {
     const { namespace } = props
     const params = useParams()
+    const [activity, setActivity] = useState(null)
 
     let path = `/`
-    if(params["*"] !== undefined){
+    if (params["*"] !== undefined) {
         path = `/${params["*"]}`
     }
 
     console.log("!!! path = ", path)
     console.log("!!! namespace = ", namespace)
-    const {info, activities, err, getInfo, getActivityLogs, setLock, updateSettings, cancelActivity, sync} = useMirror(Config.url, false, "mirror", path, localStorage.getItem("apikey"))
+    const { info, activities, err, getInfo, getActivityLogs, setLock, updateSettings, cancelActivity, sync } = useMirror(Config.url, true, "mirror", path, localStorage.getItem("apikey"))
 
     console.log("info = ", info)
     console.log("activities = ", activities)
@@ -77,7 +56,7 @@ function MirrorPage(props) {
                         <FlexBox className="gap" style={{ alignItems: "center" }}>Activity List</FlexBox>
                     </ContentPanelTitle>
                     <ContentPanelBody>
-                        <ActivityTable activities={activities?.edges}/>
+                        <ActivityTable activities={activities} setActivity={setActivity}/>
                     </ContentPanelBody>
                 </ContentPanel>
                 <ContentPanel style={{ width: "100%", minHeight: "40vh" }}>
@@ -118,7 +97,7 @@ function MirrorPage(props) {
                     <FlexBox className="gap" style={{ alignItems: "center" }}>Activity Logs</FlexBox>
                 </ContentPanelTitle>
                 <ContentPanelBody>
-                    TODO
+                    <ActivityLogs activity={activity} />
                 </ContentPanelBody>
             </ContentPanel>
 
@@ -129,7 +108,7 @@ function MirrorPage(props) {
 export default MirrorPage;
 
 export function ActivityTable(props) {
-    const { activities, err, panelStyle, bodyStyle, placeholder, namespace, totalCount, pageInfo } = props
+    const { activities, err, panelStyle, bodyStyle, placeholder, namespace, totalCount, pageInfo, setActivity } = props
     const [load, setLoad] = useState(true)
 
     const [queryParams, setQueryParams] = useState([`first=${PAGE_SIZE}`])
@@ -223,6 +202,7 @@ export function ActivityTable(props) {
                                                     startedTime={dayjs.utc(obj.node.createdAt).local().format("HH:mm a")}
                                                     finishedDate={dayjs.utc(obj.node.updatedAt).local().format("DD MMM YY")}
                                                     finishedTime={dayjs.utc(obj.node.updatedAt).local().format("HH:mm a")}
+                                                    setActivity={setActivity}
                                                 />
                                             )
                                         })}</>
@@ -230,12 +210,44 @@ export function ActivityTable(props) {
                                 : ""}
                         </tbody>
                     </table>
-            }</>:<></>}
+            }</> : <></>}
             <FlexBox>
                 {!!totalCount && <Pagination pageSize={PAGE_SIZE} pageInfo={pageInfo} updatePage={updatePage} total={totalCount} queryParams={queryParams} />}
             </FlexBox>
         </Loader>
     );
+}
+
+export function ActivityLogs(props) {
+    const {activity} = props
+    const { data, err } = useMirrorLogs(Config.url, true, "mirror", activity, localStorage.getItem("apikey"))
+
+    const [filterName, setFilterName] = useState("")
+
+    useEffect(() => {
+        console.log("useEffect filterName is: ", filterName)
+        return () => {
+            console.log("useEffect return filterName is: ", filterName)
+        } 
+    }, [filterName])
+
+    
+
+    return (
+        <>
+        <div onClick={()=>{
+            setFilterName(filterName+"1")
+        }}>
+            filterName = {`"${filterName}"`}
+        </div>
+        <div>
+            CURRENT Activity: {activity ? activity : "null"}
+        </div>
+        <div>
+            {data ? JSON.stringify(data) : "DATA IS NULL"}
+        </div>
+        </>
+    )
 }
 
 const success = "complete";
@@ -246,7 +258,7 @@ const cancelled = "cancelled";
 const running = "pending";
 
 export function ActivityRow(props) {
-    let { state, startedDate, finishedDate, startedTime, finishedTime, id, namespace, type } = props;
+    let { state, startedDate, finishedDate, startedTime, finishedTime, id, namespace, type, setActivity } = props;
     const navigate = useNavigate()
 
     let label;
@@ -262,9 +274,7 @@ export function ActivityRow(props) {
 
     return (
 
-        <tr onClick={() => {
-            navigate(`/n/${namespace}/instances/${id}`)
-        }} className="instance-row" style={{ cursor: "pointer" }}>
+        <tr className="instance-row" style={{ cursor: "pointer" }}>
             <td className="label-cell">
                 {label}
             </td>
@@ -283,7 +293,15 @@ export function ActivityRow(props) {
                     <Button>
                         Cancel
                     </Button>
-                    <Button>
+                    <Button className="small" onClick={async () => {
+                        try {
+                            setActivity(id)
+                            console.log("setting activity to id")
+                        } catch (e) {
+                            console.log("e == ?", e)
+                            alert(`got error when getting logs: ${e.message}`)
+                        }
+                    }}>
                         Logs
                     </Button>
                 </FlexBox>
