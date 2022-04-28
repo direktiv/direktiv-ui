@@ -958,7 +958,7 @@ export function GenerateFunctionSchemaWithEnum(namespaceServices, globalServices
     if (namespaceServices) {
         if (namespaceServices.length > 0) {
             nsFuncSchema.properties.service.enum = namespaceServices
-            uiSchema["knative-namespace"]["service"]["ui:placeholder"] = "Select Service :P"
+            uiSchema["knative-namespace"]["service"]["ui:placeholder"] = "Select Service"
         } else {
             delete nsFuncSchema.properties.service.enum
             uiSchema["knative-namespace"]["service"]["ui:placeholder"] = "No Services"

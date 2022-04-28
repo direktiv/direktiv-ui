@@ -351,12 +351,13 @@ function WorkingRevision(props) {
         pushOpLoadingState("Save", true)
         updateWorkflow(workflow).then(()=>{
             setShowErrors(false)
+            setTabBlocker(false)
         }).catch((opError) => {
             setErrors([opError.message])
             setShowErrors(true)
             pushOpLoadingState("Save", false)
         })
-    }, [workflow, pushOpLoadingState, updateWorkflow, canSave])
+    }, [workflow, pushOpLoadingState, updateWorkflow, canSave, setTabBlocker])
 
     return(
         <FlexBox style={{width:"100%"}}>
@@ -480,6 +481,7 @@ function WorkingRevision(props) {
                                     pushOpLoadingState("Save", true)
                                     updateWorkflow(workflow).then(()=>{
                                         setShowErrors(false)
+                                        setTabBlocker(false)
                                     }).catch((opError) => {
                                         setErrors([opError.message])
                                         setShowErrors(true)

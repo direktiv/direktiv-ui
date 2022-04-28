@@ -114,7 +114,7 @@ function FunctionsList(props) {
     }
 
     const ajv = new Ajv()
-    const functionSchemas = GenerateFunctionSchemaWithEnum(namespaceServiceHook.data.map(a => a.serviceName), (globalServiceHook.data.map(a => a.serviceName)), namespaceNodesHook.data.children.edges)
+    const functionSchemas = GenerateFunctionSchemaWithEnum(namespaceServiceHook.data.map(a => a.serviceName), (globalServiceHook.data.map(a => a.serviceName)), namespaceNodesHook.data)
     const validate = ajv.compile(functionSchemas.schema)
 
     // Set uischema to global or namespace depending on the type
