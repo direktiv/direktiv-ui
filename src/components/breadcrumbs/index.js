@@ -26,14 +26,14 @@ function Breadcrumbs(props) {
             <ul>
                 {breadcrumbs.length < 9 ? breadcrumbs.map((obj)=>{
                     // ignore breadcrumbs for dividers
-                    if(obj.key === "/g" || obj.key === "/n" || obj.key === "/" || obj.key === `/n/${namespace}/explorer` ) {
+                    if(obj.key === "/g" || obj.key === "/n" || obj.key === "/" || obj.key === `/n/${namespace}/explorer` || obj.key === `/n/${namespace}/mirror` ) {
                         return ""
                     }
                     let key = GenerateRandomKey("crumb-");
                
                     return(
-                        <li id={key} key={key}>
-                            <Link to={obj.key}>
+                        <li id={key} key={key.replace(`/n/${namespace}/mirror`, `/n/${namespace}/explorer`)}>
+                            <Link to={obj.key.replace(`/n/${namespace}/mirror`, `/n/${namespace}/explorer`)}>
                                 {obj.breadcrumb}
                             </Link>
                         </li>
@@ -41,14 +41,14 @@ function Breadcrumbs(props) {
                 }) : 
                <>
                {breadcrumbs.slice(0, 6).map((obj)=>{
-                    if(obj.key === "/g" || obj.key === "/n" || obj.key === "/" || obj.key === `/n/${namespace}/explorer` ) {
+                    if(obj.key === "/g" || obj.key === "/n" || obj.key === "/" || obj.key === `/n/${namespace}/explorer` || obj.key === `/n/${namespace}/mirror` ) {
                         return ""
                     }
                     let key = GenerateRandomKey("crumb-");
                
                     return(
-                        <li id={key} key={key}>
-                            <Link to={obj.key}>
+                        <li id={key} key={key.replace(`/n/${namespace}/mirror`, `/n/${namespace}/explorer`)}>
+                            <Link to={obj.key.replace(`/n/${namespace}/mirror`, `/n/${namespace}/explorer`)}>
                                 {obj.breadcrumb}
                             </Link>
                         </li>

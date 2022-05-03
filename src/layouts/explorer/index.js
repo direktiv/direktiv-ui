@@ -17,7 +17,7 @@ import Button from '../../components/button';
 import HelpIcon from "../../components/help"
 import Loader from '../../components/loader';
 import WorkflowPage from './workflow';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import WorkflowRevisions from './workflow/revision';
 import WorkflowPod from './workflow/pod'
 import { AutoSizer } from 'react-virtualized';
@@ -540,6 +540,11 @@ function ExplorerList(props) {
                     {
                         data && data.node.expandedType === "git" ?
                             <>
+                                <ContentPanelHeaderButton className="explorer-action-btn">
+                                    <Link to={`/n/${namespace}/mirror${path}`}>
+                                        Mirror
+                                    </Link>
+                                </ContentPanelHeaderButton>
                                 <ContentPanelHeaderButton className="explorer-action-btn">
                                     <div>
                                         <Modal title="Mirror Activities"
