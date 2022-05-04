@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useCallback} from 'react';
+import React, {useEffect, useState} from 'react';
 import './style.css';
 
 import ContentPanel, { ContentPanelBody, ContentPanelHeaderButton, ContentPanelHeaderButtonIcon, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
@@ -161,11 +161,12 @@ export default Explorer;
 
 function SearchBar(props) {
     const {search, setSearch} = props
+
     return(
         <div className="explorer-searchbar">
             <FlexBox className="" style={{height: "29px"}}>
                 <VscSearch className="auto-margin" />
-                <input search={search} onChange={(e)=>{setSearch(e.target.value)}} placeholder={"Search items"} style={{ boxSizing: "border-box" }}></input>
+                <input value={search} onChange={(e)=>{setSearch(e.target.value)}} placeholder={"Search items"} style={{ boxSizing: "border-box" }}></input>
             </FlexBox>
         </div>
     );
@@ -244,10 +245,15 @@ function ExplorerList(props) {
         }
     },[data, err])
 
-    // Reset pagination queries when searching or namespace change
+    // Reset pagination queries when searching
     useEffect(()=>{
         setQueryParams([`first=${PAGE_SIZE}`])
-    },[search, namespace])
+    },[search])
+
+    // Reset pagination and search when namespace changes
+    useEffect(()=>{
+        resetQueryParams()
+    },[namespace])
 
     useEffect(()=>{
         if(path !== currPath) {
@@ -255,11 +261,6 @@ function ExplorerList(props) {
             setLoad(true)
         }
     },[path, currPath])
-
-    //pagination
-    const updatePage = useCallback((newParam)=>{
-        setQueryParams(newParam)
-    }, [])
 
     if (err === "Not Found") {
         return <NotFound/>
@@ -297,6 +298,7 @@ function ExplorerList(props) {
                         {
                             apiHelps(namespace).map((help)=>(
                                 <ApiFragment
+                                    key={`${help.type}-key`}
                                     description={help.description}
                                     url={help.url}
                                     method={help.method}
@@ -327,6 +329,7 @@ function ExplorerList(props) {
                 <FlexBox className="gap" style={{flexDirection: "row-reverse"}}>
                     <ContentPanelHeaderButton className="explorer-action-btn">
                         <Modal title="New Workflow" 
+                            modalStyle={{width: "600px"}}
                             escapeToCancel
                             button={(
                                 <div style={{display:"flex"}}>
@@ -399,6 +402,7 @@ function ExplorerList(props) {
                     <ContentPanelHeaderButton className="explorer-action-btn">
                         <div>
                             <Modal title="New Directory" 
+                                modalStyle={{width: "240px"}}
                                 escapeToCancel
                                 button={(
                                     <div style={{display:"flex"}}>
@@ -571,7 +575,7 @@ function ExplorerList(props) {
                     </FlexBox>
             </ContentPanelBody>
             <FlexBox>
-                { !!totalCount && <Pagination pageSize={PAGE_SIZE} pageInfo={pageInfo} updatePage={updatePage} total={totalCount}/>}
+                { !!totalCount && <Pagination pageSize={PAGE_SIZE} pageInfo={pageInfo} updatePage={setQueryParams} total={totalCount}/>}
             </FlexBox>
         </ContentPanel>
     </Loader>
@@ -648,6 +652,7 @@ function DirListItem(props) {
 
                         <Modal
                                 escapeToCancel
+                                modalStyle={{width: "240px"}}
                                 style={{
                                     flexDirection: "row-reverse",
                                 }}
@@ -760,6 +765,7 @@ function WorkflowListItem(props) {
                             <FlexBox onClick={(ev)=>ev.stopPropagation()}>
 
                                 <Modal
+                                        modalStyle={{width: "400px"}}
                                         escapeToCancel
                                         style={{
                                             flexDirection: "row-reverse",
