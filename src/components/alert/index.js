@@ -2,7 +2,6 @@ import React from 'react';
 import './style.css';
 import FlexBox from '../flexbox';
 import { VscChromeClose, VscWarning } from 'react-icons/vsc';
-import Button from '../button';
 
 function Alert(props) {
 

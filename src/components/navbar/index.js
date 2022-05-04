@@ -64,33 +64,16 @@ export default NavBar;
 function NewNamespaceBtn(props) {
     const {createNamespace, createMirrorNamespace} = props
     
-    function devGetPublicKey() {
-        return localStorage.getItem('dev-publicKey') ? localStorage.getItem('dev-publicKey') : ""
-    }
     const [tabIndex, setTabIndex] = useState(0)
 
     const [mirrorSettings, setMirrorSettings] = useState({
-        "url": {edit: false, value: ""},
-        "ref": {edit: false, value: ""},
-        "cron": {edit: false, value: ""},
-        "publicKey": {edit: false, value: devGetPublicKey()},
-        "privateKey": {edit: false, value: ""},
-        "passphrase": {edit: false, value: ""}
+        "url": "",
+        "ref": "",
+        "cron": "",
+        "passphrase": "",
+        "publicKey": "",
+        "privateKey": "",
     })
-
-
-    function devSettingsSetPublicKey(settings) {
-        if (settings["publicKey"] && settings["publicKey"].value !== "") {
-            localStorage.setItem('dev-publicKey', settings["publicKey"].value)
-        }
-
-        return settings
-    }
-
-
-
-    // createErr is filled when someone tries to create namespace but proceeded to error out
-
 
     const [ns, setNs] = useState("")
     const navigate = useNavigate()
@@ -133,11 +116,7 @@ function NewNamespaceBtn(props) {
                           if (tabIndex === 0) {
                             await createNamespace(ns)
                           } else {
-                            let mSettings = {}
-                            Object.entries(mirrorSettings).map(([key, value]) => {
-                                mSettings[key] = value.value
-                            })
-                            await createMirrorNamespace(ns, mSettings)
+                            await createMirrorNamespace(ns, mirrorSettings)
                           }
                           setTimeout(()=>{
                             navigate(`/n/${ns}`)
@@ -171,13 +150,21 @@ function NewNamespaceBtn(props) {
                 </div>
                 {Object.entries(mirrorSettings).map(([key, value]) => {
                     return(
-                    <div style={{width: "100%", paddingRight: "12px", display: "flex"}}>
-                        <textarea style={{width:"100%"}} value={value.value} onChange={(e)=>{
+                    <div key={`input-new-ns-${key}`} style={{width: "100%", paddingRight: "12px", display: "flex"}}>
+                        {key === "passphrase" || key === "publicKey" || key === "privateKey" ?
+                        <textarea style={{width:"100%", resize: "none" }} value={value} onChange={(e)=>{
                             let newSettings = mirrorSettings
-                            newSettings[key].value = e.target.value
-                            newSettings = devSettingsSetPublicKey(newSettings)
+                            newSettings[key] = e.target.value
                             setMirrorSettings({...newSettings})
-                        }} autoFocus placeholder={`Enter a mirror ${key}`}/>
+                        }} autoFocus placeholder={`Enter Mirror ${key.charAt(0).toUpperCase() + key.slice(1)}`}/>
+                        :
+                        <input style={{width:"100%"}} value={value} onChange={(e)=>{
+                            let newSettings = mirrorSettings
+                            newSettings[key] = e.target.value
+                            setMirrorSettings({...newSettings})
+                        }} autoFocus placeholder={`Enter Mirror ${key.charAt(0).toUpperCase() + key.slice(1)}`}/>
+                        }
+                        
                     </div>
                     )
                 })}

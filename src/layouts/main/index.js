@@ -33,6 +33,7 @@ function NamespaceNavigation(props){
     const {namespaces, namespace, setNamespace, deleteNamespace, deleteErr, extraRoutes} = props
 
     const [load, setLoad] = useState(true)
+    const [breadcrumbChildren, setBreadcrumbChildren] = useState(null)
     const navigate = useNavigate()
 
     // on mount check if namespace is stored in local storage and exists in the response given back
@@ -92,7 +93,7 @@ function NamespaceNavigation(props){
     return(
         <FlexBox className="content-col col">
             <FlexBox className="breadcrumbs-row">
-                <Breadcrumbs namespace={namespace}/>
+                <Breadcrumbs namespace={namespace} additionalChildren={breadcrumbChildren}/>
             </FlexBox>
             <FlexBox className="col" style={{paddingBottom: "8px"}}>
                 {namespaces !== null ? 
@@ -105,11 +106,11 @@ function NamespaceNavigation(props){
                         </div>
                     }/>
                     {/* Explorer routing */}
-                    <Route path="/n/:namespace" element={<Explorer namespace={namespace} />} >
-                        <Route path="explorer/*" element={<Explorer namespace={namespace} />} />
+                    <Route path="/n/:namespace" element={<Explorer namespace={namespace} setBreadcrumbChildren={setBreadcrumbChildren} />} >
+                        <Route path="explorer/*" element={<Explorer namespace={namespace} setBreadcrumbChildren={setBreadcrumbChildren} />} />
                     </Route>
 
-                    <Route path="/n/:namespace/mirror/*" element={<MirrorPage namespace={namespace} />} />
+                    <Route path="/n/:namespace/mirror/*" element={<MirrorPage namespace={namespace} setBreadcrumbChildren={setBreadcrumbChildren}/>} />
 
                     <Route path="/n/:namespace/monitoring" element={<Monitoring namespace={namespace}/>}/>
                     {/* <Route path="/n/:namespace/builder" element={<WorkflowBuilder namespace={namespace}/>}/> */}

@@ -47,3 +47,16 @@
     pointer-events: none;
     visibility: hidden;
 }
+
+.activity-row {
+    border-top: solid 1px var(--theme-dark-gray-faded);
+    line-height: 42px;
+    height: 42px;
+}
+
+.activity-row:last-child {
+    border-top: solid 1px var(--theme-dark-gray-faded);
+    border-bottom: solid 1px var(--theme-dark-gray-faded);
+    line-height: 42px;
+    height: 42px;
+}

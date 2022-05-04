@@ -1,11 +1,10 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import './style.css';
-import './rainbow.css';
 import { AutoSizer, List, CellMeasurer, CellMeasurerCache } from 'react-virtualized';
 
-import ContentPanel, { ContentPanelBody, ContentPanelHeaderButton, ContentPanelHeaderButtonIcon, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
+import ContentPanel, { ContentPanelBody, ContentPanelHeaderButton, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
 import FlexBox from '../../components/flexbox';
-import { VscAdd, VscFolderOpened, VscCopy, VscEye, VscEyeClosed, VscSourceControl, VscScreenFull, VscTerminal, VscLock, VscSync, VscUnlock } from 'react-icons/vsc';
+import { VscAdd, VscCopy, VscEye, VscEyeClosed, VscTerminal, VscLock, VscSync, VscUnlock } from 'react-icons/vsc';
 import { Config, copyTextToClipboard, GenerateRandomKey } from '../../util';
 import { useMirror, useMirrorLogs, useNodes } from 'direktiv-react-hooks';
 import { useNavigate, useParams } from 'react-router';
@@ -15,22 +14,24 @@ import Pagination from '../../components/pagination';
 
 import * as dayjs from "dayjs"
 
-// import './style.css';
-import { BsDot } from 'react-icons/bs';
-import { MLogs } from './logs';
 import { TerminalButton } from '../instance';
 import Modal, { ButtonDefinition } from '../../components/modal';
 import Alert from '../../components/alert';
+import Tippy from '@tippyjs/react';
+import { SuccessState, CancelledState, FailState, RunningState } from '../instances';
 
 const PAGE_SIZE = 10
 
 
 
 function MirrorPage(props) {
-    const { namespace } = props
+    const { namespace, setBreadcrumbChildren } = props
     const params = useParams()
+    const navigate = useNavigate()
     const [activity, setActivity] = useState(null)
-    const [currentlyLocking, setCurrentlyLocking] = useState(false)
+    const [currentlyLocking, setCurrentlyLocking] = useState(true)
+    const [isReadOnly, setIsReadOnly] = useState(true)
+
     const [errorMsg, setErrorMsg] = useState(null)
     const [load, setLoad] = useState(true)
 
@@ -39,50 +40,169 @@ function MirrorPage(props) {
         path = `/${params["*"]}`
     }
 
-    console.log("!!! path = ", path)
-    console.log("!!! namespace = ", namespace)
-    const { info, activities, err, getInfo, getActivityLogs, setLock, updateSettings, cancelActivity, sync } = useMirror(Config.url, true, namespace, path, localStorage.getItem("apikey"), "last=50", "order.field=CREATED", "order.direction=DESC")
-    const { data } = useNodes(Config.url, true, namespace, path, localStorage.getItem("apikey"), `first=1`)
+    const { info, activities, err, setLock, updateSettings, cancelActivity, sync } = useMirror(Config.url, true, namespace, path, localStorage.getItem("apikey"), "first=50", "order.field=CREATED", "order.direction=DESC")
+    const { data, getNode, err: nodeErr } = useNodes(Config.url, false, namespace, path, localStorage.getItem("apikey"), `first=1`)
+
+    const setLockRef = useRef(setLock)
+    const syncRef = useRef(sync)
+    const setBreadcrumbChildrenRef = useRef(setBreadcrumbChildren)
+
+
+    // Error Handling Non existent node and bad mirror
+    useEffect(() => {
+        if (err) {
+            setErrorMsg("Error getting mirror info: " + nodeErr)
+        } else if (nodeErr) {
+            navigate(`/n/${namespace}/explorer${path}`)
+        }
+    }, [nodeErr, err, data, navigate, namespace, path])
+
+    // Error Handling bad node
+    useEffect(() => {
+        if (!load && data) {
+            getNode().then((nodeData) => {
+                if (nodeData.node.expandedType !== "git") {
+                    navigate(`/n/${namespace}/explorer${path}`)
+                }
+            }).catch((e) => {
+                navigate(`/n/${namespace}/explorer${path}`)
+            })
+        }
+    }, [getNode, data, load, navigate, namespace, path])
 
     useEffect(() => {
-        if (data) {
-            setCurrentlyLocking(false)
+        if (nodeErr) {
+            setErrorMsg("Error getting node: " + nodeErr)
+            return
         }
-    }, [data])
+
+        const handler = setTimeout(() => {
+            if (currentlyLocking) {
+                getNode().then((nodeData) => {
+                    setIsReadOnly(nodeData.node.readOnly)
+                }).catch((e) => {
+                    setErrorMsg("Error getting node: " + e.message)
+                }).finally(() => {
+                    setCurrentlyLocking(false)
+                })
+            }
+        }, 1000)
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [currentlyLocking, getNode, nodeErr])
 
     useEffect(() => {
         if (data && info) {
             setLoad(false)
         }
-    }, [data, info])
+    }, [data, info, load])
 
-    console.log("info = ", info)
-    console.log("data!!! = ", data)
-    console.log("activities = ", activities)
-    // console.log("err = ", getInfo())
+    useEffect(() => {
+        if (!setBreadcrumbChildrenRef.current) {
+            return
+        }
 
+        setBreadcrumbChildrenRef.current((
+            <FlexBox className="center row gap" style={{ justifyContent: "flex-end", paddingRight: "6px" }}>
+                <Modal
+                    escapeToCancel
+                    activeOverlay
+                    title="Sync Mirror"
+                    titleIcon={
+                        <VscSync />
+                    }
+                    style={{
+                        maxWidth: "68px"
+                    }}
+                    modalStyle={{
+                        width: "300px"
+                    }}
+                    button={(
+                        <Button id="btn-sync-mirror" className="small light shadow" style={{ fontWeight: "bold", width: "fit-content" }}>
+                            <FlexBox className="row center gap-sm">
+                                <VscSync />
+                                Sync
+                            </FlexBox>
+                        </Button>
+                    )}
+                    actionButtons={[
+                        ButtonDefinition("Soft Sync", async () => {
+                            await syncRef.current()
+                        }, "small blue", () => { }, true, false),
+                        ButtonDefinition("Hard Sync", async () => {
+                            await syncRef.current(true)
+                        }, "small blue", () => { }, true, false),
+                        ButtonDefinition("Cancel", () => { }, "small light", () => { }, true, false)
+                    ]}
+                >
+                    <FlexBox className="col gap" style={{ paddingTop: "8px" }}>
+                        <FlexBox className="col center info-update-label">
+                            Would you like to do a normal sync or force a hard sync?
+                        </FlexBox>
+                    </FlexBox>
+                </Modal>
+                <Button className={`small light shadow ${currentlyLocking ? "loading disabled" : ""}`} style={{ fontWeight: "bold", width: "fit-content", whiteSpace: "nowrap" }} onClick={async () => {
+                    if (isReadOnly) {
+                        setCurrentlyLocking(true)
+
+                        try {
+                            await setLockRef.current(true)
+                        } catch (e) {
+                            setCurrentlyLocking(false)
+                            setErrorMsg(e.message)
+                        }
+                    } else {
+                        setCurrentlyLocking(true)
+                        try {
+                            await setLockRef.current(false)
+                        } catch (e) {
+                            setCurrentlyLocking(false)
+                            setErrorMsg(e.message)
+                        }
+                    }
+                }}>
+                    <FlexBox className="row center gap-sm">
+                        {isReadOnly ?
+                            <>
+
+                                <VscUnlock />
+                                Make Writable
+                            </>
+                            :
+                            <>
+                                <VscLock />
+                                Make ReadOnly
+                            </>
+                        }
+                    </FlexBox>
+                </Button>
+                {isReadOnly ? <MirrorReadOnlyBadge /> : <MirrorWritableBadge />}
+            </ FlexBox>
+        ))
+    }, [currentlyLocking, isReadOnly])
+
+    // Keep Refs up to date
+    useEffect(() => {
+        setBreadcrumbChildrenRef.current = setBreadcrumbChildren
+        setLockRef.current = setLock
+        syncRef.current = sync
+    }, [setBreadcrumbChildren, setLock, sync])
+
+
+    // Unmount cleanup breadcrumb children
+    useEffect(() => {
+        return (() => {
+            if (setBreadcrumbChildrenRef.current) {
+                setBreadcrumbChildrenRef.current(<></>)
+            }
+        })
+    }, [])
 
     if (!namespace) {
         return <></>
     }
-
-
-
-    // <FlexBox className="row gap center" style={{ height: "72px", width: "200px", position: "absolute", right: "0px", top: "0px", justifyContent: "flex-end", paddingRight: "6px" }}>
-    //             <Button className="small light shadow" style={{ fontWeight: "bold" }}>
-    //                 <FlexBox className="row center gap-sm">
-    //                     <VscSync />
-    //                     Sync
-    //                 </FlexBox>
-    //             </Button>
-    //             <Button className="small light shadow" style={{ fontWeight: "bold" }}>
-    //                 <FlexBox className="row center gap-sm">
-    //                     <VscLock />
-    //                     <VscUnlock />
-    //                     Locked
-    //                 </FlexBox>
-    //             </Button>
-    //         </FlexBox>
 
 
     return (
@@ -96,80 +216,8 @@ function MirrorPage(props) {
                         : <></>
                 }
                 <FlexBox className="col gap" style={{ paddingRight: "8px" }}>
-                    <FlexBox className="row center" style={{ height: "72px", width: "200px", position: "absolute", right: "0px", top: "0px", justifyContent: "flex-end", paddingRight: "6px" }}>
-                        <Modal
-                            escapeToCancel
-                            activeOverlay
-                            title="Sync Mirror"
-                            titleIcon={
-                                <VscSync />
-                            }
-                            style={{
-                                maxWidth: "260px"
-                            }}
-                            modalStyle={{
-                                overflow: "hidden",
-                                padding: "0px"
-                            }}
-                            button={(
-                                <Button className="small light shadow" style={{ fontWeight: "bold" }}>
-                                    <FlexBox className="row center gap-sm">
-                                        <VscSync />
-                                        Sync
-                                    </FlexBox>
-                                </Button>
-                            )}
-                            actionButtons={[
-                                ButtonDefinition("Soft Sync", async () => {
-                                    await sync()
-                                }, "small blue", () => { }, true, false),
-                                ButtonDefinition("Hard Sync", async () => {
-                                    await sync(true)
-                                }, "small blue", () => { }, true, false),
-                                ButtonDefinition("Cancel", () => { }, "small light", () => { }, true, false)
-                            ]}
-                        >
-                            <FlexBox className="col gap" style={{ paddingTop: "8px" }}>
-                                <FlexBox className="col center info-update-label">
-                                    Would you like to do a normal sync or force a hard sync?
-                                </FlexBox>
-                            </FlexBox>
-                        </Modal>
-                        <Button className={`small light shadow ${currentlyLocking ? "loading disabled" : ""}`} style={{ fontWeight: "bold" }} onClick={async () => {
-                            if (data?.node?.readOnly) {
-                                setCurrentlyLocking(true)
-                                try {
-                                    await setLock(true)
-                                } catch (e) {
-                                    setCurrentlyLocking(false)
-                                    setErrorMsg(e.message)
-                                }
-                            } else {
-                                setCurrentlyLocking(true)
-                                try {
-                                    await setLock(false)
-                                } catch (e) {
-                                    setCurrentlyLocking(false)
-                                    setErrorMsg(e.message)
-                                }
-                            }
-                        }}>
-                            <FlexBox className="row center gap-sm">
-                                {data?.node?.readOnly ?
-                                    <>
-                                        <VscLock />
-                                        Locked
-                                    </>
-                                    :
-                                    <>
-                                        <VscUnlock />
-                                        Unlocked
-                                    </>
-
-                                }
-                            </FlexBox>
-                        </Button>
-                    </FlexBox>
+                    {/* <BreadcrumbCorner>
+                    </BreadcrumbCorner> */}
                     <FlexBox className="row gap wrap" style={{ flex: 1, maxHeight: "60vh" }}>
                         <ContentPanel id={`panel-activity-list`} style={{ width: "100%", minHeight: "60vh", maxHeight: "60vh", flex: 2 }}>
                             <ContentPanelTitle>
@@ -179,9 +227,10 @@ function MirrorPage(props) {
                                 <FlexBox className="gap" style={{ alignItems: "center" }}>Activity List</FlexBox>
                             </ContentPanelTitle>
                             <ContentPanelBody style={{ overflow: "auto" }}>
-                                <FlexBox >
+                                <FlexBox style={{ flexShrink: "1", height: "fit-content" }}>
                                     <ActivityTable activities={activities} setActivity={setActivity} cancelActivity={cancelActivity} setErrorMsg={setErrorMsg} />
                                 </FlexBox>
+                                <FlexBox style={{ flexGrow: "1" }}></FlexBox>
                             </ContentPanelBody>
                         </ContentPanel>
                         <MirrorInfoPanel info={info} updateSettings={updateSettings} namespace={namespace} style={{ width: "100%", height: "100%", flex: 1 }} />
@@ -208,22 +257,21 @@ export default MirrorPage;
 
 export function MirrorInfoPanel(props) {
     const { info, style, updateSettings } = props
-    const [load, setLoad] = useState(true)
 
     // Mirror Info States
-    const [infoURL, setInfoURL] = useState(null)
-    const [infoRef, setInfoRef] = useState(null)
-    const [infoCron, setInfoCron] = useState(null)
+    const [infoURL, setInfoURL] = useState("")
+    const [infoRef, setInfoRef] = useState("")
+    const [infoCron, setInfoCron] = useState("")
     const [infoPublicKey, setInfoPublicKey] = useState("")
     const [infoPrivateKey, setInfoPrivateKey] = useState("")
     const [infoPassphrase, setInfoPassphrase] = useState("")
 
-    const [infoURLOld, setInfoURLOld] = useState(null)
-    const [infoRefOld, setInfoRefOld] = useState(null)
-    const [infoCronOld, setInfoCronOld] = useState(null)
-    const [infoPublicKeyOld, setInfoPublicKeyOld] = useState("")
-    const [infoPrivateKeyOld, setInfoPrivateKeyOld] = useState("")
-    const [infoPassphraseOld, setInfoPassphraseOld] = useState("")
+    const [infoURLOld, setInfoURLOld] = useState("")
+    const [infoRefOld, setInfoRefOld] = useState("")
+    const [infoCronOld, setInfoCronOld] = useState("")
+    const [infoPublicKeyOld, ] = useState("")
+    const [infoPrivateKeyOld, ] = useState("")
+    const [infoPassphraseOld, ] = useState("")
 
     const [infoPendingChanges, setInfoPendingChanges] = useState(false)
     const [infoChangesTracker, setInfoChangesTracker] = useState({
@@ -235,13 +283,6 @@ export function MirrorInfoPanel(props) {
         "privateKey": false,
     })
 
-    // Mirror Info Refs
-    const infoURLRef = useRef("")
-    const infoRefRef = useRef()
-    const infoCronRef = useRef()
-    const infoPublicKeyRef = useRef()
-    const infoPrivateKeyRef = useRef()
-    const infoPassphraseRef = useRef()
     const infoChangesTrackerRef = useRef(infoChangesTracker)
 
     const resetStates = useCallback(() => {
@@ -260,7 +301,7 @@ export function MirrorInfoPanel(props) {
         setInfoPublicKey(infoPublicKeyOld)
         setInfoPrivateKey(infoPrivateKeyOld)
         setInfoPassphrase(infoPassphraseOld)
-    }, infoURLOld, infoRefOld, infoCronOld, infoPublicKeyOld, infoPrivateKeyOld, infoPassphraseOld)
+    }, [infoURLOld, infoRefOld, infoCronOld, infoPublicKeyOld, infoPrivateKeyOld, infoPassphraseOld])
 
     useEffect(() => {
         infoChangesTrackerRef.current = infoChangesTracker
@@ -321,8 +362,7 @@ export function MirrorInfoPanel(props) {
                                     maxWidth: "260px"
                                 }}
                                 modalStyle={{
-                                    overflow: "hidden",
-                                    padding: "0px"
+                                    width: "300px"
                                 }}
                                 button={(
                                     <div>
@@ -511,77 +551,31 @@ export function MirrorInfoPanel(props) {
 
 
 export function ActivityTable(props) {
-    const { activities, err, panelStyle, bodyStyle, placeholder, namespace, totalCount, pageInfo, setActivity, cancelActivity, setErrorMsg } = props
+    const { activities, err, placeholder, namespace, totalCount, pageInfo, setActivity, cancelActivity, setErrorMsg } = props
     const [load, setLoad] = useState(true)
 
     const [queryParams, setQueryParams] = useState([`first=${PAGE_SIZE}`])
-    const [queryFilters, setQueryFilters] = useState([])
-
-    const [filterName, setFilterName] = useState("")
-    const [filterCreatedBefore, setFilterCreatedBefore] = useState("")
-    const [filterCreatedAfter, setFilterCreatedAfter] = useState("")
-    const [filterState, setFilterState] = useState("")
-    const [filterInvoker, setFilterInvoker] = useState("")
 
     const updatePage = useCallback((newParam) => {
         setQueryParams(newParam)
     }, [])
 
-    console.log("!!!!!!!! activitieZZZs = ", activities)
 
     useEffect(() => {
         if (activities !== null || err !== null) {
-            console.log("ello?")
             setLoad(false)
         }
-        console.log("!!!!!!!! activities = ", activities)
     }, [activities, err])
-
-    // Update filters array
-    // useEffect(() => {
-    //     // If manual filter was passed in props do not update filters during runtime
-    //     if (filter) {
-    //         return
-    //     }
-
-    //     let newFilters = []
-    //     if (filterName !== "") {
-    //         newFilters.push(`filter.field=AS&filter.type=CONTAINS&filter.val=${filterName}`)
-    //     }
-
-    //     if (filterCreatedBefore !== "") {
-    //         newFilters.push(`filter.field=CREATED&filter.type=BEFORE&filter.val=${encodeURIComponent(new Date(filterCreatedBefore).toISOString())}`)
-    //     }
-
-    //     if (filterCreatedAfter !== "") {
-    //         newFilters.push(`filter.field=CREATED&filter.type=AFTER&filter.val=${encodeURIComponent(new Date(filterCreatedAfter).toISOString())}`)
-    //     }
-
-
-    //     if (filterState !== "") {
-    //         newFilters.push(`filter.field=STATUS&filter.type=MATCH&filter.val=${filterState}`)
-    //     }
-
-    //     if (filterInvoker !== "") {
-
-    //         newFilters.push(`filter.field=TRIGGER&filter.type=CONTAINS&filter.val=${filterInvoker}`)
-    //     }
-
-    //     setQueryParams([`first=${PAGE_SIZE}`])
-    //     setQueryFilters(newFilters)
-
-    // }, [filter, filterName, filterCreatedBefore, filterCreatedAfter, filterState, filterInvoker])
 
     return (
         <Loader load={load} timer={3000}>
             {activities ? <>{
                 activities !== null && activities.length === 0 ?
-                    <div style={{ paddingLeft: "10px", fontSize: "10pt" }}>{`${placeholder ? placeholder : "No instances have been recently executed. Recent instances will appear here."}`}</div>
+                    <div style={{ paddingLeft: "10px", fontSize: "10pt" }}>{`${placeholder ? placeholder : "No activities have been recently executed. Recent activities will appear here."}`}</div>
                     :
                     <table className="instances-table" style={{ width: "100%" }}>
                         <thead>
                             <tr>
-
                                 <th className="center-align" style={{ maxWidth: "120px", minWidth: "120px", width: "120px" }}>State</th>
                                 <th className="center-align">Type</th>
                                 <th className="center-align">Started <span className="hide-on-med">at</span></th>
@@ -623,12 +617,13 @@ export function ActivityTable(props) {
 }
 
 function Logs(props) {
+    const { namespace, activityID, follow, setClipData, clipData, setErrorMsg } = props;
+
     const cache = new CellMeasurerCache({
         fixedWidth: true,
         fixedHeight: false
     })
 
-    let { namespace, activityID, follow, setClipData, clipData, setErrorMsg } = props;
     const [logLength, setLogLength] = useState(0)
     const { data, err } = useMirrorLogs(Config.url, true, namespace, activityID, localStorage.getItem("apikey"))
 
@@ -636,7 +631,7 @@ function Logs(props) {
         if (err) {
             setErrorMsg(`Could not get logs: ${err}`)
         }
-    }, [err])
+    }, [err, setErrorMsg])
 
     useEffect(() => {
         if (!setClipData) {
@@ -644,15 +639,11 @@ function Logs(props) {
             return
         }
 
-        console.log("logDataChangex2 = ", data)
-
         if (data !== null) {
             if (clipData === null || logLength === 0) {
-
                 let cd = ""
                 for (let i = 0; i < data.length; i++) {
                     cd += `[${dayjs.utc(data[i].node.t).local().format("HH:mm:ss.SSS")}] ${data[i].node.msg}\n`
-                    console.log("logDataChangex2 adding cd = ", cd)
                 }
                 setClipData(cd)
                 setLogLength(data.length)
@@ -660,9 +651,6 @@ function Logs(props) {
                 let cd = clipData
                 for (let i = logLength - 1; i < data.length; i++) {
                     cd += `[${dayjs.utc(data[i].node.t).local().format("HH:mm:ss.SSS")}] ${data[i].node.msg}\n`
-
-                    console.log("logDataChangex2 adding cd2 = ", cd)
-
                 }
                 setClipData(cd)
                 setLogLength(data.length)
@@ -670,9 +658,13 @@ function Logs(props) {
         }
     }, [data, clipData, setClipData, logLength])
 
+    if (!activityID) {
+        return <div>No Activity Selected</div>
+    }
+
 
     if (!data) {
-        return <></>
+        return <div>Loading...</div>
     }
 
     if (err) {
@@ -711,7 +703,7 @@ function Logs(props) {
 
 
     return (
-        <div style={{ flex: "1 1 auto", lineHeight: "20px" }}>
+        <div className="activity-logger" style={{ flex: "1 1 auto", lineHeight: "20px" }}>
             <AutoSizer>
                 {({ height, width }) => (
                     <div style={{ height: "100%", minHeight: "100%" }}>
@@ -734,24 +726,10 @@ function Logs(props) {
 
 export function ActivityLogs(props) {
     const { activity, namespace, setErrorMsg } = props
-    const data = ["dont", "care"]
 
-    const [filterName, setFilterName] = useState("")
     const [clipData, setClipData] = useState(null)
     const [follow, setFollow] = useState(true)
     const [width,] = useState(window.innerWidth);
-
-    useEffect(() => {
-        console.log("useEffect filterName is: ", filterName)
-        return () => {
-            console.log("useEffect return filterName is: ", filterName)
-        }
-    }, [filterName])
-
-    useEffect(() => {
-        console.log("logDataChange = ", data)
-    }, [data])
-
 
 
 
@@ -764,17 +742,17 @@ export function ActivityLogs(props) {
                 </FlexBox>
                 <div style={{ height: "40px", backgroundColor: "#223848", color: "white", maxHeight: "40px", minHeight: "40px", padding: "0px 10px 0px 10px", boxShadow: "0px 0px 3px 0px #fcfdfe", alignItems: 'center', borderRadius: " 0px 0px 8px 8px", overflow: "hidden" }}>
                     <FlexBox className="gap" style={{ width: "100%", flexDirection: "row-reverse", height: "100%", alignItems: "center" }}>
-                        <TerminalButton onClick={() => {
+                        <TerminalButton className={`${activity ? "" : "terminal-disabled"}`} onClick={() => {
                             copyTextToClipboard(clipData)
                         }}>
                             <VscCopy /> Copy {width > 999 ? <span>to Clipboard</span> : ""}
                         </TerminalButton>
                         {follow ?
-                            <TerminalButton onClick={(e) => setFollow(!follow)} className={"btn-terminal"}>
+                            <TerminalButton className={`${activity ? "" : "terminal-disabled"}`} onClick={(e) => setFollow(!follow)}>
                                 <VscEyeClosed /> Stop {width > 999 ? <span>watching</span> : ""}
                             </TerminalButton>
                             :
-                            <TerminalButton onClick={(e) => setFollow(!follow)} className={"btn-terminal"} >
+                            <TerminalButton className={`${activity ? "" : "terminal-disabled"}`} onClick={(e) => setFollow(!follow)} >
                                 <VscEye /> <div>Follow {width > 999 ? <span>logs</span> : ""}</div>
                             </TerminalButton>
                         }
@@ -793,8 +771,7 @@ const cancelled = "cancelled";
 const running = "pending";
 
 export function ActivityRow(props) {
-    let { state, startedDate, finishedDate, startedTime, finishedTime, id, namespace, type, setActivity, cancelActivity, setErrorMsg } = props;
-    const navigate = useNavigate()
+    let { state, startedDate, startedTime, id, type, setActivity, cancelActivity, setErrorMsg } = props;
 
     let label;
     if (state === success) {
@@ -809,7 +786,7 @@ export function ActivityRow(props) {
 
     return (
 
-        <tr className="instance-row" style={{ cursor: "pointer" }}>
+        <tr className="activity-row" style={{ minHeight: "48px", maxHeight: "48px" }}>
             <td className="label-cell">
                 {label}
             </td>
@@ -843,42 +820,30 @@ export function ActivityRow(props) {
     )
 }
 
-function StateLabel(props) {
-
-    let { className, label } = props;
-    className += " label-cell"
-
+export function MirrorReadOnlyBadge(props) {
     return (
-        <div>
-            <FlexBox className={className} style={{ alignItems: "center", padding: "0px", width: "fit-content" }} >
-                <BsDot style={{ height: "32px", width: "32px" }} />
-                <div className="hide-on-med" style={{ marginLeft: "-8px", marginRight: "16px" }}>{label}</div>
-            </FlexBox>
-        </div>
+        <Tippy content={`This mirrors contents are currently read-only. This can be unlocked in mirror setttings`} trigger={'mouseenter focus'} zIndex={10}>
+            <div>
+                <Button className={`small light disabled`} style={{ fontWeight: "bold", width: "fit-content", whiteSpace: "nowrap" }}>
+                    <FlexBox className="row center gap-sm">
+                        <VscLock />ReadOnly
+                    </FlexBox>
+                </Button>
+            </div>
+        </Tippy>
     )
 }
 
-export function SuccessState() {
+export function MirrorWritableBadge(props) {
     return (
-        <StateLabel className={"success-label"} label={"Successful"} />
+        <Tippy content={`This mirrors contents are currently read-only. This can be unlocked in mirror setttings`} trigger={'mouseenter focus'} zIndex={10}>
+            <div>
+                <Button className={`small light disabled`} style={{ fontWeight: "bold", width: "fit-content", whiteSpace: "nowrap" }}>
+                    <FlexBox className="row center gap-sm">
+                        <VscUnlock />Writable
+                    </FlexBox>
+                </Button>
+            </div>
+        </Tippy>
     )
 }
-
-export function FailState() {
-    return (
-        <StateLabel className={"fail-label"} label={"Failed"} />
-    )
-}
-
-export function CancelledState() {
-    return (
-        <StateLabel className={"cancel-label"} label={"Cancelled"} />
-    )
-}
-
-export function RunningState() {
-    return (
-        <StateLabel className={"running-label"} label={"Running"} />
-    )
-}
-

@@ -371,9 +371,9 @@ function InstanceLogs(props) {
 
 export function TerminalButton(props) {
 
-    let {children, onClick} = props;
+    let {children, onClick, className} = props;
     return (
-        <div onClick={onClick} className="btn-terminal" style={{
+        <div onClick={onClick} className={`btn-terminal ${className}`} style={{
             maxHeight: "22px"
         }}>
             <FlexBox className="gap" style={{ alignItems: "center", userSelect: "none" }}>

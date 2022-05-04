@@ -188,7 +188,18 @@ input {
   border-radius: var(--theme-border-radius);
 }
 
-input:focus-visible {
+textarea {
+  font-family: var(--font-family);
+  min-width: 0px;
+  width: 100%;
+  padding-left: 8px;
+  font-size: 14px;
+
+  border: var(--border);
+  border-radius: var(--theme-border-radius);
+}
+
+input:focus-visible,textarea:focus-visible {
   outline: solid 1px var(--theme-brand-blue);
 }
 
