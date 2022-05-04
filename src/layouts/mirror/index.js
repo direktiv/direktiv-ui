@@ -45,6 +45,7 @@ function MirrorPage(props) {
 
     const setLockRef = useRef(setLock)
     const syncRef = useRef(sync)
+    const getNodeRef = useRef(getNode)
     const setBreadcrumbChildrenRef = useRef(setBreadcrumbChildren)
 
 
@@ -59,8 +60,12 @@ function MirrorPage(props) {
 
     // Error Handling bad node
     useEffect(() => {
+        if (!getNodeRef.current) {
+            return
+        }
+
         if (!load && data) {
-            getNode().then((nodeData) => {
+            getNodeRef.current().then((nodeData) => {
                 if (nodeData.node.expandedType !== "git") {
                     navigate(`/n/${namespace}/explorer${path}`)
                 }
@@ -68,7 +73,13 @@ function MirrorPage(props) {
                 navigate(`/n/${namespace}/explorer${path}`)
             })
         }
-    }, [getNode, data, load, navigate, namespace, path])
+    }, [data, load, navigate, namespace, path])
+
+    // Keep track of getNodeRef
+    useEffect(() => {
+        getNodeRef.current = getNode
+    }, [getNode])
+
 
     useEffect(() => {
         if (nodeErr) {
@@ -100,7 +111,7 @@ function MirrorPage(props) {
     }, [data, info, load])
 
     useEffect(() => {
-        if (!setBreadcrumbChildrenRef.current) {
+        if (!setBreadcrumbChildrenRef.current || !syncRef.current) {
             return
         }
 
@@ -375,9 +386,10 @@ export function MirrorInfoPanel(props) {
                                             "url": infoChangesTracker.url ? infoURL : "-",
                                             "ref": infoChangesTracker.ref ? infoRef : "-",
                                             "cron": infoChangesTracker.cron ? infoCron : "-",
-                                            "publicKey": infoChangesTracker.passphrase ? infoPassphrase : "-",
-                                            "privateKey": infoChangesTracker.publicKey ? infoPublicKey : "-",
-                                            "passphrase": infoChangesTracker.privateKey ? infoPrivateKey : "-",
+                                            "passphrase": infoChangesTracker.passphrase ? infoPassphrase : "-",
+                                            "publicKey": infoChangesTracker.publicKey ? infoPublicKey : "-",
+                                            "privateKey": infoChangesTracker.privateKey ? infoPrivateKey : "-",
+                                           
                                         })
 
                                         resetStates()
