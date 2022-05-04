@@ -1,5 +1,14 @@
 // COMMON
 
+const defaultExampleImages = [
+    "direktiv/request",
+    "direktiv/python",
+    "direktiv/smtp-receiver",
+    "direktiv/sql",
+    "direktiv/image-watermark"
+]
+
+
 const CommonSchemaDefinitionConsumeEvent = {
     "type": "object",
     "title": "Event Definition",
@@ -889,13 +898,7 @@ export const FunctionSchemaReusable = {
             "type": "string",
             "title": "Image",
             "description": "Image URI.",
-            "examples": [
-                "direktiv/request",
-                "direktiv/python",
-                "direktiv/smtp-receiver",
-                "direktiv/sql",
-                "direktiv/image-watermark"
-            ]
+            "examples": defaultExampleImages
         },
         "cmd": {
             "type": "string",
@@ -938,10 +941,11 @@ export const FunctionSchemaSubflow = {
 //  GenerateFunctionSchemaWithEnum : Generates schema to used for creating new funciton
 //  Automatically injects global and namespace service list as enums from arguments
 //  Also creates ui-schemas which sets placeholder and whether or not field is readonly (if no services exist)
-export function GenerateFunctionSchemaWithEnum(namespaceServices, globalServices, nodes) {
+export function GenerateFunctionSchemaWithEnum(namespaceServices, globalServices, nodes, definedRemoteImages) {
     let nsFuncSchema = FunctionSchemaNamespace
     let globalFuncSchema = FunctionSchemaGlobal
     let subflowFuncSchema = FunctionSchemaSubflow
+    let reusableFuncSchema = FunctionSchemaReusable
     let uiSchema = {
         "knative-namespace": {
             "service": {
@@ -984,6 +988,14 @@ export function GenerateFunctionSchemaWithEnum(namespaceServices, globalServices
         }
     }
 
+    let fullImageList = defaultExampleImages
+    if (definedRemoteImages && Array.isArray(definedRemoteImages)) {
+        definedRemoteImages.forEach(remoteImage => {
+            fullImageList.push(remoteImage) 
+        });
+    }
+    reusableFuncSchema.properties.image.examples = fullImageList
+
     return {
         schema: {
             "type": "object",
@@ -1012,7 +1024,7 @@ export function GenerateFunctionSchemaWithEnum(namespaceServices, globalServices
                             }
                         }
                     },
-                    "then": FunctionSchemaReusable
+                    "then": reusableFuncSchema
                 },
                 {
                     "if": {
