@@ -5,9 +5,9 @@ import { AutoSizer, List, CellMeasurer, CellMeasurerCache } from 'react-virtuali
 
 import ContentPanel, { ContentPanelBody, ContentPanelHeaderButton, ContentPanelHeaderButtonIcon, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
 import FlexBox from '../../components/flexbox';
-import { VscAdd, VscFolderOpened, VscCopy, VscEye, VscEyeClosed, VscSourceControl, VscScreenFull, VscTerminal } from 'react-icons/vsc';
+import { VscAdd, VscFolderOpened, VscCopy, VscEye, VscEyeClosed, VscSourceControl, VscScreenFull, VscTerminal, VscLock, VscSync, VscUnlock } from 'react-icons/vsc';
 import { Config, copyTextToClipboard, GenerateRandomKey } from '../../util';
-import { useMirror, useMirrorLogs } from 'direktiv-react-hooks';
+import { useMirror, useMirrorLogs, useNodes } from 'direktiv-react-hooks';
 import { useNavigate, useParams } from 'react-router';
 import Button from '../../components/button';
 import Loader from '../../components/loader';
@@ -20,6 +20,7 @@ import { BsDot } from 'react-icons/bs';
 import { MLogs } from './logs';
 import { TerminalButton } from '../instance';
 import Modal, { ButtonDefinition } from '../../components/modal';
+import Alert from '../../components/alert';
 
 const PAGE_SIZE = 10
 
@@ -29,6 +30,9 @@ function MirrorPage(props) {
     const { namespace } = props
     const params = useParams()
     const [activity, setActivity] = useState(null)
+    const [currentlyLocking, setCurrentlyLocking] = useState(false)
+    const [errorMsg, setErrorMsg] = useState(null)
+    const [load, setLoad] = useState(true)
 
     let path = `/`
     if (params["*"] !== undefined) {
@@ -37,9 +41,23 @@ function MirrorPage(props) {
 
     console.log("!!! path = ", path)
     console.log("!!! namespace = ", namespace)
-    const { info, activities, err, getInfo, getActivityLogs, setLock, updateSettings, cancelActivity, sync } = useMirror(Config.url, true, namespace, path, localStorage.getItem("apikey"))
+    const { info, activities, err, getInfo, getActivityLogs, setLock, updateSettings, cancelActivity, sync } = useMirror(Config.url, true, namespace, path, localStorage.getItem("apikey"), "last=50", "order.field=CREATED", "order.direction=DESC")
+    const { data } = useNodes(Config.url, true, namespace, path, localStorage.getItem("apikey"), `first=1`)
+
+    useEffect(() => {
+        if (data) {
+            setCurrentlyLocking(false)
+        }
+    }, [data])
+
+    useEffect(() => {
+        if (data && info) {
+            setLoad(false)
+        }
+    }, [data, info])
 
     console.log("info = ", info)
+    console.log("data!!! = ", data)
     console.log("activities = ", activities)
     // console.log("err = ", getInfo())
 
@@ -49,37 +67,140 @@ function MirrorPage(props) {
     }
 
 
-    return (
-        <FlexBox className="col gap" style={{ paddingRight: "8px" }}>
-            <FlexBox className="row gap wrap" style={{ flex: 1, maxHeight: "60vh" }}>
-                <ContentPanel id={`panel-activity-list`} style={{ width: "100%", minHeight: "60vh", maxHeight: "60vh", flex: 2 }}>
-                    <ContentPanelTitle>
-                        <ContentPanelTitleIcon>
-                            <VscAdd />
-                        </ContentPanelTitleIcon>
-                        <FlexBox className="gap" style={{ alignItems: "center" }}>Activity List</FlexBox>
-                    </ContentPanelTitle>
-                    <ContentPanelBody style={{ overflow: "auto" }}>
-                        <FlexBox >
-                            <ActivityTable activities={activities} setActivity={setActivity} />
-                        </FlexBox>
-                    </ContentPanelBody>
-                </ContentPanel>
-                <MirrorInfoPanel info={info} updateSettings={updateSettings} namespace={namespace} style={{ width: "100%", height: "100%", flex: 1 }} />
-            </FlexBox>
-            <ContentPanel style={{ width: "100%", minHeight: "20vh", flex: 1 }}>
-                <ContentPanelTitle>
-                    <ContentPanelTitleIcon>
-                        <VscAdd />
-                    </ContentPanelTitleIcon>
-                    <FlexBox className="gap" style={{ alignItems: "center" }}>Activity Logs</FlexBox>
-                </ContentPanelTitle>
-                <ContentPanelBody>
-                    <ActivityLogs activity={activity} namespace={namespace}/>
-                </ContentPanelBody>
-            </ContentPanel>
 
-        </FlexBox>
+    // <FlexBox className="row gap center" style={{ height: "72px", width: "200px", position: "absolute", right: "0px", top: "0px", justifyContent: "flex-end", paddingRight: "6px" }}>
+    //             <Button className="small light shadow" style={{ fontWeight: "bold" }}>
+    //                 <FlexBox className="row center gap-sm">
+    //                     <VscSync />
+    //                     Sync
+    //                 </FlexBox>
+    //             </Button>
+    //             <Button className="small light shadow" style={{ fontWeight: "bold" }}>
+    //                 <FlexBox className="row center gap-sm">
+    //                     <VscLock />
+    //                     <VscUnlock />
+    //                     Locked
+    //                 </FlexBox>
+    //             </Button>
+    //         </FlexBox>
+
+
+    return (
+        <>
+            <Loader load={load} timer={1000}>
+                {
+                    errorMsg ?
+                        <FlexBox style={{ maxHeight: "50px", paddingRight: "6px", paddingBottom: "8px" }}>
+                            <Alert setErrorMsg={setErrorMsg} className="critical" style={{ height: "100%" }}>{`Error: ${errorMsg}`}</Alert>
+                        </FlexBox>
+                        : <></>
+                }
+                <FlexBox className="col gap" style={{ paddingRight: "8px" }}>
+                    <FlexBox className="row center" style={{ height: "72px", width: "200px", position: "absolute", right: "0px", top: "0px", justifyContent: "flex-end", paddingRight: "6px" }}>
+                        <Modal
+                            escapeToCancel
+                            activeOverlay
+                            title="Sync Mirror"
+                            titleIcon={
+                                <VscSync />
+                            }
+                            style={{
+                                maxWidth: "260px"
+                            }}
+                            modalStyle={{
+                                overflow: "hidden",
+                                padding: "0px"
+                            }}
+                            button={(
+                                <Button className="small light shadow" style={{ fontWeight: "bold" }}>
+                                    <FlexBox className="row center gap-sm">
+                                        <VscSync />
+                                        Sync
+                                    </FlexBox>
+                                </Button>
+                            )}
+                            actionButtons={[
+                                ButtonDefinition("Soft Sync", async () => {
+                                    await sync()
+                                }, "small blue", () => { }, true, false),
+                                ButtonDefinition("Hard Sync", async () => {
+                                    await sync(true)
+                                }, "small blue", () => { }, true, false),
+                                ButtonDefinition("Cancel", () => { }, "small light", () => { }, true, false)
+                            ]}
+                        >
+                            <FlexBox className="col gap" style={{ paddingTop: "8px" }}>
+                                <FlexBox className="col center info-update-label">
+                                    Would you like to do a normal sync or force a hard sync?
+                                </FlexBox>
+                            </FlexBox>
+                        </Modal>
+                        <Button className={`small light shadow ${currentlyLocking ? "loading disabled" : ""}`} style={{ fontWeight: "bold" }} onClick={async () => {
+                            if (data?.node?.readOnly) {
+                                setCurrentlyLocking(true)
+                                try {
+                                    await setLock(true)
+                                } catch (e) {
+                                    setCurrentlyLocking(false)
+                                    setErrorMsg(e.message)
+                                }
+                            } else {
+                                setCurrentlyLocking(true)
+                                try {
+                                    await setLock(false)
+                                } catch (e) {
+                                    setCurrentlyLocking(false)
+                                    setErrorMsg(e.message)
+                                }
+                            }
+                        }}>
+                            <FlexBox className="row center gap-sm">
+                                {data?.node?.readOnly ?
+                                    <>
+                                        <VscLock />
+                                        Locked
+                                    </>
+                                    :
+                                    <>
+                                        <VscUnlock />
+                                        Unlocked
+                                    </>
+
+                                }
+                            </FlexBox>
+                        </Button>
+                    </FlexBox>
+                    <FlexBox className="row gap wrap" style={{ flex: 1, maxHeight: "60vh" }}>
+                        <ContentPanel id={`panel-activity-list`} style={{ width: "100%", minHeight: "60vh", maxHeight: "60vh", flex: 2 }}>
+                            <ContentPanelTitle>
+                                <ContentPanelTitleIcon>
+                                    <VscAdd />
+                                </ContentPanelTitleIcon>
+                                <FlexBox className="gap" style={{ alignItems: "center" }}>Activity List</FlexBox>
+                            </ContentPanelTitle>
+                            <ContentPanelBody style={{ overflow: "auto" }}>
+                                <FlexBox >
+                                    <ActivityTable activities={activities} setActivity={setActivity} cancelActivity={cancelActivity} setErrorMsg={setErrorMsg} />
+                                </FlexBox>
+                            </ContentPanelBody>
+                        </ContentPanel>
+                        <MirrorInfoPanel info={info} updateSettings={updateSettings} namespace={namespace} style={{ width: "100%", height: "100%", flex: 1 }} />
+                    </FlexBox>
+                    <ContentPanel style={{ width: "100%", minHeight: "20vh", flex: 1 }}>
+                        <ContentPanelTitle>
+                            <ContentPanelTitleIcon>
+                                <VscAdd />
+                            </ContentPanelTitleIcon>
+                            <FlexBox className="gap" style={{ alignItems: "center" }}>Activity Logs</FlexBox>
+                        </ContentPanelTitle>
+                        <ContentPanelBody>
+                            <ActivityLogs activity={activity} namespace={namespace} setErrorMsg={setErrorMsg} />
+                        </ContentPanelBody>
+                    </ContentPanel>
+
+                </FlexBox>
+            </Loader>
+        </>
     );
 }
 
@@ -104,6 +225,7 @@ export function MirrorInfoPanel(props) {
     const [infoPrivateKeyOld, setInfoPrivateKeyOld] = useState("")
     const [infoPassphraseOld, setInfoPassphraseOld] = useState("")
 
+    const [infoPendingChanges, setInfoPendingChanges] = useState(false)
     const [infoChangesTracker, setInfoChangesTracker] = useState({
         "url": false,
         "ref": false,
@@ -174,6 +296,11 @@ export function MirrorInfoPanel(props) {
 
     }, [info])
 
+    useEffect(() => {
+        console.log("should pend =", infoChangesTracker.url || infoChangesTracker.ref || infoChangesTracker.cron || infoChangesTracker.passphrase || infoChangesTracker.publicKey || infoChangesTracker.privateKey)
+        setInfoPendingChanges(infoChangesTracker.url || infoChangesTracker.ref || infoChangesTracker.cron || infoChangesTracker.passphrase || infoChangesTracker.publicKey || infoChangesTracker.privateKey)
+    }, [infoChangesTracker])
+
     return (
         <ContentPanel id={`panel-mirror-info`} style={{ ...style }}>
             <ContentPanelTitle>
@@ -182,82 +309,79 @@ export function MirrorInfoPanel(props) {
                 </ContentPanelTitleIcon>
                 <FlexBox className="gap" style={{ alignItems: "center" }}>Mirror Info
                     <FlexBox style={{ flex: "auto", justifyContent: "right", paddingRight: "6px", alignItems: "unset" }}>
-                        {/* <ContentPanelHeaderButton> */}
-                        <Modal
-                            escapeToCancel
-                            activeOverlay
-                            title="Update Mirror Settings"
-                            titleIcon={
-                                <VscTerminal />
-                            }
-                            style={{
-                                maxWidth: "260px"
-                            }}
-                            modalStyle={{
-                                overflow: "hidden",
-                                padding: "0px"
-                            }}
-                            button={(
-                                <ContentPanelHeaderButton hackyStyle={{ marginBottom: "8px", height: "29px" }}>
-                                    <ContentPanelHeaderButtonIcon>
-                                        <VscScreenFull />
+                        <ContentPanelHeaderButton className={`${infoPendingChanges ? "" : "disabled"}`} style={infoPendingChanges ? {} : { color: "grey" }}>
+                            <Modal
+                                escapeToCancel
+                                activeOverlay
+                                title="Update Mirror Settings"
+                                titleIcon={
+                                    <VscTerminal />
+                                }
+                                style={{
+                                    maxWidth: "260px"
+                                }}
+                                modalStyle={{
+                                    overflow: "hidden",
+                                    padding: "0px"
+                                }}
+                                button={(
+                                    <div>
                                         Update Settings
-                                    </ContentPanelHeaderButtonIcon>
-                                </ContentPanelHeaderButton>
-                            )}
-                            actionButtons={[
-                                ButtonDefinition("Update Settings", async () => {
-                                    await updateSettings({
-                                        "url": infoChangesTracker.url ? infoURL : "-",
-                                        "ref": infoChangesTracker.ref ? infoRef : "-",
-                                        "cron": infoChangesTracker.cron ? infoCron : "-",
-                                        "publicKey": infoChangesTracker.passphrase ? infoPassphrase : "-",
-                                        "privateKey": infoChangesTracker.publicKey ? infoPublicKey : "-",
-                                        "passphrase": infoChangesTracker.privateKey ? infoPrivateKey : "-",
-                                    })
+                                    </div>
+                                )}
+                                actionButtons={[
+                                    ButtonDefinition("Update Settings", async () => {
+                                        await updateSettings({
+                                            "url": infoChangesTracker.url ? infoURL : "-",
+                                            "ref": infoChangesTracker.ref ? infoRef : "-",
+                                            "cron": infoChangesTracker.cron ? infoCron : "-",
+                                            "publicKey": infoChangesTracker.passphrase ? infoPassphrase : "-",
+                                            "privateKey": infoChangesTracker.publicKey ? infoPublicKey : "-",
+                                            "passphrase": infoChangesTracker.privateKey ? infoPrivateKey : "-",
+                                        })
 
-                                    resetStates()
-                                }, "small blue", () => { }, true, false),
-                                ButtonDefinition("Cancel", () => { }, "small light", () => { }, true, false)
-                            ]}
-                        >
-                            <FlexBox className="col gap" style={{ height: "fit-content" }}>
-                                <FlexBox className="col center info-update-label">
-                                    The following changes will been made
+                                        resetStates()
+                                    }, "small blue", () => { }, true, false),
+                                    ButtonDefinition("Cancel", () => { }, "small light", () => { }, true, false)
+                                ]}
+                            >
+                                <FlexBox className="col gap" style={{ height: "fit-content" }}>
+                                    <FlexBox className="col center info-update-label">
+                                        The following changes will been made
+                                    </FlexBox>
+                                    {infoChangesTracker.url ?
+                                        <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
+                                            <span className={`info-input-title readonly`}>URL</span>
+                                            <input className={`info-input-value readonly`} value={infoURL} />
+                                        </FlexBox> : <></>}
+                                    {infoChangesTracker.ref ?
+                                        <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
+                                            <span className={`info-input-title readonly`}>Ref</span>
+                                            <input className={`info-input-value readonly`} value={infoRef} />
+                                        </FlexBox> : <></>}
+                                    {infoChangesTracker.cron ?
+                                        <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
+                                            <span className={`info-input-title readonly`}>Cron</span>
+                                            <input className={`info-input-value readonly`} readonly={true} value={infoCron} />
+                                        </FlexBox> : <></>}
+                                    {infoChangesTracker.passphrase ?
+                                        <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
+                                            <span className={`info-input-title readonly`}>Passphrase</span>
+                                            <input className={`info-input-value readonly`} readonly={true} type="password" value={infoPassphrase} />
+                                        </FlexBox> : <></>}
+                                    {infoChangesTracker.publicKey ?
+                                        <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
+                                            <span className={`info-input-title readonly`}>Public Key</span>
+                                            <textarea className={`info-textarea-value readonly`} readonly={true} style={{ width: "100%", resize: "none" }} value={infoPublicKey} />
+                                        </FlexBox> : <></>}
+                                    {infoChangesTracker.privateKey ?
+                                        <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
+                                            <span className={`info-input-title readonly`} >Private Key</span>
+                                            <textarea className={`info-textarea-value readonly`} readonly={true} style={{ width: "100%", resize: "none" }} value={infoPrivateKey} />
+                                        </FlexBox> : <></>}
                                 </FlexBox>
-                                {infoChangesTracker.url ?
-                                    <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
-                                        <span className={`info-input-title readonly`}>URL</span>
-                                        <input className={`info-input-value readonly`} value={infoURL} />
-                                    </FlexBox> : <></>}
-                                {infoChangesTracker.ref ?
-                                    <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
-                                        <span className={`info-input-title readonly`}>Ref</span>
-                                        <input className={`info-input-value readonly`} value={infoRef} />
-                                    </FlexBox> : <></>}
-                                {infoChangesTracker.cron ?
-                                    <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
-                                        <span className={`info-input-title readonly`}>Cron</span>
-                                        <input className={`info-input-value readonly`} readonly={true} value={infoCron} />
-                                    </FlexBox> : <></>}
-                                {infoChangesTracker.passphrase ?
-                                    <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
-                                        <span className={`info-input-title readonly`}>Passphrase</span>
-                                        <input className={`info-input-value readonly`} readonly={true} type="password" value={infoPassphrase} />
-                                    </FlexBox> : <></>}
-                                {infoChangesTracker.publicKey ?
-                                    <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
-                                        <span className={`info-input-title readonly`}>Public Key</span>
-                                        <textarea className={`info-textarea-value readonly`} readonly={true} style={{ width: "100%", resize: "none" }} value={infoPublicKey} />
-                                    </FlexBox> : <></>}
-                                {infoChangesTracker.privateKey ?
-                                    <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
-                                        <span className={`info-input-title readonly`} >Private Key</span>
-                                        <textarea className={`info-textarea-value readonly`} readonly={true} style={{ width: "100%", resize: "none" }} value={infoPrivateKey} />
-                                    </FlexBox> : <></>}
-                            </FlexBox>
-                        </Modal>
-                        {/* </ContentPanelHeaderButton> */}
+                            </Modal>
+                        </ContentPanelHeaderButton>
                     </FlexBox>
                 </FlexBox>
             </ContentPanelTitle>
@@ -387,7 +511,7 @@ export function MirrorInfoPanel(props) {
 
 
 export function ActivityTable(props) {
-    const { activities, err, panelStyle, bodyStyle, placeholder, namespace, totalCount, pageInfo, setActivity } = props
+    const { activities, err, panelStyle, bodyStyle, placeholder, namespace, totalCount, pageInfo, setActivity, cancelActivity, setErrorMsg } = props
     const [load, setLoad] = useState(true)
 
     const [queryParams, setQueryParams] = useState([`first=${PAGE_SIZE}`])
@@ -461,7 +585,7 @@ export function ActivityTable(props) {
                                 <th className="center-align" style={{ maxWidth: "120px", minWidth: "120px", width: "120px" }}>State</th>
                                 <th className="center-align">Type</th>
                                 <th className="center-align">Started <span className="hide-on-med">at</span></th>
-                                <th className="center-align">ACTIONS</th>
+                                <th className="center-align" style={{ maxWidth: "120px", minWidth: "120px", width: "120px" }}></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -481,6 +605,8 @@ export function ActivityTable(props) {
                                                     finishedDate={dayjs.utc(obj.node.updatedAt).local().format("DD MMM YY")}
                                                     finishedTime={dayjs.utc(obj.node.updatedAt).local().format("HH:mm a")}
                                                     setActivity={setActivity}
+                                                    cancelActivity={cancelActivity}
+                                                    setErrorMsg={setErrorMsg}
                                                 />
                                             )
                                         })}</>
@@ -502,9 +628,15 @@ function Logs(props) {
         fixedHeight: false
     })
 
-    let { namespace, activityID, follow, setClipData, clipData } = props;
+    let { namespace, activityID, follow, setClipData, clipData, setErrorMsg } = props;
     const [logLength, setLogLength] = useState(0)
     const { data, err } = useMirrorLogs(Config.url, true, namespace, activityID, localStorage.getItem("apikey"))
+
+    useEffect(() => {
+        if (err) {
+            setErrorMsg(`Could not get logs: ${err}`)
+        }
+    }, [err])
 
     useEffect(() => {
         if (!setClipData) {
@@ -601,7 +733,7 @@ function Logs(props) {
 }
 
 export function ActivityLogs(props) {
-    const { activity, namespace } = props
+    const { activity, namespace, setErrorMsg } = props
     const data = ["dont", "care"]
 
     const [filterName, setFilterName] = useState("")
@@ -628,7 +760,7 @@ export function ActivityLogs(props) {
         <>
             <FlexBox className="col">
                 <FlexBox style={{ backgroundColor: "#002240", color: "white", borderRadius: "8px 8px 0px 0px", overflow: "hidden", padding: "8px" }}>
-                    <Logs clipData={clipData} setClipData={setClipData} follow={true} activityID={activity} namespace={namespace} />
+                    <Logs clipData={clipData} setClipData={setClipData} follow={true} activityID={activity} namespace={namespace} setErrorMsg={setErrorMsg} />
                 </FlexBox>
                 <div style={{ height: "40px", backgroundColor: "#223848", color: "white", maxHeight: "40px", minHeight: "40px", padding: "0px 10px 0px 10px", boxShadow: "0px 0px 3px 0px #fcfdfe", alignItems: 'center', borderRadius: " 0px 0px 8px 8px", overflow: "hidden" }}>
                     <FlexBox className="gap" style={{ width: "100%", flexDirection: "row-reverse", height: "100%", alignItems: "center" }}>
@@ -661,7 +793,7 @@ const cancelled = "cancelled";
 const running = "pending";
 
 export function ActivityRow(props) {
-    let { state, startedDate, finishedDate, startedTime, finishedTime, id, namespace, type, setActivity } = props;
+    let { state, startedDate, finishedDate, startedTime, finishedTime, id, namespace, type, setActivity, cancelActivity, setErrorMsg } = props;
     const navigate = useNavigate()
 
     let label;
@@ -690,17 +822,18 @@ export function ActivityRow(props) {
             </td>
             <td className="center-align">
                 <FlexBox className="center gap">
-                    <Button>
+                    <Button className={`small light`} style={state !== "pending" ? { visibility: "hidden" } : {}} onClick={async () => {
+                        try {
+                            await cancelActivity(id)
+                        } catch (e) {
+                            setErrorMsg(`Failed to cancel: ${e.message}`)
+                        }
+
+                    }}>
                         Cancel
                     </Button>
-                    <Button className="small" onClick={async () => {
-                        try {
-                            setActivity(id)
-                            console.log("setting activity to id")
-                        } catch (e) {
-                            console.log("e == ?", e)
-                            alert(`got error when getting logs: ${e.message}`)
-                        }
+                    <Button className="small blue" onClick={async () => {
+                        setActivity(id)
                     }}>
                         Logs
                     </Button>
