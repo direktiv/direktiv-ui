@@ -25,6 +25,7 @@ import Modal, { ButtonDefinition, ModalHeadless } from '../modal';
 
 import Ajv from "ajv"
 import { CustomWidgets } from './widgets';
+import useRemoteFunctions from './dev-hook';
 
 const actionsNodesFuse = new Fuse(ActionsNodes, {
     keys: ['name']
@@ -103,18 +104,43 @@ function FunctionsList(props) {
 
     const [newFunctionFormRef, setNewFunctionFormRef] = useState(null)
     const [formData, setFormData] = useState({})
+    const [functionSchemas, setFunctionSchemas] = useState(null)
 
     const namespaceServiceHook = useNamespaceServices(Config.url, false, namespace, localStorage.getItem("apikey"))
     const globalServiceHook = useGlobalServices(Config.url, false, localStorage.getItem("apikey"))
     const namespaceNodesHook = useNodes(Config.url, false, namespace, "/", localStorage.getItem("apikey"), "first=20")
+    const {data: imageData, getImages, getImageInfo} = useRemoteFunctions(Config.url, namespace, "/", localStorage.getItem("apikey"))
+
+    useEffect(()=>{
+        console.log("imageData = ", imageData)
+    }, [imageData])
+
+    useEffect(()=>{
+        if (namespaceServiceHook.data === null || globalServiceHook.data === null || namespaceNodesHook.data === null) {
+            return 
+        }
+
+        
+        //TODO: Change
+        let remoteImages = []
+        if (imageData) {
+            imageData.forEach(img => {
+                remoteImages.push(`remote/${img.name}`)
+            });
+        }
+        
+
+        console.log("setting func schema with remote images: ", remoteImages)
+
+        setFunctionSchemas(GenerateFunctionSchemaWithEnum(namespaceServiceHook.data.map(a => a.serviceName), (globalServiceHook.data.map(a => a.serviceName)), namespaceNodesHook.data, remoteImages))
+    }, [imageData, namespaceServiceHook.data, globalServiceHook.data, namespaceNodesHook.data])
 
 
-    if (namespaceServiceHook.data === null || globalServiceHook.data === null || namespaceNodesHook.data === null) {
+    if (namespaceServiceHook.data === null || globalServiceHook.data === null || namespaceNodesHook.data === null || functionSchemas === null) {
         return <></>
     }
 
     const ajv = new Ajv()
-    const functionSchemas = GenerateFunctionSchemaWithEnum(namespaceServiceHook.data.map(a => a.serviceName), (globalServiceHook.data.map(a => a.serviceName)), namespaceNodesHook.data)
     const validate = ajv.compile(functionSchemas.schema)
 
     // Set uischema to global or namespace depending on the type

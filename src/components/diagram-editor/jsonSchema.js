@@ -1169,10 +1169,94 @@ function functionListToActionEnum(functionList) {
 export function getSchemaDefault(schemaKey) {
     return SchemaMap[schemaKey]
 }
+
+const devExampleBodySchema = {
+    "swagger": "2.0",
+    "info": {
+        "description": "Description for bash-service",
+        "title": "Bash Service",
+        "version": "1.0.0",
+        "x-direktiv": {
+            "container": "direktiv/bash-service",
+            "category": "unknown",
+            "long-description": "Bash is the GNU Project's Bourne Again SHell, a complete implementation of the IEEE POSIX and Open Group shell specification with interactive command line editing, job control on architectures that support it, csh-like features such as history substitution and brace expansion, and a slew of other features."
+        }
+    },
+    "paths": {
+        "/": {
+            "post": {
+                "parameters": {
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "type": "object",
+                            "required": [
+                                "command"
+                            ],
+                            "properties": {
+                                "command": {
+                                    "type": "string",
+                                    "title":"Command",
+                                    "description": "Command to run in bash"
+                                },
+                                "user": {
+                                    "type": "number",
+                                    "title":"Unique User ID",
+                                    "description": "UUID of user that will run command"
+                                }
+                            }
+                        }
+                    }
+            }
+        }
+    },
+    "definitions": {
+        "direktivFile": {
+            "type": "object",
+            "x-go-type": {
+                "type": "DirektivFile",
+                "import": {
+                    "package": "github.com/direktiv/apps/go/pkg/apps"
+                }
+            }
+        },
+        "error": {
+            "type": "object",
+            "required": [
+                "errorCode",
+                "errorMessage"
+            ],
+            "properties": {
+                "errorCode": {
+                    "type": "string"
+                },
+                "errorMessage": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
+
 export const getSchemaCallbackMap = {
-    "stateSchemaAction": (schemaKey, functionList, varList) => {
-        let selectedSchema = SchemaMap[schemaKey]
+    "stateSchemaAction": (schemaKey, functionList, varList, schemaOverride) => {
+        let selectedSchema = JSON.parse(JSON.stringify(SchemaMap[schemaKey]))
         selectedSchema.properties.action.properties.function.enum = functionListToActionEnum(functionList)
+        selectedSchema.properties.action = {
+            "type": "object",
+            "title": devExampleBodySchema["info"]["title"] + " Description",
+            "description": devExampleBodySchema["info"]["x-direktiv"]["long-description"],
+            "properties": {
+                "input": {
+                    title:  devExampleBodySchema["info"]["title"] + " Input",
+                    ...devExampleBodySchema["paths"]["/"]["post"]["parameters"]["schema"]
+                }
+            }
+        }
+
+        console.log("selectedSchema = ", selectedSchema)
+
+        // selectedSchema = devExampleBodySchema
         return selectedSchema
     },
     "stateSchemaForeach": (schemaKey, functionList, varList) => {
