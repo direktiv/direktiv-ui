@@ -1,5 +1,5 @@
 import { useGlobalServices, useNamespaceServices, useNodes } from 'direktiv-react-hooks';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { VscGear, VscListUnordered, VscSymbolEvent, VscInfo, VscFileCode, VscClose } from 'react-icons/vsc';
 import Alert from '../../components/alert';
 import FlexBox from '../../components/flexbox';
@@ -13,7 +13,6 @@ import { AutoSizer, CellMeasurer, CellMeasurerCache, List } from 'react-virtuali
 import Fuse from 'fuse.js';
 import { ActionsNodes, NodeStateAction } from "../../components/diagram-editor/nodes";
 import PrettyYAML from "json-to-pretty-yaml"
-import YAML from 'js-yaml'
 
 
 // Import Styles
@@ -371,7 +370,7 @@ export default function DiagramEditor(props) {
 
     // Track remote function definitions details here that are references in workflow knative-workflow functions
     const [remoteFunctionListDetails, setRemoteFunctionListDetails] = useState({})
-    const { data: remoteImages, getImages, getImageInfo } = useRemoteFunctions(Config.url, "apps-svc", "/", localStorage.getItem("apikey"))
+    const { data: remoteImages, getImageInfo } = useRemoteFunctions(Config.url, "apps-svc", "/", localStorage.getItem("apikey"))
 
     const [nodeDetailsVisible, setNodeDetailsVisible] = useState(false)
     const [nodeIDModalVisible, setNodeIDModalVisible] = useState(false)
@@ -420,8 +419,10 @@ export default function DiagramEditor(props) {
                 }
 
                 if (useRemoteSchema) {
+                    // Get remote schema
                     setSelectedNodeSchema(getSchema(selectedNode.data.schemaKey, functionList, null, selectedNode.data?.formData?.action?.function))
                 } else {
+                    // Get Action Node Schema
                     setSelectedNodeSchema(getSchema(selectedNode.data.schemaKey, functionList, null))
                 }
 
