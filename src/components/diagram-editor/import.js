@@ -3,6 +3,8 @@ import YAML from 'js-yaml'
 import prettyYAML from "json-to-pretty-yaml"
 import { CreateNode, sortNodes, unescapeJSStrings } from "./util";
 
+const imageRegex = new RegExp('^(?<Name>(?<=^)(?:(?<Domain>(?:(?:localhost|[\\w-]+(?:\\.[\\w-]+)+)(?::\\d+)?)|[\\w]+:\\d+)\\/)?\\/?(?<Namespace>(?:(?:[a-z0-9]+(?:(?:[._]|__|[-]*)[a-z0-9]+)*)\\/)*)(?<Repo>[a-z0-9-]+))[:@]?(?<Reference>(?<=:)(?<Tag>[\\w][\\w.-]{0,127})|(?<=@)(?<Digest>[A-Za-z][A-Za-z0-9]*(?:[-_+.][A-Za-z][A-Za-z0-9]*)*[:][0-9A-Fa-f]{32,}))?', 'gm')
+
 export function importFromYAML(diagramEditor, setFunctions, wfYAML) {
     const wfData = YAML.load(wfYAML)
     let nodeIDToStateIDMap = {}
@@ -11,7 +13,31 @@ export function importFromYAML(diagramEditor, setFunctions, wfYAML) {
 
     // Set functions
     if (wfData.functions) {
-        setFunctions(wfData.functions)
+        let importedFunctions = JSON.parse(JSON.stringify(wfData.functions))
+
+        // Split Image into image and tag
+        importedFunctions.forEach(f => {
+            if (!f.image) {
+                return
+            }
+
+            const unprocessedImage = `${f.image}`
+
+            let m;
+            while ((m = imageRegex.exec(unprocessedImage)) !== null) {
+                // This is necessary to avoid infinite loops with zero-width matches
+                if (m.index === imageRegex.lastIndex) {
+                    imageRegex.lastIndex++;
+                }
+
+                f.tag = m?.groups?.Tag ?  m?.groups?.Tag : ""
+                f.image = m?.groups?.Name ?  m?.groups?.Name : unprocessedImage
+                
+            }
+        });
+
+        setFunctions(importedFunctions)
+        
     }
 
     // Add StartNode
@@ -201,12 +227,16 @@ function importDefaultProcessTransformCallback(state, transformKey) {
             const yamlString = unescapeJSStrings(prettyYAML.stringify(oldTransform))
             state[transformKey] = {
                 selectionType: "YAML",
-                "rawYAML": yamlString
+                "rawYAML": yamlString,
+                "useRemoteSchemaInput": transformKey === "input",
+                "remoteFunctionInput": transformKey === "input" ? oldTransform : undefined // FIXME: This is a patch so we can keep the object to use it in remote action forms, but it means we have double data.  
             }
         } else {
             state[transformKey] = {
                 selectionType: "Key Value",
-                "keyValue": oldTransform
+                "keyValue": oldTransform,
+                "useRemoteSchemaInput": transformKey === "input",
+                "remoteFunctionInput": transformKey === "input" ? oldTransform : undefined // FIXME: This is a patch so we can keep the object to use it in remote action forms, but it means we have double data.  
             }
         }
     }  else if (oldTransform.trim().startsWith(`js(`) && oldTransform.trim().endsWith(")")){

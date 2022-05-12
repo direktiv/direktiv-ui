@@ -14,8 +14,7 @@ const useRemoteFunctions = (url, namespace, path, apikey, ...queryParameters) =>
         async function fetchData() {
             try {
                 const images = await getImages()
-                console.log("images = ", images)
-                setData(images.data)
+                setData(images)
             } catch (e) {
                 setErr(e.onmessage)
             }
@@ -42,7 +41,7 @@ const useRemoteFunctions = (url, namespace, path, apikey, ...queryParameters) =>
             headers: apikey === undefined ? {} : { "apikey": apikey }
         }
 
-        let resp = await fetch(`https://fakerapi.it/api/v1/custom?_quantity=10&name=word${ExtractQueryString(true, ...queryParameters)}`, request)
+        let resp = await fetch(`http://192.168.1.16/api/namespaces/${namespace}/tree/list?op=wait&field=output&raw-output=true&ctype=application%2Fjson${ExtractQueryString(true, ...queryParameters)}`, request)
         if (!resp.ok) {
             throw new Error(await HandleError('get mirror info', resp, 'mirrorInfo'))
         }
@@ -50,9 +49,9 @@ const useRemoteFunctions = (url, namespace, path, apikey, ...queryParameters) =>
         return await resp.json()
     }
 
-    async function getImageInfo(image, ...queryParameters) {
-        if (!image) {
-            throw new Error("image cannot be empty")
+    async function getImageInfo(image, tag, ...queryParameters) {
+        if (!image || !tag) {
+            throw new Error("image and tag cannot be empty")
         }
 
         let uriPath = `${url}namespaces/${namespace}/tree`
@@ -64,7 +63,7 @@ const useRemoteFunctions = (url, namespace, path, apikey, ...queryParameters) =>
             headers: apikey === undefined ? {} : { "apikey": apikey }
         }
 
-        let resp = await fetch(`https://fakerapi.it/api/v1/custom?_quantity=10&name=word${image}${ExtractQueryString(true, ...queryParameters)}`, request)
+        let resp = await fetch(`http://192.168.1.16/api/namespaces/${namespace}/tree/spec?op=wait&input.uri=${encodeURIComponent(image)}&input.tag=${encodeURIComponent(tag)}&field=output&raw-output=true&ctype=application%2Fjson${ExtractQueryString(true, ...queryParameters)}`, request)
         if (!resp.ok) {
             throw new Error(await HandleError('get mirror info', resp, 'mirrorInfo'))
         }

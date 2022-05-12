@@ -83,4 +83,27 @@ export function MimeTypeFileExtension(mime) {
   return null
 }
 
+// utilRemoveNulls : Recursively remove null and empty keys from an object
+export const utilRemoveNulls = (obj) => {
+  const isArray = Array.isArray(obj);
+  for (const k of Object.keys(obj)) {
+    if (obj[k] && Object.keys(obj[k]).length === 0 && Object.getPrototypeOf(obj[k]) === Object.prototype) {
+      delete obj[k];
+      continue
+    }
+    if (obj[k] === null || obj[k] === {}) {
+      if (isArray) {
+        obj.splice(k, 1)
+      } else {
+        delete obj[k];
+      }
+    } else if (typeof obj[k] === "object") {
+      utilRemoveNulls(obj[k]);
+    }
+    if (isArray && obj.length === k) {
+      utilRemoveNulls(obj);
+    }
+  }
+  return obj;
+}
 

@@ -1,5 +1,7 @@
 import YAML from 'js-yaml'
 import dagre from "dagre"
+import Ajv from "ajv"
+import { utilRemoveNulls } from '../../util';
 
 
 export function sortNodes(diagramEditor) {
@@ -129,14 +131,22 @@ function processTransform(stateData, transformKey) {
     const jqQuery = stateData[transformKey]["jqQuery"] ? stateData[transformKey]["jqQuery"] : ""
     const rawYAML = stateData[transformKey]["rawYAML"] ? stateData[transformKey]["rawYAML"] : ""
     const js = stateData[transformKey]["js"] ? stateData[transformKey]["js"] : ""
+    const useRemoteSchemaInput = stateData[transformKey]["useRemoteSchemaInput"]
+    const remoteFunctionInput = stateData[transformKey]["remoteFunctionInput"] ? stateData[transformKey]["remoteFunctionInput"] : ""
 
     delete stateData[transformKey]["keyValue"]
     delete stateData[transformKey]["jqQuery"]
+    delete stateData[transformKey]["useRemoteSchemaInput"]
     delete stateData[transformKey]["selectionType"]
     delete stateData[transformKey]["rawYAML"]
     delete stateData[transformKey]["js"]
 
-    if (selectionType && selectionType === "Key Value") {
+    // Remove null/empty objects to prevent them to from appearing in YAML later
+    stateData[transformKey] = utilRemoveNulls(stateData[transformKey])
+
+    if (useRemoteSchemaInput) {
+        stateData[transformKey] = remoteFunctionInput
+    } else if (selectionType && selectionType === "Key Value") {
         stateData[transformKey] = { ...keyValue }
     } else if (selectionType && selectionType === "YAML") {
         stateData[transformKey] = YAML.load(rawYAML)
@@ -409,9 +419,26 @@ export const onValidateSubmitCallbackMap = {
         }
         validateFormTransform(formData.transform)
     },
-    "StateAction": (formData) => {
+    "StateAction": (formData, useRemoteSchemaInput, selectedNodeFunction) => {
         validateFormTransform(formData.transform)
         validateFormTransform(formData.action.input)
+        formData.action.input.useRemoteSchemaInput = useRemoteSchemaInput
+
+        if (useRemoteSchemaInput && selectedNodeFunction?.remoteDetails && formData.action.input?.remoteFunctionInput) {
+            // FIXME: duplicate code
+            for (const param of selectedNodeFunction.remoteDetails["paths"]["/"]["post"]["parameters"]) {
+                if (param.name === "body") {
+                    // Remove removeAdditional from action input
+                    const ajv = new Ajv({removeAdditional: true})
+                    const validate = ajv.compile({
+                        additionalProperties: false,
+                        ...param.schema
+                    })
+                    validate(formData.action.input.remoteFunctionInput)
+                }
+            }
+
+        }
     },
     "StateForeach": (formData) => {
         validateFormTransform(formData.transform)

@@ -1,6 +1,6 @@
 import { useGlobalServices, useNamespaceServices, useNodes } from 'direktiv-react-hooks';
-import { useCallback, useEffect, useState } from 'react';
-import { VscGear, VscListUnordered, VscSymbolEvent, VscInfo, VscFileCode } from 'react-icons/vsc';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { VscGear, VscListUnordered, VscSymbolEvent, VscInfo, VscFileCode, VscClose } from 'react-icons/vsc';
 import Alert from '../../components/alert';
 import FlexBox from '../../components/flexbox';
 import { Config } from '../../util';
@@ -13,6 +13,8 @@ import { AutoSizer, CellMeasurer, CellMeasurerCache, List } from 'react-virtuali
 import Fuse from 'fuse.js';
 import { ActionsNodes, NodeStateAction } from "../../components/diagram-editor/nodes";
 import PrettyYAML from "json-to-pretty-yaml"
+import YAML from 'js-yaml'
+
 
 // Import Styles
 import './styles/form.css';
@@ -26,6 +28,7 @@ import Modal, { ButtonDefinition, ModalHeadless } from '../modal';
 import Ajv from "ajv"
 import { CustomWidgets } from './widgets';
 import useRemoteFunctions from './dev-hook';
+import Tippy from '@tippyjs/react';
 
 const actionsNodesFuse = new Fuse(ActionsNodes, {
     keys: ['name']
@@ -59,11 +62,11 @@ function Actions(props) {
                                 </span>
                                 {
                                     ActionsNodes[index].info.link ?
-                                    <a style={{ whiteSpace: "nowrap", cursor: "pointer", fontSize: "11px", paddingRight: "3px", display: "flex", alignItems: "center", justifyContent: "center" }} href={`${ActionsNodes[index].info.link}`} target="_blank" rel="noreferrer">
-                                        <VscInfo />
-                                    </a>
-                                    :
-                                    <></>
+                                        <a style={{ whiteSpace: "nowrap", cursor: "pointer", fontSize: "11px", paddingRight: "3px", display: "flex", alignItems: "center", justifyContent: "center" }} href={`${ActionsNodes[index].info.link}`} target="_blank" rel="noreferrer">
+                                            <VscInfo />
+                                        </a>
+                                        :
+                                        <></>
                                 }
                             </div>
                             <div style={{ fontSize: "10px", lineHeight: "10px", paddingTop: "2px" }}>
@@ -100,40 +103,24 @@ function Actions(props) {
 }
 
 function FunctionsList(props) {
-    const { functionList, setFunctionList, namespace, functionDrawerWidth } = props
+    const { functionList, setFunctionList, namespace, functionDrawerWidth, remoteImages, diagramEditor } = props
 
     const [newFunctionFormRef, setNewFunctionFormRef] = useState(null)
     const [formData, setFormData] = useState({})
+    const [functionIndexToDelete, setFunctionIndexToDelete] = useState(null)
     const [functionSchemas, setFunctionSchemas] = useState(null)
 
     const namespaceServiceHook = useNamespaceServices(Config.url, false, namespace, localStorage.getItem("apikey"))
     const globalServiceHook = useGlobalServices(Config.url, false, localStorage.getItem("apikey"))
     const namespaceNodesHook = useNodes(Config.url, false, namespace, "/", localStorage.getItem("apikey"), "first=20")
-    const {data: imageData, getImages, getImageInfo} = useRemoteFunctions(Config.url, namespace, "/", localStorage.getItem("apikey"))
 
-    useEffect(()=>{
-        console.log("imageData = ", imageData)
-    }, [imageData])
-
-    useEffect(()=>{
+    useEffect(() => {
         if (namespaceServiceHook.data === null || globalServiceHook.data === null || namespaceNodesHook.data === null) {
-            return 
+            return
         }
-
-        
-        //TODO: Change
-        let remoteImages = []
-        if (imageData) {
-            imageData.forEach(img => {
-                remoteImages.push(`remote/${img.name}`)
-            });
-        }
-        
-
-        console.log("setting func schema with remote images: ", remoteImages)
 
         setFunctionSchemas(GenerateFunctionSchemaWithEnum(namespaceServiceHook.data.map(a => a.serviceName), (globalServiceHook.data.map(a => a.serviceName)), namespaceNodesHook.data, remoteImages))
-    }, [imageData, namespaceServiceHook.data, globalServiceHook.data, namespaceNodesHook.data])
+    }, [remoteImages, namespaceServiceHook.data, globalServiceHook.data, namespaceNodesHook.data])
 
 
     if (namespaceServiceHook.data === null || globalServiceHook.data === null || namespaceNodesHook.data === null || functionSchemas === null) {
@@ -148,6 +135,8 @@ function FunctionsList(props) {
     let uiSchema = functionSchemas.uiSchema['knative-global']
     if (functionSchemas.schema && formData && formData.type === "knative-namespace") {
         uiSchema = functionSchemas.uiSchema['knative-namespace']
+    } else if (functionSchemas.schema && formData && formData.type === "knative-workflow") {
+        uiSchema = functionSchemas.uiSchema['knative-workflow']
     }
 
     const cache = new CellMeasurerCache({
@@ -164,16 +153,43 @@ function FunctionsList(props) {
                 columnIndex={0}
                 rowIndex={index}
             >
-                <div style={{ ...style, minHeight: "6px", height: "84px", cursor: "move", userSelect: "none", display: "flex" }}>
+                <div style={{ ...style, minHeight: "6px", height: "104px", cursor: "move", userSelect: "none", display: "flex" }}>
                     <div className={`function`} draggable={true} function-index={index} onDragStart={(ev) => {
                         ev.dataTransfer.setData("functionIndex", ev.target.getAttribute("function-index"));
                     }}>
-                        <div class="node-labels" style={{ display: "flex", gap: "4px", flexDirection: "column", marginLeft: "5px" }}>
-                            <div>
-                                ID: <span class="label-id" style={{ maxWidth: functionDrawerWidth - 50 }}>{functionList[index].id}</span>
+                        <div class="node-labels" style={{ display: "flex", gap: "4px", flexDirection: "column", marginLeft: "5px", width: "100%" }}>
+                            <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                <span style={{ whiteSpace: "pre-wrap", cursor: "move", fontSize: "13px", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                    ID: <span class="label-id" style={{ maxWidth: functionDrawerWidth - 50 }}>{functionList[index].id}</span>
+                                </span>
+                                <div style={{ whiteSpace: "nowrap", cursor: "pointer", fontSize: "12px", paddingRight: "3px", display: "flex", alignItems: "center", justifyContent: "center", }}>
+                                    {
+                                        functionList[index]?.remoteDetails?.info?.["x-direktiv-meta"]?.url ?
+                                            <Tippy content={`${functionList[index]?.remoteDetails?.info?.title}: ${functionList[index]?.remoteDetails?.info?.description}. Click for documentation`} trigger={'mouseenter focus'} zIndex={10}>
+                                                <a style={{ whiteSpace: "nowrap", cursor: "pointer", display: "flex", paddingRight: "3px", alignItems: "center", justifyContent: "center" }} href={functionList[index]?.remoteDetails?.info?.["x-direktiv-meta"]?.url} target="_blank" rel="noreferrer">
+                                                    <VscInfo />
+                                                </a>
+                                            </Tippy>
+                                            :
+                                            <></>
+                                    }
+                                    <Tippy content={`Delete Function`} trigger={'mouseenter focus'} zIndex={10}>
+                                        <div style={{ whiteSpace: "nowrap", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }} onClick={() => {
+                                            setFunctionIndexToDelete(index)
+                                        }}>
+                                            <VscClose />
+                                        </div>
+                                    </Tippy>
+                                </div>
                             </div>
                             <div>
                                 Type: <span class="label-type">{functionList[index].type}</span>
+                            </div>
+                            <div>
+                                {functionList[index].tag ? `Tag:` : ""}
+                                <span style={{ maxWidth: functionDrawerWidth - 80 }} class="label-type">
+                                    {functionList[index].tag ? `${functionList[index].tag}` : ""}
+                                </span>
                             </div>
                             <div>
                                 {functionList[index].service ? `Service:` : ""}
@@ -194,6 +210,53 @@ function FunctionsList(props) {
 
     return (
         <>
+            <ModalHeadless
+                visible={functionIndexToDelete !== null && functionIndexToDelete !== false}
+                setVisible={setFunctionIndexToDelete}
+                modalStyle={{ width: "400px" }}
+                escapeToCancel
+                style={{
+                    flexDirection: "row-reverse",
+                }}
+                title="Delete a function"
+                actionButtons={
+                    [
+                        ButtonDefinition("Delete", async () => {
+                            // Check if Function is being referenced by any nodes
+                            if (diagramEditor) {
+                                const actionNodeIDs = diagramEditor.getNodesFromName("StateAction")
+                                let actionsNodesReferencingFunction = []
+                                actionNodeIDs.forEach(nodeID => {
+                                    const node = diagramEditor.getNodeFromId(nodeID)
+                                    if (functionList?.[functionIndexToDelete]?.id === node?.data?.formData?.action?.function ) {
+                                        actionsNodesReferencingFunction.push(`'${node?.data?.id}'`)
+                                    }
+                                    
+                                });
+
+                                if (actionsNodesReferencingFunction.length > 0) {
+                                    throw new Error(`Cannot delete function while nodes ${actionsNodesReferencingFunction.join(", ")} are referencing function`)
+                                } else {
+                                    setFunctionList((old)=>{
+                                        old.splice(functionIndexToDelete, 1)
+                                        return [...old]
+                                    })
+                                }
+                            }
+                        }, "small red", () => { }, true, false),
+                        ButtonDefinition("Cancel", () => {
+                        }, "small light", () => { }, true, false)
+                    ]
+                }
+            >
+                <FlexBox className="col gap">
+                    <FlexBox >
+                        Are you sure you want to delete {functionList?.[functionIndexToDelete]?.id}?
+                        <br />
+                        This action cannot be undone.
+                    </FlexBox>
+                </FlexBox>
+            </ModalHeadless>
             <Modal
                 style={{ justifyContent: "center" }}
                 className="run-workflow-modal"
@@ -268,7 +331,7 @@ function FunctionsList(props) {
                             deferredMeasurementCache={cache}
                             scrollToIndex={0}
                             rowCount={functionList.length}
-                            rowHeight={84}
+                            rowHeight={104}
                             scrollToAlignment={"start"}
                         />
                     )}
@@ -292,6 +355,7 @@ export default function DiagramEditor(props) {
     const [load, setLoad] = useState(true);
 
     const [selectedNode, setSelectedNode] = useState(null);
+    const [selectedNodeFunction, setSelectedNodeFunction] = useState(null);
     const [formRef, setFormRef] = useState(null);
     const [error, setError] = useState(null)
 
@@ -305,12 +369,17 @@ export default function DiagramEditor(props) {
     const [functionDrawerMinWidth, setFunctionDrawerMinWidth] = useState(0)
     const [functionList, setFunctionList] = useState([])
 
+    // Track remote function definitions details here that are references in workflow knative-workflow functions
+    const [remoteFunctionListDetails, setRemoteFunctionListDetails] = useState({})
+    const { data: remoteImages, getImages, getImageInfo } = useRemoteFunctions(Config.url, "apps-svc", "/", localStorage.getItem("apikey"))
+
     const [nodeDetailsVisible, setNodeDetailsVisible] = useState(false)
     const [nodeIDModalVisible, setNodeIDModalVisible] = useState(false)
     const [newNodeID, setNewNodeID] = useState("")
     const [selectedNodeFormData, setSelectedNodeFormData] = useState({})
     const [oldSelectedNodeFormData, setOldSelectedNodeFormData] = useState({})
     const [selectedNodeSchema, setSelectedNodeSchema] = useState({})
+    const [useRemoteSchema, setUseRemoteSchema] = useState(false);
     const [selectedNodeSchemaUI, setSelectedNodeSchemaUI] = useState({})
 
     // Track whether all nodes have been init'd
@@ -328,11 +397,35 @@ export default function DiagramEditor(props) {
     // Context menu to edit nodes
     const [showNodeContextMenu, setShowNodeContextMenu] = useState(false);
 
+    
+    // Get function with name 'fName' from a functionList 
+    function getFunc(funcList, fID) {
+        for (const f of funcList) {
+            if (f?.id === fID) {
+                return f
+            }
+        }
+
+        return null
+    }
+
+
     useEffect(() => {
+        let selectFunc = null
         if (selectedNode) {
             const getSchema = getSchemaCallbackMap[selectedNode.data.schemaKey]
             if (getSchema) {
-                setSelectedNodeSchema(getSchema(selectedNode.data.schemaKey, functionList))
+                if (selectedNode.data?.formData?.action?.function){
+                    selectFunc = getFunc(functionList, selectedNode.data?.formData?.action?.function)
+                }
+
+                if (useRemoteSchema) {
+                    setSelectedNodeSchema(getSchema(selectedNode.data.schemaKey, functionList, null, selectedNode.data?.formData?.action?.function))
+                } else {
+                    setSelectedNodeSchema(getSchema(selectedNode.data.schemaKey, functionList, null))
+                }
+
+                
             } else {
                 setSelectedNodeSchema(getSchemaDefault(selectedNode.data.schemaKey))
             }
@@ -347,7 +440,9 @@ export default function DiagramEditor(props) {
                 setSelectedNodeSchemaUI(DefaultSchemaUI)
             }
         }
-    }, [selectedNode, functionList])
+
+        setSelectedNodeFunction(selectFunc)
+    }, [selectedNode, functionList, remoteFunctionListDetails, useRemoteSchema])
 
     useEffect(() => {
         var id = document.getElementById("drawflow");
@@ -447,6 +542,88 @@ export default function DiagramEditor(props) {
         }
     }, [diagramEditor, workflow, load])
 
+    //TODO: move / check if it already exists somewhere else
+    function isInArray(arr, value, key) {
+        if (!arr) {
+            return false
+        }
+
+        for (const elm of arr) {
+            if (key && elm[key] && elm[key] === value) {
+                return true
+            } else if (elm === value) {
+                return true
+            }
+        }
+
+        return false
+    }
+
+    // Checks functions list whenever it changes and attempts to fetch remote image details if
+    // function is using a image
+    useEffect(() => {
+        if (!getImageInfo || load) {
+            return
+        }
+
+        const batchImageFetcher = async (funcImages) => {
+            let newFuncDetails = remoteFunctionListDetails
+            for (const funcURI of funcImages) {
+                const funcImage = `${funcURI.image}:${funcURI.tag}`
+                if (newFuncDetails[funcImage] !== undefined) {
+                    continue // Function already fetched
+                }
+
+                try {
+                    const rfDetails = await getImageInfo(funcURI.image, funcURI.tag)
+                    newFuncDetails[funcImage] = rfDetails
+                } catch (e) {
+                    // We can ignore this error
+                    newFuncDetails[funcImage] = null // Set null to mark that function has already been fetched even if it failed
+                }
+            }
+
+            setRemoteFunctionListDetails(newFuncDetails)
+        }
+
+        const fetchRemoteFunctionDetailsHandler = setTimeout(() => {
+            let imageListToFetchDetails = []
+            let updateFunctionList = false
+            let newFunctionList = functionList
+
+            for (let i = 0; i < functionList.length; i++) {
+                const f = functionList[i];
+                if (f.image) {
+                    const imageTag = f.tag && f.tag !== "" ? f.tag : "latest"
+                    // Add Image to fetch
+                    // FIXME: The isInArray will only check images that where part of the original remoteImages list.
+                    //        If you want to check if image details exist remotely regardless if they were in original payload then remove
+                    //        isInArray condition
+                    if (remoteFunctionListDetails[`${f.image}:${imageTag}`] === undefined && remoteImages?.[f.image] && isInArray(remoteImages[f.image], imageTag, "tag")) {
+                        imageListToFetchDetails.push({image: f.image, tag: imageTag})
+                    }
+
+                    // Add Image Details to function
+                    if (!f.remoteDetails && remoteFunctionListDetails[`${f.image}:${imageTag}`]) {
+                        newFunctionList[i].remoteDetails = remoteFunctionListDetails[`${f.image}:${imageTag}`]
+                        updateFunctionList = true
+                    }
+                }
+            }
+
+            if (imageListToFetchDetails.length > 0 && remoteImages) {
+                batchImageFetcher(imageListToFetchDetails)
+            } else if (updateFunctionList) {
+                setFunctionList([...newFunctionList])
+            }
+            
+        }, 100);
+
+        return () => {
+            clearTimeout(fetchRemoteFunctionDetailsHandler);
+        };
+    }, [functionList, getImageInfo, remoteFunctionListDetails, load, remoteImages])
+
     const resizeStyle = {
         display: "flex",
         alignItems: "center",
@@ -507,7 +684,7 @@ export default function DiagramEditor(props) {
                         left: contextMenuAnchorPoint.x
                     }}
                 >
-                    <div style={{ textAlign: "center", padding: "4px 2px 4px 2px", fontWeight:"bold"}}>
+                    <div style={{ textAlign: "center", padding: "4px 2px 4px 2px", fontWeight: "bold" }}>
                         Add Node
                     </div>
                     <input autoFocus type="search" id="fname" name="fname" onChange={(ev) => {
@@ -555,14 +732,30 @@ export default function DiagramEditor(props) {
                         left: contextMenuAnchorPoint.x
                     }}
                 >
-                    <div style={{ textAlign: "center", padding: "4px 2px 4px 2px", fontWeight:"bold" }}>
+                    <div style={{ textAlign: "center", padding: "4px 2px 4px 2px", fontWeight: "bold" }}>
                         Node Options
                     </div>
                     <ul >
+                        {selectedNode && selectedNodeFunction?.remoteDetails ? 
+                            <li onClick={() => {
+                                if (!useRemoteSchema) {
+                                    setUseRemoteSchema(true)
+                                }
+
+                                setNodeDetailsVisible(true)
+                            }}>
+                                Edit Values (Remote)
+                            </li>
+                            : <></>
+                        }
                         <li onClick={() => {
+                            if (useRemoteSchema) {
+                                setUseRemoteSchema(false)
+                            }
+
                             setNodeDetailsVisible(true)
                         }}>
-                            Edit Values
+                            Edit Values {`${selectedNode && selectedNodeFunction?.remoteDetails ? "(Classic)" :""}`}
                         </li>
                         {/* Only show delete option if selected node is not a start node */}
                         {selectedNode && selectedNode.data.family !== "special" ?
@@ -622,7 +815,16 @@ export default function DiagramEditor(props) {
                         // Export Nodes to an object so we can convert it to a workflow yaml
                         let rawExport = diagramEditor.export()
                         let rawData = rawExport.drawflow.Home.data
-                        let wfData = { start: {}, functions: functionList, states: [] }
+                        let wfData = { start: {}, functions: functionList ? [...functionList] : [], states: [] }
+
+                        // Remove remoteDetails from function list
+                        wfData.functions.forEach(f => {
+                            if (f.tag && f.image) {
+                                f.image = `${f.image}:${f.tag}`
+                            }
+                            delete f["remoteDetails"]
+                            delete f["tag"]
+                        });
 
                         // Delete empty functions from workflow YAML
                         if (functionList.length === 0) {
@@ -677,9 +879,6 @@ export default function DiagramEditor(props) {
                         setConnections(startState.id, startBlock.id, null, rawData, wfData)
                         wfData.states.reverse()
 
-
-
-
                         // Create States for disconnected nodes
                         for (const nodeID in rawData) {
                             const rawNode = rawData[nodeID]
@@ -693,7 +892,7 @@ export default function DiagramEditor(props) {
 
 
                         if (updateWorkflow) {
-                            wfData = {...unhandledData, ...wfData}
+                            wfData = { ...unhandledData, ...wfData }
                             const workflowStr = unescapeJSStrings(PrettyYAML.stringify(wfData))
                             updateWorkflow(workflowStr)
                         } else {
@@ -798,7 +997,7 @@ export default function DiagramEditor(props) {
                         >
                             <div className={"panel left"} style={{ display: "flex" }}>
                                 <div style={{ width: "100%", margin: "2px 0px 2px 4px" }}>
-                                    <FunctionsList functionDrawerWidth={functionDrawerWidth} functionList={functionList} setFunctionList={setFunctionList} namespace={namespace} />
+                                    <FunctionsList functionDrawerWidth={functionDrawerWidth} functionList={functionList} setFunctionList={setFunctionList} namespace={namespace} remoteImages={remoteImages} diagramEditor={diagramEditor}/>
                                 </div>
                             </div>
                         </Resizable>
@@ -877,7 +1076,7 @@ export default function DiagramEditor(props) {
                                     // Preflight custom formData
                                     let onSubmitValidateCallback = onValidateSubmitCallbackMap[updatedNode.name]
                                     if (onSubmitValidateCallback) {
-                                        onSubmitValidateCallback(selectedNodeFormData)
+                                        onSubmitValidateCallback(selectedNodeFormData, useRemoteSchema, selectedNodeFunction)
                                     } else {
                                         DefaultValidateSubmitCallbackMap(selectedNodeFormData)
                                     }

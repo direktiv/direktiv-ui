@@ -886,7 +886,8 @@ export const FunctionSchemaReusable = {
     "type": "object",
     "required": [
         "id",
-        "image"
+        "image",
+        "tag"
     ],
     "properties": {
         "id": {
@@ -900,6 +901,11 @@ export const FunctionSchemaReusable = {
             "description": "Image URI.",
             "examples": defaultExampleImages
         },
+        "tag": {
+            "type": "string",
+            "title": "Tag",
+            "description": "Image Tag",
+        },
         "cmd": {
             "type": "string",
             "title": "CMD",
@@ -908,7 +914,12 @@ export const FunctionSchemaReusable = {
         "size": {
             "type": "string",
             "title": "Size",
-            "description": "Size of virtual machine"
+            "description": "Size of virtual machine",
+            "enum": [
+                "small",
+                "medium",
+                "large"
+            ]
         },
         "scale": {
             "type": "integer",
@@ -945,7 +956,7 @@ export function GenerateFunctionSchemaWithEnum(namespaceServices, globalServices
     let nsFuncSchema = FunctionSchemaNamespace
     let globalFuncSchema = FunctionSchemaGlobal
     let subflowFuncSchema = FunctionSchemaSubflow
-    let reusableFuncSchema = FunctionSchemaReusable
+    let reusableFuncSchema = JSON.parse(JSON.stringify(FunctionSchemaReusable))
     let uiSchema = {
         "knative-namespace": {
             "service": {
@@ -955,6 +966,11 @@ export function GenerateFunctionSchemaWithEnum(namespaceServices, globalServices
         "knative-global": {
             "service": {
 
+            }
+        },
+        "knative-workflow": {
+            "tag": {
+                // "ui:placeholder": "Enter Tag"
             }
         }
     }
@@ -994,7 +1010,66 @@ export function GenerateFunctionSchemaWithEnum(namespaceServices, globalServices
             fullImageList.push(remoteImage) 
         });
     }
+
+    let tagsSchema = []
+    if (definedRemoteImages) {
+        Object.keys(definedRemoteImages).forEach(imgKey => {
+            fullImageList.push(imgKey)
+            const imgTags = []
+            definedRemoteImages[imgKey].forEach(i =>{
+                imgTags.push(i.tag)
+            })
+
+            tagsSchema.push({
+                "if": {
+                    "properties": {
+                        "image": {
+                            "const": imgKey
+                        }
+                    }
+                },
+                "then": {
+                    "type": "object",
+                    "required": [
+                        "tag",
+                    ],
+                    "properties": {
+                        "tag": {
+                            "default": imgTags[0],
+                            "enum": imgTags,
+                        }
+                    }
+                }
+            })
+        });
+
+        // TODO: we need this for string input when image = "". No idea why this works
+        tagsSchema.push({
+            "if": {
+                "properties": {
+                    "image": {
+                        "const": ""
+                    }
+                }
+            },
+            "then": {
+                "type": "object",
+                "required": [
+                    "tag",
+                ],
+                "properties": {
+                    "tag": {
+                        "enum": [""],
+                    }
+                }
+            }
+        })
+    }
+
     reusableFuncSchema.properties.image.examples = fullImageList
+    if (tagsSchema.length > 0) {
+        reusableFuncSchema.allOf = tagsSchema
+    }
 
     return {
         schema: {
@@ -1238,24 +1313,55 @@ const devExampleBodySchema = {
     }
 }
 
+// Get function with name 'fName' from a functionList 
+function getFunc(funcList, fID) {
+    for (const f of funcList) {
+        if (f?.id === fID) {
+            return f
+        }
+    }
+
+    return null
+}
+
 export const getSchemaCallbackMap = {
-    "stateSchemaAction": (schemaKey, functionList, varList, schemaOverride) => {
+    "stateSchemaAction": (schemaKey, functionList, varList, functionName) => {
         let selectedSchema = JSON.parse(JSON.stringify(SchemaMap[schemaKey]))
+        const actionFunction = getFunc(functionList, functionName)
         selectedSchema.properties.action.properties.function.enum = functionListToActionEnum(functionList)
-        selectedSchema.properties.action = {
-            "type": "object",
-            "title": devExampleBodySchema["info"]["title"] + " Description",
-            "description": devExampleBodySchema["info"]["x-direktiv"]["long-description"],
-            "properties": {
-                "input": {
-                    title:  devExampleBodySchema["info"]["title"] + " Input",
-                    ...devExampleBodySchema["paths"]["/"]["post"]["parameters"]["schema"]
+
+        // If function action is using has remoteDetails updated action node schema
+        // name of function that action node is using is functionName.
+        // functionName can be set to null to skip setting schema from remoteDetails
+        if (actionFunction && actionFunction.remoteDetails){
+            let customSchema = {}
+            for (const param of actionFunction.remoteDetails["paths"]["/"]["post"]["parameters"]) {
+                if (param.name === "body") {
+                    customSchema = param.schema
+                }
+            }
+
+            // TODO: SAFE LOAD ALL REMOTE DETAILS KEYS
+            selectedSchema.properties.action = {
+                "type": "object",
+                "title": actionFunction.remoteDetails["info"]["title"] + " Description",
+                "description": actionFunction.remoteDetails["info"]["x-direktiv-meta"]["long-description"],
+                "properties": {
+                    "input": {
+                        title:  actionFunction.remoteDetails["info"]["title"] + " Input",
+                        type: "object",
+                        "properties": {
+                            "remoteFunctionInput": {
+                                type: "object",
+                                title:  ">>> todo remove",
+                                ...customSchema
+                            }
+                        }
+                        
+                    }
                 }
             }
         }
-
-        console.log("selectedSchema = ", selectedSchema)
-
         // selectedSchema = devExampleBodySchema
         return selectedSchema
     },
