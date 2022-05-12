@@ -886,8 +886,7 @@ export const FunctionSchemaReusable = {
     "type": "object",
     "required": [
         "id",
-        "image",
-        "tag"
+        "image"
     ],
     "properties": {
         "id": {
@@ -922,8 +921,9 @@ export const FunctionSchemaReusable = {
             ]
         },
         "scale": {
-            "type": "integer",
+            "type": "number",
             "title": "Scale",
+            "minimum": 0,
             "description": "Minimum number of instances"
         }
     }
@@ -1054,9 +1054,6 @@ export function GenerateFunctionSchemaWithEnum(namespaceServices, globalServices
             },
             "then": {
                 "type": "object",
-                "required": [
-                    "tag",
-                ],
                 "properties": {
                     "tag": {
                         "enum": [""],
@@ -1273,12 +1270,15 @@ export const getSchemaCallbackMap = {
                 }
             }
 
+            delete selectedSchema.properties.action.properties["function"]
+
             // TODO: SAFE LOAD ALL REMOTE DETAILS KEYS
             selectedSchema.properties.action = {
                 "type": "object",
                 "title": actionFunction.remoteDetails["info"]["title"] + " Description",
                 "description": actionFunction.remoteDetails["info"]["x-direktiv-meta"]["long-description"],
                 "properties": {
+                    ...selectedSchema.properties.action.properties,
                     "input": {
                         title:  actionFunction.remoteDetails["info"]["title"] + " Input",
                         type: "object",
