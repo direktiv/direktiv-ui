@@ -181,12 +181,12 @@ export default function MirrorInfoPanel(props) {
                                     {infoChangesTracker.publicKey ?
                                         <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
                                             <span className={`input-title readonly`}>Public Key</span>
-                                            <textarea className={`info-textarea-value readonly`} readonly={true} style={{ width: "100%", resize: "none" }} value={infoPublicKey} />
+                                            <textarea className={`info-textarea-value readonly`} readonly={true} rows={5} style={{ width: "100%", resize: "none" }} value={infoPublicKey} />
                                         </FlexBox> : <></>}
                                     {infoChangesTracker.privateKey ?
                                         <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
                                             <span className={`input-title readonly`} >Private Key</span>
-                                            <textarea className={`info-textarea-value readonly`} readonly={true} style={{ width: "100%", resize: "none" }} value={infoPrivateKey} />
+                                            <textarea className={`info-textarea-value readonly`} readonly={true} rows={5} style={{ width: "100%", resize: "none" }} value={infoPrivateKey} />
                                         </FlexBox> : <></>}
                                 </FlexBox>
                             </Modal>
