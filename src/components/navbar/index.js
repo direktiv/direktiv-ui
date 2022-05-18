@@ -229,7 +229,7 @@ function NewNamespaceBtn(props) {
                                 <FlexBox key={`input-new-ns-${key}`} className="col gap-md" style={{ paddingRight: "12px" }}>
                                     <FlexBox className="row" style={{ justifyContent: "space-between" }}>
                                         <FlexBox className="row gap-sm" style={{ justifyContent: "flex-start" }}>
-                                            <span className={`input-title`}>{mirrorSettingInfoMetaInfo[key].plainName}</span>
+                                            <span className={`input-title`}>{mirrorSettingInfoMetaInfo[key].plainName}{mirrorSettingInfoMetaInfo[key].required ? "*" : ""}</span>
                                             {
                                                 mirrorSettingInfoMetaInfo[key].info ?
                                                     <HelpIcon msg={mirrorSettingInfoMetaInfo[key].info}/> : <></>
