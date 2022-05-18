@@ -216,7 +216,7 @@ export default function MirrorInfoPanel(props) {
                                 old.url = true
                                 return { ...old }
                             })
-                        }} placeholder="Enter URL" />
+                        }} placeholder={mirrorSettingInfoMetaInfo["url"].placeholder} />
                     </FlexBox>
                     <FlexBox className="col gap-md" style={{ paddingRight: "10px" }}>
                         <FlexBox className="row" style={{ justifyContent: "space-between" }}>
@@ -238,7 +238,7 @@ export default function MirrorInfoPanel(props) {
                                 old.ref = true
                                 return { ...old }
                             })
-                        }} placeholder="Enter Ref" />
+                        }} placeholder={mirrorSettingInfoMetaInfo["ref"].placeholder} />
                     </FlexBox>
                     <FlexBox className="col gap-md" style={{ paddingRight: "10px" }}>
                         <FlexBox className="row" style={{ justifyContent: "space-between" }}>
@@ -260,7 +260,7 @@ export default function MirrorInfoPanel(props) {
                                 old.cron = true
                                 return { ...old }
                             })
-                        }} placeholder="Enter cron" />
+                        }} placeholder={mirrorSettingInfoMetaInfo["cron"].placeholder} />
                     </FlexBox>
                     <FlexBox className="col gap-md" style={{ paddingRight: "10px" }}>
                         <FlexBox className="row" style={{ justifyContent: "space-between" }}>
@@ -282,7 +282,7 @@ export default function MirrorInfoPanel(props) {
                                 old.passphrase = true
                                 return { ...old }
                             })
-                        }} placeholder="Enter Passphrase" />
+                        }} placeholder={mirrorSettingInfoMetaInfo["passphrase"].placeholder} />
                     </FlexBox>
                     <FlexBox className="col gap-md" style={{ paddingRight: "10px" }}>
                         <FlexBox className="row" style={{ justifyContent: "space-between" }}>
@@ -336,7 +336,7 @@ export default function MirrorInfoPanel(props) {
                                 old.publicKey = true
                                 return { ...old }
                             })
-                        }} placeholder="Enter Public Key" />
+                        }} placeholder={mirrorSettingInfoMetaInfo["publicKey"].placeholder} />
                     </FlexBox>
                     <FlexBox className="col gap-md" style={{ paddingRight: "10px" }}>
                         <FlexBox className="row" style={{ justifyContent: "space-between" }}>
@@ -390,7 +390,7 @@ export default function MirrorInfoPanel(props) {
                                 old.privateKey = true
                                 return { ...old }
                             })
-                        }} placeholder="Enter Private Key" />
+                        }} placeholder={mirrorSettingInfoMetaInfo["privateKey"].placeholder} />
                     </FlexBox>
                 </FlexBox>
 
