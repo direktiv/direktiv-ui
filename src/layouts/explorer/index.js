@@ -556,7 +556,7 @@ function ExplorerList(props) {
                                                                 setMirrorSettings({ ...newSettings })
                                                             }} autoFocus placeholder={mirrorSettingInfoMetaInfo[key].placeholder} />
                                                             :
-                                                            <input style={{ width: "100%" }} value={value} onChange={(e) => {
+                                                            <input type={key === "passphrase" ? "password" : "text"} style={{ width: "100%" }} value={value} onChange={(e) => {
                                                                 let newSettings = mirrorSettings
                                                                 newSettings[key] = e.target.value
                                                                 setMirrorSettings({ ...newSettings })
