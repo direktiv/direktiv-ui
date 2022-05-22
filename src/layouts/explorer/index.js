@@ -536,11 +536,11 @@ function ExplorerList(props) {
                                             </FlexBox>
                                             {Object.entries(mirrorSettings).map(([key, value]) => {
                                                 if ((mirrorAuthMethod === "token" || mirrorAuthMethod === "none") && (key === "publicKey" || key === "privateKey" || key === "passphrase")) {
-                                                    return
+                                                    return (<></>)
                                                 }
 
                                                 if ((mirrorAuthMethod === "ssh" || mirrorAuthMethod === "none") && (key === "token")) {
-                                                    return
+                                                    return (<></>)
                                                 }
 
                                                 return (

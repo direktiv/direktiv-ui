@@ -220,26 +220,26 @@ function NewNamespaceBtn(props) {
             <Tabs
                 // TODO: change wf-execute-input => tabbed-form
                 id={"wf-execute-input"}
-                key={"inputForm"}
+                key={"inputForm-ns"}
                 callback={setTabIndex}
                 tabIndex={tabIndex}
                 style={{ minWidth: "280px" }}
                 headers={["Standard", "Mirror"]}
                 tabs={[(
-                    <FlexBox className="col gap-md" style={{ paddingRight: "12px" }}>
-                        <FlexBox className="row gap-sm" style={{ justifyContent: "flex-start" }}>
+                    <FlexBox key={`form-new-ns`} className="col gap-md" style={{ paddingRight: "12px" }}>
+                        <FlexBox key={`label-new-ns-name`} className="row gap-sm" style={{ justifyContent: "flex-start" }}>
                             <span className={`input-title`}>Namespace*</span>
                         </FlexBox>
-                        <input autoFocus value={ns} onChange={(e) => setNs(e.target.value)} placeholder="Enter namespace name" />
+                        <input key={`input-new-ns-name-input`} autoFocus value={ns} onChange={(e) => setNs(e.target.value)} placeholder="Enter namespace name" />
                     </FlexBox>), (
-                    <FlexBox className="col gap">
-                        <FlexBox className="col gap-md" style={{ paddingRight: "12px" }}>
+                    <FlexBox key={`form-new-ns-mirror`} className="col gap">
+                        <FlexBox key={`input-new-ns-name`} className="col gap-md" style={{ paddingRight: "12px" }}>
                             <FlexBox className="row gap-sm" style={{ justifyContent: "flex-start" }}>
                                 <span className={`input-title`}>Namespace*</span>
                             </FlexBox>
                             <input autoFocus value={ns} onChange={(e) => setNs(e.target.value)} placeholder="Enter namespace name" />
                         </FlexBox>
-                        <FlexBox className="col gap-md" style={{ paddingRight: "12px" }}>
+                        <FlexBox key={`input-new-ns-auth`} className="col gap-md" style={{ paddingRight: "12px" }}>
                             <FlexBox className="row gap-sm" style={{ justifyContent: "flex-start" }}>
                                 <span className={`input-title`}>Authentication Method</span>
                             </FlexBox>
@@ -253,11 +253,11 @@ function NewNamespaceBtn(props) {
                         </FlexBox>
                         {Object.entries(mirrorSettings).map(([key, value]) => {
                             if ((mirrorAuthMethod === "token" || mirrorAuthMethod === "none") && (key === "publicKey" || key === "privateKey" || key === "passphrase")) {
-                                return
+                                return (<></>)
                             }
 
                             if ((mirrorAuthMethod === "ssh" || mirrorAuthMethod === "none") && (key === "token")) {
-                                return
+                                return (<></>)
                             }
 
                             return (
