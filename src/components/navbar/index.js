@@ -14,6 +14,7 @@ import { mirrorSettingInfoMetaInfo } from '../../layouts/mirror/info';
 import HelpIcon from '../help';
 import Tippy from '@tippyjs/react';
 import {useDropzone} from 'react-dropzone';
+import HideShowButton from '../hide-show';
 
 
 function NavBar(props) {
@@ -113,6 +114,7 @@ function NewNamespaceBtn(props) {
     
     const [tabIndex, setTabIndex] = useState(0)
 
+    const [showPassphrase, setShowPassphrase] = useState(false)
     const [mirrorAuthMethod, setMirrorAuthMethod] = useState("none")
     const [mirrorSettings, setMirrorSettings] = useState({
         "url": "",
@@ -163,9 +165,12 @@ function NewNamespaceBtn(props) {
                     "ref": "",
                     "cron": "",
                     "passphrase": "",
+                    "token": "",
                     "publicKey": "",
                     "privateKey": "",
                 })
+                setShowPassphrase(false)
+                setMirrorAuthMethod("none")
                 setTabIndex(0)
             }}
 
@@ -196,7 +201,7 @@ function NewNamespaceBtn(props) {
                         }
 
                         delete processesMirrorSettings["token"]
-                        await createMirrorNamespace(ns, mirrorSettings)
+                        await createMirrorNamespace(ns, processesMirrorSettings)
                     }
                     setTimeout(() => {
                         navigate(`/n/${ns}`)
@@ -267,7 +272,11 @@ function NewNamespaceBtn(props) {
                                             <span className={`input-title`}>{mirrorSettingInfoMetaInfo[key].plainName}{mirrorSettingInfoMetaInfo[key].required ? "*" : ""}</span>
                                             {
                                                 mirrorSettingInfoMetaInfo[key].info ?
-                                                    <HelpIcon msg={mirrorSettingInfoMetaInfo[key].info} zIndex={9999} /> : <></>
+                                                <>
+                                                <HelpIcon msg={mirrorSettingInfoMetaInfo[key].info} zIndex={9999} />
+                                                {key === "passphrase" ? <HideShowButton  show={showPassphrase} setShow={setShowPassphrase} field={"Passphrase"}/> : <></>}
+                                                </>
+                                                 : <></>
                                             }
                                         </FlexBox>
                                         {key === "publicKey" || key === "privateKey" ?
@@ -308,7 +317,7 @@ function NewNamespaceBtn(props) {
                                             setMirrorSettings({ ...newSettings })
                                         }} autoFocus placeholder={mirrorSettingInfoMetaInfo[key].placeholder} />
                                         :
-                                        <input type={key === "passphrase" ? "password" : "text"} style={{ width: "100%" }} value={value} spellcheck="false" onChange={(e) => {
+                                        <input type={key === "passphrase" && !showPassphrase ? "password" : "text"} style={{ width: "100%" }} value={value} spellcheck="false" onChange={(e) => {
                                             let newSettings = mirrorSettings
                                             newSettings[key] = e.target.value
                                             setMirrorSettings({ ...newSettings })
