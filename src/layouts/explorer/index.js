@@ -434,7 +434,7 @@ function ExplorerList(props) {
                     <ContentPanelHeaderButton className="explorer-action-btn">
                         <div>
                             <Modal title="New Directory"
-                                modalStyle={{ width: "240px" }}
+                                modalStyle={{ width: "340px" }}
                                 escapeToCancel
                                 button={(
                                     <div style={{ display: "flex" }}>
@@ -510,7 +510,7 @@ function ExplorerList(props) {
                                     key={"inputForm"}
                                     callback={setTabIndex}
                                     tabIndex={tabIndex}
-                                    style={{ minWidth: "280px" }}
+                                    style={{ minWidth: "300px" }}
                                     headers={["Standard", "Mirror"]}
                                     tabs={[(
                                         <FlexBox className="col gap-md" style={{ paddingRight: "12px" }}>
@@ -527,7 +527,7 @@ function ExplorerList(props) {
                                                 </FlexBox>
                                                 <input autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter a directory name" />
                                             </FlexBox>
-                                            <FlexBox className="col gap-md" style={{ paddingRight: "12px" }}>
+                                            <FlexBox className="col gap-md">
                                                 <FlexBox className="row gap-sm" style={{ justifyContent: "flex-start" }}>
                                                     <span className={`input-title`}>Authentication Method</span>
                                                 </FlexBox>

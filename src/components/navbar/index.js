@@ -140,7 +140,7 @@ function NewNamespaceBtn(props) {
     return (
         <Modal title="New namespace"
             escapeToCancel
-            modalStyle={{ width: "240px" }}
+            modalStyle={{ width: "340px" }}
             button={(
                 <FlexBox className="new-namespace-btn">
                     <div className="auto-margin">
@@ -228,7 +228,7 @@ function NewNamespaceBtn(props) {
                 key={"inputForm-ns"}
                 callback={setTabIndex}
                 tabIndex={tabIndex}
-                style={{ minWidth: "280px" }}
+                style={{ minWidth: "300px" }}
                 headers={["Standard", "Mirror"]}
                 tabs={[(
                     <FlexBox key={`form-new-ns`} className="col gap-md" style={{ paddingRight: "12px" }}>
@@ -244,7 +244,7 @@ function NewNamespaceBtn(props) {
                             </FlexBox>
                             <input autoFocus value={ns} onChange={(e) => setNs(e.target.value)} placeholder="Enter namespace name" />
                         </FlexBox>
-                        <FlexBox key={`input-new-ns-auth`} className="col gap-md" style={{ paddingRight: "12px" }}>
+                        <FlexBox key={`input-new-ns-auth`} className="col gap-md">
                             <FlexBox className="row gap-sm" style={{ justifyContent: "flex-start" }}>
                                 <span className={`input-title`}>Authentication Method</span>
                             </FlexBox>
