@@ -324,37 +324,58 @@ export default function MirrorInfoPanel(props) {
                                             }
                                             {infoChangesTracker.url ?
                                                 <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
-                                                    <span className={`input-title readonly`}>URL</span>
+                                                    <FlexBox className="col gap-sm center-x" style={{}}>
+                                                        <span className={`input-title readonly`} >URL</span>
+                                                        { infoURL === "" ? <span className={`input-description readonly`}> Warning: URL will be deleted</span> : <></>}
+                                                    </FlexBox>
                                                     <input className={`info-input-value readonly`} value={infoURL} />
                                                 </FlexBox> : <></>}
                                             {infoChangesTracker.ref ?
                                                 <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
-                                                    <span className={`input-title readonly`}>Ref</span>
+                                                    <FlexBox className="col gap-sm center-x" style={{}}>
+                                                        <span className={`input-title readonly`} >Ref</span>
+                                                        { infoRef === "" ? <span className={`input-description readonly`}> Warning: Ref will be deleted</span> : <></>}
+                                                    </FlexBox>
                                                     <input className={`info-input-value readonly`} value={infoRef} />
                                                 </FlexBox> : <></>}
                                             {infoChangesTracker.cron ?
                                                 <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
-                                                    <span className={`input-title readonly`}>Cron</span>
+                                                    <FlexBox className="col gap-sm center-x" style={{}}>
+                                                        <span className={`input-title readonly`} >Cron</span>
+                                                        { infoCron === "" ? <span className={`input-description readonly`}> Warning: Cron will be deleted</span> : <></>}
+                                                    </FlexBox>
                                                     <input className={`info-input-value readonly`} readonly={true} value={infoCron} />
                                                 </FlexBox> : <></>}
                                             {infoChangesTracker.passphrase && mirrorAuthMethod === "token" ?
                                                 <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
-                                                    <span className={`input-title readonly`} >Token</span>
+                                                    <FlexBox className="col gap-sm center-x" style={{}}>
+                                                        <span className={`input-title readonly`} >Token</span>
+                                                        { infoPassphrase === "" ? <span className={`input-description readonly`}> Warning: Token will be deleted</span> : <></>}
+                                                    </FlexBox>
                                                     <textarea className={`info-textarea-value readonly`} readonly={true} rows={5} style={{ width: "100%", resize: "none" }} value={infoPassphrase} />
                                                 </FlexBox> : <></>}
                                             {infoChangesTracker.passphrase && mirrorAuthMethod === "ssh" ?
                                                 <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
-                                                    <span className={`input-title readonly`}>Passphrase</span>
+                                                    <FlexBox className="col gap-sm center-x" style={{}}>
+                                                        <span className={`input-title readonly`} >Passphrase</span>
+                                                        { infoPassphrase === "" ? <span className={`input-description readonly`}> Warning: Passphrase will be deleted</span> : <></>}
+                                                    </FlexBox>
                                                     <input className={`info-input-value readonly`} readonly={true} type="password" value={infoPassphrase} />
                                                 </FlexBox> : <></>}
                                             {infoChangesTracker.publicKey && mirrorAuthMethod === "ssh" ?
                                                 <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
-                                                    <span className={`input-title readonly`}>Public Key</span>
+                                                    <FlexBox className="col gap-sm center-x" style={{}}>
+                                                        <span className={`input-title readonly`} >Public Key</span>
+                                                        { infoPublicKey === "" ? <span className={`input-description readonly`}> Warning: Public Key will be deleted</span> : <></>}
+                                                    </FlexBox>
                                                     <textarea className={`info-textarea-value readonly`} readonly={true} rows={5} style={{ width: "100%", resize: "none" }} value={infoPublicKey} />
                                                 </FlexBox> : <></>}
                                             {infoChangesTracker.privateKey && mirrorAuthMethod === "ssh" ?
                                                 <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
-                                                    <span className={`input-title readonly`} >Private Key</span>
+                                                    <FlexBox className="col gap-sm center-x" style={{}}>
+                                                        <span className={`input-title readonly`} >Private Key</span>
+                                                        { infoPrivateKey === "" ? <span className={`input-description readonly`}> Warning: Private Key will be deleted</span> : <></>}
+                                                    </FlexBox>
                                                     <textarea className={`info-textarea-value readonly`} readonly={true} rows={5} style={{ width: "100%", resize: "none" }} value={infoPrivateKey} />
                                                 </FlexBox> : <></>}
                                         </FlexBox>
