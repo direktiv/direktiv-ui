@@ -92,14 +92,14 @@ function EventsPage(props) {
                                     <tbody>
                                         {eventHistory.map((obj) => {
                                             return <tr style={{ borderBottom: "1px solid #f4f4f4" }}>
-                                                <td title={obj.node.type} style={{ textOverflow: "ellipsis", overflow: "hidden" }}>
-                                                    {obj.node.type}
+                                                <td title={obj.type} style={{ textOverflow: "ellipsis", overflow: "hidden" }}>
+                                                    {obj.type}
                                                 </td>
-                                                <td title={obj.node.source} style={{ textOverflow: "ellipsis", overflow: "hidden" }}>
-                                                    {obj.node.source}
+                                                <td title={obj.source} style={{ textOverflow: "ellipsis", overflow: "hidden" }}>
+                                                    {obj.source}
                                                 </td>
                                                 <td>
-                                                    {dayjs.utc(obj.node.receivedAt).local().format("HH:mm:ss a")}
+                                                    {dayjs.utc(obj.receivedAt).local().format("HH:mm:ss a")}
                                                 </td>
                                                 <td style={{ textAlign: 'center', justifyContent: "center", }}>
                                                     <FlexBox className={"gap center"}>
@@ -118,14 +118,14 @@ function EventsPage(props) {
                                                             }
                                                             actionButtons={[
                                                                 ButtonDefinition("Retrigger", async () => {
-                                                                    await replayEvent(obj.node.id)
+                                                                    await replayEvent(obj.id)
                                                                 }, "small", () => { }, true, true),
                                                                 ButtonDefinition("Cancel", async () => {
                                                                 }, "small light", () => { }, true, false)
                                                             ]}
                                                         >
                                                             <FlexBox style={{ overflow: "hidden" }}>
-                                                                Are you sure you want to retrigger {obj.node.id}?
+                                                                Are you sure you want to retrigger {obj.id}?
                                                             </FlexBox>
                                                         </Modal>
                                                         <Modal
@@ -147,7 +147,7 @@ function EventsPage(props) {
                                                             <FlexBox className="col" style={{ overflow: "hidden" }}>
                                                                 <AutoSizer>
                                                                     {({ height, width }) => (
-                                                                        <DirektivEditor noBorderRadius value={atob(obj.node.cloudevent)} readonly={true} dlang="plaintext"
+                                                                        <DirektivEditor noBorderRadius value={atob(obj.cloudevent)} readonly={true} dlang="plaintext"
                                                                             options={{
                                                                                 autoLayout: true
                                                                             }}
@@ -222,21 +222,21 @@ function EventsPage(props) {
                                             return(
                                                 <tr  style={{borderBottom:"1px solid #f4f4f4"}}>
                                                     <td style={{textOverflow:"ellipsis", overflow:"hidden"}}>
-                                                        <Link style={{color:"#2396d8"}} to={`/n/${namespace}/explorer${obj.node.workflow}`}>
-                                                            {obj.node.workflow}
+                                                        <Link style={{color:"#2396d8"}} to={`/n/${namespace}/explorer${obj.workflow}`}>
+                                                            {obj.workflow}
                                                         </Link> 
                                                     </td>
                                                     <td style={{textOverflow:"ellipsis", overflow:"hidden"}}>
-                                                        {obj.node.instance !== "" ? <Link style={{color:"#2396d8"}} to={`/n/${namespace}/instances/${obj.node.instance}`}>{obj.node.instance.split("-")[0]}</Link> : "start"}
+                                                        {obj.instance !== "" ? <Link style={{color:"#2396d8"}} to={`/n/${namespace}/instances/${obj.instance}`}>{obj.instance.split("-")[0]}</Link> : "start"}
                                                     </td>
                                                     <td style={{textOverflow:"ellipsis", overflow:"hidden"}}>
-                                                        {obj.node.mode}
+                                                        {obj.mode}
                                                     </td>
                                                     <td>
-                                                        {dayjs.utc(obj.node.updatedAt).local().format("HH:mm:ss a")}
+                                                        {dayjs.utc(obj.updatedAt).local().format("HH:mm:ss a")}
                                                     </td>
                                                     <td className="event-split">
-                                                        {obj.node.events.map((obj)=>{
+                                                        {obj.events.map((obj)=>{
                                                             return <span>{obj.type}</span>
                                                         })}
                                                     </td>

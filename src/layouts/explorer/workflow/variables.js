@@ -220,16 +220,16 @@ function Variable(props) {
     let lang = MimeTypeFileExtension(mimeType)
 
     return(
-        <tr className="body-row" key={`var-${obj.node.name}${obj.node.size}`}>
+        <tr className="body-row" key={`var-${obj.name}${obj.size}`}>
         <td className="wrap-word variable-name" style={{ width: "180px", maxWidth: "180px", textOverflow:"ellipsis",  overflow:"hidden" }}>
-            <Tippy content={obj.node.name} trigger={'mouseenter focus'} zIndex={10}>
+            <Tippy content={obj.name} trigger={'mouseenter focus'} zIndex={10}>
                 <div className={"variable-name"} style={{width: "fit-content", maxWidth: "180px", textOverflow:"ellipsis",  overflow:"hidden"}}>
-                    {obj.node.name}
+                    {obj.name}
                 </div>
             </Tippy>
         </td>
         <td className="muted-text show-variable">
-            {obj.node.size <= 2500000 ? 
+            {obj.size <= 2500000 ? 
                 <Modal
                     modalStyle={{height: "90vh",width: "600px"}}
                     escapeToCancel
@@ -243,7 +243,7 @@ function Variable(props) {
                         setValue("")
                     }}
                     onOpen={async ()=>{
-                        let data = await getWorkflowVariable(obj.node.name)
+                        let data = await getWorkflowVariable(obj.name)
                         setType(data.contentType)
                         setValue(data.data)
                     }}
@@ -260,7 +260,7 @@ function Variable(props) {
                     actionButtons={
                         [
                             ButtonDefinition("Save", async () => {
-                                await setWorkflowVariable(obj.node.name, val , mimeType)
+                                await setWorkflowVariable(obj.name, val , mimeType)
                             }, "small", ()=>{}, true, false),
                             ButtonDefinition("Cancel", () => {
                             }, "small light", ()=>{}, true, false)
@@ -301,7 +301,7 @@ function Variable(props) {
                     </FlexBox>
                 </Modal>:<div style={{textAlign:"center"}}>Cannot show filesize greater than 2.5MiB</div>}
         </td>
-        <td style={{ width: "80px", maxWidth: "80px", textAlign: "center" }}>{fileSize(obj.node.size)}</td>
+        <td style={{ width: "80px", maxWidth: "80px", textAlign: "center" }}>{fileSize(obj.size)}</td>
         <td style={{ width: "120px", maxWidth: "120px", paddingLeft: "12px" }}> 
             <FlexBox style={{gap: "2px"}}>
                 <FlexBox>
@@ -310,9 +310,9 @@ function Variable(props) {
                     <VariablesDownloadButton onClick={async()=>{
                         setDownloading(true)
 
-                        const variableData = await getWorkflowVariableBlob(obj.node.name)
+                        const variableData = await getWorkflowVariableBlob(obj.name)
                         const extension = MimeTypeFileExtension(variableData.contentType)
-                        saveAs(variableData.data, obj.node.name + `${extension ? `.${extension}`: ""}`)
+                        saveAs(variableData.data, obj.name + `${extension ? `.${extension}`: ""}`)
 
                         setDownloading(false)
                     }}/>:<VariablesDownloadingButton />}
@@ -334,7 +334,7 @@ function Variable(props) {
                         [
                             ButtonDefinition("Upload", async () => {
                                 setUploading(true)
-                                await setWorkflowVariable(obj.node.name, file, mimeType)
+                                await setWorkflowVariable(obj.name, file, mimeType)
                             }, `small ${uploading ? "loading" : ""}`, ()=>{setUploading(false)}, true, false, true),
                             ButtonDefinition("Cancel", () => {
                             }, "small light",()=>{}, true, false)
@@ -362,7 +362,7 @@ function Variable(props) {
                     actionButtons={
                         [
                             ButtonDefinition("Delete", async () => {
-                                    await deleteWorkflowVariable(obj.node.name)
+                                    await deleteWorkflowVariable(obj.name)
                             }, "small red", ()=>{}, true, false),
                             ButtonDefinition("Cancel", () => {
                             }, "small light", ()=>{}, true, false)
@@ -371,7 +371,7 @@ function Variable(props) {
                 >
                         <FlexBox className="col gap">
                     <FlexBox >
-                        Are you sure you want to delete '{obj.node.name}'?
+                        Are you sure you want to delete '{obj.name}'?
                         <br/>
                         This action cannot be undone.
                     </FlexBox>

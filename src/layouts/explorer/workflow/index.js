@@ -102,8 +102,8 @@ function InitialWorkflowHook(props){
             if(revisions === null){
                 // get workflow revisions
                 let resp = await getRevisions()
-                if(Array.isArray(resp.edges)){
-                    setRevisions(resp.edges)
+                if(Array.isArray(resp.results)){
+                    setRevisions(resp.results)
                 } else {
                     setRevsErr(resp)
                 }
@@ -464,7 +464,7 @@ function WorkingRevision(props) {
                                             {
                                                 updateRevisions()
                                                 setShowErrors(false)
-                                                navigate(`/n/${namespace}/explorer${result.node.path}?tab=1&revision=${result.revision.name}&revtab=0`)
+                                                navigate(`/n/${namespace}/explorer${result.path}?tab=1&revision=${result.revision.name}&revtab=0`)
                                             }else{
                                                 setErrors("Something went wrong")
                                                 setShowErrors(true)
@@ -601,8 +601,8 @@ function WorkflowInstances(props) {
                     <>
                     {instances.map((obj)=>{
 
-                    let state = obj.node.status;
-                    if (obj.node.errorCode === "direktiv.cancels.api") {
+                    let state = obj.status;
+                    if (obj.errorCode === "direktiv.cancels.api") {
                         state = "cancelled"
                     }
 
@@ -613,12 +613,12 @@ function WorkflowInstances(props) {
                             key={key}
                             namespace={namespace}
                             state={state} 
-                            name={obj.node.as} 
-                            id={obj.node.id}
-                            startedDate={dayjs.utc(obj.node.createdAt).local().format("DD MMM YY")} 
-                            startedTime={dayjs.utc(obj.node.createdAt).local().format("HH:mm a")} 
-                            finishedDate={dayjs.utc(obj.node.updatedAt).local().format("DD MMM YY")}
-                            finishedTime={dayjs.utc(obj.node.updatedAt).local().format("HH:mm a")} 
+                            name={obj.as} 
+                            id={obj.id}
+                            startedDate={dayjs.utc(obj.createdAt).local().format("DD MMM YY")} 
+                            startedTime={dayjs.utc(obj.createdAt).local().format("HH:mm a")} 
+                            finishedDate={dayjs.utc(obj.updatedAt).local().format("DD MMM YY")}
+                            finishedTime={dayjs.utc(obj.updatedAt).local().format("HH:mm a")} 
                         />
                     )
                     })}</>
@@ -651,8 +651,8 @@ function OverviewTab(props) {
                     let resp = await getInstancesForWorkflow(...queryParams)
                     setTotal(resp.instances.totalCount)
                     setPageInfo(resp?.instances?.pageInfo)
-                    if(Array.isArray(resp?.instances?.edges)){
-                        setInstances(resp?.instances?.edges)
+                    if(Array.isArray(resp?.instances?.results)){
+                        setInstances(resp?.instances?.results)
                     } else {
                         setErr(resp)
                     }
@@ -1109,7 +1109,7 @@ function SettingsTab(props) {
                                     </ContentPanelHeaderButton> */}
                                 </ContentPanelTitle>
                                 <ContentPanelBody>
-                                    <WorkflowAttributes attributes={workflowData.node.attributes} deleteAttributes={deleteAttributes} addAttributes={addAttributes}/>
+                                    <WorkflowAttributes attributes={workflowData.attributes} deleteAttributes={deleteAttributes} addAttributes={addAttributes}/>
                                 </ContentPanelBody>
                             </ContentPanel>
                         {/* </div> */}

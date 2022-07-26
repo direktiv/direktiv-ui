@@ -59,7 +59,7 @@ export default function MirrorPage(props) {
 
         if (!load && data) {
             getNodeRef.current().then((nodeData) => {
-                if (nodeData.node.expandedType !== "git") {
+                if (nodeData.expandedType !== "git") {
                     navigate(`/n/${namespace}/explorer${path}`)
                 }
             }).catch((e) => {
@@ -83,7 +83,7 @@ export default function MirrorPage(props) {
         const handler = setTimeout(() => {
             if (currentlyLocking) {
                 getNode().then((nodeData) => {
-                    setIsReadOnly(nodeData.node.readOnly)
+                    setIsReadOnly(nodeData.readOnly)
                 }).catch((e) => {
                     setErrorMsg("Error getting node: " + e.message)
                 }).finally(() => {

@@ -201,14 +201,14 @@ export function InstancesTable(props) {
                                     mini={mini}
                                     key={GenerateRandomKey()}
                                     namespace={namespace}
-                                    state={obj.node.status} 
-                                    name={obj.node.as} 
-                                    id={obj.node.id}
-                                    invoker={obj.node.invoker}
-                                    startedDate={dayjs.utc(obj.node.createdAt).local().format("DD MMM YY")} 
-                                    startedTime={dayjs.utc(obj.node.createdAt).local().format("HH:mm a")} 
-                                    finishedDate={dayjs.utc(obj.node.updatedAt).local().format("DD MMM YY")}
-                                    finishedTime={dayjs.utc(obj.node.updatedAt).local().format("HH:mm a")} 
+                                    state={obj.status} 
+                                    name={obj.as} 
+                                    id={obj.id}
+                                    invoker={obj.invoker}
+                                    startedDate={dayjs.utc(obj.createdAt).local().format("DD MMM YY")} 
+                                    startedTime={dayjs.utc(obj.createdAt).local().format("HH:mm a")} 
+                                    finishedDate={dayjs.utc(obj.updatedAt).local().format("DD MMM YY")}
+                                    finishedTime={dayjs.utc(obj.updatedAt).local().format("HH:mm a")} 
                                 />
                             )
                             })}</>
