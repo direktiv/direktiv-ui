@@ -1,20 +1,20 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import './style.css';
-import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
-import Pagination from '../../components/pagination';
-import FlexBox from '../../components/flexbox';
-import { VscClose, VscVmRunning } from 'react-icons/vsc';
-import { BsDot } from 'react-icons/bs';
-import HelpIcon from '../../components/help';
 import { useInstances } from 'direktiv-react-hooks';
+import { useEffect, useMemo, useState } from 'react';
+import { BsDot } from 'react-icons/bs';
+import { VscClose, VscVmRunning } from 'react-icons/vsc';
+import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
+import FlexBox from '../../components/flexbox';
+import HelpIcon from '../../components/help';
+import { PaginationV4, usePageHandler } from '../../components/paginationv2';
 import { Config, GenerateRandomKey } from '../../util';
+import './style.css';
 
-import * as dayjs from "dayjs"
+import Tippy from '@tippyjs/react';
+import * as dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import utc from "dayjs/plugin/utc"
+import utc from "dayjs/plugin/utc";
 import { useNavigate } from 'react-router-dom';
 import Loader from '../../components/loader';
-import Tippy from '@tippyjs/react';
 
 const PAGE_SIZE = 10
 
@@ -27,9 +27,9 @@ function InstancesPage(props) {
         return <></>
     }
     return(
-        <div style={{ paddingRight: "8px" }}>
+        <FlexBox className="col gap" style={{ paddingRight: "8px" }}>
             <InstancesTable namespace={namespace}/>
-        </div>
+        </FlexBox>
     );
 }
 
@@ -38,34 +38,15 @@ export default InstancesPage;
 export function InstancesTable(props) {
     const {namespace, mini, hideTitle, panelStyle, bodyStyle, filter, placeholder} = props
     const [load, setLoad] = useState(true)
-    
-    const [queryParams, setQueryParams] = useState([`first=${PAGE_SIZE}`])
-    const [queryFilters, setQueryFilters] = useState(filter ? filter : [] )
 
     const [filterName, setFilterName] = useState("")
     const [filterCreatedBefore, setFilterCreatedBefore] = useState("")
     const [filterCreatedAfter, setFilterCreatedAfter] = useState("")
     const [filterState, setFilterState] = useState("")
     const [filterInvoker, setFilterInvoker] = useState("")
-
-
-    const {data, err, pageInfo, totalCount} = useInstances(Config.url, true, namespace, localStorage.getItem("apikey"), ...queryParams, ...queryFilters)
-
-    const updatePage = useCallback((newParam)=>{
-        setQueryParams(newParam)
-    }, [])
-
-    useEffect(()=>{
-        if(data !== null || err !== null) {
-            setLoad(false)
-        }
-    },[data, err])
-
-    // Update filters array
-    useEffect(()=>{
-        // If manual filter was passed in props do not update filters during runtime
+    const queryFilters = useMemo(()=>{
         if (filter) {
-            return
+            return filter
         }
 
         let newFilters = []
@@ -87,14 +68,27 @@ export function InstancesTable(props) {
         }
 
         if (filterInvoker !== ""){
-
             newFilters.push(`filter.field=TRIGGER&filter.type=CONTAINS&filter.val=${filterInvoker}`)
         }
 
-        setQueryParams([`first=${PAGE_SIZE}`])
-        setQueryFilters(newFilters)
+        return newFilters
+    }, [filter, filterName, filterCreatedBefore, filterCreatedAfter, filterState, filterInvoker])
 
-    },[filter, filterName, filterCreatedBefore, filterCreatedAfter, filterState, filterInvoker])
+    const pageHandler = usePageHandler(PAGE_SIZE)
+    const {data, err, pageInfo, totalCount} = useInstances(Config.url, true, namespace, localStorage.getItem("apikey"), pageHandler.pageParams, ...queryFilters)
+
+    useEffect(()=>{
+        console.log("data =", data)
+        if(data !== null || err !== null) {
+            setLoad(false)
+        }
+    },[data, err])
+
+    // Reset Page to start when filters changes
+    useEffect(()=>{
+        // TODO: This will interfere with page position if initPage > 1
+        pageHandler.goToFirstPage()
+    },[queryFilters, pageHandler.goToFirstPage])
 
     return(
         <Loader load={load} timer={3000}>
@@ -218,10 +212,10 @@ export function InstancesTable(props) {
                 </table>
         }
         </ContentPanelBody>
-    </ContentPanel>
-    <FlexBox>
-        {!!totalCount && <Pagination pageSize={PAGE_SIZE} pageInfo={pageInfo} updatePage={updatePage} total={totalCount} queryParams={queryParams}/>}
-    </FlexBox>
+        </ContentPanel>
+        <FlexBox className="row" style={{justifyContent:"flex-end", paddingBottom:"1em", flexGrow: 0}}>
+            <PaginationV4 pageHandler={pageHandler} pageInfo={pageInfo}/>
+        </FlexBox>
     </Loader>
         
     );
@@ -282,7 +276,7 @@ export function InstanceRow(props) {
         {mini ? <></>:<td title={revStr} style={{ fontSize: "12px", lineHeight: "20px", textOverflow:"ellipsis", overflow:"hidden", color: revStr !== undefined ? "" : "var(--theme-dark-gray-text)" }} className="center-align">
             {revStr !== undefined ? revStr : "ROUTER"}
         </td>}
-        {mini ? <></>:<td title={invoker} style={{ fontSize: "12px", lineHeight: "20px", textOverflow:"ellipsis", overflow:"hidden" }} className="center-align">
+        {mini || wf ? <></>:<td title={invoker} style={{ fontSize: "12px", lineHeight: "20px", textOverflow:"ellipsis", overflow:"hidden" }} className="center-align">
             {/* Trim instance id from invoker label */}
             {invoker !== undefined &&  invoker !== "" ? invoker.split(":")[0] : "NA"}
         </td>}

@@ -5,6 +5,7 @@ import { useNavigate, useParams } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from '../../../components/content-panel';
 import FlexBox from '../../../components/flexbox';
+import { PaginationV4, usePageHandler } from '../../../components/paginationv2';
 import { Config, GenerateRandomKey } from '../../../util';
 import './style.css';
 
@@ -34,7 +35,6 @@ import { AutoSizer } from "react-virtualized";
 import Alert from '../../../components/alert';
 import HelpIcon from "../../../components/help";
 import Loader from '../../../components/loader';
-import Pagination from '../../../components/pagination';
 import SankeyDiagram from '../../../components/sankey';
 
 import Form from "@rjsf/core";
@@ -641,29 +641,28 @@ function OverviewTab(props) {
     const [total, setTotal] = useState(PAGE_SIZE)
     const [queryParams, setQueryParams] = useState([`first=${PAGE_SIZE}`])
 
+    const pageHandler = usePageHandler(PAGE_SIZE)
+
     // fetch instances using the workflow hook from above
-    useEffect(()=>{
+    useEffect(() => {
         async function listData() {
-            if(load){
-                setLoad(false)
-                // get the instances
-                try {
-                    let resp = await getInstancesForWorkflow(...queryParams)
-                    setTotal(resp.instances.totalCount)
-                    setPageInfo(resp?.instances?.pageInfo)
-                    if(Array.isArray(resp?.instances?.results)){
-                        setInstances(resp?.instances?.results)
-                    } else {
-                        setErr(resp)
-                    }
-                }catch (e) {
-                    setErr(e)
+            // get the instances
+            try {
+                let resp = await getInstancesForWorkflow(pageHandler.pageParams)
+                setTotal(resp.instances.totalCount)
+                setPageInfo(resp?.instances?.pageInfo)
+                if (Array.isArray(resp?.instances?.results)) {
+                    setInstances(resp?.instances?.results)
+                } else {
+                    setErr(resp)
                 }
+            } catch (e) {
+                setErr(e)
             }
         }
 
         listData()
-    },[queryParams, load, getInstancesForWorkflow])
+    }, [pageHandler.pageParams, getInstancesForWorkflow])
 
     const updatePage = useCallback((newParam)=>{
         setLoad(true)
@@ -691,9 +690,9 @@ function OverviewTab(props) {
                                 </FlexBox>
                             </ContentPanelTitle>
                             <WorkflowInstances instances={instances} namespace={namespace} />
-                            {
-                               !!total && <Pagination pageInfo={pageInfo} total={total} updatePage={updatePage} pageSize={PAGE_SIZE}/>
-                            }
+                            <FlexBox className="row" style={{justifyContent:"flex-end", paddingBottom:"1em", flexGrow: 0}}>
+                                <PaginationV4 pageHandler={pageHandler} pageInfo={pageInfo}/>
+                            </FlexBox>
                         </ContentPanel>
                     </FlexBox>
                     <FlexBox style={{ minWidth: "370px", maxHeight: "342px" }}>

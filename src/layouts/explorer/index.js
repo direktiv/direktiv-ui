@@ -328,7 +328,7 @@ function ExplorerList(props) {
                 <SearchBar setSearch={setSearch}/>
             </FlexBox>
         </FlexBox>
-        <ContentPanel grow>
+        <ContentPanel>
             <ContentPanelTitle>
                 <ContentPanelTitleIcon>
                     <VscFolderOpened/>
