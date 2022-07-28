@@ -33,8 +33,8 @@ export default function MirrorPage(props) {
         path = `/${params["*"]}`
     }
 
-    const { info, activities, err, setLock, updateSettings, cancelActivity, sync } = useMirror(Config.url, true, namespace, path, localStorage.getItem("apikey"), "first=50", "order.field=CREATED", "order.direction=DESC")
-    const { data, getNode, err: nodeErr } = useNodes(Config.url, false, namespace, path, localStorage.getItem("apikey"), `first=1`)
+    const { info, activities, err, setLock, updateSettings, cancelActivity, sync } = useMirror(Config.url, true, namespace, path, localStorage.getItem("apikey"), "limit=50", "order.field=CREATED", "order.direction=DESC")
+    const { data, getNode, err: nodeErr } = useNodes(Config.url, false, namespace, path, localStorage.getItem("apikey"), `limit=1`)
 
     const setLockRef = useRef(setLock)
     const syncRef = useRef(sync)

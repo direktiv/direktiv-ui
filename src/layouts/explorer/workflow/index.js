@@ -637,10 +637,8 @@ function OverviewTab(props) {
     const [load, setLoad] = useState(true)
     const [instances, setInstances] = useState([])
     const [err, setErr] = useState(null)
-    const [pageInfo, setPageInfo] = useState()
-    const [total, setTotal] = useState(PAGE_SIZE)
-    const [queryParams, setQueryParams] = useState([`first=${PAGE_SIZE}`])
-
+    const [pageInfo, setPageInfo] = useState(null)
+    
     const pageHandler = usePageHandler(PAGE_SIZE)
 
     // fetch instances using the workflow hook from above
@@ -649,7 +647,6 @@ function OverviewTab(props) {
             // get the instances
             try {
                 let resp = await getInstancesForWorkflow(pageHandler.pageParams)
-                setTotal(resp.instances.totalCount)
                 setPageInfo(resp?.instances?.pageInfo)
                 if (Array.isArray(resp?.instances?.results)) {
                     setInstances(resp?.instances?.results)
@@ -664,10 +661,6 @@ function OverviewTab(props) {
         listData()
     }, [pageHandler.pageParams, getInstancesForWorkflow])
 
-    const updatePage = useCallback((newParam)=>{
-        setLoad(true)
-        setQueryParams([...newParam])
-    }, [])
     if (err) {
         // TODO report error
     }
@@ -1108,7 +1101,7 @@ function SettingsTab(props) {
                                     </ContentPanelHeaderButton> */}
                                 </ContentPanelTitle>
                                 <ContentPanelBody>
-                                    <WorkflowAttributes attributes={workflowData.attributes} deleteAttributes={deleteAttributes} addAttributes={addAttributes}/>
+                                    <WorkflowAttributes attributes={workflowData.node.attributes} deleteAttributes={deleteAttributes} addAttributes={addAttributes}/>
                                 </ContentPanelBody>
                             </ContentPanel>
                         {/* </div> */}

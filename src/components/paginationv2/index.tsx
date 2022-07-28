@@ -162,6 +162,7 @@ export interface PaginationV3Props {
 
 export function PaginationV4({ pageHandler, pageInfo }: PaginationV3Props) {
   const pageCount = React.useMemo(() => {
+    console.log("pageInfo = ", pageInfo)
     if (!pageInfo || pageInfo.limit === 0) {
       return 0
     }

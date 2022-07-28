@@ -17,6 +17,7 @@ import { saveAs } from 'file-saver'
 import Tippy from '@tippyjs/react';
 import Pagination from '../../../components/pagination';
 import { SearchBar } from '../../explorer';
+import { PaginationV4, usePageHandler } from '../../../components/paginationv2';
 
 const PAGE_SIZE = 10 ;
 
@@ -28,18 +29,16 @@ function VariablesPanel(props){
     const [file, setFile] = useState(null)
     const [uploading, setUploading] = useState(false)
     const [mimeType, setMimeType] = useState("application/json")
-    const [varParam, setVarParam] = useState([`first=${PAGE_SIZE}`])
     const [search, setSearch] = useState("")
-    const updateVarPage = useCallback((newParam)=>{
-        setVarParam([...newParam])
-    }, [])
 
-    const {data, err, pageInfo, totalCount, setNamespaceVariable, getNamespaceVariable, deleteNamespaceVariable, getNamespaceVariableBlob} = useNamespaceVariables(Config.url, true, namespace, localStorage.getItem("apikey"), ...varParam,  `filter.field=NAME`, `filter.val=${search}`, `filter.type=CONTAINS`)
+    const pageHandler = usePageHandler(PAGE_SIZE)
+    const {data, err, pageInfo, totalCount, setNamespaceVariable, getNamespaceVariable, deleteNamespaceVariable, getNamespaceVariableBlob} = useNamespaceVariables(Config.url, true, namespace, localStorage.getItem("apikey"), pageHandler.pageParams,  `filter.field=NAME`, `filter.val=${search}`, `filter.type=CONTAINS`)
 
-    // Reset pagination queries when searching
-    useEffect(()=>{
-        setVarParam([`first=${PAGE_SIZE}`])
-    },[search])
+    // Reset Page to start when filters changes
+    useEffect(() => {
+        // TODO: This will interfere with page position if initPage > 1
+        pageHandler.goToFirstPage()
+    }, [search, pageHandler.goToFirstPage])
 
     // something went wrong with error listing for variables
     if(err !== null){
@@ -111,16 +110,13 @@ function VariablesPanel(props){
             </ContentPanelTitle>
             <ContentPanelBody style={{minHeight:"180px"}}>
                 {data !== null ?
-                <FlexBox className="col">
+                <FlexBox className="col" style={{justifyContent:"space-between"}}>
                     <div>
                     <Variables namespace={namespace} deleteNamespaceVariable={deleteNamespaceVariable} setNamespaceVariable={setNamespaceVariable} getNamespaceVariable={getNamespaceVariable} variables={data} getNamespaceVariableBlob={getNamespaceVariableBlob}/>
                     </div>
-                    <Pagination
-                    pageSize={PAGE_SIZE}
-                    total={totalCount}
-                    pageInfo={pageInfo}
-                    updatePage={updateVarPage}
-                    />
+                    <FlexBox className="row" style={{justifyContent:"flex-end", paddingBottom:"1em", flexGrow: 0}}>
+                        <PaginationV4 pageHandler={pageHandler} pageInfo={pageInfo}/>
+                    </FlexBox>
                 </FlexBox>:<></>}
             </ContentPanelBody>
         </ContentPanel>

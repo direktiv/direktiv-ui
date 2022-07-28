@@ -18,6 +18,7 @@ import Pagination from '../../../components/pagination';
 import Tabs from '../../../components/tabs';
 import { CanPreviewMimeType, Config, MimeTypeFileExtension } from '../../../util';
 import { VariableFilePicker } from '../../settings/variables-panel';
+import { PaginationV4, usePageHandler } from '../../../components/paginationv2';
 
 const PAGE_SIZE = 10 ;
 
@@ -29,20 +30,18 @@ function AddWorkflowVariablePanel(props) {
     const [file, setFile] = useState(null)
     const [uploading, setUploading] = useState(false)
     const [mimeType, setMimeType] = useState("application/json")
-    const [varParam, setVarParam] = useState([`first=${PAGE_SIZE}`])
     const [search, setSearch] = useState("")
-    const updateVarPage = useCallback((newParam)=>{
-        setVarParam([...newParam])
-    }, [])
 
     let wfVar = workflow.substring(1)
 
-    const {data, pageInfo, totalCount, setWorkflowVariable, getWorkflowVariable, getWorkflowVariableBlob, deleteWorkflowVariable} = useWorkflowVariables(Config.url, true, namespace, wfVar, localStorage.getItem("apikey"), ...varParam, `filter.field=NAME`, `filter.val=${search}`, `filter.type=CONTAINS`)
+    const pageHandler = usePageHandler(PAGE_SIZE)
+    const {data, pageInfo, totalCount, setWorkflowVariable, getWorkflowVariable, getWorkflowVariableBlob, deleteWorkflowVariable} = useWorkflowVariables(Config.url, true, namespace, wfVar, localStorage.getItem("apikey"), pageHandler.pageParams, `filter.field=NAME`, `filter.val=${search}`, `filter.type=CONTAINS`)
 
-    // Reset pagination queries when searching
-    useEffect(()=>{
-        setVarParam([`first=${PAGE_SIZE}`])
-    },[search])
+    // Reset Page to start when filters changes
+    useEffect(() => {
+        // TODO: This will interfere with page position if initPage > 1
+        pageHandler.goToFirstPage()
+    }, [search, pageHandler.goToFirstPage])
 
     if (data === null) {
         return <></>
@@ -105,12 +104,9 @@ function AddWorkflowVariablePanel(props) {
                     <div>
                     <Variables namespace={namespace} deleteWorkflowVariable={deleteWorkflowVariable} setWorkflowVariable={setWorkflowVariable} getWorkflowVariable={getWorkflowVariable} getWorkflowVariableBlob={getWorkflowVariableBlob} variables={data}/>
                     </div>
-                    <Pagination
-                    pageSize={PAGE_SIZE}
-                    total={totalCount}
-                    pageInfo={pageInfo}
-                    updatePage={updateVarPage}
-                    />
+                    <FlexBox className="row" style={{justifyContent:"flex-end", paddingBottom:"1em", flexGrow: 0}}>
+                        <PaginationV4 pageHandler={pageHandler} pageInfo={pageInfo}/>
+                    </FlexBox>
                 </FlexBox>:<></>}
             </ContentPanelBody>
         </ContentPanel>
