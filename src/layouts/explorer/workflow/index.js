@@ -5,7 +5,7 @@ import { useNavigate, useParams } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from '../../../components/content-panel';
 import FlexBox from '../../../components/flexbox';
-import { PaginationV4, usePageHandler } from '../../../components/paginationv2';
+import Pagination, { usePageHandler } from '../../../components/pagination';
 import { Config, GenerateRandomKey } from '../../../util';
 import './style.css';
 
@@ -634,7 +634,6 @@ function WorkflowInstances(props) {
 
 function OverviewTab(props) {
     const {getInstancesForWorkflow,  namespace, filepath, router, getSuccessFailedMetrics} = props
-    const [load, setLoad] = useState(true)
     const [instances, setInstances] = useState([])
     const [err, setErr] = useState(null)
     const [pageInfo, setPageInfo] = useState(null)
@@ -684,7 +683,7 @@ function OverviewTab(props) {
                             </ContentPanelTitle>
                             <WorkflowInstances instances={instances} namespace={namespace} />
                             <FlexBox className="row" style={{justifyContent:"flex-end", paddingBottom:"1em", flexGrow: 0}}>
-                                <PaginationV4 pageHandler={pageHandler} pageInfo={pageInfo}/>
+                                <Pagination pageHandler={pageHandler} pageInfo={pageInfo}/>
                             </FlexBox>
                         </ContentPanel>
                     </FlexBox>

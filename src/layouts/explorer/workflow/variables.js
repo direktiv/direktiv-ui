@@ -1,5 +1,5 @@
 import { useWorkflowVariables } from 'direktiv-react-hooks';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { VscCloudDownload, VscCloudUpload, VscEye, VscLoading, VscTrash, VscVariableGroup } from 'react-icons/vsc';
 
@@ -14,11 +14,10 @@ import DirektivEditor from '../../../components/editor';
 import FlexBox from '../../../components/flexbox';
 import HelpIcon from "../../../components/help";
 import Modal, { ButtonDefinition } from '../../../components/modal';
-import Pagination from '../../../components/pagination';
+import Pagination, { usePageHandler } from '../../../components/pagination';
 import Tabs from '../../../components/tabs';
 import { CanPreviewMimeType, Config, MimeTypeFileExtension } from '../../../util';
 import { VariableFilePicker } from '../../settings/variables-panel';
-import { PaginationV4, usePageHandler } from '../../../components/paginationv2';
 
 const PAGE_SIZE = 10 ;
 
@@ -35,13 +34,14 @@ function AddWorkflowVariablePanel(props) {
     let wfVar = workflow.substring(1)
 
     const pageHandler = usePageHandler(PAGE_SIZE)
+    const goToFirstPage = pageHandler.goToFirstPage
     const {data, pageInfo, setWorkflowVariable, getWorkflowVariable, getWorkflowVariableBlob, deleteWorkflowVariable} = useWorkflowVariables(Config.url, true, namespace, wfVar, localStorage.getItem("apikey"), pageHandler.pageParams, `filter.field=NAME`, `filter.val=${search}`, `filter.type=CONTAINS`)
 
     // Reset Page to start when filters changes
     useEffect(() => {
         // TODO: This will interfere with page position if initPage > 1
-        pageHandler.goToFirstPage()
-    }, [search, pageHandler.goToFirstPage])
+        goToFirstPage()
+    }, [search, goToFirstPage])
 
     if (data === null) {
         return <></>
@@ -105,7 +105,7 @@ function AddWorkflowVariablePanel(props) {
                     <Variables namespace={namespace} deleteWorkflowVariable={deleteWorkflowVariable} setWorkflowVariable={setWorkflowVariable} getWorkflowVariable={getWorkflowVariable} getWorkflowVariableBlob={getWorkflowVariableBlob} variables={data}/>
                     </div>
                     <FlexBox className="row" style={{justifyContent:"flex-end", paddingBottom:"1em", flexGrow: 0}}>
-                        <PaginationV4 pageHandler={pageHandler} pageInfo={pageInfo}/>
+                        <Pagination pageHandler={pageHandler} pageInfo={pageInfo}/>
                     </FlexBox>
                 </FlexBox>:<></>}
             </ContentPanelBody>

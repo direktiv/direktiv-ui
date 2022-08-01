@@ -5,7 +5,7 @@ import { VscClose, VscVmRunning } from 'react-icons/vsc';
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
 import FlexBox from '../../components/flexbox';
 import HelpIcon from '../../components/help';
-import { PaginationV4, usePageHandler } from '../../components/paginationv2';
+import Pagination, { usePageHandler } from '../../components/pagination';
 import { Config, GenerateRandomKey } from '../../util';
 import './style.css';
 
@@ -75,7 +75,8 @@ export function InstancesTable(props) {
     }, [filter, filterName, filterCreatedBefore, filterCreatedAfter, filterState, filterInvoker])
 
     const pageHandler = usePageHandler(PAGE_SIZE)
-    const {data, err, pageInfo, totalCount} = useInstances(Config.url, true, namespace, localStorage.getItem("apikey"), pageHandler.pageParams, ...queryFilters)
+    const goToFirstPage = pageHandler.goToFirstPage
+    const {data, err, pageInfo} = useInstances(Config.url, true, namespace, localStorage.getItem("apikey"), pageHandler.pageParams, ...queryFilters)
 
     useEffect(()=>{
         if(data !== null || err !== null) {
@@ -86,8 +87,8 @@ export function InstancesTable(props) {
     // Reset Page to start when filters changes
     useEffect(()=>{
         // TODO: This will interfere with page position if initPage > 1
-        pageHandler.goToFirstPage()
-    },[queryFilters, pageHandler.goToFirstPage])
+        goToFirstPage()
+    },[queryFilters, goToFirstPage])
 
     return(
         <Loader load={load} timer={3000}>
@@ -213,7 +214,7 @@ export function InstancesTable(props) {
         </ContentPanelBody>
         </ContentPanel>
         <FlexBox className="row" style={{justifyContent:"flex-end", paddingBottom:"1em", flexGrow: 0}}>
-            <PaginationV4 pageHandler={pageHandler} pageInfo={pageInfo}/>
+            <Pagination pageHandler={pageHandler} pageInfo={pageInfo}/>
         </FlexBox>
     </Loader>
         

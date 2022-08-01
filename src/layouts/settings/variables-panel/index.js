@@ -1,23 +1,22 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import './style.css';
-import ContentPanel, {ContentPanelTitle, ContentPanelTitleIcon, ContentPanelBody } from '../../../components/content-panel';
-import FlexBox from '../../../components/flexbox';
-import Modal, { ButtonDefinition } from '../../../components/modal';
-import AddValueButton from '../../../components/add-button';
+import Tippy from '@tippyjs/react';
 import { useNamespaceVariables } from 'direktiv-react-hooks';
-import { Config, CanPreviewMimeType, MimeTypeFileExtension } from '../../../util';
-import DirektivEditor from '../../../components/editor';
-import Button from '../../../components/button';
-import {useDropzone} from 'react-dropzone'
-import Tabs from '../../../components/tabs';
-import HelpIcon from '../../../components/help';
+import { saveAs } from 'file-saver';
+import { useCallback, useEffect, useState } from 'react';
+import { useDropzone } from 'react-dropzone';
 import { VscCloudDownload, VscCloudUpload, VscEye, VscLoading, VscTrash, VscVariableGroup } from 'react-icons/vsc';
 import { AutoSizer } from 'react-virtualized';
-import { saveAs } from 'file-saver'
-import Tippy from '@tippyjs/react';
-import Pagination from '../../../components/pagination';
+import AddValueButton from '../../../components/add-button';
+import Button from '../../../components/button';
+import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from '../../../components/content-panel';
+import DirektivEditor from '../../../components/editor';
+import FlexBox from '../../../components/flexbox';
+import HelpIcon from '../../../components/help';
+import Modal, { ButtonDefinition } from '../../../components/modal';
+import Pagination, { usePageHandler } from '../../../components/pagination';
+import Tabs from '../../../components/tabs';
+import { CanPreviewMimeType, Config, MimeTypeFileExtension } from '../../../util';
 import { SearchBar } from '../../explorer';
-import { PaginationV4, usePageHandler } from '../../../components/paginationv2';
+import './style.css';
 
 const PAGE_SIZE = 10 ;
 
@@ -32,13 +31,14 @@ function VariablesPanel(props){
     const [search, setSearch] = useState("")
 
     const pageHandler = usePageHandler(PAGE_SIZE)
+    const goToFirstPage = pageHandler.goToFirstPage
     const {data, err, pageInfo, setNamespaceVariable, getNamespaceVariable, deleteNamespaceVariable, getNamespaceVariableBlob} = useNamespaceVariables(Config.url, true, namespace, localStorage.getItem("apikey"), pageHandler.pageParams,  `filter.field=NAME`, `filter.val=${search}`, `filter.type=CONTAINS`)
 
     // Reset Page to start when filters changes
     useEffect(() => {
         // TODO: This will interfere with page position if initPage > 1
-        pageHandler.goToFirstPage()
-    }, [search, pageHandler.goToFirstPage])
+        goToFirstPage()
+    }, [search, goToFirstPage])
 
     // something went wrong with error listing for variables
     if(err !== null){
@@ -115,7 +115,7 @@ function VariablesPanel(props){
                     <Variables namespace={namespace} deleteNamespaceVariable={deleteNamespaceVariable} setNamespaceVariable={setNamespaceVariable} getNamespaceVariable={getNamespaceVariable} variables={data} getNamespaceVariableBlob={getNamespaceVariableBlob}/>
                     </div>
                     <FlexBox className="row" style={{justifyContent:"flex-end", paddingBottom:"1em", flexGrow: 0}}>
-                        <PaginationV4 pageHandler={pageHandler} pageInfo={pageInfo}/>
+                        <Pagination pageHandler={pageHandler} pageInfo={pageInfo}/>
                     </FlexBox>
                 </FlexBox>:<></>}
             </ContentPanelBody>

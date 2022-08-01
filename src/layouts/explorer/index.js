@@ -16,7 +16,7 @@ import FlexBox from '../../components/flexbox';
 import HelpIcon from "../../components/help";
 import Loader from '../../components/loader';
 import Modal, { ButtonDefinition, KeyDownDefinition } from '../../components/modal';
-import PaginationV2, { usePage } from '../../components/paginationv2';
+import Pagination, { usePageHandler } from '../../components/pagination';
 import { Config, GenerateRandomKey } from '../../util';
 import WorkflowPage from './workflow';
 import WorkflowPod from './workflow/pod';
@@ -177,12 +177,19 @@ function ExplorerList(props) {
     const [streamNodes, setStreamNodes] = useState(true)
     const [queryParams, setQueryParams] = useState([])
 
-    const initPage = 1 // TODO make query hook
-    const [pageParams, pageHandler] = usePage(PAGE_SIZE, initPage)
-    const {data, err, templates, pageInfo, createNode, createMirrorNode, deleteNode, renameNode, totalCount } = useNodes(Config.url, streamNodes, namespace, path, localStorage.getItem("apikey"), pageParams, ...queryParams, `order.field=${orderFieldDictionary[orderFieldKey]}`, `filter.field=NAME`, `filter.val=${search}`, `filter.type=CONTAINS`)
+    const pageHandler = usePageHandler(PAGE_SIZE)
+    const goToFirstPage = pageHandler.goToFirstPage
+
+    const {data, err, templates, pageInfo, createNode, createMirrorNode, deleteNode, renameNode } = useNodes(Config.url, streamNodes, namespace, path, localStorage.getItem("apikey"), pageHandler.pageParams, ...queryParams, `order.field=${orderFieldDictionary[orderFieldKey]}`, `filter.field=NAME`, `filter.val=${search}`, `filter.type=CONTAINS`)
 
     const [wfData, setWfData] = useState(templates["noop"].data)
     const [wfTemplate, setWfTemplate] = useState("noop")
+
+    // Reset Page to start when filters changes
+    useEffect(() => {
+        // TODO: This will interfere with page position if initPage > 1
+        goToFirstPage()
+    }, [search, goToFirstPage])
 
 
     // Mirror
@@ -667,7 +674,7 @@ function ExplorerList(props) {
             </ContentPanelBody>
         </ContentPanel>
         <FlexBox className="row" style={{justifyContent:"flex-end", paddingBottom:"1em", flexGrow: 0}}>
-                <PaginationV2 initPage={initPage} pageInfo={pageInfo} pageHandler={pageHandler}/>
+                <Pagination pageHandler={pageHandler} pageInfo={pageInfo}/>
         </FlexBox>
     </Loader>
   
