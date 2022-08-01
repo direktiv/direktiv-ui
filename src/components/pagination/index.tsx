@@ -82,7 +82,6 @@ export default function Pagination({ pageHandler, pageInfo }: PaginationProps) {
   if (!pageInfo) {
     return (
       <div>
-        TODO: loading pages
       </div>
     )
   }
