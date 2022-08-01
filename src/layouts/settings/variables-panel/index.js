@@ -32,7 +32,7 @@ function VariablesPanel(props){
     const [search, setSearch] = useState("")
 
     const pageHandler = usePageHandler(PAGE_SIZE)
-    const {data, err, pageInfo, totalCount, setNamespaceVariable, getNamespaceVariable, deleteNamespaceVariable, getNamespaceVariableBlob} = useNamespaceVariables(Config.url, true, namespace, localStorage.getItem("apikey"), pageHandler.pageParams,  `filter.field=NAME`, `filter.val=${search}`, `filter.type=CONTAINS`)
+    const {data, err, pageInfo, setNamespaceVariable, getNamespaceVariable, deleteNamespaceVariable, getNamespaceVariableBlob} = useNamespaceVariables(Config.url, true, namespace, localStorage.getItem("apikey"), pageHandler.pageParams,  `filter.field=NAME`, `filter.val=${search}`, `filter.type=CONTAINS`)
 
     // Reset Page to start when filters changes
     useEffect(() => {

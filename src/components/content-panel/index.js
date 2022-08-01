@@ -12,7 +12,7 @@ function ContentPanel(props) {
     className = "content-panel-parent opaque " + className
 
     return(
-        <div id={id} style={{...style, display: "flex", flexDirection: "column", flexGrow: grow ? "1": undefined}} className={className} >
+        <div id={id} style={{display: "flex", flexDirection: "column", flexGrow: grow ? "1": undefined, ...style}} className={className} >
             {children}
         </div>
     );

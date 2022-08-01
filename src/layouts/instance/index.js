@@ -335,7 +335,6 @@ function InstanceDiagram(props) {
         const handler = setTimeout(() => {
             async function getwf() {
                 if (wfpath !== "" && instRef !== "" && rev !== null && rev !== "" && load) {
-                    console.log("HELO!!!!!!!!!!")
                     let refWF = await getWorkflowRevisionData(instRef === "latest" ? instRef : rev)
                     setWFData(atob(refWF.revision.source))
                     setLoad(false)

@@ -35,7 +35,7 @@ function AddWorkflowVariablePanel(props) {
     let wfVar = workflow.substring(1)
 
     const pageHandler = usePageHandler(PAGE_SIZE)
-    const {data, pageInfo, totalCount, setWorkflowVariable, getWorkflowVariable, getWorkflowVariableBlob, deleteWorkflowVariable} = useWorkflowVariables(Config.url, true, namespace, wfVar, localStorage.getItem("apikey"), pageHandler.pageParams, `filter.field=NAME`, `filter.val=${search}`, `filter.type=CONTAINS`)
+    const {data, pageInfo, setWorkflowVariable, getWorkflowVariable, getWorkflowVariableBlob, deleteWorkflowVariable} = useWorkflowVariables(Config.url, true, namespace, wfVar, localStorage.getItem("apikey"), pageHandler.pageParams, `filter.field=NAME`, `filter.val=${search}`, `filter.type=CONTAINS`)
 
     // Reset Page to start when filters changes
     useEffect(() => {

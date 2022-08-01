@@ -78,7 +78,6 @@ export function InstancesTable(props) {
     const {data, err, pageInfo, totalCount} = useInstances(Config.url, true, namespace, localStorage.getItem("apikey"), pageHandler.pageParams, ...queryFilters)
 
     useEffect(()=>{
-        console.log("data =", data)
         if(data !== null || err !== null) {
             setLoad(false)
         }
@@ -93,7 +92,7 @@ export function InstancesTable(props) {
     return(
         <Loader load={load} timer={3000}>
         {hideTitle ?<></>:
-        <FlexBox className="gap instance-filter" style={{justifyContent: "space-between", alignItems: "center", paddingBottom: "8px"}}>
+        <FlexBox className="gap instance-filter" style={{justifyContent: "space-between", alignItems: "center", paddingBottom: "8px", flexGrow:"0"}}>
             <FlexBox className="col gap">
                 <FlexBox className="row center-y gap">
                     Filter Name

@@ -362,7 +362,7 @@ function ExplorerList(props) {
                                 ButtonDefinition("Add", async () => {
                                     const result = await createNode(name, "workflow", wfData)
                                     if(result.node && result.namespace){
-                                        navigate(`/n/${result.namespace}/explorer/${result.path.substring(1)}`)
+                                        navigate(`/n/${result.namespace}/explorer/${result.node.path.substring(1)}`)
                                     }
                                 }, `small`, ()=>{}, true, false, true),
                                 ButtonDefinition("Cancel", () => {
@@ -597,7 +597,7 @@ function ExplorerList(props) {
                         </div>
                     </ContentPanelHeaderButton>
                     {
-                        data && data.expandedType === "git" ?
+                        data && data?.node?.expandedType === "git" ?
                             <>
                                 <ContentPanelHeaderButton className="explorer-action-btn">
                                     <ContentPanelHeaderButtonIcon>

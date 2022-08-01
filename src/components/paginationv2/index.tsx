@@ -1,8 +1,6 @@
 import Pagination from '@mui/material/Pagination';
 import PaginationItem from '@mui/material/PaginationItem/PaginationItem';
 import * as React from 'react';
-
-const DEFAULT_PAGE_LIMIT = 5
 export interface PageInfo {
   order: Order[]
   filter: Filter[]
@@ -162,7 +160,6 @@ export interface PaginationV3Props {
 
 export function PaginationV4({ pageHandler, pageInfo }: PaginationV3Props) {
   const pageCount = React.useMemo(() => {
-    console.log("pageInfo = ", pageInfo)
     if (!pageInfo || pageInfo.limit === 0) {
       return 0
     }

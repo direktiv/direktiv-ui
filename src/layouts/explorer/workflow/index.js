@@ -464,7 +464,7 @@ function WorkingRevision(props) {
                                             {
                                                 updateRevisions()
                                                 setShowErrors(false)
-                                                navigate(`/n/${namespace}/explorer${result.path}?tab=1&revision=${result.revision.name}&revtab=0`)
+                                                navigate(`/n/${namespace}/explorer${result.node.path}?tab=1&revision=${result.revision.name}&revtab=0`)
                                             }else{
                                                 setErrors("Something went wrong")
                                                 setShowErrors(true)
