@@ -1,11 +1,11 @@
-import { useWorkflowService } from "direktiv-react-hooks"
-import { Config } from "../../../util"
-import FlexBox from "../../../components/flexbox"
-import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from "../../../components/content-panel"
+import { useWorkflowService } from "direktiv-react-hooks";
 import { VscLayers } from 'react-icons/vsc';
+import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from "../../../components/content-panel";
+import FlexBox from "../../../components/flexbox";
+import { Config } from "../../../util";
 
-import { Service } from "../../namespace-services"
-import { useNavigate } from "react-router"
+import { useNavigate } from "react-router";
+import { Service } from "../../namespace-services";
 
 export default function WorkflowRevisions(props) {
     const {namespace, service, version, filepath} = props
@@ -56,7 +56,6 @@ export default function WorkflowRevisions(props) {
                 </ContentPanelBody>
             </ContentPanel>
         </FlexBox>
-        {/* <UpdateTraffic setNamespaceServiceRevisionTraffic={setNamespaceServiceRevisionTraffic} service={service} revisions={revisions} traffic={traffic}/> */}
     </FlexBox>
     )
 }

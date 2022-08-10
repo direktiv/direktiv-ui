@@ -1,25 +1,24 @@
-import { useEffect, useState } from "react"
+import { useGlobalService } from "direktiv-react-hooks";
+import { useEffect, useState } from "react";
 import { VscLayers } from 'react-icons/vsc';
-import { useNavigate, useParams } from "react-router"
-import { Service } from "../namespace-services"
-import { RevisionCreatePanel, UpdateTraffic } from "../namespace-services/revisions"
-import AddValueButton from "../../components/add-button"
-import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from "../../components/content-panel"
-import FlexBox from "../../components/flexbox"
-import Modal, { ButtonDefinition, KeyDownDefinition } from "../../components/modal"
-import { Config } from "../../util"
-import { useGlobalService } from "direktiv-react-hooks"
+import { useNavigate, useParams } from "react-router";
+import AddValueButton from "../../components/add-button";
+import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from "../../components/content-panel";
+import FlexBox from "../../components/flexbox";
+import Modal, { ButtonDefinition, KeyDownDefinition } from "../../components/modal";
+import { Config } from "../../util";
+import { Service } from "../namespace-services";
+import { RevisionCreatePanel } from "../namespace-services/revisions";
 
 export default function GlobalRevisionsPanel(props){
     const {service} = useParams()
     const navigate = useNavigate()
-    const {revisions, config, traffic, createGlobalServiceRevision, deleteGlobalServiceRevision, setGlobalServiceRevisionTraffic, getServiceConfig} = useGlobalService(Config.url, service, navigate, localStorage.getItem("apikey"))
+    const {revisions, config, traffic, createGlobalServiceRevision, deleteGlobalServiceRevision, getServiceConfig} = useGlobalService(Config.url, service, navigate, localStorage.getItem("apikey"))
 
     const [load, setLoad] = useState(true)
     const [image, setImage] = useState("")
     const [scale, setScale] = useState(0)
     const [size, setSize] = useState(0)
-    const [trafficPercent, setTrafficPercent] = useState(100)
     const [cmd, setCmd] = useState("")
     const [maxScale, setMaxScale] = useState(0)
 
@@ -86,7 +85,7 @@ export default function GlobalRevisionsPanel(props){
                                 ]}
                                 actionButtons={[
                                     ButtonDefinition("Add", async () => {
-                                        await createGlobalServiceRevision(image, parseInt(scale), parseInt(size), cmd, parseInt(trafficPercent))
+                                        await createGlobalServiceRevision(image, parseInt(scale), parseInt(size), cmd, 100)
                                     }, "small", ()=>{}, true, false, true),
                                     ButtonDefinition("Cancel", () => {
                                     }, "small light", ()=>{}, true, false)
@@ -98,7 +97,6 @@ export default function GlobalRevisionsPanel(props){
                                     scale={scale} setScale={setScale}
                                     size={size} setSize={setSize}
                                     cmd={cmd} setCmd={setCmd}
-                                    traffic={trafficPercent} setTraffic={setTrafficPercent}
                                     maxScale={maxScale}
                                 />:""}
                             </Modal>
@@ -142,10 +140,6 @@ export default function GlobalRevisionsPanel(props){
                             </ContentPanelBody>
                         </ContentPanel>
                     </FlexBox>
-                    {
-                        traffic &&
-                        <UpdateTraffic setNamespaceServiceRevisionTraffic={setGlobalServiceRevisionTraffic} service={service} revisions={revisions} traffic={traffic}/>
-                    }
                     </FlexBox>
         </FlexBox>
     )

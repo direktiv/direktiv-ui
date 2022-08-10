@@ -1,17 +1,15 @@
-import { useNamespaceService } from "direktiv-react-hooks"
-import { useEffect, useState } from "react"
+import Tippy from '@tippyjs/react';
+import { useNamespaceService } from "direktiv-react-hooks";
+import { useEffect, useState } from "react";
 import { VscLayers } from 'react-icons/vsc';
-import { useNavigate, useParams } from "react-router"
-import { Service } from "."
-import AddValueButton from "../../components/add-button"
-import Alert from "../../components/alert"
-import Button from "../../components/button"
-import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon, ContentPanelFooter } from "../../components/content-panel"
-import FlexBox from "../../components/flexbox"
-import Modal, { ButtonDefinition, KeyDownDefinition } from "../../components/modal"
-import { Config } from "../../util"
-import Tippy from '@tippyjs/react'
-import 'tippy.js/dist/tippy.css'
+import { useNavigate, useParams } from "react-router";
+import 'tippy.js/dist/tippy.css';
+import { Service } from ".";
+import AddValueButton from "../../components/add-button";
+import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from "../../components/content-panel";
+import FlexBox from "../../components/flexbox";
+import Modal, { ButtonDefinition, KeyDownDefinition } from "../../components/modal";
+import { Config } from "../../util";
 
 export default function NamespaceRevisionsPanel(props) {
     const {namespace} = props
@@ -27,7 +25,7 @@ export default function NamespaceRevisionsPanel(props) {
 }
 
 export function RevisionCreatePanel(props){
-    const {image, setImage, scale, setScale, size, setSize, cmd, setCmd, traffic, setTraffic, maxScale} = props
+    const {image, setImage, scale, setScale, size, setSize, cmd, setCmd, maxScale} = props
 
     return(
         <FlexBox className="col gap" style={{fontSize: "12px"}}>
@@ -59,16 +57,6 @@ export function RevisionCreatePanel(props){
                         CMD
                         <input value={cmd} onChange={(e)=>setCmd(e.target.value)} placeholder="Enter the CMD for a service" />
                     </FlexBox>
-                    <FlexBox className="col" style={{paddingRight:"10px"}}>
-                        Traffic
-                        <Tippy content={`${traffic}%`} trigger={"mouseenter click"}>
-                            <input type="range" style={{paddingLeft:"0px"}} min={"0"} max="100" value={traffic.toString()} onChange={(e)=>setTraffic(e.target.value)} />
-                        </Tippy>
-                        <datalist style={{display:"flex", alignItems:'center'}} id="sizeMarks">
-                            <option style={{flex:"auto", textAlign:"left", lineHeight:"10px"}} value={0} label="0%"/>
-                            <option style={{flex:"auto", textAlign:"right", lineHeight:"10px" }} value={100} label="100%"/>
-                        </datalist>
-                    </FlexBox>
             </FlexBox>
         </FlexBox>
     )
@@ -77,13 +65,12 @@ export function RevisionCreatePanel(props){
 function NamespaceRevisions(props) {
     const {namespace, service} = props
     const navigate = useNavigate()
-    const {revisions, config, traffic, setNamespaceServiceRevisionTraffic, deleteNamespaceServiceRevision, getNamespaceServiceConfig, createNamespaceServiceRevision} = useNamespaceService(Config.url, namespace, service, navigate, localStorage.getItem("apikey"))
+    const {revisions, config, deleteNamespaceServiceRevision, getNamespaceServiceConfig, createNamespaceServiceRevision} = useNamespaceService(Config.url, namespace, service, navigate, localStorage.getItem("apikey"))
 
     const [load, setLoad] = useState(true)
     const [image, setImage] = useState("")
     const [scale, setScale] = useState(0)
     const [size, setSize] = useState(0)
-    const [trafficPercent, setTrafficPercent] = useState(100)
     const [cmd, setCmd] = useState("")
     const [maxScale, setMaxScale] = useState(0)
     
@@ -112,7 +99,7 @@ function NamespaceRevisions(props) {
         }
     },[config, getNamespaceServiceConfig, load, navigate])
 
-    if(revisions === null || traffic === null) {
+    if(revisions === null) {
         return <></>
     }
 
@@ -149,7 +136,7 @@ function NamespaceRevisions(props) {
                                 ]}
                                 actionButtons={[
                                     ButtonDefinition("Add", async () => {
-                                        await createNamespaceServiceRevision(image, parseInt(scale), parseInt(size), cmd, parseInt(trafficPercent))
+                                        await createNamespaceServiceRevision(image, parseInt(scale), parseInt(size), cmd, 100)
                                     }, "small", ()=>{}, true, false, true),
                                     ButtonDefinition("Cancel", () => {
                                     }, "small light", ()=>{}, true, false)
@@ -161,7 +148,6 @@ function NamespaceRevisions(props) {
                                     scale={scale} setScale={setScale}
                                     size={size} setSize={setSize}
                                     cmd={cmd} setCmd={setCmd}
-                                    traffic={trafficPercent} setTraffic={setTrafficPercent}
                                     maxScale={maxScale}
                                 />:""}
                             </Modal>
@@ -174,19 +160,9 @@ function NamespaceRevisions(props) {
                                 {revisions.sort((a, b)=> (a.created > b.created) ? -1 : 1).map((obj, i) => {
 
                                     let dontDelete = false
-                                    let t = 0
-                                    for (let i=0; i < traffic.length; i++) {
-                                        if(traffic[i].revisionName === obj.name){
-                                            dontDelete= true
-                                            t = traffic[i].traffic
-                                            break
-                                        }
-                                    }
-
                                     return (
                                         <Service 
                                             latest={i===0}
-                                            traffic={t}
                                             dontDelete={dontDelete && i !== 0} 
                                             revision={obj.rev}
                                             deleteService={deleteNamespaceServiceRevision}
@@ -201,140 +177,6 @@ function NamespaceRevisions(props) {
                         </FlexBox>
 
                     </ContentPanelBody>
-                </ContentPanel>
-            </FlexBox>
-            <UpdateTraffic setNamespaceServiceRevisionTraffic={setNamespaceServiceRevisionTraffic} service={service} revisions={revisions} traffic={traffic}/>
-        </FlexBox>
-    )
-}
-
-export function UpdateTraffic(props){
-
-    const {traffic, service, revisions, setNamespaceServiceRevisionTraffic} = props
-    const [revOne, setRevOne] = useState(traffic[0] ? traffic[0].revisionName : "")
-    const [revTwo, setRevTwo] = useState(traffic[1] ? traffic[1].revisionname : "")
-    const [tpercent, setTPercent] = useState(traffic[0] ? traffic[0].traffic : 0)
-    const [errMsg, setErrMsg] = useState("")
-
-    // handle data from traffic stream updating
-    useEffect(()=>{
-        if(traffic[0]) {
-            setRevOne(traffic[0].revisionName)
-            setTPercent(traffic[0].traffic)
-        } else {
-            setRevOne("")
-            setTPercent(0)
-        }
-        if(traffic[1]){
-            setRevTwo(traffic[1].revisionName)
-        } else {
-            setRevTwo("")
-        }
-    },[traffic])
-
-    return(
-        <FlexBox style={{flex: 1, minWidth: "370px"}}>
-            <FlexBox className="gap" style={{fontSize:"12px", maxHeight: "fit-content"}}>
-                <ContentPanel style={{width:"100%", height:"fit-content"}}>
-                    <ContentPanelTitle>
-                        <ContentPanelTitleIcon>
-                            <VscLayers/>
-                        </ContentPanelTitleIcon>
-                        <FlexBox>
-                            Update '{service}' traffic
-                        </FlexBox>
-                    </ContentPanelTitle>
-                        <ContentPanelBody className="secrets-panel">
-                            <FlexBox className="gap col" style={{}}>
-                                <FlexBox className="col gap">
-                                    <FlexBox className="col" style={{paddingRight:"4px"}}>
-                                        <span style={{fontWeight:"bold"}}>Rev 1</span>
-                                        <select value={revOne} onChange={(e)=>{
-                                            if(e.target.value === "") {
-                                                setTPercent(0)
-                                            }
-                                            setRevOne(e.target.value)
-                                        }}>
-                                            <option value="">No revision selected</option>
-                                            {revisions.map((obj, key)=>{
-                                                if(obj.name !== revTwo) {
-                                                    return(
-                                                        <option key={`option-rev-update-traffic-1-${key}`} value={obj.name}>{obj.name}</option>
-                                                    )
-                                                } else {
-                                                    return <></>
-                                                }
-                                            })}
-                                        </select>
-                                    </FlexBox>
-                                    <FlexBox className="col" style={{paddingRight:"4px"}}>
-                                        <span style={{fontWeight:"bold"}}>Rev 2</span>
-                                        <select value={revTwo} onChange={(e)=>{
-                                            if(e.target.value === "") {
-                                                setTPercent(100)
-                                            }
-                                            setRevTwo(e.target.value)
-                                        }}>
-                                            <option value="">No revision selected</option>
-                                            {revisions.map((obj, key)=>{
-                                                if(obj.name !== revOne) {
-                                                    return(
-                                                        <option key={`option-rev-update-traffic-2-${key}`} value={obj.name}>{obj.name}</option>
-                                                    )
-                                                } else {
-                                                    return <></>
-                                                } 
-                                            })}
-                                        </select>
-                                    </FlexBox>
-                                    <FlexBox className="col" style={{paddingRight:"10px"}}>
-                                        <span style={{fontWeight:"bold"}}>Traffic Distribution</span>
-                                        <FlexBox>
-                                            <FlexBox>
-                                                Rev 1
-                                            </FlexBox>
-                                            <FlexBox style={{textAlign:"right", justifyContent:"flex-end"}}>
-                                                Rev 2
-                                            </FlexBox>
-                                        </FlexBox>
-                                        <input 
-                                            disabled={revTwo === "" || revOne === "" ? true:false} 
-                                            id="revisionMarks" 
-                                            style={{paddingLeft:"0px"}} 
-                                            value={tpercent} onChange={(e)=>setTPercent(e.target.value)} 
-                                            type="range" 
-                                        />
-                                        <datalist style={{display:"flex", alignItems:'center'}} id="revisionMarks">
-                                            <option style={{flex:"auto", textAlign:"left", lineHeight:"10px"}} value="0" label={`${tpercent}%`}/>
-                                            <option style={{flex:"auto", textAlign:"right", lineHeight:"10px" }} value="100" label={`${100-tpercent}%`}/>
-                                        </datalist>
-                                    </FlexBox>
-                                    <FlexBox>
-                                        { errMsg ? 
-                                            <Alert className="critical">{errMsg}</Alert>
-                                        :<></>}
-                                    </FlexBox>
-                                </FlexBox>
-                            </FlexBox>
-                        </ContentPanelBody>
-                        <ContentPanelFooter>
-                            <FlexBox className="col" style={{alignItems:"flex-end"}}>
-                                <Button className="small" onClick={async ()=>{
-                                    try { 
-                                        await setNamespaceServiceRevisionTraffic(revOne, parseInt(tpercent), revTwo, parseInt(100-tpercent))
-                                        setErrMsg("")
-                                    } catch(err) {
-                                        if(err.message){
-                                            setErrMsg(err.message)
-                                        } else {
-                                            setErrMsg(err)
-                                        }
-                                    }
-                                }}>
-                                    Save
-                                </Button>
-                            </FlexBox>
-                        </ContentPanelFooter>
                 </ContentPanel>
             </FlexBox>
         </FlexBox>
