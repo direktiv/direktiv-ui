@@ -12,6 +12,9 @@ import { VscClose } from 'react-icons/vsc';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css'
 
+import Button2 from '../../components/buttonv2';
+
+
 export function ModalHeadless(props) {
     let {maximised, noPadding, titleIcon, title, children, withCloseButton, activeOverlay, label} = props;
     let {modalStyle, actionButtons, keyDownActions, escapeToCancel, onClose, onOpen, requiredFields, visible, setVisible } = props;
@@ -125,7 +128,16 @@ function Modal(props) {
         onClose={onClose}
         onOpen={onOpen}
         requiredFields={requiredFields}/>
-        <FlexBox style={{...style}}>
+        <Button2 onClick={async(ev)=>{
+             if(onOpen){
+                await onOpen()
+            }
+            setVisible(true)
+            ev.stopPropagation()
+        }} variant={"outlined"} color="info">
+            {button}
+        </Button2>
+        {/* <FlexBox style={{...style}}>
             <div style={{width: "100%", display:'flex', justifyContent: "center", pointerEvents: buttonDisabled ? "none" : "", ...btnStyle}} onClick={async(ev) => {
                 if(onOpen){
                     await onOpen()
@@ -135,7 +147,7 @@ function Modal(props) {
             }}>
                 {button}
             </div>
-        </FlexBox>
+        </FlexBox> */}
         </>
     )
         }

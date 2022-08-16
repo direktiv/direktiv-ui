@@ -16,20 +16,37 @@ const theme = createTheme({
     },
     palette: {
         primary: {
-            main: Colors.primary
+            main: Colors.primary,
+            light: "#44a3d9"
         },
         secondary: {
             main: Colors.secondary
         },
         text: {
             primary: Colors.light
-        }
+        },
+        info: {
+            main: "#ffffff"
+        },
     },
     components: {
         // Name of the component
         MuiPaginationItem: {
             defaultProps: {
                 disableRipple: true,
+            }
+        },
+        MuiTooltip:{
+            defaultProps:{
+                backgroundColor:"red"
+            },
+            styleOverrides:{
+                tooltipArrow:{
+                    backgroundColor:"#1a3041"
+                },
+                arrow:{
+                    color:"#1a3041"
+                }
             }
         }
     },

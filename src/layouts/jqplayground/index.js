@@ -9,6 +9,7 @@ import FlexBox from '../../components/flexbox';
 import HelpIcon from '../../components/help';
 import { Config } from '../../util';
 import './style.css';
+import Button2 from '../../components/buttonv2';
 
 
 export default function JQPlayground() {
@@ -302,15 +303,14 @@ function JQFilter(props) {
                     </FlexBox>
                 </ContentPanelTitle>
                 <ContentPanelBody >
-                    <FlexBox className="gap wrap" style={{height:"40px"}}>
+                    <FlexBox className="gap wrap center-y" style={{height:"40px"}}>
                         <FlexBox style={{fontSize: "12pt"}} >
                             <input style={{height:"28px", width:"100%"}} onChange={(e)=>setFilter(e.target.value)} value={query} placeholder={"Enter a Filter to JQ on"} type="text" />
                         </FlexBox>
                         <FlexBox style={{maxWidth:"65px"}}>
-                             
-                            <Button className="small" onClick={()=>execute()}>
+                            <Button2 asyncDisable onClick={()=>execute()}>
                                 Execute
-                            </Button>
+                            </Button2>
                         </FlexBox>
                     </FlexBox>
                 </ContentPanelBody>
