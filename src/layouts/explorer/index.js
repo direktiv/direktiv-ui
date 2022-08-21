@@ -24,6 +24,7 @@ import { Config, GenerateRandomKey } from '../../util';
 import WorkflowPage from './workflow';
 import WorkflowPod from './workflow/pod';
 import WorkflowRevisions from './workflow/revision';
+import Button2 from '../../components/buttonv2';
 
 import Alert from '../../components/alert';
 import NotFound from '../notfound';
@@ -307,9 +308,7 @@ function ExplorerList(props) {
                         titleIcon={<VscCode/>}
                         button={
                             <>
-                                <ContentPanelHeaderButtonIcon>
-                                    <VscCode style={{ maxHeight: "12px", marginRight: "4px" }} />
-                                </ContentPanelHeaderButtonIcon>
+                                <VscCode style={{ maxHeight: "12px", marginRight: "4px" }} />
                                 API Commands
                             </>
                         }
@@ -354,13 +353,11 @@ function ExplorerList(props) {
                             modalStyle={{width: "600px"}}
                             escapeToCancel
                             button={(
-                                <div style={{display:"flex"}}>
-                                    <ContentPanelHeaderButtonIcon>
-                                        <VscAdd/>
-                                    </ContentPanelHeaderButtonIcon>
+                                <>
+                                    <VscAdd/>
                                     <span className="hide-600">Workflow</span>
                                     <span className="show-600">WF</span>
-                                </div>
+                                </>
                             )}  
                             onClose={()=>{
                                 setWfData(templates["noop"].data)
@@ -424,13 +421,11 @@ function ExplorerList(props) {
                             modalStyle={{ width: "340px" }}
                             escapeToCancel
                             button={(
-                                <div style={{ display: "flex" }}>
-                                    <ContentPanelHeaderButtonIcon>
-                                        <VscAdd />
-                                    </ContentPanelHeaderButtonIcon>
+                                <>
+                                    <VscAdd />
                                     <span className="hide-600">Directory</span>
                                     <span className="show-600">Dir</span>
-                                </div>
+                                </>
                             )}
                             onClose={() => {
                                 setName("")
@@ -602,16 +597,12 @@ function ExplorerList(props) {
                         </Modal>
                     {
                         data && data?.node?.expandedType === "git" ?
-                            <>
-                                <ContentPanelHeaderButton className="explorer-action-btn">
-                                    <ContentPanelHeaderButtonIcon>
-                                        <VscRepo />
-                                    </ContentPanelHeaderButtonIcon>
-                                    <Link to={`/n/${namespace}/mirror${path}`}>
+                            <Link to={`/n/${namespace}/mirror${path}`}>
+                                <Button2 variant='outline' color='info'>
+                                    <VscRepo />
                                         Mirror Info
-                                    </Link>
-                                </ContentPanelHeaderButton>
-                            </>
+                                </Button2>
+                            </Link>
                             :
                             <></>
                     }
@@ -775,10 +766,14 @@ function DirListItem(props) {
                                 }}
                                 title="Delete a directory" 
                                 button={(
-                                    <FlexBox>
+                                    <>
                                         <VscTrash className="auto-margin red-text" />
-                                    </FlexBox>
+                                    </>
                                 )}
+                                buttonProps={{
+                                    auto: true,
+                                    variant: "text"
+                                }}
                                 actionButtons={
                                     [
                                         ButtonDefinition("Delete", async () => {
@@ -893,6 +888,10 @@ function WorkflowListItem(props) {
                                                 <HiOutlineTrash className="auto-margin red-text" />
                                             // </FlexBox>
                                         )}
+                                        buttonProps={{
+                                            auto: true,
+                                            variant: "text"
+                                        }}
                                         actionButtons={
                                             [
                                                 ButtonDefinition("Delete", async () => {

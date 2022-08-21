@@ -67,7 +67,7 @@ export function ModalHeadless(props) {
 
 function Modal(props) {
 
-    let {maximised, noPadding, titleIcon, title, children, button, withCloseButton, activeOverlay, label, buttonDisabled} = props;
+    let {maximised, noPadding, titleIcon, title, children, button, buttonProps, withCloseButton, activeOverlay, label, buttonDisabled} = props;
     let {modalStyle, style, btnStyle, actionButtons, keyDownActions, escapeToCancel, onClose, onOpen, requiredFields } = props;
     const [visible, setVisible] = useState(false);
     if (!button) {
@@ -134,8 +134,8 @@ function Modal(props) {
             }
             setVisible(true)
             ev.stopPropagation()
-        }} variant={"outlined"} color="info">
-            {button}
+        }} variant={"outlined"} color="info" {...buttonProps} >
+           {button}
         </Button2>
         {/* <FlexBox style={{...style}}>
             <div style={{width: "100%", display:'flex', justifyContent: "center", pointerEvents: buttonDisabled ? "none" : "", ...btnStyle}} onClick={async(ev) => {
