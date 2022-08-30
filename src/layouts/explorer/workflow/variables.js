@@ -1,14 +1,12 @@
 import { useWorkflowVariables } from 'direktiv-react-hooks';
 import { useEffect, useState } from 'react';
 
-import { VscCloudDownload, VscCloudUpload, VscEye, VscLoading, VscTrash, VscVariableGroup } from 'react-icons/vsc';
+import { VscCloudDownload, VscCloudUpload, VscEye, VscLoading, VscTrash, VscVariableGroup, VscAdd } from 'react-icons/vsc';
 
 import Tippy from '@tippyjs/react';
 import { saveAs } from 'file-saver';
 import { AutoSizer } from 'react-virtualized';
 import { SearchBar } from '..';
-import AddValueButton from '../../../components/add-button';
-import Button from '../../../components/button';
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from '../../../components/content-panel';
 import DirektivEditor from '../../../components/editor';
 import FlexBox from '../../../components/flexbox';
@@ -18,6 +16,9 @@ import Pagination, { usePageHandler } from '../../../components/pagination';
 import Tabs from '../../../components/tabs';
 import { CanPreviewMimeType, Config, MimeTypeFileExtension } from '../../../util';
 import { VariableFilePicker } from '../../settings/variables-panel';
+
+import Button2 from '../../../components/buttonv2';
+
 
 const PAGE_SIZE = 10 ;
 
@@ -51,26 +52,27 @@ function AddWorkflowVariablePanel(props) {
         <ContentPanel style={{width: "100%", height: "100%"}}>
             <ContentPanelTitle>
                 <ContentPanelTitleIcon>
-                    <VscVariableGroup/>
+                    <VscVariableGroup />
                 </ContentPanelTitleIcon>
-                <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
+                <FlexBox style={{ display: "flex", alignItems: "center" }} className="gap">
                     <div>
                         Variables
                     </div>
                     <HelpIcon msg={"List of variables for that workflow."} />
                 </FlexBox>
-                <FlexBox className="row gap" >
-                    <FlexBox className="row center" style={{justifyContent: "flex-end"}}>
-                        <SearchBar setSearch={setSearch} style={{height: "26px"}}/>
-                    </FlexBox>
-                    <Modal title="New variable" 
-                        modalStyle={{width: "600px"}}
-                        style={{maxWidth:"42px"}}
+                <SearchBar setSearch={setSearch} style={{ height: "26px" }} />
+                <div>
+                    <Modal title="New variable"
+                        modalStyle={{ width: "600px" }}
+                        style={{ maxWidth: "42px" }}
                         escapeToCancel
                         button={(
-                            <AddValueButton label=" " />
-                        )}  
-                        onClose={()=>{
+                            <VscAdd />
+                        )}
+                        buttonProps={{
+                            auto: true,
+                        }}
+                        onClose={() => {
                             setKeyValue("")
                             setDValue("")
                             setFile(null)
@@ -79,24 +81,24 @@ function AddWorkflowVariablePanel(props) {
                         }}
                         actionButtons={[
                             ButtonDefinition("Add", async () => {
-                                if(document.getElementById("file-picker")){
+                                if (document.getElementById("file-picker")) {
                                     setUploading(true)
                                     await setWorkflowVariable(encodeURIComponent(keyValue), file, mimeType)
                                 } else {
                                     await setWorkflowVariable(encodeURIComponent(keyValue), dValue, mimeType)
                                 }
-                            }, `small ${uploading ? "loading" : ""}`, ()=>{setUploading(false)}, true, false, true),
+                            }, `small ${uploading ? "loading" : ""}`, () => { setUploading(false) }, true, false, true),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light",()=>{}, true, false)
+                            }, "small light", () => { }, true, false)
                         ]}
 
                         requiredFields={[
-                            {tip: "variable key name is required", value: keyValue}
+                            { tip: "variable key name is required", value: keyValue }
                         ]}
                     >
-                        <AddVariablePanel mimeType={mimeType} setMimeType={setMimeType} file={file} setFile={setFile} setKeyValue={setKeyValue} keyValue={keyValue} dValue={dValue} setDValue={setDValue}/>
+                        <AddVariablePanel mimeType={mimeType} setMimeType={setMimeType} file={file} setFile={setFile} setKeyValue={setKeyValue} keyValue={keyValue} dValue={dValue} setDValue={setDValue} />
                     </Modal>
-                    </FlexBox>
+                </div>
             </ContentPanelTitle>
             <ContentPanelBody>
                 {data !== null ?
@@ -225,83 +227,84 @@ function Variable(props) {
             </Tippy>
         </td>
         <td className="muted-text show-variable">
-            {obj.size <= 2500000 ? 
-                <Modal
-                    modalStyle={{height: "90vh",width: "600px"}}
-                    escapeToCancel
-                    style={{
-                        flexDirection: "row-reverse",
-                        marginRight: "8px"
-                    }}
-                    title="View Variable" 
-                    onClose={()=>{
-                        setType("")
-                        setValue("")
-                    }}
-                    onOpen={async ()=>{
-                        let data = await getWorkflowVariable(obj.name)
-                        setType(data.contentType)
-                        setValue(data.data)
-                    }}
-                    button={(
-                        <Button className="light small bold">
-                            <FlexBox className="gap">
+            <FlexBox className="center-x">
+                {obj.size <= 2500000 ? 
+                    <Modal
+                        modalStyle={{height: "90vh",width: "600px"}}
+                        escapeToCancel
+                        style={{
+                            flexDirection: "row-reverse",
+                            marginRight: "8px"
+                        }}
+                        title="View Variable" 
+                        onClose={()=>{
+                            setType("")
+                            setValue("")
+                        }}
+                        onOpen={async ()=>{
+                            let data = await getWorkflowVariable(obj.name)
+                            setType(data.contentType)
+                            setValue(data.data)
+                        }}
+                        button={(
+                            <FlexBox className={"gap"} style={{fontWeight:"bold"}}>
                                 <VscEye className="auto-margin" />
-                                <div>
-                                    Show <span className="hide-600">value</span>
+                                Show <span className="hide-600">value</span>
+                            </FlexBox>
+                        )}
+                        buttonProps={{
+                            color: "light",
+                        }}
+                        actionButtons={
+                            [
+                                ButtonDefinition("Save", async () => {
+                                    await setWorkflowVariable(obj.name, val , mimeType)
+                                }, "small", ()=>{}, true, false),
+                                ButtonDefinition("Cancel", () => {
+                                }, "small light", ()=>{}, true, false)
+                            ]
+                        } 
+                    >
+                        <FlexBox className="col gap" style={{fontSize: "12px",minHeight: "500px"}}>
+                            <FlexBox className="gap" style={{flexGrow: 1}}>
+                                <FlexBox style={{overflow:"hidden"}}>
+                                {CanPreviewMimeType(mimeType) ?   
+                                <AutoSizer>
+                                    {({height, width})=>(
+                                    <DirektivEditor dlang={lang} width={width} dvalue={val} setDValue={setValue} height={height}/>
+                                    )}
+                                </AutoSizer>
+                                :
+                                <div style={{width: "100%", display:"flex", justifyContent: "center", alignItems:"center"}}>
+                                    <p style={{fontSize:"11pt"}}>
+                                        Cannot preview variable with mime-type: {mimeType}
+                                    </p>
                                 </div>
+                                }
+                                </FlexBox>
                             </FlexBox>
-                        </Button>
-                    )}
-                    actionButtons={
-                        [
-                            ButtonDefinition("Save", async () => {
-                                await setWorkflowVariable(obj.name, val , mimeType)
-                            }, "small", ()=>{}, true, false),
-                            ButtonDefinition("Cancel", () => {
-                            }, "small light", ()=>{}, true, false)
-                        ]
-                    } 
-                >
-                    <FlexBox className="col gap" style={{fontSize: "12px",minHeight: "500px"}}>
-                        <FlexBox className="gap" style={{flexGrow: 1}}>
-                            <FlexBox style={{overflow:"hidden"}}>
-                            {CanPreviewMimeType(mimeType) ?   
-                            <AutoSizer>
-                                {({height, width})=>(
-                                <DirektivEditor dlang={lang} width={width} dvalue={val} setDValue={setValue} height={height}/>
-                                )}
-                            </AutoSizer>
-                            :
-                            <div style={{width: "100%", display:"flex", justifyContent: "center", alignItems:"center"}}>
-                                <p style={{fontSize:"11pt"}}>
-                                    Cannot preview variable with mime-type: {mimeType}
-                                </p>
-                            </div>
-                            }
+                            <FlexBox className="gap" style={{flexGrow: 0, flexShrink: 1}}>
+                                <FlexBox>
+                                    <select style={{width:"100%"}} defaultValue={mimeType} onChange={(e)=>setType(e.target.value)}>
+                                        <option value="">Choose a mimetype</option>
+                                        <option value="application/json">json</option>
+                                        <option value="application/yaml">yaml</option>
+                                        <option value="application/x-sh">shell</option>
+                                        <option value="text/plain">plaintext</option>
+                                        <option value="text/html">html</option>
+                                        <option value="text/css">css</option>
+                                    </select>
+                                </FlexBox>
                             </FlexBox>
                         </FlexBox>
-                        <FlexBox className="gap" style={{flexGrow: 0, flexShrink: 1}}>
-                            <FlexBox>
-                                <select style={{width:"100%"}} defaultValue={mimeType} onChange={(e)=>setType(e.target.value)}>
-                                    <option value="">Choose a mimetype</option>
-                                    <option value="application/json">json</option>
-                                    <option value="application/yaml">yaml</option>
-                                    <option value="application/x-sh">shell</option>
-                                    <option value="text/plain">plaintext</option>
-                                    <option value="text/html">html</option>
-                                    <option value="text/css">css</option>
-                                </select>
-                            </FlexBox>
-                        </FlexBox>
-                    </FlexBox>
-                </Modal>:<div style={{textAlign:"center"}}>Cannot show filesize greater than 2.5MiB</div>}
+                    </Modal>:<div style={{textAlign:"center"}}>Cannot show filesize greater than 2.5MiB</div>
+                }
+            </FlexBox>
         </td>
         <td style={{ width: "80px", maxWidth: "80px", textAlign: "center" }}>{fileSize(obj.size)}</td>
         <td style={{ width: "120px", maxWidth: "120px", paddingLeft: "12px" }}> 
-            <FlexBox style={{gap: "2px"}}>
-                <FlexBox>
-                    
+            <FlexBox style={{gap: "2px", justifyContent:"flex-end"}}>
+                <div>
                     {!downloading? 
                     <VariablesDownloadButton onClick={async()=>{
                         setDownloading(true)
@@ -312,7 +315,8 @@ function Variable(props) {
 
                         setDownloading(false)
                     }}/>:<VariablesDownloadingButton />}
-                </FlexBox>
+                </div>
+                <div>
                 <Modal
                     modalStyle={{width: "500px"}}
                     escapeToCancel
@@ -326,6 +330,11 @@ function Variable(props) {
                     button={(
                         <VariablesUploadButton />
                     )}
+                    buttonProps={{
+                        auto: true,
+                        variant: "text",
+                        color:"light"
+                    }}
                     actionButtons={
                         [
                             ButtonDefinition("Upload", async () => {
@@ -345,6 +354,10 @@ function Variable(props) {
                         <VariableFilePicker setMimeType={setType} id="modal-file-picker" file={file} setFile={setFile} />
                     </FlexBox>
                 </Modal>
+                </div>
+                <div>
+
+                
                 <Modal
                     escapeToCancel
                     style={{
@@ -355,6 +368,11 @@ function Variable(props) {
                     button={(
                         <VariablesDeleteButton/>
                     )}
+                    buttonProps={{
+                        auto: true,
+                        variant: "text",
+                        color:"light"
+                    }}
                     actionButtons={
                         [
                             ButtonDefinition("Delete", async () => {
@@ -373,6 +391,7 @@ function Variable(props) {
                     </FlexBox>
                 </FlexBox>
                 </Modal>
+                </div>
             </FlexBox>
         </td>
     </tr>
@@ -391,26 +410,24 @@ function VariablesDownloadButton(props) {
     const {onClick} = props
 
     return (
-        <div onClick={onClick} className="secrets-delete-btn grey-text auto-margin" style={{display: "flex", alignItems: "center", height: "100%"}}>
+        <Button2 onClick={onClick} auto={true} variant={"text"} color={"light"}>
             <VscCloudDownload/>
-        </div>
+        </Button2>
     )
 }
 
 function VariablesDownloadingButton(props) {
 
     return (
-        <div className="secrets-delete-btn grey-text auto-margin" style={{display: "flex", alignItems: "center", height: "100%"}}>
-            <VscLoading style={{animation: "spin 2s linear infinite"}}/>
-        </div>
+        <VscLoading style={{animation: "spin 2s linear infinite"}}/>
     )
 }
 
 
 function VariablesDeleteButton() {
     return (
-        <div className="secrets-delete-btn grey-text auto-margin red-text" style={{display: "flex", alignItems: "center", height: "100%"}}>
-            <VscTrash className="auto-margin"/>
+        <div className="red-text" style={{display: "flex", alignItems: "center", height: "100%"}}>
+            <VscTrash className="auto-margin" />
         </div>
     )
 }

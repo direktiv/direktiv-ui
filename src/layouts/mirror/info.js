@@ -1,15 +1,17 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import './style.css';
 
-import ContentPanel, { ContentPanelBody, ContentPanelHeaderButton, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
-import FlexBox from '../../components/flexbox';
-import { VscAdd, VscCloudUpload, VscTerminal } from 'react-icons/vsc';
-import Modal, { ButtonDefinition } from '../../components/modal';
-import HelpIcon from '../../components/help';
 import Tippy from '@tippyjs/react';
-import { ClientFileUpload } from '../../components/navbar';
+import { VscAdd, VscCloudUpload, VscTerminal } from 'react-icons/vsc';
 import TextareaAutosize from 'react-textarea-autosize';
+import Button2 from '../../components/buttonv2';
+import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
+import FlexBox from '../../components/flexbox';
+import HelpIcon from '../../components/help';
 import HideShowButton from '../../components/hide-show';
+import Modal, { ButtonDefinition } from '../../components/modal';
+import { ClientFileUpload } from '../../components/navbar';
+
 
 export const mirrorSettingInfoMetaInfo = {
     "url": {plainName: "URL", required: true, placeholder: "Enter repository URL", info: `URL to repository. If authentication method is SSH Key a git url must be used e.g. "git@github.com:direktiv/apps-svc.git". All other authentication methods must use HTTP/S urls`},
@@ -259,7 +261,8 @@ export default function MirrorInfoPanel(props) {
                     <FlexBox style={{ flex: "auto", justifyContent: "right", paddingRight: "6px", alignItems: "unset" }}>
                         <Tippy content={mirrorSettingsValidateMsg} disabled={mirrorSettingsValidateMsg === ""} trigger={'mouseenter focus'} zIndex={10}>
                             <div>                            
-                                <ContentPanelHeaderButton className={`${infoPendingChanges && mirrorSettingsValid ? "" : "disabled"}`} style={infoPendingChanges&& mirrorSettingsValid ? {} : { color: "grey" }}>
+                                {/* <ContentPanelHeaderButton className={`${infoPendingChanges && mirrorSettingsValid ? "" : "disabled"}`} style={infoPendingChanges&& mirrorSettingsValid ? {} : { color: "grey" }}> */}
+                                    <Button2 variant='outline' color='info'>
                                     <Modal
                                         escapeToCancel
                                         activeOverlay
@@ -278,6 +281,9 @@ export default function MirrorInfoPanel(props) {
                                                 Update <span className="hide-600">Settings</span>
                                             </div>
                                         )}
+                                        buttonProps={{
+                                            disabled: !infoPendingChanges || !mirrorSettingsValid
+                                        }}
                                         actionButtons={[
                                             ButtonDefinition("Update Settings", async () => {
                                                 let newSettings = {
@@ -380,7 +386,8 @@ export default function MirrorInfoPanel(props) {
                                                 </FlexBox> : <></>}
                                         </FlexBox>
                                     </Modal>
-                                </ContentPanelHeaderButton>
+                                </Button2>
+                                {/* </ContentPanelHeaderButton> */}
                             </div>
                         </Tippy>
                     </FlexBox>

@@ -28,6 +28,16 @@ const theme = createTheme({
         info: {
             main: "#ffffff"
         },
+        light:{
+            main:"rgb(86, 104, 117)"
+        },
+        error:{
+            main:"#ff616d"
+        },
+        terminal: {
+            main: "#355166",
+            light: "#3a5970",
+        }
     },
     components: {
         // Name of the component

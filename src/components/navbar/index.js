@@ -142,20 +142,16 @@ function NewNamespaceBtn(props) {
             escapeToCancel
             modalStyle={{ width: "340px" }}
             button={(
-                <FlexBox className="new-namespace-btn">
-                    <div className="auto-margin">
-                        <FlexBox className="row" style={{ gap: "8px", alignItems: "center" }}>
-                            <FlexBox>
-                                <VscAdd />
-                            </FlexBox>
-                            <FlexBox>
-                                New namespace
-                            </FlexBox>
-                        </FlexBox>
-                    </div>
+                <FlexBox className="gap center">
+                <VscAdd />
+                <span style={{fontSize:"15px", fontWeight:"normal"}}>New namespace</span>
                 </FlexBox>
             )}
-
+            buttonProps={{
+                auto: true,
+                size: "medium",
+                fontSize: "large"
+            }}
             titleIcon={<VscAdd />}
 
             onClose={() => {

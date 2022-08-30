@@ -344,11 +344,7 @@ function WorkingRevision(props) {
                                 </Button>
                             </div>
                             <div style={{display:"flex", flex:1, justifyContent:"center"}}>
-                                { workflow !== oldWf ?
-                                <Button tip={"Requires save"} className="terminal small" disabled={true}>
-                                    Run
-                                </Button>
-                                : <Modal 
+                                <Modal 
                                     style={{ justifyContent: "center" }}
                                     className="run-workflow-modal"
                                     modalStyle={{color: "black", width: "600px", minWidth:"30vw"}}
@@ -387,10 +383,15 @@ function WorkingRevision(props) {
                                         } catch (e){}
                                     }}
                                     button={(
-                                        <Button tip={"Run Workflow"}className="terminal small" disabled={opLoadingStates["IsLoading"]}>
-                                            Run
-                                        </Button>
+                                        <span style={{fontSize:"15px"}}>Run</span>
                                     )}
+                                    buttonProps={{
+                                        variant: "contained",
+                                        disabled: workflow !== oldWf,
+                                        color: "terminal",
+                                        tooltip: "Run Workflow",
+                                        disabledTooltip: "Requires save"
+                                    }}
                                 >
                                     <FlexBox style={{ height: "45vh", minWidth: "250px", minHeight: "160px", overflow:"hidden" }}>
                                         <Tabs
@@ -425,7 +426,7 @@ function WorkingRevision(props) {
                                                 </div>
                                             </FlexBox>)]} />
                                     </FlexBox>
-                                </Modal>}
+                                </Modal>
                             </div>
                             <div style={{ display: "flex", flex: 1, gap: "3px", justifyContent: "flex-end", paddingRight: "10px"}}>
 
@@ -1095,9 +1096,6 @@ function SettingsTab(props) {
                                         </div>
                                         <HelpIcon msg={"Attributes to define the workflow."} />
                                     </FlexBox>
-                                    {/* <ContentPanelHeaderButton>
-                                        + Add
-                                    </ContentPanelHeaderButton> */}
                                 </ContentPanelTitle>
                                 <ContentPanelBody>
                                     <WorkflowAttributes attributes={workflowData.node.attributes} deleteAttributes={deleteAttributes} addAttributes={addAttributes}/>

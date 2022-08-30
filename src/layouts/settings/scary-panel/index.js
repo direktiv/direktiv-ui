@@ -3,7 +3,6 @@ import './style.css';
 import ContentPanel, {ContentPanelTitle, ContentPanelTitleIcon, ContentPanelBody} from '../../../components/content-panel';
 import FlexBox from '../../../components/flexbox';
 import Alert from '../../../components/alert';
-import Button from '../../../components/button';
 import Modal, { ButtonDefinition } from '../../../components/modal';
 import { VscSettingsGear, VscTrash } from 'react-icons/vsc';
 
@@ -59,13 +58,14 @@ function Scary(props) {
                         modalStyle={{width: "360px"}}
                         titleIcon={<VscTrash/>}
                         button={(
-                            <Button className="auto-margin small red" style={{
-                                minWidth: "120px",
-                                textAlign: "center"
-                            }}>
-                                Delete Namespace
-                            </Button>
-                        )}  
+                            <span>Delete Namespace</span>
+                        )}
+                        buttonProps={{
+                            variant: "contained",
+                            color: "error",
+                            tooltip: "Delete Namespace",
+                            disabledTooltip: "Requires save"
+                        }}
                         actionButtons={[
                             ButtonDefinition("Delete", async () => {
                                 await deleteNamespace(namespace)

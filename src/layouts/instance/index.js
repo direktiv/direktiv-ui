@@ -178,9 +178,9 @@ function InstancePage(props) {
                                     Instance Details
                                 </div>
                                 {label} 
-                                <FlexBox className="row center-y gap" style={{justifyContent: "flex-end", marginRight:"8px"}}>
+                                <FlexBox className="row center-y gap" style={{justifyContent: "flex-end"}}>
                                     { data.status === "running" || data.status === "pending" ? 
-                                    <Button className="small light" style={{marginRight: "8px"}} onClick={() => {
+                                    <Button className="small light" onClick={() => {
                                         cancelInstance()
                                         setLoad(true)
                                     }}>
@@ -222,7 +222,7 @@ function InstancePage(props) {
                                 <div>
                                 Input
                                 </div>
-                                <FlexBox className="row center-y gap" style={{ justifyContent: "flex-end", marginRight: "8px" }}>
+                                <FlexBox className="row center-y gap" style={{ justifyContent: "flex-end"}}>
                                     <Button tip={onlyShow ? "Collapse Window" : "Expand Window"} className="small light black" onClick={() => toggleFullscreen("input")}>
                                         <FlexBox className="col center" style={{ fontSize: "15px" }} >
                                             {onlyShow ? <VscScreenNormal /> : <VscScreenFull />}
@@ -275,7 +275,7 @@ function InstancePage(props) {
                                 <div>
                                 Output
                                 </div>
-                                <FlexBox className="row center-y gap" style={{ justifyContent: "flex-end", marginRight: "8px" }}>
+                                <FlexBox className="row center-y gap" style={{ justifyContent: "flex-end"}}>
                                     <Button tip={onlyShow ? "Collapse Window" : "Expand Window"} className="small light black" onClick={() => toggleFullscreen("output")}>
                                         <FlexBox className="col center" style={{ fontSize: "15px" }} >
                                             {onlyShow ? <VscScreenNormal /> : <VscScreenFull />}

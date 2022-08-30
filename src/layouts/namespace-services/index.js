@@ -9,12 +9,13 @@ import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIco
 import FlexBox from "../../components/flexbox";
 import { Config, GenerateRandomKey } from "../../util";
 import Modal, { ButtonDefinition, KeyDownDefinition } from "../../components/modal";
-import AddValueButton from "../../components/add-button";
 import {Link} from 'react-router-dom'
 import HelpIcon from "../../components/help"
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
-import Button from "../../components/button";
+
+import { VscAdd } from 'react-icons/vsc';
+
 
 export default function ServicesPanel(props) {
     const {namespace} = props
@@ -134,8 +135,11 @@ function NamespaceServices(props) {
                         setCmd("")
                     }}
                     button={(
-                        <AddValueButton  label=" " />
-                    )}  
+                        <VscAdd/>
+                    )}
+                    buttonProps={{
+                        auto: true,
+                    }}
                     keyDownActions={[
                         KeyDownDefinition("Enter", async () => {
                         }, ()=>{}, true)
@@ -283,10 +287,11 @@ export function Service(props) {
                                 <VscRefresh />
                             )}
                             button={(
-                                <Button className="light small">
-                                    <VscRefresh className="grey-text" style={{ fontSize: "16px" }} />
-                                </Button>
+                                <VscRefresh className="grey-text" style={{ fontSize: "16px" }} />
                             )}
+                            buttonProps={{
+                                auto: true,
+                            }}
                             actionButtons={[
                                 ButtonDefinition(
                                     "Yes", 

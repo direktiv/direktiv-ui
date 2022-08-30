@@ -5,7 +5,6 @@ import { useCallback, useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { VscCloudDownload, VscCloudUpload, VscEye, VscLoading, VscTrash, VscVariableGroup } from 'react-icons/vsc';
 import { AutoSizer } from 'react-virtualized';
-import AddValueButton from '../../../components/add-button';
 import Button from '../../../components/button';
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from '../../../components/content-panel';
 import DirektivEditor from '../../../components/editor';
@@ -17,6 +16,9 @@ import Tabs from '../../../components/tabs';
 import { CanPreviewMimeType, Config, MimeTypeFileExtension } from '../../../util';
 import { SearchBar } from '../../explorer';
 import './style.css';
+
+import { VscAdd } from 'react-icons/vsc';
+
 
 const PAGE_SIZE = 10 ;
 
@@ -46,30 +48,31 @@ function VariablesPanel(props){
     }
 
     return (
-        <ContentPanel style={{width: "100%"}}>
+        <ContentPanel style={{ width: "100%" }}>
             <ContentPanelTitle>
                 <ContentPanelTitleIcon>
-                    <VscVariableGroup/>
+                    <VscVariableGroup />
                 </ContentPanelTitleIcon>
-                <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
+                <FlexBox style={{ display: "flex", alignItems: "center" }} className="gap">
                     <div>
                         Variables
                     </div>
                     <HelpIcon msg={"Unencrypted key/value pairs that can be referenced within workflows."} />
                 </FlexBox>
-                <FlexBox className="row gap" >
-                    <FlexBox className="row center" style={{justifyContent: "flex-end"}}>
-                        <SearchBar setSearch={setSearch} style={{height: "26px"}}/>
-                    </FlexBox>
-                    <Modal title="New variable" 
-                        modalStyle={{width: "600px"}}
-                        style={{maxWidth:"42px"}}
+                <SearchBar setSearch={setSearch} style={{ height: "25px" }} />
+                <div>
+                    <Modal title="New variable"
+                        modalStyle={{ width: "600px" }}
+                        style={{ maxWidth: "42px" }}
                         escapeToCancel
-                        titleIcon={<VscVariableGroup/>}
+                        titleIcon={<VscVariableGroup />}
                         button={(
-                            <AddValueButton label=" " />
-                        )}  
-                        onClose={()=>{
+                            <VscAdd />
+                        )}
+                        buttonProps={{
+                            auto: true,
+                        }}
+                        onClose={() => {
                             setKeyValue("")
                             setDValue("")
                             setFile(null)
@@ -77,21 +80,21 @@ function VariablesPanel(props){
                             setMimeType("application/json")
                         }}
                         requiredFields={[
-                            {tip: "variable key name is required", value: keyValue}
+                            { tip: "variable key name is required", value: keyValue }
                         ]}
                         actionButtons={[
                             ButtonDefinition("Add", async () => {
-                                if(document.getElementById("file-picker")){
+                                if (document.getElementById("file-picker")) {
                                     setUploading(true)
-                                    if(keyValue.trim() === "") {
+                                    if (keyValue.trim() === "") {
                                         throw new Error("Variable key name needs to be provided.")
                                     }
-                                    if(!file) {
+                                    if (!file) {
                                         throw new Error("Variable file needs to be provided.")
                                     }
                                     await setNamespaceVariable(encodeURIComponent(keyValue), file, mimeType)
                                 } else {
-                                    if(keyValue.trim() === "") {
+                                    if (keyValue.trim() === "") {
                                         throw new Error("Variable key name needs to be provided.")
                                     }
                                     if (mimeType === "") {
@@ -99,25 +102,25 @@ function VariablesPanel(props){
                                     }
                                     await setNamespaceVariable(encodeURIComponent(keyValue), dValue, mimeType)
                                 }
-                            }, `small ${uploading ? "loading" : ""}`, ()=>{setUploading(false)}, true, false, true),
+                            }, `small ${uploading ? "loading" : ""}`, () => { setUploading(false) }, true, false, true),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light", ()=>{}, true, false)
+                            }, "small light", () => { }, true, false)
                         ]}
                     >
-                        <AddVariablePanel mimeType={mimeType} setMimeType={setMimeType} file={file} setFile={setFile} setKeyValue={setKeyValue} keyValue={keyValue} dValue={dValue} setDValue={setDValue}/>
+                        <AddVariablePanel mimeType={mimeType} setMimeType={setMimeType} file={file} setFile={setFile} setKeyValue={setKeyValue} keyValue={keyValue} dValue={dValue} setDValue={setDValue} />
                     </Modal>
-                </FlexBox>
+                </div>
             </ContentPanelTitle>
-            <ContentPanelBody style={{minHeight:"180px"}}>
+            <ContentPanelBody style={{ minHeight: "180px" }}>
                 {data !== null ?
-                <FlexBox className="col" style={{justifyContent:"space-between"}}>
-                    <div>
-                    <Variables namespace={namespace} deleteNamespaceVariable={deleteNamespaceVariable} setNamespaceVariable={setNamespaceVariable} getNamespaceVariable={getNamespaceVariable} variables={data} getNamespaceVariableBlob={getNamespaceVariableBlob}/>
-                    </div>
-                    <FlexBox className="row" style={{justifyContent:"flex-end", paddingBottom:"1em", flexGrow: 0}}>
-                        <Pagination pageHandler={pageHandler} pageInfo={pageInfo}/>
-                    </FlexBox>
-                </FlexBox>:<></>}
+                    <FlexBox className="col" style={{ justifyContent: "space-between" }}>
+                        <div>
+                            <Variables namespace={namespace} deleteNamespaceVariable={deleteNamespaceVariable} setNamespaceVariable={setNamespaceVariable} getNamespaceVariable={getNamespaceVariable} variables={data} getNamespaceVariableBlob={getNamespaceVariableBlob} />
+                        </div>
+                        <FlexBox className="row" style={{ justifyContent: "flex-end", paddingBottom: "1em", flexGrow: 0 }}>
+                            <Pagination pageHandler={pageHandler} pageInfo={pageInfo} />
+                        </FlexBox>
+                    </FlexBox> : <></>}
             </ContentPanelBody>
         </ContentPanel>
     )

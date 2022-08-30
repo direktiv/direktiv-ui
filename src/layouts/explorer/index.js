@@ -13,7 +13,7 @@ import { useNavigate, useParams } from 'react-router';
 import { Link, useSearchParams } from 'react-router-dom';
 import { AutoSizer } from 'react-virtualized';
 import Button from '../../components/button';
-import ContentPanel, { ContentPanelBody, ContentPanelHeaderButton, ContentPanelHeaderButtonIcon, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
+import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
 import DirektivEditor from '../../components/editor';
 import FlexBox from '../../components/flexbox';
 import HelpIcon from "../../components/help";
@@ -348,7 +348,7 @@ function ExplorerList(props) {
                     </div>
                     <HelpIcon msg={"Directory/workflow browser."} />
                 </FlexBox>
-                <FlexBox className="gap center-y" style={{flexDirection: "row-reverse", paddingRight:"16px"}}>
+                <FlexBox className="gap center-y" style={{flexDirection: "row-reverse"}}>
                         <Modal title="New Workflow" 
                             modalStyle={{width: "600px"}}
                             escapeToCancel

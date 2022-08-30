@@ -1,16 +1,16 @@
-import React, {useEffect, useState} from 'react';
-import './style.css';
+import { useEffect, useState } from 'react';
+import ContentPanel, { ContentPanelBody, ContentPanelFooter, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
 import Button from '../button';
-import ContentPanel, {ContentPanelTitle, ContentPanelBody, ContentPanelTitleIcon, ContentPanelFooter} from '../../components/content-panel';
+import './style.css';
 
 import { VscDiffAdded } from 'react-icons/vsc';
 
-import FlexBox from '../flexbox';
-import Alert from '../alert';
 import { VscClose } from 'react-icons/vsc';
+import Alert from '../alert';
+import FlexBox from '../flexbox';
 
 import Tippy from '@tippyjs/react';
-import 'tippy.js/dist/tippy.css'
+import 'tippy.js/dist/tippy.css';
 
 import Button2 from '../../components/buttonv2';
 
@@ -68,7 +68,7 @@ export function ModalHeadless(props) {
 function Modal(props) {
 
     let {maximised, noPadding, titleIcon, title, children, button, buttonProps, withCloseButton, activeOverlay, label, buttonDisabled} = props;
-    let {modalStyle, style, btnStyle, actionButtons, keyDownActions, escapeToCancel, onClose, onOpen, requiredFields } = props;
+    let {modalStyle, style, actionButtons, keyDownActions, escapeToCancel, onClose, onOpen, requiredFields } = props;
     const [visible, setVisible] = useState(false);
     if (!button) {
         return(
@@ -134,7 +134,7 @@ function Modal(props) {
             }
             setVisible(true)
             ev.stopPropagation()
-        }} variant={"outlined"} color="info" {...buttonProps} >
+        }} variant={"outlined"} color="info" {...buttonProps}>
            {button}
         </Button2>
         {/* <FlexBox style={{...style}}>

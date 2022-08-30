@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import Button from '../../../components/button';
 import {HiOutlineTrash} from 'react-icons/hi';
-import ContentPanel, { ContentPanelBody, ContentPanelHeaderButtonIcon, ContentPanelTitle, ContentPanelTitleIcon } from '../../../components/content-panel';
+import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from '../../../components/content-panel';
 import FlexBox from '../../../components/flexbox';
 import {GenerateRandomKey} from '../../../util';
 import {BiChevronLeft} from 'react-icons/bi';
@@ -360,12 +360,10 @@ export function RevisionSelectorTab(props) {
                 <Modal
                     titleIcon={<VscCode/>}
                     button={
-                        <Button className="small light" style={{ display: "flex", minWidth: "120px" }}>
-                            <ContentPanelHeaderButtonIcon>
-                                <VscCode style={{ maxHeight: "12px", marginRight: "4px" }} />
-                            </ContentPanelHeaderButtonIcon>
+                        <>
+                            <VscCode style={{ maxHeight: "12px", marginRight: "4px" }} />
                             API Commands
-                        </Button>
+                        </>
                     }
                     escapeToCancel
                     withCloseButton
