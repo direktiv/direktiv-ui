@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import ContentPanel, {ContentPanelTitle, ContentPanelTitleIcon, ContentPanelBody } from '../../components/content-panel';
 import Modal, { ButtonDefinition, KeyDownDefinition } from '../../components/modal';
-import AddValueButton from '../../components/add-button';
 import FlexBox from '../../components/flexbox';
 import Alert from '../../components/alert';
 import { useGlobalRegistries, useGlobalPrivateRegistries } from 'direktiv-react-hooks';
@@ -9,6 +8,7 @@ import {AddRegistryPanel, Registries, TestRegistry} from '../settings/registries
 import { Config } from '../../util';
 import HelpIcon from '../../components/help';
 import { VscAdd, VscServer } from 'react-icons/vsc';
+
 
 
 export default function GlobalRegistriesPanel(){
@@ -62,8 +62,11 @@ export function GlobalRegistries(){
                             minWidth: "450px"
                         }}
                         button={(
-                            <AddValueButton label=" " />
-                        )} 
+                            <VscAdd/>
+                        )}
+                        buttonProps={{
+                            auto: true,
+                        }}
                         onClose={()=>{
                             setURL("")
                             setToken("")
@@ -92,7 +95,7 @@ export function GlobalRegistries(){
                             ButtonDefinition("Add", async() => {
                                     await createRegistry(url, `${username}:${token}`)
                                     await  getRegistries()
-                            }, "small", ()=>{}, true, false, true),
+                            }, {variant: "contained", color: "primary"}, ()=>{}, true, false, true),
                             ButtonDefinition("Test Connection", async () => {
                                 setURLErr("")
                                 setTokenErr("")
@@ -126,7 +129,7 @@ export function GlobalRegistries(){
                             }, `small ${testConnLoading ? "loading" : ""}`, ()=>{   setTestConnLoading(false)
                                 setSuccessFeedback(false)}, false, false, true),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light", ()=>{},true, false)
+                            }, {}, ()=>{},true, false)
                         ]}
                     >
                         <AddRegistryPanel err={err} token={token} setToken={setToken} username={username} setUsername={setUsername} url={url} setURL={setURL} successMsg={successFeedback} urlErr={urlErr} userErr={userErr} tokenErr={tokenErr} />    
@@ -190,8 +193,11 @@ export function GlobalPrivateRegistries(){
                             minWidth: "450px"
                         }}
                         button={(
-                            <AddValueButton label=" " />
-                        )} 
+                            <VscAdd/>
+                        )}
+                        buttonProps={{
+                            auto: true,
+                        }}
                         onClose={()=>{
                             setURL("")
                             setToken("")
@@ -214,7 +220,7 @@ export function GlobalPrivateRegistries(){
                             ButtonDefinition("Add", async() => {
                                     await createRegistry(url, `${username}:${token}`)
                                     await  getRegistries()
-                            }, "small", ()=>{}, true, false, true),
+                            }, {variant: "contained", color: "primary"}, ()=>{}, true, false, true),
                             ButtonDefinition("Test Connection", async () => {
                                 setURLErr("")
                                 setTokenErr("")
@@ -245,10 +251,10 @@ export function GlobalPrivateRegistries(){
                                     setErr(resp.message)                                
                                 }
                            
-                            }, `small ${testConnLoading ? "loading" : ""}`, ()=>{   setTestConnLoading(false)
+                            }, {variant: "contained", color: "primary"}, ()=>{   setTestConnLoading(false)
                                 setSuccessFeedback(false)}, false, false, true),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light", ()=>{}, true, false)
+                            }, {}, ()=>{}, true, false)
                         ]}
                     >
                         <AddRegistryPanel err={err} token={token} setToken={setToken} username={username} setUsername={setUsername} url={url} setURL={setURL} successMsg={successFeedback} urlErr={urlErr} userErr={userErr} tokenErr={tokenErr} />    

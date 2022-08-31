@@ -1,7 +1,6 @@
 import { useJQPlayground } from 'direktiv-react-hooks';
 import { useCallback, useEffect, useState } from 'react';
 import { VscFileCode, VscArrowRight } from 'react-icons/vsc';
-import Button from '../../components/button';
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
 import DirektivEditor from '../../components/editor';
 import Alert from '../../components/alert';
@@ -9,6 +8,7 @@ import FlexBox from '../../components/flexbox';
 import HelpIcon from '../../components/help';
 import { Config } from '../../util';
 import './style.css';
+import Button from '../../components/button';
 
 
 export default function JQPlayground() {
@@ -100,14 +100,16 @@ function HowToJQ(){
                             <div>
                                 For information on the JQ syntax, please refer to the offical JQ manual online.
                             </div>
-                            <Button className="small light bold shadow">
-                                <FlexBox className="gap">
-                                    <VscArrowRight className="auto-margin" />
-                                    <a href="https://stedolan.github.io/jq/manual/">
-                                        View JQ Manual
-                                    </a>
-                                </FlexBox>
-                            </Button>
+                            <div>
+                                <Button variant='outlined' color="info">
+                                    <FlexBox className="gap">
+                                        <VscArrowRight className="auto-margin" />
+                                        <a href="https://stedolan.github.io/jq/manual/">
+                                            View JQ Manual
+                                        </a>
+                                    </FlexBox>
+                                </Button>
+                            </div>
                         </FlexBox>
                     </ContentPanelBody>
             </ContentPanel>
@@ -158,7 +160,7 @@ function ExamplesJQ(props){
                                                 {obj.tip}
                                             </td>
                                             <td style={{ width: "20%"}} onClick={()=>loadJQ(obj.filter, obj.json)}>
-                                                <Button className="small light bold shadow">
+                                                <Button variant='outlined' color="info">
                                                     <FlexBox className="gap">
                                                         <VscFileCode className="auto-margin" />
                                                         <div>
@@ -185,7 +187,7 @@ function ExamplesJQ(props){
                                                 {obj.tip}
                                             </td>
                                             <td style={{ width: "20%"}} onClick={()=>loadJQ(obj.filter, obj.json)}>
-                                                <Button className="small light bold shadow">
+                                                <Button variant='outlined' color="info">
                                                     <FlexBox className="gap">
                                                         <VscFileCode className="auto-margin" />
                                                         <div>
@@ -302,13 +304,12 @@ function JQFilter(props) {
                     </FlexBox>
                 </ContentPanelTitle>
                 <ContentPanelBody >
-                    <FlexBox className="gap wrap" style={{height:"40px"}}>
+                    <FlexBox className="gap wrap center-y" style={{height:"40px"}}>
                         <FlexBox style={{fontSize: "12pt"}} >
                             <input style={{height:"28px", width:"100%"}} onChange={(e)=>setFilter(e.target.value)} value={query} placeholder={"Enter a Filter to JQ on"} type="text" />
                         </FlexBox>
                         <FlexBox style={{maxWidth:"65px"}}>
-                             
-                            <Button className="small" onClick={()=>execute()}>
+                            <Button onClick={()=>execute()}>
                                 Execute
                             </Button>
                         </FlexBox>

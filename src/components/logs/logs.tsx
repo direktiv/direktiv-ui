@@ -212,7 +212,7 @@ export function LogFooterButtons({ follow, setFollow, wordWrap, setWordWrap, dat
     return (
         <>
 
-            <Button className="small terminal" onClick={() => {
+            <Button color="terminal" variant="contained" onClick={() => {
                 if (clipData) {
                     copyTextToClipboard(clipData)
                 } else {
@@ -225,7 +225,7 @@ export function LogFooterButtons({ follow, setFollow, wordWrap, setWordWrap, dat
             </Button>
             {
                 follow !== undefined && setFollow !== undefined ?
-                    <Button className="small terminal" onClick={() => setFollow(!follow)}>
+                    <Button color="terminal" variant="contained" onClick={() => setFollow(!follow)}>
                         <FlexBox className="row center gap-sm">
                             {follow ? <><VscEyeClosed /> Stop <span className='hide-1000'>watching</span></> :
                                 <><VscEye /> Follow <span className='hide-1000'>logs</span></>}
@@ -236,7 +236,7 @@ export function LogFooterButtons({ follow, setFollow, wordWrap, setWordWrap, dat
             }
             {
                 wordWrap !== undefined && setWordWrap !== undefined ?
-                    <Button className="small terminal" tip={wordWrap ? "Disable word wrapping" : "Enable word wrapping"} onClick={() => {
+                    <Button color="terminal" variant="contained" tooltip={wordWrap ? "Disable word wrapping" : "Enable word wrapping"} onClick={() => {
                         setWordWrap(!wordWrap)
                     }}>
                         <FlexBox className="row center gap-sm">

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import './style.css';
-import AddValueButton from '../../../components/add-button';
 import ContentPanel, {ContentPanelTitle, ContentPanelTitleIcon, ContentPanelBody } from '../../../components/content-panel';
 import {VscLock, VscTrash} from 'react-icons/vsc'
 import Modal, {ButtonDefinition} from '../../../components/modal';
@@ -13,6 +12,8 @@ import HelpIcon from '../../../components/help';
 import Tabs from '../../../components/tabs'
 import DirektivEditor from '../../../components/editor';
 import { AutoSizer } from 'react-virtualized';
+
+import { VscAdd } from 'react-icons/vsc';
 
 
 
@@ -52,8 +53,11 @@ function SecretsPanel(props){
                         }}
                         
                         button={(
-                            <AddValueButton label=" " />
-                        )}                         
+                            <VscAdd/>
+                        )}
+                        buttonProps={{
+                            auto: true,
+                        }}
                         actionButtons={[
                             ButtonDefinition("Add", async () => {
                                 if(document.getElementById("file-picker")){
@@ -74,9 +78,9 @@ function SecretsPanel(props){
                                     await createSecret(keyValue, vValue)
                                 }
                                 await  getSecrets()
-                            }, "small",()=>{}, true, false, true),
+                            }, {variant: "contained", color: "primary"},()=>{}, true, false, true),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light",()=>{}, true, false)
+                            }, {},()=>{}, true, false)
                         ]}
                         requiredFields={[
                             { tip: "secret key is required", value: keyValue }
@@ -185,9 +189,9 @@ function Secrets(props) {
                                                 ButtonDefinition("Delete", async () => {
                                                     await deleteSecret(obj.name)
                                                     await getSecrets()
-                                                }, "small red",()=>{}, true, false),
+                                                }, {variant: "contained", color: "error"},()=>{}, true, false),
                                                 ButtonDefinition("Cancel", () => {
-                                                }, "small light",()=>{}, true, false)
+                                                }, {},()=>{}, true, false)
                                             ]
                                         }   
                                     >

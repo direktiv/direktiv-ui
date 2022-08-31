@@ -5,9 +5,11 @@ import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIco
 import FlexBox from "../../components/flexbox";
 import { Config, GenerateRandomKey } from "../../util";
 import Modal, { ButtonDefinition, KeyDownDefinition } from "../../components/modal";
-import AddValueButton from "../../components/add-button";
 import { VscLayers } from 'react-icons/vsc';
 import HelpIcon from "../../components/help"
+
+import { VscAdd } from 'react-icons/vsc';
+
 
 export default function GlobalServicesPanel(props) {
     const {data, err, config, createGlobalService, getConfig, getGlobalServices, deleteGlobalService} = useGlobalServices(Config.url, true, localStorage.getItem("apikey"))
@@ -68,8 +70,11 @@ export default function GlobalServicesPanel(props) {
                             setCmd("")
                         }}
                         button={(
-                            <AddValueButton  label=" " />
-                        )}  
+                            <VscAdd/>
+                        )}
+                        buttonProps={{
+                            auto: true,
+                        }}
                         keyDownActions={[
                             KeyDownDefinition("Enter", async () => {
                             }, ()=>{}, true)
@@ -77,9 +82,9 @@ export default function GlobalServicesPanel(props) {
                         actionButtons={[
                             ButtonDefinition("Add", async () => {
                                     await createGlobalService(serviceName, image, parseInt(scale), parseInt(size), cmd)
-                            }, "small", ()=>{}, true, false),
+                            }, {variant: "contained", color: "primary"}, ()=>{}, true, false),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light", ()=>{}, true, false)
+                            }, {}, ()=>{}, true, false)
                         ]}
                     >
                         {config !== null ? 

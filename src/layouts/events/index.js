@@ -2,8 +2,7 @@ import { useEvents } from 'direktiv-react-hooks';
 import { useState } from 'react';
 import { VscCloud, VscDebugStepInto, VscPlay } from 'react-icons/vsc';
 import { AutoSizer } from 'react-virtualized';
-import Button from '../../components/button';
-import ContentPanel, { ContentPanelBody, ContentPanelHeaderButton, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
+import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
 import DirektivEditor from '../../components/editor';
 import FlexBox from '../../components/flexbox';
 import HelpIcon from "../../components/help";
@@ -100,61 +99,71 @@ function EventsPage(props) {
                                                         </td>
                                                         <td style={{ textAlign: 'center', justifyContent: "center", }}>
                                                             <FlexBox className={"gap center"}>
-                                                                <Modal
-                                                                    className="run-workflow-modal"
-                                                                    style={{ justifyContent: "flex-end" }}
-                                                                    modalStyle={{ color: "black", width: "360px" }}
-                                                                    title="Retrigger Event"
-                                                                    onClose={() => {
-                                                                    }}
-                                                                    btnStyle={{ width: "unset" }}
-                                                                    button={
-                                                                        <Button className="small light bold" tip="Retrigger Event">
-                                                                            <VscPlay /> <span className='hide-800'>Retrigger</span>
-                                                                        </Button>
-                                                                    }
-                                                                    actionButtons={[
-                                                                        ButtonDefinition("Retrigger", async () => {
-                                                                            await replayEvent(obj.id)
-                                                                        }, "small", () => { }, true, true),
-                                                                        ButtonDefinition("Cancel", async () => {
-                                                                        }, "small light", () => { }, true, false)
-                                                                    ]}
-                                                                >
-                                                                    <FlexBox style={{ overflow: "hidden" }}>
-                                                                        Are you sure you want to retrigger {obj.id}?
-                                                                    </FlexBox>
-                                                                </Modal>
-                                                                <Modal
-                                                                    className="run-workflow-modal"
-                                                                    modalStyle={{ color: "black", minWidth: "360px", width: "50vw", height: "40vh", minHeight: "680px" }}
-                                                                    title="View Event"
-                                                                    onClose={() => {
-                                                                    }}
-                                                                    btnStyle={{ width: "unset" }}
-                                                                    button={
-                                                                        <Button className="small light bold">
-                                                                            View
-                                                                        </Button>}
-                                                                    actionButtons={[
-                                                                        ButtonDefinition("Close", async () => {
-                                                                        }, "small light", () => { }, true, false)
-                                                                    ]}
-                                                                >
-                                                                    <FlexBox className="col" style={{ overflow: "hidden" }}>
-                                                                        <AutoSizer>
-                                                                            {({ height, width }) => (
-                                                                                <DirektivEditor noBorderRadius value={atob(obj.cloudevent)} readonly={true} dlang="plaintext"
-                                                                                    options={{
-                                                                                        autoLayout: true
-                                                                                    }}
-                                                                                    width={width}
-                                                                                    height={height}
-                                                                                />
-                                                                            )}
-                                                                        </AutoSizer>
-                                                                    </FlexBox>
-                                                                </Modal>
+                                                                <div>
+                                                                    <Modal
+                                                                        className="run-workflow-modal"
+                                                                        style={{ justifyContent: "flex-end" }}
+                                                                        modalStyle={{ color: "black", width: "360px" }}
+                                                                        title="Retrigger Event"
+                                                                        onClose={() => {
+                                                                        }}
+                                                                        button={
+                                                                            <>
+                                                                                <VscPlay /> <span className='hide-800'>Retrigger</span>
+                                                                            </>
+                                                                        }
+                                                                        buttonProps={{
+                                                                            auto: true,
+                                                                            color: "info"
+                                                                        }}
+                                                                        actionButtons={[
+                                                                            ButtonDefinition("Retrigger", async () => {
+                                                                                await replayEvent(obj.id)
+                                                                            }, {variant: "contained", color: "primary"}, () => { }, true, true),
+                                                                            ButtonDefinition("Cancel", async () => {
+                                                                            }, {}, () => { }, true, false)
+                                                                        ]}
+                                                                    >
+                                                                        <FlexBox style={{ overflow: "hidden" }}>
+                                                                            Are you sure you want to retrigger {obj.id}?
+                                                                        </FlexBox>
+                                                                    </Modal>
+                                                                </div>
+                                                                <div>
+                                                                    <Modal
+                                                                        className="run-workflow-modal"
+                                                                        modalStyle={{ color: "black", minWidth: "360px", width: "50vw", height: "40vh", minHeight: "680px" }}
+                                                                        title="View Event"
+                                                                        onClose={() => {
+                                                                        }}
+                                                                        btnStyle={{ width: "unset" }}
+                                                                        button={
+                                                                                <span>View</span>
+                                                                        }
+                                                                        buttonProps={{
+                                                                            auto: true,
+                                                                            color: "info"
+                                                                        }}
+                                                                        actionButtons={[
+                                                                            ButtonDefinition("Close", async () => {
+                                                                            }, {}, () => { }, true, false)
+                                                                        ]}
+                                                                    >
+                                                                        <FlexBox className="col" style={{ overflow: "hidden" }}>
+                                                                            <AutoSizer>
+                                                                                {({ height, width }) => (
+                                                                                    <DirektivEditor noBorderRadius value={atob(obj.cloudevent)} readonly={true} dlang="plaintext"
+                                                                                        options={{
+                                                                                            autoLayout: true
+                                                                                        }}
+                                                                                        width={width}
+                                                                                        height={height}
+                                                                                    />
+                                                                                )}
+                                                                            </AutoSizer>
+                                                                        </FlexBox>
+                                                                    </Modal>
+                                                                </div>
                                                             </FlexBox>
                                                         </td>
                                                     </tr>
@@ -275,17 +284,13 @@ function SendEventModal(props) {
         <Modal
             title="Send New Event"
             button={(
-                <ContentPanelHeaderButton>
-                    <div>
-                        Send New Event
-                    </div>
-                </ContentPanelHeaderButton>
+                <span>Send New Event</span>
             )}
             actionButtons={[
                 ButtonDefinition("Send", async () => {
                     await sendEvent(eventData)
-                }, "small", ()=>{}, true, false),
-                ButtonDefinition("Cancel", () => {}, "small light", ()=>{}, true, false)
+                }, {variant: "contained", color: "primary"}, ()=>{}, true, false),
+                ButtonDefinition("Cancel", () => {}, {}, ()=>{}, true, false)
             ]}
             noPadding
         >

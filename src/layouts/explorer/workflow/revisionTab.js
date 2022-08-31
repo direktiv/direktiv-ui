@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import Button from '../../../components/button';
 import {HiOutlineTrash} from 'react-icons/hi';
-import ContentPanel, { ContentPanelBody, ContentPanelHeaderButtonIcon, ContentPanelTitle, ContentPanelTitleIcon } from '../../../components/content-panel';
+import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from '../../../components/content-panel';
 import FlexBox from '../../../components/flexbox';
 import {GenerateRandomKey} from '../../../util';
 import {BiChevronLeft} from 'react-icons/bi';
@@ -69,7 +69,7 @@ function RevisionTab(props) {
                         setSearchParams({
                             tab: searchParams.get('tab')
                         })
-                    }} className="small light" style={{ minWidth: "160px", maxWidth: "160px" }}>
+                    }} variant="outlined" color="info" >
                         <FlexBox className="gap" style={{ alignItems: "center", justifyContent: "center" }}>
                             <BiChevronLeft style={{ fontSize: "16px" }} />
                             <div>Back to All Revisions</div>
@@ -121,9 +121,9 @@ function RevisionTab(props) {
                                                     } else {
                                                         navigate(`/n/${namespace}/instances/${r}`)
                                                     }
-                                                }, `small ${tabIndex === 1 && workflowJSONSchema === null ? "disabled" : ""}`, ()=>{}, tabIndex === 0, false),
+                                                }, {variant: "contained", color: "primary", disabled: tabIndex === 1 && workflowJSONSchema === null}, ()=>{}, tabIndex === 0, false),
                                                 ButtonDefinition("Cancel", async () => {
-                                                }, "small light", ()=>{}, true, false)
+                                                }, {}, ()=>{}, true, false)
                                             ]}
                                             onOpen={()=>{
                                                 let wfObj =  YAML.load(workflow)
@@ -133,10 +133,13 @@ function RevisionTab(props) {
                                                 }
                                             }}
                                             button={(
-                                                <div style={{alignItems:"center", gap:"3px",backgroundColor:"#355166", paddingTop:"3px", paddingBottom:"3px", paddingLeft:"6px", paddingRight:"6px", cursor:"pointer", borderRadius:"3px"}}>
-                                                    Run
-                                                </div>
+                                                <span style={{fontSize:"15px"}}>Run</span>
                                             )}
+                                            buttonProps={{
+                                                variant: "contained",
+                                                color: "terminal",
+                                                tooltip: "Run Workflow"
+                                            }}
                                         >
                                         <FlexBox style={{ height: "45vh", minWidth: "250px", minHeight: "160px", overflow:"hidden" }}>
                                             <Tabs
@@ -360,12 +363,10 @@ export function RevisionSelectorTab(props) {
                 <Modal
                     titleIcon={<VscCode/>}
                     button={
-                        <Button className="small light" style={{ display: "flex", minWidth: "120px" }}>
-                            <ContentPanelHeaderButtonIcon>
-                                <VscCode style={{ maxHeight: "12px", marginRight: "4px" }} />
-                            </ContentPanelHeaderButtonIcon>
+                        <>
+                            <VscCode style={{ maxHeight: "12px", marginRight: "4px" }} />
                             API Commands
-                        </Button>
+                        </>
                     }
                     escapeToCancel
                     withCloseButton
@@ -438,9 +439,7 @@ export function RevisionSelectorTab(props) {
                                                     }}
                                                     title="Remove a Tag"
                                                     button={(
-                                                        <Button className="small light bold" title="Remove Tag" >
-                                                            <HiOutlineTrash className="red-text" style={{ fontSize: "16px" }} />
-                                                        </Button>
+                                                        <HiOutlineTrash className="red-text" style={{ fontSize: "16px" }} />
                                                     )}
                                                     actionButtons={
                                                         [
@@ -450,9 +449,9 @@ export function RevisionSelectorTab(props) {
                                                                 let revResp = await getRevisions()
                                                                 setRevisions(revResp.results)
                                                                 updateTags(tagsResp.results)
-                                                            }, "small red", ()=>{}, true, false),
+                                                            }, {variant: "contained", color: "error"}, ()=>{}, true, false),
                                                             ButtonDefinition("Cancel", () => {
-                                                            }, "small light", ()=>{}, true, false)
+                                                            }, {}, ()=>{}, true, false)
                                                         ]
                                                     }
                                                 >
@@ -471,10 +470,12 @@ export function RevisionSelectorTab(props) {
                                                     modalStyle={{width: "400px"}}
                                                     title="Delete a revision"
                                                     button={(
-                                                        <Button className="small light bold" tip="Remove Tag">
-                                                            <HiOutlineTrash className="red-text" style={{ fontSize: "16px" }} />
-                                                        </Button>
+                                                        <HiOutlineTrash className="red-text" style={{ fontSize: "16px" }} />
                                                     )}
+                                                    buttonProps={{
+                                                        color: "info",
+                                                        disableShadows: true
+                                                    }}
                                                     actionButtons={
                                                         [
                                                             ButtonDefinition("Delete", async () => {
@@ -482,9 +483,9 @@ export function RevisionSelectorTab(props) {
                                                                     let x = await getRevisions()
                                                                     setRevisions(x.results)
                                                                     setRouter(await getWorkflowRouter())
-                                                            }, "small red", ()=>{}, true, false),
+                                                            }, {variant: "contained", color: "error"}, ()=>{}, true, false),
                                                             ButtonDefinition("Cancel", () => {
-                                                            }, "small light", ()=>{}, true, false)
+                                                            }, {}, ()=>{}, true, false)
                                                         ]
                                                     }
                                                 >
@@ -508,21 +509,25 @@ export function RevisionSelectorTab(props) {
                                                     modalStyle={{width: "400px"}}
                                                     title={`Revert to ${obj.name}`}
                                                     button={(
-                                                        <Button className="small light bold" tip="Revert revision to latest">
+                                                        <>
                                                             <VscDebugStepBack className='show-700'/>
                                                             <span className="hide-700">Revert{" "}</span>
                                                             <span className="hide-900">To</span>
-                                                        </Button>
+                                                        </>
                                                     )}
+                                                    buttonProps={{
+                                                        color: "info",
+                                                        disableShadows: true
+                                                    }}
                                                     actionButtons={
                                                         [
                                                             ButtonDefinition("Revert", async () => {
                                                                 let data = await getWorkflowRevisionData(obj.name)
                                                                 await updateWorkflow(atob(data.revision.source))
                                                                 navigate(`/n/${namespace}/explorer/${filepath.substring(1)}?tab=2`)
-                                                            }, "small red", ()=>{}, true, false),
+                                                            }, {variant: "contained", color: "error"}, ()=>{}, true, false),
                                                             ButtonDefinition("Cancel", () => {
-                                                            }, "small light", ()=>{}, true, false)
+                                                            }, {}, ()=>{}, true, false)
                                                         ]
                                                     }
                                                 >
@@ -532,7 +537,7 @@ export function RevisionSelectorTab(props) {
                                                         </FlexBox>
                                                     </FlexBox>
                                             </Modal>
-                                            <Button className="small light bold" onClick={()=>{
+                                            <Button color="info" variant="outlined" disableShadows onClick={()=>{
                                                 setSearchParams({tab: 1, revision: obj.name})
                                             }}>
                                                 Open{" "}<span className="hide-900">Revision</span>
@@ -541,19 +546,19 @@ export function RevisionSelectorTab(props) {
                                             <>
                                                 {/* Hidden buttons to retain same spacing on latest */}
                                                 <div style={{visibility:"hidden"}}>
-                                                <Button className="small light bold" onClick={async()=>{
+                                                <Button color="info" variant="outlined" onClick={async()=>{
                                                 }}>
                                                     Tag
                                                 </Button>
                                                 </div>
                                                 <div style={{visibility:"hidden"}}>
-                                                <Button className="small light bold" onClick={async()=>{
+                                                <Button color="info" variant="outlined" onClick={async()=>{
                                                 }}>
                                                     Revert{" "}<span className="hide-900">To</span>
                                                 </Button>
                                                 </div>
                                                 <div>
-                                                <Button className="small light bold" onClick={()=>{
+                                                <Button color="info" variant="outlined" onClick={()=>{
                                                 }}>
                                                     Open{" "}<span className="hide-900">Revision</span>
                                                 </Button></div>
@@ -632,14 +637,16 @@ function TagRevisionBtn(props) {
                 setTag("")
             }}
             button={(
-                <Button className="light small bold" tip="Tag Revision">
-                    <FlexBox className="gap">
-                        <div>
-                            Tag
-                        </div>
-                    </FlexBox>
-                </Button>
+                <FlexBox className="gap">
+                    <div>
+                        Tag
+                    </div>
+                </FlexBox>
             )}
+            buttonProps={{
+                color: "info",
+                disableShadows: true
+            }}
             actionButtons={
                 [
                     ButtonDefinition("Tag", async () => {
@@ -648,9 +655,9 @@ function TagRevisionBtn(props) {
                             let revResp = await getRevisions()
                             setRevisions(revResp.results)
                             updateTags(tagsResp.results)
-                    }, "small", ()=>{}, true, false, true),
+                    }, {variant: "contained", color: "primary"}, ()=>{}, true, false, true),
                     ButtonDefinition("Cancel", () => {
-                    }, "small light", ()=>{}, true, false)
+                    }, {}, ()=>{}, true, false)
                 ]
             } 
 
@@ -823,7 +830,7 @@ export function RevisionTrafficShaper(props) {
                         }
                         await editWorkflowRouter(arr, router.live)
                         setRouter(await getWorkflowRouter())
-                    }} className={`small ${rev2 && rev1 ? "" : "disabled"}`}>
+                    }} disabled={!rev2 || !rev1}>
                         Save
                     </Button>
                     <ModalHeadless
@@ -846,9 +853,9 @@ export function RevisionTrafficShaper(props) {
                                 } else {
                                     navigate(`/n/${namespace}/instances/${r}`)
                                 }
-                            }, `small`, () => { }, true, false),
+                            }, {variant: "contained", color: "primary"}, () => { }, true, false),
                             ButtonDefinition("Cancel", async () => {
-                            }, "small light", () => { }, true, false)
+                            }, {}, () => { }, true, false)
                         ]}
                     >
                         <FlexBox style={{ height: "45vh", minWidth: "250px", minHeight: "160px", overflow: "hidden" }}>
@@ -861,7 +868,7 @@ export function RevisionTrafficShaper(props) {
                             </FlexBox>
                         </FlexBox>
                     </ModalHeadless>
-                    <Button className="small" onClick={() =>{setShowRunModal(true)}} tip="Run workflow with router traffic">
+                    <Button onClick={() =>{setShowRunModal(true)}} tooltip="Run workflow with router traffic">
                         Run
                     </Button>
                 </FlexBox>

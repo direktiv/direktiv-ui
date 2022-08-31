@@ -3,12 +3,14 @@ import { VscLayers } from 'react-icons/vsc';
 import { useNavigate, useParams } from "react-router"
 import { Service } from "../namespace-services"
 import { RevisionCreatePanel, UpdateTraffic } from "../namespace-services/revisions"
-import AddValueButton from "../../components/add-button"
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from "../../components/content-panel"
 import FlexBox from "../../components/flexbox"
 import Modal, { ButtonDefinition, KeyDownDefinition } from "../../components/modal"
 import { Config } from "../../util"
 import { useGlobalService } from "direktiv-react-hooks"
+
+import { VscAdd } from 'react-icons/vsc';
+
 
 export default function GlobalRevisionsPanel(props){
     const {service} = useParams()
@@ -75,8 +77,11 @@ export default function GlobalRevisionsPanel(props){
                                 onClose={()=>{
                                 }}
                                 button={(
-                                    <AddValueButton  label=" " />
-                                )}  
+                                    <VscAdd/>
+                                )}
+                                buttonProps={{
+                                    auto: true,
+                                }}
                                 keyDownActions={[
                                     KeyDownDefinition("Enter", async () => {
                                     },()=>{}, true)
@@ -87,9 +92,9 @@ export default function GlobalRevisionsPanel(props){
                                 actionButtons={[
                                     ButtonDefinition("Add", async () => {
                                         await createGlobalServiceRevision(image, parseInt(scale), parseInt(size), cmd, parseInt(trafficPercent))
-                                    }, "small", ()=>{}, true, false, true),
+                                    }, {variant: "contained", color: "primary"}, ()=>{}, true, false, true),
                                     ButtonDefinition("Cancel", () => {
-                                    }, "small light", ()=>{}, true, false)
+                                    }, {}, ()=>{}, true, false)
                                 ]}
                             >
                                 {config !== null ? 

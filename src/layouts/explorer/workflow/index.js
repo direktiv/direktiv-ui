@@ -330,10 +330,11 @@ function WorkingRevision(props) {
                             <WorkingRevisionErrorBar errors={errors} showErrors={showErrors}/>
                             <div style={{ display: "flex", flex: 1 }}>
                                 <Button 
-                                    className="terminal small" 
+                                    color="terminal"
+                                    variant="contained"
                                     loading={opLoadingStates["IsLoading"]} 
-                                    tip={"Revert workflow to previous revision"}
-                                    disabledTip={"Cannot revert while theres changes"}
+                                    tooltip={"Revert workflow to previous revision"}
+                                    disabledTooltip={"Cannot revert while theres changes"}
                                     disabled={canSave}
                                     onClick={async () => {
                                         setErrors([])
@@ -344,11 +345,7 @@ function WorkingRevision(props) {
                                 </Button>
                             </div>
                             <div style={{display:"flex", flex:1, justifyContent:"center"}}>
-                                { workflow !== oldWf ?
-                                <Button tip={"Requires save"} className="terminal small" disabled={true}>
-                                    Run
-                                </Button>
-                                : <Modal 
+                                <Modal 
                                     style={{ justifyContent: "center" }}
                                     className="run-workflow-modal"
                                     modalStyle={{color: "black", width: "600px", minWidth:"30vw"}}
@@ -373,9 +370,9 @@ function WorkingRevision(props) {
                                             } else {
                                                 navigate(`/n/${namespace}/instances/${r}`)
                                             }
-                                        }, `small ${tabIndex === 1 && workflowJSONSchema === null ? "disabled" : ""}`, ()=>{}, tabIndex === 0, false),
+                                        }, {variant: "contained", color: "primary", disabled: tabIndex === 1 && workflowJSONSchema === null}, ()=>{}, tabIndex === 0, false),
                                         ButtonDefinition("Cancel", async () => {
-                                        }, "small light", ()=>{}, true, false)
+                                        }, {}, ()=>{}, true, false)
                                     ]}
                                     onOpen={()=>{
                                         try{
@@ -387,10 +384,15 @@ function WorkingRevision(props) {
                                         } catch (e){}
                                     }}
                                     button={(
-                                        <Button tip={"Run Workflow"}className="terminal small" disabled={opLoadingStates["IsLoading"]}>
-                                            Run
-                                        </Button>
+                                        <span style={{fontSize:"15px"}}>Run</span>
                                     )}
+                                    buttonProps={{
+                                        variant: "contained",
+                                        disabled: workflow !== oldWf,
+                                        color: "terminal",
+                                        tooltip: "Run Workflow",
+                                        disabledTooltip: "Requires save"
+                                    }}
                                 >
                                     <FlexBox style={{ height: "45vh", minWidth: "250px", minHeight: "160px", overflow:"hidden" }}>
                                         <Tabs
@@ -425,14 +427,15 @@ function WorkingRevision(props) {
                                                 </div>
                                             </FlexBox>)]} />
                                     </FlexBox>
-                                </Modal>}
+                                </Modal>
                             </div>
                             <div style={{ display: "flex", flex: 1, gap: "3px", justifyContent: "flex-end", paddingRight: "10px"}}>
 
                                 <Button 
-                                    tip={"Save workflow to latest"} 
-                                    disabledTip={"No changes to workflow"}
-                                    className="terminal small"
+                                    tooltip={"Save workflow to latest"} 
+                                    disabledTooltip={"No changes to workflow"}
+                                    color="terminal"
+                                    variant="contained"
                                     loading={opLoadingStates["Save"]} 
                                     disabled={!canSave}
                                     onClick={async () => {
@@ -451,9 +454,10 @@ function WorkingRevision(props) {
                                 </Button>
 
                                 <Button 
-                                    tip={"Save latest workflow as new revision"} 
-                                    disabledTip={"Requires save"}
-                                    className="terminal small"
+                                    tooltip={"Save latest workflow as new revision"} 
+                                    disabledTooltip={"Requires save"}
+                                    color="terminal"
+                                    variant="contained"
                                     loading={opLoadingStates["IsLoading"]} 
                                     disabled={canSave}
                                     onClick={async () => {
@@ -478,8 +482,9 @@ function WorkingRevision(props) {
                                 </Button>
 
                                 <Button 
-                                    tip={`${showErrors ? "Hide Problems": "Show Problems"}`} 
-                                    className="terminal small"
+                                    tooltip={`${showErrors ? "Hide Problems": "Show Problems"}`} 
+                                    color="terminal"
+                                    variant="contained"
                                     style={{width:"24px", paddingLeft: "0px", paddingRight: "0px"}}
                                     onClick={async () => {
                                         setShowErrors(!showErrors)
@@ -1095,9 +1100,6 @@ function SettingsTab(props) {
                                         </div>
                                         <HelpIcon msg={"Attributes to define the workflow."} />
                                     </FlexBox>
-                                    {/* <ContentPanelHeaderButton>
-                                        + Add
-                                    </ContentPanelHeaderButton> */}
                                 </ContentPanelTitle>
                                 <ContentPanelBody>
                                     <WorkflowAttributes attributes={workflowData.node.attributes} deleteAttributes={deleteAttributes} addAttributes={addAttributes}/>

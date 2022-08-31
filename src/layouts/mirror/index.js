@@ -1,3 +1,4 @@
+import { useTheme } from '@mui/material/styles';
 import Tippy from '@tippyjs/react';
 import { useMirror, useNodes } from 'direktiv-react-hooks';
 import React, { useEffect, useRef, useState } from 'react';
@@ -111,7 +112,7 @@ export default function MirrorPage(props) {
 
         setBreadcrumbChildrenRef.current((
             <FlexBox className="center row gap" style={{ justifyContent: "flex-end", paddingRight: "6px" }}>
-                <Button id="btn-sync-mirror" tip={"Sync mirror with remote"} disabledTip={"Cannot sync mirror while Writable"} disabled={!isReadOnly} className="small light bold shadow" style={{ fontWeight: "bold", width: "fit-content" }} onClick={()=>{
+                <Button tooltip={"Sync mirror with remote"} disabledTooltip={"Cannot sync mirror while Writable"} disabled={!isReadOnly} variant="outlined" color="info" onClick={()=>{
                     setSyncVisible(!syncVisible)
                 }}>
                     <FlexBox className="row center gap-sm">
@@ -137,8 +138,8 @@ export default function MirrorPage(props) {
                     actionButtons={[
                         ButtonDefinition("Sync", async () => {
                             await syncRef.current(true)
-                        }, "small", () => { }, true, false),
-                        ButtonDefinition("Cancel", () => { }, "small light", () => { }, true, false)
+                        }, {variant: "contained", color: "primary"}, () => { }, true, false),
+                        ButtonDefinition("Cancel", () => { }, {}, () => { }, true, false)
                     ]}
                 >
                     <FlexBox className="col gap" style={{ paddingTop: "8px" }}>
@@ -147,7 +148,7 @@ export default function MirrorPage(props) {
                         </FlexBox>
                     </FlexBox>
                 </ModalHeadless>
-                <Button className={`small light bold shadow ${currentlyLocking ? "loading disabled" : ""}`} style={{ fontWeight: "bold", width: "fit-content", whiteSpace: "nowrap" }} onClick={async () => {
+                <Button variant="outlined" color="info" onClick={async () => {
                     if (isReadOnly) {
                         setCurrentlyLocking(true)
 
@@ -261,7 +262,7 @@ export function MirrorReadOnlyBadge(props) {
     return (
         <Tippy content={`This mirrors contents are currently read-only. This can be unlocked in mirror setttings`} trigger={'mouseenter focus'} zIndex={10}>
             <div>
-                <Button className={`cancel-label small disabled-no-filter shadow`} style={{ fontWeight: "bold", width: "fit-content", whiteSpace: "nowrap"}}>
+                <Button variant="contained" color="info" disabled style={{ borderRadius:"20px" }}>
                     <FlexBox className="row center gap-sm">
                         <VscLock />ReadOnly
                     </FlexBox>
@@ -272,10 +273,18 @@ export function MirrorReadOnlyBadge(props) {
 }
 
 export function MirrorWritableBadge(props) {
+    const theme = useTheme()
     return (
         <Tippy content={`This mirrors contents are currently writable. This can be unlocked in mirror setttings`} trigger={'mouseenter focus'} zIndex={10}>
             <div>
-                <Button className={`running-label small disabled-no-filter shadow`} style={{ fontWeight: "bold", width: "fit-content", whiteSpace: "nowrap"}}>
+                <Button disabled variant="contained" color="secondary" sx={{
+                    "&:disabled":{
+                        backgroundColor: theme.palette.secondary.main,
+                        color: theme.palette.primary.main,
+                        fontWeight:"bold",
+                        borderRadius:"20px"
+                    }
+                }}>
                     <FlexBox className="row center gap-sm">
                         <VscUnlock />Writable
                     </FlexBox>

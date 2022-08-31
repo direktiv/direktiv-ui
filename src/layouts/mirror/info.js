@@ -1,15 +1,16 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import './style.css';
 
-import ContentPanel, { ContentPanelBody, ContentPanelHeaderButton, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
-import FlexBox from '../../components/flexbox';
-import { VscAdd, VscCloudUpload, VscTerminal } from 'react-icons/vsc';
-import Modal, { ButtonDefinition } from '../../components/modal';
-import HelpIcon from '../../components/help';
 import Tippy from '@tippyjs/react';
-import { ClientFileUpload } from '../../components/navbar';
+import { VscAdd, VscCloudUpload, VscTerminal } from 'react-icons/vsc';
 import TextareaAutosize from 'react-textarea-autosize';
+import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
+import FlexBox from '../../components/flexbox';
+import HelpIcon from '../../components/help';
 import HideShowButton from '../../components/hide-show';
+import Modal, { ButtonDefinition } from '../../components/modal';
+import { ClientFileUpload } from '../../components/navbar';
+
 
 export const mirrorSettingInfoMetaInfo = {
     "url": {plainName: "URL", required: true, placeholder: "Enter repository URL", info: `URL to repository. If authentication method is SSH Key a git url must be used e.g. "git@github.com:direktiv/apps-svc.git". All other authentication methods must use HTTP/S urls`},
@@ -259,128 +260,129 @@ export default function MirrorInfoPanel(props) {
                     <FlexBox style={{ flex: "auto", justifyContent: "right", paddingRight: "6px", alignItems: "unset" }}>
                         <Tippy content={mirrorSettingsValidateMsg} disabled={mirrorSettingsValidateMsg === ""} trigger={'mouseenter focus'} zIndex={10}>
                             <div>                            
-                                <ContentPanelHeaderButton className={`${infoPendingChanges && mirrorSettingsValid ? "" : "disabled"}`} style={infoPendingChanges&& mirrorSettingsValid ? {} : { color: "grey" }}>
-                                    <Modal
-                                        escapeToCancel
-                                        activeOverlay
-                                        title="Update Mirror Settings"
-                                        titleIcon={
-                                            <VscTerminal />
-                                        }
-                                        style={{
-                                            maxWidth: "260px"
-                                        }}
-                                        modalStyle={{
-                                            width: "300px"
-                                        }}
-                                        button={(
-                                            <div>
-                                                Update <span className="hide-600">Settings</span>
-                                            </div>
-                                        )}
-                                        actionButtons={[
-                                            ButtonDefinition("Update Settings", async () => {
-                                                let newSettings = {
-                                                    "url": infoChangesTracker.url ? infoURL : "-",
-                                                    "ref": infoChangesTracker.ref ? infoRef : "-",
-                                                    "cron": infoChangesTracker.cron ? infoCron : "-",
-                                                    "passphrase": infoChangesTracker.passphrase ? infoPassphrase : "-",
-                                                    "publicKey": infoChangesTracker.publicKey ? infoPublicKey : "-",
-                                                    "privateKey": infoChangesTracker.privateKey ? infoPrivateKey : "-",
-                                                }
-
-                                                if (mirrorAuthMethod === "token") {
-                                                    newSettings["privateKey"] = ""
-                                                    newSettings["publicKey"] = ""
-                                                } else if (mirrorAuthMethod === "none") {
-                                                    newSettings["passphrase"] = ""
-                                                    newSettings["privateKey"] = ""
-                                                    newSettings["publicKey"] = ""
-                                                } else if (mirrorAuthMethod === "ssh" && !infoChangesTracker.passphrase) {
-                                                    newSettings["passphrase"] = ""
-                                                }
-
-                                                await updateSettings(newSettings)
-
-                                                resetStates()
-                                            }, "small", () => { }, true, false),
-                                            ButtonDefinition("Cancel", () => { }, "small light", () => { }, true, false)
-                                        ]}
-                                    >
-                                        <FlexBox className="col gap" style={{ height: "fit-content" }}>
-                                            <FlexBox className="col center info-update-label">
-                                                The following changes will been made
-                                            </FlexBox>
-                                            {
-                                                infoChangesTracker.authMethod ?
-                                                <FlexBox className="col center info-update-label" style={{textAlign: "center"}}>
-                                                    Warning: 
-                                                    { mirrorAuthMethod === "none" ? ` Changing authentication method to "None" will remove Passphrase, Public Key and Private Key from settings.`: ""}
-                                                    { mirrorAuthMethod === "token" ? ` Changing authentication method to "Access Token" will remove Public Key and Private Key from settings.`: ""}
-                                                    { mirrorAuthMethod === "ssh" ? ` Changing authentication method to "SSH Keys" will remove Access Token from settings.`: ""}
-                                                </FlexBox>
-                                                :
-                                                <></>
+                                <Modal
+                                    escapeToCancel
+                                    activeOverlay
+                                    title="Update Mirror Settings"
+                                    titleIcon={
+                                        <VscTerminal />
+                                    }
+                                    style={{
+                                        maxWidth: "260px"
+                                    }}
+                                    modalStyle={{
+                                        width: "300px"
+                                    }}
+                                    button={(
+                                        <>
+                                            Update <span className="hide-600">Settings</span>
+                                        </>
+                                    )}
+                                    buttonProps={{
+                                        disabled: !infoPendingChanges || !mirrorSettingsValid
+                                    }}
+                                    actionButtons={[
+                                        ButtonDefinition("Update Settings", async () => {
+                                            let newSettings = {
+                                                "url": infoChangesTracker.url ? infoURL : "-",
+                                                "ref": infoChangesTracker.ref ? infoRef : "-",
+                                                "cron": infoChangesTracker.cron ? infoCron : "-",
+                                                "passphrase": infoChangesTracker.passphrase ? infoPassphrase : "-",
+                                                "publicKey": infoChangesTracker.publicKey ? infoPublicKey : "-",
+                                                "privateKey": infoChangesTracker.privateKey ? infoPrivateKey : "-",
                                             }
-                                            {infoChangesTracker.url ?
-                                                <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
-                                                    <FlexBox className="col gap-sm center-x" style={{}}>
-                                                        <span className={`input-title readonly`} >URL</span>
-                                                        { infoURL === "" ? <span className={`input-description readonly`}> Warning: URL will be deleted</span> : <></>}
-                                                    </FlexBox>
-                                                    <input className={`info-input-value readonly`} value={infoURL} />
-                                                </FlexBox> : <></>}
-                                            {infoChangesTracker.ref ?
-                                                <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
-                                                    <FlexBox className="col gap-sm center-x" style={{}}>
-                                                        <span className={`input-title readonly`} >Ref</span>
-                                                        { infoRef === "" ? <span className={`input-description readonly`}> Warning: Ref will be deleted</span> : <></>}
-                                                    </FlexBox>
-                                                    <input className={`info-input-value readonly`} value={infoRef} />
-                                                </FlexBox> : <></>}
-                                            {infoChangesTracker.cron ?
-                                                <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
-                                                    <FlexBox className="col gap-sm center-x" style={{}}>
-                                                        <span className={`input-title readonly`} >Cron</span>
-                                                        { infoCron === "" ? <span className={`input-description readonly`}> Warning: Cron will be deleted</span> : <></>}
-                                                    </FlexBox>
-                                                    <input className={`info-input-value readonly`} readonly={true} value={infoCron} />
-                                                </FlexBox> : <></>}
-                                            {infoChangesTracker.passphrase && mirrorAuthMethod === "token" ?
-                                                <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
-                                                    <FlexBox className="col gap-sm center-x" style={{}}>
-                                                        <span className={`input-title readonly`} >Token</span>
-                                                        { infoPassphrase === "" ? <span className={`input-description readonly`}> Warning: Token will be deleted</span> : <></>}
-                                                    </FlexBox>
-                                                    <textarea className={`info-textarea-value readonly`} readonly={true} rows={5} style={{ width: "100%", resize: "none" }} value={infoPassphrase} />
-                                                </FlexBox> : <></>}
-                                            {infoChangesTracker.passphrase && mirrorAuthMethod === "ssh" ?
-                                                <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
-                                                    <FlexBox className="col gap-sm center-x" style={{}}>
-                                                        <span className={`input-title readonly`} >Passphrase</span>
-                                                        { infoPassphrase === "" ? <span className={`input-description readonly`}> Warning: Passphrase will be deleted</span> : <></>}
-                                                    </FlexBox>
-                                                    <input className={`info-input-value readonly`} readonly={true} type="password" value={infoPassphrase} />
-                                                </FlexBox> : <></>}
-                                            {infoChangesTracker.publicKey && mirrorAuthMethod === "ssh" ?
-                                                <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
-                                                    <FlexBox className="col gap-sm center-x" style={{}}>
-                                                        <span className={`input-title readonly`} >Public Key</span>
-                                                        { infoPublicKey === "" ? <span className={`input-description readonly`}> Warning: Public Key will be deleted</span> : <></>}
-                                                    </FlexBox>
-                                                    <textarea className={`info-textarea-value readonly`} readonly={true} rows={5} style={{ width: "100%", resize: "none" }} value={infoPublicKey} />
-                                                </FlexBox> : <></>}
-                                            {infoChangesTracker.privateKey && mirrorAuthMethod === "ssh" ?
-                                                <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
-                                                    <FlexBox className="col gap-sm center-x" style={{}}>
-                                                        <span className={`input-title readonly`} >Private Key</span>
-                                                        { infoPrivateKey === "" ? <span className={`input-description readonly`}> Warning: Private Key will be deleted</span> : <></>}
-                                                    </FlexBox>
-                                                    <textarea className={`info-textarea-value readonly`} readonly={true} rows={5} style={{ width: "100%", resize: "none" }} value={infoPrivateKey} />
-                                                </FlexBox> : <></>}
+
+                                            if (mirrorAuthMethod === "token") {
+                                                newSettings["privateKey"] = ""
+                                                newSettings["publicKey"] = ""
+                                            } else if (mirrorAuthMethod === "none") {
+                                                newSettings["passphrase"] = ""
+                                                newSettings["privateKey"] = ""
+                                                newSettings["publicKey"] = ""
+                                            } else if (mirrorAuthMethod === "ssh" && !infoChangesTracker.passphrase) {
+                                                newSettings["passphrase"] = ""
+                                            }
+
+                                            await updateSettings(newSettings)
+
+                                            resetStates()
+                                        }, {variant: "contained", color: "primary"}, () => { }, true, false),
+                                        ButtonDefinition("Cancel", () => { }, {}, () => { }, true, false)
+                                    ]}
+                                >
+                                    <FlexBox className="col gap" style={{ height: "fit-content" }}>
+                                        <FlexBox className="col center info-update-label">
+                                            The following changes will been made
                                         </FlexBox>
-                                    </Modal>
-                                </ContentPanelHeaderButton>
+                                        {
+                                            infoChangesTracker.authMethod ?
+                                            <FlexBox className="col center info-update-label" style={{textAlign: "center"}}>
+                                                Warning: 
+                                                { mirrorAuthMethod === "none" ? ` Changing authentication method to "None" will remove Passphrase, Public Key and Private Key from settings.`: ""}
+                                                { mirrorAuthMethod === "token" ? ` Changing authentication method to "Access Token" will remove Public Key and Private Key from settings.`: ""}
+                                                { mirrorAuthMethod === "ssh" ? ` Changing authentication method to "SSH Keys" will remove Access Token from settings.`: ""}
+                                            </FlexBox>
+                                            :
+                                            <></>
+                                        }
+                                        {infoChangesTracker.url ?
+                                            <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
+                                                <FlexBox className="col gap-sm center-x" style={{}}>
+                                                    <span className={`input-title readonly`} >URL</span>
+                                                    { infoURL === "" ? <span className={`input-description readonly`}> Warning: URL will be deleted</span> : <></>}
+                                                </FlexBox>
+                                                <input className={`info-input-value readonly`} value={infoURL} />
+                                            </FlexBox> : <></>}
+                                        {infoChangesTracker.ref ?
+                                            <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
+                                                <FlexBox className="col gap-sm center-x" style={{}}>
+                                                    <span className={`input-title readonly`} >Ref</span>
+                                                    { infoRef === "" ? <span className={`input-description readonly`}> Warning: Ref will be deleted</span> : <></>}
+                                                </FlexBox>
+                                                <input className={`info-input-value readonly`} value={infoRef} />
+                                            </FlexBox> : <></>}
+                                        {infoChangesTracker.cron ?
+                                            <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
+                                                <FlexBox className="col gap-sm center-x" style={{}}>
+                                                    <span className={`input-title readonly`} >Cron</span>
+                                                    { infoCron === "" ? <span className={`input-description readonly`}> Warning: Cron will be deleted</span> : <></>}
+                                                </FlexBox>
+                                                <input className={`info-input-value readonly`} readonly={true} value={infoCron} />
+                                            </FlexBox> : <></>}
+                                        {infoChangesTracker.passphrase && mirrorAuthMethod === "token" ?
+                                            <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
+                                                <FlexBox className="col gap-sm center-x" style={{}}>
+                                                    <span className={`input-title readonly`} >Token</span>
+                                                    { infoPassphrase === "" ? <span className={`input-description readonly`}> Warning: Token will be deleted</span> : <></>}
+                                                </FlexBox>
+                                                <textarea className={`info-textarea-value readonly`} readonly={true} rows={5} style={{ width: "100%", resize: "none" }} value={infoPassphrase} />
+                                            </FlexBox> : <></>}
+                                        {infoChangesTracker.passphrase && mirrorAuthMethod === "ssh" ?
+                                            <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
+                                                <FlexBox className="col gap-sm center-x" style={{}}>
+                                                    <span className={`input-title readonly`} >Passphrase</span>
+                                                    { infoPassphrase === "" ? <span className={`input-description readonly`}> Warning: Passphrase will be deleted</span> : <></>}
+                                                </FlexBox>
+                                                <input className={`info-input-value readonly`} readonly={true} type="password" value={infoPassphrase} />
+                                            </FlexBox> : <></>}
+                                        {infoChangesTracker.publicKey && mirrorAuthMethod === "ssh" ?
+                                            <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
+                                                <FlexBox className="col gap-sm center-x" style={{}}>
+                                                    <span className={`input-title readonly`} >Public Key</span>
+                                                    { infoPublicKey === "" ? <span className={`input-description readonly`}> Warning: Public Key will be deleted</span> : <></>}
+                                                </FlexBox>
+                                                <textarea className={`info-textarea-value readonly`} readonly={true} rows={5} style={{ width: "100%", resize: "none" }} value={infoPublicKey} />
+                                            </FlexBox> : <></>}
+                                        {infoChangesTracker.privateKey && mirrorAuthMethod === "ssh" ?
+                                            <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
+                                                <FlexBox className="col gap-sm center-x" style={{}}>
+                                                    <span className={`input-title readonly`} >Private Key</span>
+                                                    { infoPrivateKey === "" ? <span className={`input-description readonly`}> Warning: Private Key will be deleted</span> : <></>}
+                                                </FlexBox>
+                                                <textarea className={`info-textarea-value readonly`} readonly={true} rows={5} style={{ width: "100%", resize: "none" }} value={infoPrivateKey} />
+                                            </FlexBox> : <></>}
+                                    </FlexBox>
+                                </Modal>
                             </div>
                         </Tippy>
                     </FlexBox>

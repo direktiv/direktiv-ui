@@ -3,15 +3,17 @@ import { useEffect, useState } from "react"
 import { VscLayers } from 'react-icons/vsc';
 import { useNavigate, useParams } from "react-router"
 import { Service } from "."
-import AddValueButton from "../../components/add-button"
 import Alert from "../../components/alert"
-import Button from "../../components/button"
+import Button from "../../components/button";
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon, ContentPanelFooter } from "../../components/content-panel"
 import FlexBox from "../../components/flexbox"
 import Modal, { ButtonDefinition, KeyDownDefinition } from "../../components/modal"
 import { Config } from "../../util"
 import Tippy from '@tippyjs/react'
 import 'tippy.js/dist/tippy.css'
+
+import { VscAdd } from 'react-icons/vsc';
+
 
 export default function NamespaceRevisionsPanel(props) {
     const {namespace} = props
@@ -138,8 +140,11 @@ function NamespaceRevisions(props) {
                                 onClose={()=>{
                                 }}
                                 button={(
-                                    <AddValueButton  label=" " />
-                                )}  
+                                    <VscAdd/>
+                                )}
+                                buttonProps={{
+                                    auto: true,
+                                }}
                                 keyDownActions={[
                                     KeyDownDefinition("Enter", async () => {
                                     }, ()=>{}, true)
@@ -150,9 +155,9 @@ function NamespaceRevisions(props) {
                                 actionButtons={[
                                     ButtonDefinition("Add", async () => {
                                         await createNamespaceServiceRevision(image, parseInt(scale), parseInt(size), cmd, parseInt(trafficPercent))
-                                    }, "small", ()=>{}, true, false, true),
+                                    }, {variant: "contained", color: "primary"}, ()=>{}, true, false, true),
                                     ButtonDefinition("Cancel", () => {
-                                    }, "small light", ()=>{}, true, false)
+                                    }, {}, ()=>{}, true, false)
                                 ]}
                             >
                                 {config !== null ? 
@@ -319,7 +324,7 @@ export function UpdateTraffic(props){
                         </ContentPanelBody>
                         <ContentPanelFooter>
                             <FlexBox className="col" style={{alignItems:"flex-end"}}>
-                                <Button className="small" onClick={async ()=>{
+                                <Button onClick={async ()=>{
                                     try { 
                                         await setNamespaceServiceRevisionTraffic(revOne, parseInt(tpercent), revTwo, parseInt(100-tpercent))
                                         setErrMsg("")

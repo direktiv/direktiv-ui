@@ -227,14 +227,13 @@ function ResponsiveHeaderBar(props) {
                     <Button onClick={(e) => {
                             setToggleResponsive(!toggleResponsive)
                             e.stopPropagation()
-                        }} className="light small" style={{
+                        }} variant="outlined" color="info" style={{
                             marginTop: "5px",
                             marginLeft: "5px",
-                            maxWidth: "32px",
-                            paddingBottom: "8px"
+                            maxWidth: "32px"
                         }}>
-                            <IoMenu className="auto-margin" style={{
-                                fontSize: "18px"
+                            <IoMenu style={{
+                                fontSize: "20px"
                             }} />
                     </Button>
                 </div>

@@ -1,16 +1,17 @@
-import React, {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
+import ContentPanel, { ContentPanelBody, ContentPanelFooter, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
 import './style.css';
-import Button from '../button';
-import ContentPanel, {ContentPanelTitle, ContentPanelBody, ContentPanelTitleIcon, ContentPanelFooter} from '../../components/content-panel';
 
 import { VscDiffAdded } from 'react-icons/vsc';
 
-import FlexBox from '../flexbox';
-import Alert from '../alert';
 import { VscClose } from 'react-icons/vsc';
+import Alert from '../alert';
+import FlexBox from '../flexbox';
 
-import Tippy from '@tippyjs/react';
-import 'tippy.js/dist/tippy.css'
+import 'tippy.js/dist/tippy.css';
+
+import Button from '../button';
+
 
 export function ModalHeadless(props) {
     let {maximised, noPadding, titleIcon, title, children, withCloseButton, activeOverlay, label} = props;
@@ -64,8 +65,8 @@ export function ModalHeadless(props) {
 
 function Modal(props) {
 
-    let {maximised, noPadding, titleIcon, title, children, button, withCloseButton, activeOverlay, label, buttonDisabled} = props;
-    let {modalStyle, style, btnStyle, actionButtons, keyDownActions, escapeToCancel, onClose, onOpen, requiredFields } = props;
+    let {maximised, noPadding, titleIcon, title, children, button, buttonProps, withCloseButton, activeOverlay, label, buttonDisabled} = props;
+    let {modalStyle, style, actionButtons, keyDownActions, escapeToCancel, onClose, onOpen, requiredFields } = props;
     const [visible, setVisible] = useState(false);
     if (!button) {
         return(
@@ -125,7 +126,16 @@ function Modal(props) {
         onClose={onClose}
         onOpen={onOpen}
         requiredFields={requiredFields}/>
-        <FlexBox style={{...style}}>
+        <Button onClick={async(ev)=>{
+             if(onOpen){
+                await onOpen()
+            }
+            setVisible(true)
+            ev.stopPropagation()
+        }} variant={"outlined"} color="info" {...buttonProps}>
+           {button}
+        </Button>
+        {/* <FlexBox style={{...style}}>
             <div style={{width: "100%", display:'flex', justifyContent: "center", pointerEvents: buttonDisabled ? "none" : "", ...btnStyle}} onClick={async(ev) => {
                 if(onOpen){
                     await onOpen()
@@ -135,7 +145,7 @@ function Modal(props) {
             }}>
                 {button}
             </div>
-        </FlexBox>
+        </FlexBox> */}
         </>
     )
         }
@@ -320,11 +330,11 @@ function ModalOverlay(props) {
     )
 }
 
-export function ButtonDefinition(label, onClick, classList, errFunc, closesModal, async, validate) {
+export function ButtonDefinition(label, onClick, buttonProps, errFunc, closesModal, async, validate) {
     return {
         label: label,
         onClick: onClick,
-        classList: classList,
+        buttonProps: buttonProps,
         errFunc: errFunc,
         closesModal: closesModal,
         async: async,
@@ -379,17 +389,15 @@ function generateButtons(closeModal, setDisplayAlert, setAlertMessage, actionBut
         }
 
         out.push(
-            !validateResults.valid && btn.validate ? 
-            <Tippy content={`${validateResults.tips.join(", ")}`} trigger={'mouseenter focus click'} zIndex={10}>
-                <div>
-                <Button key={Array(5).fill().map(()=>"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".charAt(Math.random()*62)).join("")} className={`disabled ${btn.classList}`} onClick={onClick}>
-                    <div>{btn.label}</div>
-                </Button>
-                </div>
-            </Tippy>
-            :
-            <Button key={Array(5).fill().map(()=>"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".charAt(Math.random()*62)).join("")} className={`${btn.classList}`} onClick={onClick}>
-                    <div>{btn.label}</div>
+            <Button
+            variant='outlined'
+            color='info'
+            key={Array(5).fill().map(()=>"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".charAt(Math.random()*62)).join("")}
+            disabledTooltip={`${validateResults.tips.join(", ")}`}
+            disabled={!validateResults.valid && btn.validate}
+            onClick={onClick}
+            {...btn.buttonProps}>
+                <div>{btn.label}</div>
             </Button>
         )
     }
