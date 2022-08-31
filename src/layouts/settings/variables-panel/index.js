@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { VscCloudDownload, VscCloudUpload, VscEye, VscLoading, VscTrash, VscVariableGroup } from 'react-icons/vsc';
 import { AutoSizer } from 'react-virtualized';
-import Button2 from '../../../components/buttonv2';
+import Button from '../../../components/button';
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from '../../../components/content-panel';
 import DirektivEditor from '../../../components/editor';
 import FlexBox from '../../../components/flexbox';
@@ -448,9 +448,9 @@ function VariablesDownloadButton(props) {
     const {onClick} = props
 
     return (
-        <Button2 onClick={onClick} variant={"text"} color={"info"}>
+        <Button onClick={onClick} variant={"text"} color={"info"}>
             <VscCloudDownload/>
-        </Button2>
+        </Button>
     )
 }
 

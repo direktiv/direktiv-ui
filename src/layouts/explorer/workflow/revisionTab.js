@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import Button2 from '../../../components/buttonv2';
+import Button from '../../../components/button';
 import {HiOutlineTrash} from 'react-icons/hi';
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from '../../../components/content-panel';
 import FlexBox from '../../../components/flexbox';
@@ -64,7 +64,7 @@ function RevisionTab(props) {
         <FlexBox>
             <FlexBox className="col gap">
                 <FlexBox  style={{maxHeight:"32px"}}>
-                    <Button2 onClick={()=>{
+                    <Button onClick={()=>{
                         setRevision(null)
                         setSearchParams({
                             tab: searchParams.get('tab')
@@ -74,7 +74,7 @@ function RevisionTab(props) {
                             <BiChevronLeft style={{ fontSize: "16px" }} />
                             <div>Back to All Revisions</div>
                         </FlexBox>
-                    </Button2>
+                    </Button>
                 </FlexBox>
                 <FlexBox>
                 <ContentPanel style={{ width: "100%", minWidth: "300px", flex: 1}}>
@@ -537,31 +537,31 @@ export function RevisionSelectorTab(props) {
                                                         </FlexBox>
                                                     </FlexBox>
                                             </Modal>
-                                            <Button2 color="info" variant="outlined" disableShadows onClick={()=>{
+                                            <Button color="info" variant="outlined" disableShadows onClick={()=>{
                                                 setSearchParams({tab: 1, revision: obj.name})
                                             }}>
                                                 Open{" "}<span className="hide-900">Revision</span>
-                                            </Button2></>
+                                            </Button></>
                                             : 
                                             <>
                                                 {/* Hidden buttons to retain same spacing on latest */}
                                                 <div style={{visibility:"hidden"}}>
-                                                <Button2 color="info" variant="outlined" onClick={async()=>{
+                                                <Button color="info" variant="outlined" onClick={async()=>{
                                                 }}>
                                                     Tag
-                                                </Button2>
+                                                </Button>
                                                 </div>
                                                 <div style={{visibility:"hidden"}}>
-                                                <Button2 color="info" variant="outlined" onClick={async()=>{
+                                                <Button color="info" variant="outlined" onClick={async()=>{
                                                 }}>
                                                     Revert{" "}<span className="hide-900">To</span>
-                                                </Button2>
+                                                </Button>
                                                 </div>
                                                 <div>
-                                                <Button2 color="info" variant="outlined" onClick={()=>{
+                                                <Button color="info" variant="outlined" onClick={()=>{
                                                 }}>
                                                     Open{" "}<span className="hide-900">Revision</span>
-                                                </Button2></div>
+                                                </Button></div>
                                             </>
                                             }
                                         </FlexBox>
@@ -806,7 +806,7 @@ export function RevisionTrafficShaper(props) {
                     <div style={{width:"99.5%", margin:"auto", background: "#E9ECEF", height:"1px"}}/>
                 </FlexBox>
                 <FlexBox className={"row gap"} style={{ marginTop: "10px", justifyContent: "flex-end" }}>
-                    <Button2 onClick={async () => {
+                    <Button onClick={async () => {
                         let arr = []
                         if (rev1 !== "" && rev2 !== "") {
                             arr.push({
@@ -832,7 +832,7 @@ export function RevisionTrafficShaper(props) {
                         setRouter(await getWorkflowRouter())
                     }} disabled={!rev2 || !rev1}>
                         Save
-                    </Button2>
+                    </Button>
                     <ModalHeadless
                         setVisible={setShowRunModal}
                         visible={showRunModal}
@@ -868,9 +868,9 @@ export function RevisionTrafficShaper(props) {
                             </FlexBox>
                         </FlexBox>
                     </ModalHeadless>
-                    <Button2 onClick={() =>{setShowRunModal(true)}} tooltip="Run workflow with router traffic">
+                    <Button onClick={() =>{setShowRunModal(true)}} tooltip="Run workflow with router traffic">
                         Run
-                    </Button2>
+                    </Button>
                 </FlexBox>
             </ContentPanelBody>
         </ContentPanel>

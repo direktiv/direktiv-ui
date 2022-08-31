@@ -4,7 +4,7 @@ import { VscCopy, VscEye, VscEyeClosed, VscInbox, VscLayers, VscWholeWord, VscWo
 import AutoSizer from "react-virtualized-auto-sizer";
 import { VariableSizeList } from "react-window";
 import { copyTextToClipboard } from "../../util";
-import Button2 from "../buttonv2";
+import Button from "../button";
 import FlexBox from "../flexbox";
 import "./style.css";
 
@@ -212,7 +212,7 @@ export function LogFooterButtons({ follow, setFollow, wordWrap, setWordWrap, dat
     return (
         <>
 
-            <Button2 color="terminal" variant="contained" onClick={() => {
+            <Button color="terminal" variant="contained" onClick={() => {
                 if (clipData) {
                     copyTextToClipboard(clipData)
                 } else {
@@ -222,28 +222,28 @@ export function LogFooterButtons({ follow, setFollow, wordWrap, setWordWrap, dat
                 <FlexBox className="row center gap-sm">
                     <VscCopy /> Copy <span className='hide-1000'>to Clipboard</span>
                 </FlexBox>
-            </Button2>
+            </Button>
             {
                 follow !== undefined && setFollow !== undefined ?
-                    <Button2 color="terminal" variant="contained" onClick={() => setFollow(!follow)}>
+                    <Button color="terminal" variant="contained" onClick={() => setFollow(!follow)}>
                         <FlexBox className="row center gap-sm">
                             {follow ? <><VscEyeClosed /> Stop <span className='hide-1000'>watching</span></> :
                                 <><VscEye /> Follow <span className='hide-1000'>logs</span></>}
                         </FlexBox>
-                    </Button2>
+                    </Button>
                     :
                     <></>
             }
             {
                 wordWrap !== undefined && setWordWrap !== undefined ?
-                    <Button2 color="terminal" variant="contained" tooltip={wordWrap ? "Disable word wrapping" : "Enable word wrapping"} onClick={() => {
+                    <Button color="terminal" variant="contained" tooltip={wordWrap ? "Disable word wrapping" : "Enable word wrapping"} onClick={() => {
                         setWordWrap(!wordWrap)
                     }}>
                         <FlexBox className="row center gap-sm">
                             {wordWrap ? <><VscWholeWord /> Whole<span className='hide-1000'>{` Word`}</span></> :
                                 <><VscWordWrap /> Wrap<span className='hide-1000'>{` Word`}</span></>}
                         </FlexBox>
-                    </Button2> :
+                    </Button> :
                     <></>
             }
         </>

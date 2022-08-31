@@ -17,7 +17,7 @@ import Tabs from '../../../components/tabs';
 import { CanPreviewMimeType, Config, MimeTypeFileExtension } from '../../../util';
 import { VariableFilePicker } from '../../settings/variables-panel';
 
-import Button2 from '../../../components/buttonv2';
+import Button from '../../../components/button';
 
 
 const PAGE_SIZE = 10 ;
@@ -410,9 +410,9 @@ function VariablesDownloadButton(props) {
     const {onClick} = props
 
     return (
-        <Button2 onClick={onClick} auto={true} variant={"text"} color={"info"}>
+        <Button onClick={onClick} auto={true} variant={"text"} color={"info"}>
             <VscCloudDownload/>
-        </Button2>
+        </Button>
     )
 }
 

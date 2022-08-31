@@ -4,7 +4,7 @@ import { VscLayers } from 'react-icons/vsc';
 import { useNavigate, useParams } from "react-router"
 import { Service } from "."
 import Alert from "../../components/alert"
-import Button2 from "../../components/buttonv2";
+import Button from "../../components/button";
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon, ContentPanelFooter } from "../../components/content-panel"
 import FlexBox from "../../components/flexbox"
 import Modal, { ButtonDefinition, KeyDownDefinition } from "../../components/modal"
@@ -324,7 +324,7 @@ export function UpdateTraffic(props){
                         </ContentPanelBody>
                         <ContentPanelFooter>
                             <FlexBox className="col" style={{alignItems:"flex-end"}}>
-                                <Button2 onClick={async ()=>{
+                                <Button onClick={async ()=>{
                                     try { 
                                         await setNamespaceServiceRevisionTraffic(revOne, parseInt(tpercent), revTwo, parseInt(100-tpercent))
                                         setErrMsg("")
@@ -337,7 +337,7 @@ export function UpdateTraffic(props){
                                     }
                                 }}>
                                     Save
-                                </Button2>
+                                </Button>
                             </FlexBox>
                         </ContentPanelFooter>
                 </ContentPanel>

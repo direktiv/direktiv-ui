@@ -27,7 +27,7 @@ import WorkflowDiagram from '../../../components/diagram';
 
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
-import Button2 from '../../../components/buttonv2';
+import Button from '../../../components/button';
 import Modal, { ButtonDefinition } from '../../../components/modal';
 
 import { PieChart } from 'react-minimal-pie-chart';
@@ -329,7 +329,7 @@ function WorkingRevision(props) {
                         <FlexBox className="gap editor-footer">
                             <WorkingRevisionErrorBar errors={errors} showErrors={showErrors}/>
                             <div style={{ display: "flex", flex: 1 }}>
-                                <Button2 
+                                <Button 
                                     color="terminal"
                                     variant="contained"
                                     loading={opLoadingStates["IsLoading"]} 
@@ -342,7 +342,7 @@ function WorkingRevision(props) {
                                         setShowErrors(false)
                                 }}>
                                     Revert
-                                </Button2>
+                                </Button>
                             </div>
                             <div style={{display:"flex", flex:1, justifyContent:"center"}}>
                                 <Modal 
@@ -431,7 +431,7 @@ function WorkingRevision(props) {
                             </div>
                             <div style={{ display: "flex", flex: 1, gap: "3px", justifyContent: "flex-end", paddingRight: "10px"}}>
 
-                                <Button2 
+                                <Button 
                                     tooltip={"Save workflow to latest"} 
                                     disabledTooltip={"No changes to workflow"}
                                     color="terminal"
@@ -451,9 +451,9 @@ function WorkingRevision(props) {
                                         })
                                 }}>
                                     Save
-                                </Button2>
+                                </Button>
 
-                                <Button2 
+                                <Button 
                                     tooltip={"Save latest workflow as new revision"} 
                                     disabledTooltip={"Requires save"}
                                     color="terminal"
@@ -479,9 +479,9 @@ function WorkingRevision(props) {
                                         }
                                 }}>
                                     Make Revision
-                                </Button2>
+                                </Button>
 
-                                <Button2 
+                                <Button 
                                     tooltip={`${showErrors ? "Hide Problems": "Show Problems"}`} 
                                     color="terminal"
                                     variant="contained"
@@ -496,7 +496,7 @@ function WorkingRevision(props) {
                                         <VscChevronUp style={{ width: "80%", height: "80%" }} />
                                         }
                                     </FlexBox>
-                                </Button2>
+                                </Button>
                             </div>
                         </FlexBox>
                     </FlexBox>:""}
@@ -1066,7 +1066,7 @@ function SettingsTab(props) {
                                         <div style={{width:"99.5%", margin:"auto", background: "#E9ECEF", height:"1px"}}/>
                                         <FlexBox className="gap" style={{justifyContent:"flex-end", width:"100%"}}>
                                             { lteStatus ? <Alert className={`${lteStatus} small`}>{lteStatusMessage}</Alert> : <></> }
-                                            <Button2 onClick={async()=>{
+                                            <Button onClick={async()=>{
                                                 try { 
                                                     await setWorkflowLogToEvent(logToEvent)
                                                 } catch(err) {
@@ -1079,7 +1079,7 @@ function SettingsTab(props) {
                                                 setLTEStatusMessage("'Log to Event' value set!")
                                             }} className="small">
                                                 Save
-                                            </Button2>
+                                            </Button>
                                         </FlexBox>
                                     </FlexBox>
                                 </ContentPanelBody>

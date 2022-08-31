@@ -5,7 +5,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { VscAdd, VscLock, VscSync, VscUnlock } from 'react-icons/vsc';
 import { useNavigate, useParams } from 'react-router';
 import Alert from '../../components/alert';
-import Button2 from '../../components/buttonv2';
+import Button from '../../components/button';
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
 import FlexBox from '../../components/flexbox';
 import Loader from '../../components/loader';
@@ -112,14 +112,14 @@ export default function MirrorPage(props) {
 
         setBreadcrumbChildrenRef.current((
             <FlexBox className="center row gap" style={{ justifyContent: "flex-end", paddingRight: "6px" }}>
-                <Button2 tooltip={"Sync mirror with remote"} disabledTooltip={"Cannot sync mirror while Writable"} disabled={!isReadOnly} variant="outlined" color="info" onClick={()=>{
+                <Button tooltip={"Sync mirror with remote"} disabledTooltip={"Cannot sync mirror while Writable"} disabled={!isReadOnly} variant="outlined" color="info" onClick={()=>{
                     setSyncVisible(!syncVisible)
                 }}>
                     <FlexBox className="row center gap-sm">
                         <VscSync />
                         Sync
                     </FlexBox>
-                </Button2>
+                </Button>
                 <ModalHeadless
                     visible={syncVisible}
                     setVisible={setSyncVisible}
@@ -148,7 +148,7 @@ export default function MirrorPage(props) {
                         </FlexBox>
                     </FlexBox>
                 </ModalHeadless>
-                <Button2 variant="outlined" color="info" onClick={async () => {
+                <Button variant="outlined" color="info" onClick={async () => {
                     if (isReadOnly) {
                         setCurrentlyLocking(true)
 
@@ -182,7 +182,7 @@ export default function MirrorPage(props) {
                             </>
                         }
                     </FlexBox>
-                </Button2>
+                </Button>
                 {isReadOnly ? <MirrorReadOnlyBadge /> : <MirrorWritableBadge />}
             </ FlexBox>
         ))
@@ -262,11 +262,11 @@ export function MirrorReadOnlyBadge(props) {
     return (
         <Tippy content={`This mirrors contents are currently read-only. This can be unlocked in mirror setttings`} trigger={'mouseenter focus'} zIndex={10}>
             <div>
-                <Button2 variant="contained" color="info" disabled style={{ borderRadius:"20px" }}>
+                <Button variant="contained" color="info" disabled style={{ borderRadius:"20px" }}>
                     <FlexBox className="row center gap-sm">
                         <VscLock />ReadOnly
                     </FlexBox>
-                </Button2>
+                </Button>
             </div>
         </Tippy>
     )
@@ -277,7 +277,7 @@ export function MirrorWritableBadge(props) {
     return (
         <Tippy content={`This mirrors contents are currently writable. This can be unlocked in mirror setttings`} trigger={'mouseenter focus'} zIndex={10}>
             <div>
-                <Button2 disabled variant="contained" color="secondary" sx={{
+                <Button disabled variant="contained" color="secondary" sx={{
                     "&:disabled":{
                         backgroundColor: theme.palette.secondary.main,
                         color: theme.palette.primary.main,
@@ -288,7 +288,7 @@ export function MirrorWritableBadge(props) {
                     <FlexBox className="row center gap-sm">
                         <VscUnlock />Writable
                     </FlexBox>
-                </Button2>
+                </Button>
             </div>
         </Tippy>
     )

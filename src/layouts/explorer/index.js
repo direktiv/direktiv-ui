@@ -23,7 +23,7 @@ import { Config, GenerateRandomKey } from '../../util';
 import WorkflowPage from './workflow';
 import WorkflowPod from './workflow/pod';
 import WorkflowRevisions from './workflow/revision';
-import Button2 from '../../components/buttonv2';
+import Button from '../../components/button';
 
 import Alert from '../../components/alert';
 import NotFound from '../notfound';
@@ -596,10 +596,10 @@ function ExplorerList(props) {
                         </Modal>
                     {
                         data && data?.node?.expandedType === "git" ?
-                                <Button2 variant='outlined' color='info' href={`/n/${namespace}/mirror${path}`}>
+                                <Button variant='outlined' color='info' href={`/n/${namespace}/mirror${path}`}>
                                     <VscRepo />
                                     <span>Mirror Info</span>
-                                </Button2>
+                                </Button>
                             :
                             <></>
                     }
@@ -924,7 +924,7 @@ export function ApiFragment(props) {
         <FlexBox className='helper-wrap col'>
             <FlexBox className='helper-title row'>
                 <FlexBox className='row vertical-center'>
-                    <Button2 className={`btn-method ${method}`}>{method}</Button2>
+                    <Button className={`btn-method ${method}`}>{method}</Button>
                     <div className='url'>{url}</div>
                 </FlexBox>
                 <div className='description' style={{textAlign:"right"}}>{description}</div>

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import ContentPanel, { ContentPanelBody, ContentPanelFooter, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
-import Button from '../buttonv2';
 import './style.css';
 
 import { VscDiffAdded } from 'react-icons/vsc';
@@ -11,7 +10,7 @@ import FlexBox from '../flexbox';
 
 import 'tippy.js/dist/tippy.css';
 
-import Button2 from '../../components/buttonv2';
+import Button from '../button';
 
 
 export function ModalHeadless(props) {
@@ -127,7 +126,7 @@ function Modal(props) {
         onClose={onClose}
         onOpen={onOpen}
         requiredFields={requiredFields}/>
-        <Button2 onClick={async(ev)=>{
+        <Button onClick={async(ev)=>{
              if(onOpen){
                 await onOpen()
             }
@@ -135,7 +134,7 @@ function Modal(props) {
             ev.stopPropagation()
         }} variant={"outlined"} color="info" {...buttonProps}>
            {button}
-        </Button2>
+        </Button>
         {/* <FlexBox style={{...style}}>
             <div style={{width: "100%", display:'flex', justifyContent: "center", pointerEvents: buttonDisabled ? "none" : "", ...btnStyle}} onClick={async(ev) => {
                 if(onOpen){

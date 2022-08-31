@@ -8,7 +8,7 @@ import FlexBox from '../../components/flexbox';
 import HelpIcon from '../../components/help';
 import { Config } from '../../util';
 import './style.css';
-import Button2 from '../../components/buttonv2';
+import Button from '../../components/button';
 
 
 export default function JQPlayground() {
@@ -101,14 +101,14 @@ function HowToJQ(){
                                 For information on the JQ syntax, please refer to the offical JQ manual online.
                             </div>
                             <div>
-                                <Button2 variant='outlined' color="info">
+                                <Button variant='outlined' color="info">
                                     <FlexBox className="gap">
                                         <VscArrowRight className="auto-margin" />
                                         <a href="https://stedolan.github.io/jq/manual/">
                                             View JQ Manual
                                         </a>
                                     </FlexBox>
-                                </Button2>
+                                </Button>
                             </div>
                         </FlexBox>
                     </ContentPanelBody>
@@ -160,14 +160,14 @@ function ExamplesJQ(props){
                                                 {obj.tip}
                                             </td>
                                             <td style={{ width: "20%"}} onClick={()=>loadJQ(obj.filter, obj.json)}>
-                                                <Button2 variant='outlined' color="info">
+                                                <Button variant='outlined' color="info">
                                                     <FlexBox className="gap">
                                                         <VscFileCode className="auto-margin" />
                                                         <div>
                                                             Load
                                                         </div>
                                                     </FlexBox>
-                                                </Button2>
+                                                </Button>
                                             </td>
                                         </tr>
                                     )
@@ -187,14 +187,14 @@ function ExamplesJQ(props){
                                                 {obj.tip}
                                             </td>
                                             <td style={{ width: "20%"}} onClick={()=>loadJQ(obj.filter, obj.json)}>
-                                                <Button2 variant='outlined' color="info">
+                                                <Button variant='outlined' color="info">
                                                     <FlexBox className="gap">
                                                         <VscFileCode className="auto-margin" />
                                                         <div>
                                                             Load
                                                         </div>
                                                     </FlexBox>
-                                                </Button2>
+                                                </Button>
                                             </td>
                                         </tr>
                                     )
@@ -309,9 +309,9 @@ function JQFilter(props) {
                             <input style={{height:"28px", width:"100%"}} onChange={(e)=>setFilter(e.target.value)} value={query} placeholder={"Enter a Filter to JQ on"} type="text" />
                         </FlexBox>
                         <FlexBox style={{maxWidth:"65px"}}>
-                            <Button2 onClick={()=>execute()}>
+                            <Button onClick={()=>execute()}>
                                 Execute
-                            </Button2>
+                            </Button>
                         </FlexBox>
                     </FlexBox>
                 </ContentPanelBody>

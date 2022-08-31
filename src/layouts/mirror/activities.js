@@ -3,7 +3,7 @@ import './style.css';
 
 import FlexBox from '../../components/flexbox';
 import { GenerateRandomKey } from '../../util';
-import Button2 from '../../components/buttonv2';
+import Button from '../../components/button';
 import Loader from '../../components/loader';
 
 import * as dayjs from "dayjs"
@@ -101,7 +101,7 @@ export function ActivityRow(props) {
             </td>
             <td className="center-align">
                 <FlexBox className="center gap">
-                    <Button2 color="info" variant="outlined" className={`small light`} style={state !== "pending" ? { visibility: "hidden" } : {}} onClick={async () => {
+                    <Button color="info" variant="outlined" className={`small light`} style={state !== "pending" ? { visibility: "hidden" } : {}} onClick={async () => {
                         try {
                             await cancelActivity(id)
                         } catch (e) {
@@ -110,12 +110,12 @@ export function ActivityRow(props) {
 
                     }}>
                         Cancel
-                    </Button2>
-                    <Button2 onClick={async () => {
+                    </Button>
+                    <Button onClick={async () => {
                         setActivity(id)
                     }}>
                         Logs
-                    </Button2>
+                    </Button>
                 </FlexBox>
             </td>
         </tr>
