@@ -1,11 +1,10 @@
 import Button from '@mui/material/Button';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { createTheme } from '@mui/material/styles';
 import * as React from 'react';
 import {
     Link as RouterLink,
-    LinkProps as RouterLinkProps,
-    MemoryRouter,
-  } from 'react-router-dom';
+    LinkProps as RouterLinkProps
+} from 'react-router-dom';
 
 const Colors = {
     primary: "#3E94C5",

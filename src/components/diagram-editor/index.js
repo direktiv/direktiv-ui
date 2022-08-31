@@ -209,11 +209,13 @@ function FunctionsList(props) {
                     }, {}, () => { }, true, false)
                 ]}
                 button={(
-                    <div className={`btn function-btn`}>
+                    <span>
                         New function
-                    </div>
-
+                    </span>
                 )}
+                buttonProps={{
+                    auto: true
+                }}
             >
                 <FlexBox className="col" style={{ height: "45vh", minWidth: "250px", minHeight: "200px", justifyContent: "space-between" }}>
                     <div style={{ overflow: "auto" }}>

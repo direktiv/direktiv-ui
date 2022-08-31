@@ -21,6 +21,9 @@ const DirektivButton = styled(MUIButton, {
     minWidth: "auto",
     height: "auto",
     fontWeight: "bold",
+    "&:visited":{
+        color: color !== undefined && color !== "inherit" ? theme.palette[color].main : undefined
+    },
     "&.MuiButton-sizeSmall": {
         height: "1.8rem",
         lineHeight: "1rem",

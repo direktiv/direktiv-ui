@@ -596,12 +596,10 @@ function ExplorerList(props) {
                         </Modal>
                     {
                         data && data?.node?.expandedType === "git" ?
-                            // <Link to={`/n/${namespace}/mirror${path}`}>
                                 <Button2 variant='outlined' color='info' href={`/n/${namespace}/mirror${path}`}>
                                     <VscRepo />
                                     <span>Mirror Info</span>
                                 </Button2>
-                            // </Link>
                             :
                             <></>
                     }
