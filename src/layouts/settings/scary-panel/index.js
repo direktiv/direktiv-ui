@@ -66,10 +66,13 @@ function Scary(props) {
                             tooltip: "Delete Namespace",
                             disabledTooltip: "Requires save"
                         }}
+                        requiredFields={[
+                            {tip: "typing namespace name is required", value: delButtonEnabled ? "valid":""}
+                        ]}
                         actionButtons={[
                             ButtonDefinition("Delete", async () => {
                                 await deleteNamespace(namespace)
-                            }, delBtnClasses,()=>{}, true, false),
+                            }, {variant: "contained", color:"error"},()=>{}, true, false, true),
                             ButtonDefinition("Cancel", () => {
                             }, {},()=>{}, true, false)
                         ]}

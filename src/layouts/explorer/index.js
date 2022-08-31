@@ -10,7 +10,7 @@ import { FiFolder } from 'react-icons/fi';
 import { HiOutlineTrash } from 'react-icons/hi';
 import { VscAdd, VscClose, VscCloudUpload, VscCode, VscEdit, VscFolderOpened, VscRepo, VscSearch, VscTrash } from 'react-icons/vsc';
 import { useNavigate, useParams } from 'react-router';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { AutoSizer } from 'react-virtualized';
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
 import DirektivEditor from '../../components/editor';
@@ -596,12 +596,12 @@ function ExplorerList(props) {
                         </Modal>
                     {
                         data && data?.node?.expandedType === "git" ?
-                            <Link to={`/n/${namespace}/mirror${path}`}>
-                                <Button2 variant='outline' color='info'>
+                            // <Link to={`/n/${namespace}/mirror${path}`}>
+                                <Button2 variant='outlined' color='info' href={`/n/${namespace}/mirror${path}`}>
                                     <VscRepo />
-                                        Mirror Info
+                                    <span>Mirror Info</span>
                                 </Button2>
-                            </Link>
+                            // </Link>
                             :
                             <></>
                     }

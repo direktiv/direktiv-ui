@@ -1,4 +1,3 @@
-import { useTheme } from "@emotion/react";
 import dayjs from "dayjs";
 import { createContext, CSSProperties, forwardRef, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { VscCopy, VscEye, VscEyeClosed, VscInbox, VscLayers, VscWholeWord, VscWordWrap } from "react-icons/vsc";
@@ -210,7 +209,6 @@ interface LogFooterButtonsProps {
 }
 
 export function LogFooterButtons({ follow, setFollow, wordWrap, setWordWrap, data, clipData }: LogFooterButtonsProps) {
-    const theme = useTheme()
     return (
         <>
 

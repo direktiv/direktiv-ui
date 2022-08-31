@@ -114,7 +114,7 @@ function EventsPage(props) {
                                                                         }
                                                                         buttonProps={{
                                                                             auto: true,
-                                                                            color: "light"
+                                                                            color: "info"
                                                                         }}
                                                                         actionButtons={[
                                                                             ButtonDefinition("Retrigger", async () => {
@@ -142,7 +142,7 @@ function EventsPage(props) {
                                                                         }
                                                                         buttonProps={{
                                                                             auto: true,
-                                                                            color: "light"
+                                                                            color: "info"
                                                                         }}
                                                                         actionButtons={[
                                                                             ButtonDefinition("Close", async () => {

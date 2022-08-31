@@ -9,7 +9,6 @@ import { VscClose } from 'react-icons/vsc';
 import Alert from '../alert';
 import FlexBox from '../flexbox';
 
-import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 
 import Button2 from '../../components/buttonv2';

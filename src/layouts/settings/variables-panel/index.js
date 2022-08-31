@@ -296,7 +296,7 @@ function Variable(props) {
                             </FlexBox>
                         )}
                         buttonProps={{
-                            color: "light",
+                            color: "info",
                         }}
                         actionButtons={
                             [
@@ -375,7 +375,7 @@ function Variable(props) {
                     )}
                     buttonProps={{
                         variant: "text",
-                        color:"light"
+                        color: "info"
                     }}
                     actionButtons={
                         [
@@ -408,7 +408,7 @@ function Variable(props) {
                     )}
                     buttonProps={{
                         variant: "text",
-                        color:"light"
+                        color: "info"
                     }}
                     actionButtons={
                         [
@@ -448,7 +448,7 @@ function VariablesDownloadButton(props) {
     const {onClick} = props
 
     return (
-        <Button2 onClick={onClick} variant={"text"} color={"light"}>
+        <Button2 onClick={onClick} variant={"text"} color={"info"}>
             <VscCloudDownload/>
         </Button2>
     )

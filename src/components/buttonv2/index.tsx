@@ -8,20 +8,19 @@ interface ButtonProps extends MUIButtonProps {
     disabledTooltip?: string;
     asyncDisable?: boolean;
     auto?: boolean;
+    disableShadows?: boolean;
 }
 
 const DirektivButton = styled(MUIButton, {
     shouldForwardProp: (prop) => prop !== 'success',
-})<ButtonProps>(({ theme, color, size, auto, variant, disabledTooltip }) => ({
-    ...(variant !== "text" && {
-        boxShadow: "var(--theme-shadow-box-shadow)",
-        border: "var(--border)",
-    }),
+})<ButtonProps>(({ theme, color, size, auto, variant, disabledTooltip, disabled, disableShadows }) => ({
+    // Defaults
     textTransform: "none",
     fontSize: "0.8rem",
     padding: "0.4rem 0.5rem",
     minWidth: "auto",
     height: "auto",
+    fontWeight: "bold",
     "&.MuiButton-sizeSmall": {
         height: "1.8rem",
         lineHeight: "1rem",
@@ -34,51 +33,51 @@ const DirektivButton = styled(MUIButton, {
         height: "3.8rem",
         lineHeight: "3rem",
     },
-    ":hover": {
-        backgroundColor: color !== undefined && color !== "inherit" && color !== "info" ? theme.palette[color].light : "none",
+    // Enable Shadows for non-text variants
+    ...(variant !== "text" && {
         boxShadow: "var(--theme-shadow-box-shadow)",
-        transition: '0.2s',
-    },
-    ":active": {
-        backgroundColor: color !== undefined && color !== "inherit" ? theme.palette[color].dark : "none",
-    },
-    ...(color === "info" && {
-        fontWeight: "bold",
-        color: "var(--theme-dark-text)",
-        ":hover": {
-            backgroundColor: "#e6e6e6",
-            boxShadow: "var(--theme-shadow-box-shadow)",
-            borderColor: 'var(--theme-dark-text)',
-            transition: '0.2s',
+        "&:hover": {
+            backgroundColor: color !== undefined && color !== "inherit" ? theme.palette[color].light : undefined,
+            transition: '0.2s'
         },
     }),
-    // ...(color as string === "light" && {
-    //     fontWeight: "bold",
-    //     ":hover": {
-    //         backgroundColor: "#e6e6e6",
-    //         boxShadow: "var(--theme-shadow-box-shadow)",
-    //         transition: '0.2s',
-    //     },
-    // }),
-    ...(color === "terminal" && {
+    // Custom Style for info color
+    ...(color === "info" && variant !== "text" && {
+        backgroundColor: "white",
+        // outline: "var(--border)",
+        borderColor: "var(--theme-subtle-border)",
+        ":hover": {
+            borderColor: "#d2d4d7"
+        }
+    }),
+    // Custom Style for terminal color
+    ...(color === "terminal" && variant !== "text" && {
         border: "none",
         ":disabled": {
             backgroundColor: "#2e3d48",
-            color: 'white'
+            color: "#65747f"
         },
     }),
+    // Support Disabled Tooltips
     ...(disabledTooltip !== undefined && {
-        ":disabled": {
+        "&:disabled": {
             pointerEvents:"auto",
-            backgroundColor: color === "terminal" ? "#2e3d48" : undefined,
-            color: color === "terminal" ? "white" : undefined,
         },
+        ...(disabled && {
+            "&:hover": {
+                backgroundColor: undefined
+            },
+        }),
     }),
+    // Auto expand height/width
     ...(auto && {
         width: "100%",
         minWidth: "0px",
         minHeight: "0px",
         height: "auto !important"
+    }),
+    ...(disableShadows && {
+        boxShadow: undefined 
     }),
 }));
 

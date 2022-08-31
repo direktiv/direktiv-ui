@@ -1,4 +1,11 @@
-import { createTheme } from '@mui/material/styles';
+import Button from '@mui/material/Button';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import * as React from 'react';
+import {
+    Link as RouterLink,
+    LinkProps as RouterLinkProps,
+    MemoryRouter,
+  } from 'react-router-dom';
 
 const Colors = {
     primary: "#3E94C5",
@@ -6,12 +13,21 @@ const Colors = {
     light: "#566875"
 };
 
+// React Router link behavior for MUIButton
+const LinkBehavior = React.forwardRef<
+  HTMLAnchorElement,
+  Omit<RouterLinkProps, 'to'> & { href: RouterLinkProps['to'] }
+>((props, ref) => {
+  const { href, ...other } = props;
+  return <RouterLink data-testid="custom-link" ref={ref} to={href} {...other} />;
+});
+
 const theme = createTheme({
     typography: {
         fontFamily: [
             "Inter"
         ].join(","),
-        body1:{
+        body1: {
             fontWeight: "bold",
             fontSize: "14px"
         }
@@ -28,7 +44,8 @@ const theme = createTheme({
             primary: Colors.light
         },
         info: {
-            main: "#566875"
+            main: "#566875",
+            light: "#e6e6e6"
         },
         error: {
             main: "#ff616d"
@@ -38,7 +55,7 @@ const theme = createTheme({
             light: "#3a5970",
         }
     },
-components: {
+    components: {
         // Name of the component
         MuiPaginationItem: {
             defaultProps: {
@@ -54,7 +71,12 @@ components: {
                     color: "#1a3041"
                 }
             }
-        }
+        },
+        MuiButtonBase: {
+            defaultProps: {
+              LinkComponent: LinkBehavior,
+            },
+        },
     },
 });
 

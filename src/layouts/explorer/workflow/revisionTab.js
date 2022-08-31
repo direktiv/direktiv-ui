@@ -133,10 +133,13 @@ function RevisionTab(props) {
                                                 }
                                             }}
                                             button={(
-                                                <div style={{alignItems:"center", gap:"3px",backgroundColor:"#355166", paddingTop:"3px", paddingBottom:"3px", paddingLeft:"6px", paddingRight:"6px", cursor:"pointer", borderRadius:"3px"}}>
-                                                    Run
-                                                </div>
+                                                <span style={{fontSize:"15px"}}>Run</span>
                                             )}
+                                            buttonProps={{
+                                                variant: "contained",
+                                                color: "terminal",
+                                                tooltip: "Run Workflow"
+                                            }}
                                         >
                                         <FlexBox style={{ height: "45vh", minWidth: "250px", minHeight: "160px", overflow:"hidden" }}>
                                             <Tabs
@@ -469,6 +472,10 @@ export function RevisionSelectorTab(props) {
                                                     button={(
                                                         <HiOutlineTrash className="red-text" style={{ fontSize: "16px" }} />
                                                     )}
+                                                    buttonProps={{
+                                                        color: "info",
+                                                        disableShadows: true
+                                                    }}
                                                     actionButtons={
                                                         [
                                                             ButtonDefinition("Delete", async () => {
@@ -509,7 +516,8 @@ export function RevisionSelectorTab(props) {
                                                         </>
                                                     )}
                                                     buttonProps={{
-                                                        color:"light"
+                                                        color: "info",
+                                                        disableShadows: true
                                                     }}
                                                     actionButtons={
                                                         [
@@ -529,7 +537,7 @@ export function RevisionSelectorTab(props) {
                                                         </FlexBox>
                                                     </FlexBox>
                                             </Modal>
-                                            <Button2 color="info" variant="outlined" onClick={()=>{
+                                            <Button2 color="info" variant="outlined" disableShadows onClick={()=>{
                                                 setSearchParams({tab: 1, revision: obj.name})
                                             }}>
                                                 Open{" "}<span className="hide-900">Revision</span>
@@ -636,7 +644,8 @@ function TagRevisionBtn(props) {
                 </FlexBox>
             )}
             buttonProps={{
-                color:"light"
+                color: "info",
+                disableShadows: true
             }}
             actionButtons={
                 [
