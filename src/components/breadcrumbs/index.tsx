@@ -12,8 +12,12 @@ const routes = [
     { path: '/n/:namespace/services', breadcrumb: "Namespace Services"}
 ];
 
-function Breadcrumbs(props) {
-    const {namespace, additionalChildren} = props
+export interface BreadcrumbsProps {
+    namespace: string
+    additionalChildren?: React.ReactNode
+}
+
+function Breadcrumbs({namespace, additionalChildren}: BreadcrumbsProps) {
     const breadcrumbs = useBreadcrumbs(routes)
     const [searchParams] = useSearchParams() // removed 'setSearchParams' from square brackets (this should not affect anything: search 'destructuring assignment')
     
@@ -89,7 +93,7 @@ function Breadcrumbs(props) {
                    </li>
                 :""}
             </ul>
-            {additionalChildren ? additionalChildren : <></>}
+            {additionalChildren}
         </FlexBox>
     );
 }
