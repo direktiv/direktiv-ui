@@ -306,8 +306,8 @@ export default function MirrorInfoPanel(props) {
                                             await updateSettings(newSettings)
 
                                             resetStates()
-                                        }, "small", () => { }, true, false),
-                                        ButtonDefinition("Cancel", () => { }, "small light", () => { }, true, false)
+                                        }, {variant: "contained", color: "primary"}, () => { }, true, false),
+                                        ButtonDefinition("Cancel", () => { }, {}, () => { }, true, false)
                                     ]}
                                 >
                                     <FlexBox className="col gap" style={{ height: "fit-content" }}>

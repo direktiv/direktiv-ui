@@ -87,9 +87,9 @@ function AddWorkflowVariablePanel(props) {
                                 } else {
                                     await setWorkflowVariable(encodeURIComponent(keyValue), dValue, mimeType)
                                 }
-                            }, `small ${uploading ? "loading" : ""}`, () => { setUploading(false) }, true, false, true),
+                            }, {variant: "contained", color: "primary"}, () => { setUploading(false) }, true, false, true),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light", () => { }, true, false)
+                            }, {}, () => { }, true, false)
                         ]}
 
                         requiredFields={[
@@ -259,9 +259,9 @@ function Variable(props) {
                             [
                                 ButtonDefinition("Save", async () => {
                                     await setWorkflowVariable(obj.name, val , mimeType)
-                                }, "small", ()=>{}, true, false),
+                                }, {variant: "contained", color: "primary"}, ()=>{}, true, false),
                                 ButtonDefinition("Cancel", () => {
-                                }, "small light", ()=>{}, true, false)
+                                }, {}, ()=>{}, true, false)
                             ]
                         } 
                     >
@@ -317,43 +317,43 @@ function Variable(props) {
                     }}/>:<VariablesDownloadingButton />}
                 </div>
                 <div>
-                <Modal
-                    modalStyle={{width: "500px"}}
-                    escapeToCancel
-                    style={{
-                        flexDirection: "row-reverse",
-                    }}
-                    onClose={()=>{
-                        setFile(null)
-                    }}
-                    title="Replace variable" 
-                    button={(
-                        <VariablesUploadButton />
-                    )}
-                    buttonProps={{
-                        auto: true,
-                        variant: "text",
-                        color:"light"
-                    }}
-                    actionButtons={
-                        [
-                            ButtonDefinition("Upload", async () => {
-                                setUploading(true)
-                                await setWorkflowVariable(obj.name, file, mimeType)
-                            }, `small ${uploading ? "loading" : ""}`, ()=>{setUploading(false)}, true, false, true),
-                            ButtonDefinition("Cancel", () => {
-                            }, "small light",()=>{}, true, false)
-                        ]
-                    } 
+                    <Modal
+                        modalStyle={{width: "500px"}}
+                        escapeToCancel
+                        style={{
+                            flexDirection: "row-reverse",
+                        }}
+                        onClose={()=>{
+                            setFile(null)
+                        }}
+                        title="Replace variable" 
+                        button={(
+                            <VariablesUploadButton />
+                        )}
+                        buttonProps={{
+                            auto: true,
+                            variant: "text",
+                            color:"light"
+                        }}
+                        actionButtons={
+                            [
+                                ButtonDefinition("Upload", async () => {
+                                    setUploading(true)
+                                    await setWorkflowVariable(obj.name, file, mimeType)
+                                }, {variant: "contained", color: "primary"}, ()=>{setUploading(false)}, true, false, true),
+                                ButtonDefinition("Cancel", () => {
+                                }, {},()=>{}, true, false)
+                            ]
+                        } 
 
-                    requiredFields={[
-                        {tip: "file is required", value: file}
-                    ]}
-                >
-                    <FlexBox className="col gap">
-                        <VariableFilePicker setMimeType={setType} id="modal-file-picker" file={file} setFile={setFile} />
-                    </FlexBox>
-                </Modal>
+                        requiredFields={[
+                            {tip: "file is required", value: file}
+                        ]}
+                    >
+                        <FlexBox className="col gap">
+                            <VariableFilePicker setMimeType={setType} id="modal-file-picker" file={file} setFile={setFile} />
+                        </FlexBox>
+                    </Modal>
                 </div>
                 <div>
 
@@ -377,9 +377,9 @@ function Variable(props) {
                         [
                             ButtonDefinition("Delete", async () => {
                                     await deleteWorkflowVariable(obj.name)
-                            }, "small red", ()=>{}, true, false),
+                            }, {variant: "contained", color: "error"}, ()=>{}, true, false),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light", ()=>{}, true, false)
+                            }, {}, ()=>{}, true, false)
                         ]
                     } 
                 >

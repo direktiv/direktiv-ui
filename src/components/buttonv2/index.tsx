@@ -20,8 +20,7 @@ const DirektivButton = styled(MUIButton, {
     textTransform: "none",
     fontSize: "0.8rem",
     padding: "0.4rem 0.5rem",
-    // minWidth: "0px",
-    // width:"inherit",
+    minWidth: "auto",
     height: "auto",
     "&.MuiButton-sizeSmall": {
         height: "1.8rem",
@@ -47,21 +46,21 @@ const DirektivButton = styled(MUIButton, {
         fontWeight: "bold",
         color: "var(--theme-dark-text)",
         ":hover": {
-            backgroundColor: theme.palette[color].main,
+            backgroundColor: "#e6e6e6",
             boxShadow: "var(--theme-shadow-box-shadow)",
             borderColor: 'var(--theme-dark-text)',
             transition: '0.2s',
         },
     }),
-    ...(color as string === "light" && {
-        fontWeight: "bold",
-        ":hover": {
-            backgroundColor: "#e6e6e6",
-            boxShadow: "var(--theme-shadow-box-shadow)",
-            transition: '0.2s',
-        },
-    }),
-    ...(color as string === "terminal" && {
+    // ...(color as string === "light" && {
+    //     fontWeight: "bold",
+    //     ":hover": {
+    //         backgroundColor: "#e6e6e6",
+    //         boxShadow: "var(--theme-shadow-box-shadow)",
+    //         transition: '0.2s',
+    //     },
+    // }),
+    ...(color === "terminal" && {
         border: "none",
         ":disabled": {
             backgroundColor: "#2e3d48",
@@ -71,8 +70,8 @@ const DirektivButton = styled(MUIButton, {
     ...(disabledTooltip !== undefined && {
         ":disabled": {
             pointerEvents:"auto",
-            backgroundColor: color as string === "terminal" ? "#2e3d48" : undefined,
-            color: color as string === "terminal" ? "white" : undefined,
+            backgroundColor: color === "terminal" ? "#2e3d48" : undefined,
+            color: color === "terminal" ? "white" : undefined,
         },
     }),
     ...(auto && {

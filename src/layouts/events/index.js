@@ -119,9 +119,9 @@ function EventsPage(props) {
                                                                         actionButtons={[
                                                                             ButtonDefinition("Retrigger", async () => {
                                                                                 await replayEvent(obj.id)
-                                                                            }, "small", () => { }, true, true),
+                                                                            }, {variant: "contained", color: "primary"}, () => { }, true, true),
                                                                             ButtonDefinition("Cancel", async () => {
-                                                                            }, "small light", () => { }, true, false)
+                                                                            }, {}, () => { }, true, false)
                                                                         ]}
                                                                     >
                                                                         <FlexBox style={{ overflow: "hidden" }}>
@@ -146,7 +146,7 @@ function EventsPage(props) {
                                                                         }}
                                                                         actionButtons={[
                                                                             ButtonDefinition("Close", async () => {
-                                                                            }, "small light", () => { }, true, false)
+                                                                            }, {}, () => { }, true, false)
                                                                         ]}
                                                                     >
                                                                         <FlexBox className="col" style={{ overflow: "hidden" }}>
@@ -289,8 +289,8 @@ function SendEventModal(props) {
             actionButtons={[
                 ButtonDefinition("Send", async () => {
                     await sendEvent(eventData)
-                }, "small", ()=>{}, true, false),
-                ButtonDefinition("Cancel", () => {}, "small light", ()=>{}, true, false)
+                }, {variant: "contained", color: "primary"}, ()=>{}, true, false),
+                ButtonDefinition("Cancel", () => {}, {}, ()=>{}, true, false)
             ]}
             noPadding
         >

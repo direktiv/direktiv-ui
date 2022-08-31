@@ -1,10 +1,11 @@
+import { useTheme } from "@emotion/react";
 import dayjs from "dayjs";
 import { createContext, CSSProperties, forwardRef, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { VscCopy, VscEye, VscEyeClosed, VscInbox, VscLayers, VscWholeWord, VscWordWrap } from "react-icons/vsc";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { VariableSizeList } from "react-window";
 import { copyTextToClipboard } from "../../util";
-import Button from "../button";
+import Button2 from "../buttonv2";
 import FlexBox from "../flexbox";
 import "./style.css";
 
@@ -209,10 +210,11 @@ interface LogFooterButtonsProps {
 }
 
 export function LogFooterButtons({ follow, setFollow, wordWrap, setWordWrap, data, clipData }: LogFooterButtonsProps) {
+    const theme = useTheme()
     return (
         <>
 
-            <Button className="small terminal" onClick={() => {
+            <Button2 color="terminal" variant="contained" onClick={() => {
                 if (clipData) {
                     copyTextToClipboard(clipData)
                 } else {
@@ -222,28 +224,28 @@ export function LogFooterButtons({ follow, setFollow, wordWrap, setWordWrap, dat
                 <FlexBox className="row center gap-sm">
                     <VscCopy /> Copy <span className='hide-1000'>to Clipboard</span>
                 </FlexBox>
-            </Button>
+            </Button2>
             {
                 follow !== undefined && setFollow !== undefined ?
-                    <Button className="small terminal" onClick={() => setFollow(!follow)}>
+                    <Button2 color="terminal" variant="contained" onClick={() => setFollow(!follow)}>
                         <FlexBox className="row center gap-sm">
                             {follow ? <><VscEyeClosed /> Stop <span className='hide-1000'>watching</span></> :
                                 <><VscEye /> Follow <span className='hide-1000'>logs</span></>}
                         </FlexBox>
-                    </Button>
+                    </Button2>
                     :
                     <></>
             }
             {
                 wordWrap !== undefined && setWordWrap !== undefined ?
-                    <Button className="small terminal" tip={wordWrap ? "Disable word wrapping" : "Enable word wrapping"} onClick={() => {
+                    <Button2 color="terminal" variant="contained" tooltip={wordWrap ? "Disable word wrapping" : "Enable word wrapping"} onClick={() => {
                         setWordWrap(!wordWrap)
                     }}>
                         <FlexBox className="row center gap-sm">
                             {wordWrap ? <><VscWholeWord /> Whole<span className='hide-1000'>{` Word`}</span></> :
                                 <><VscWordWrap /> Wrap<span className='hide-1000'>{` Word`}</span></>}
                         </FlexBox>
-                    </Button> :
+                    </Button2> :
                     <></>
             }
         </>

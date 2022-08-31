@@ -78,9 +78,9 @@ function SecretsPanel(props){
                                     await createSecret(keyValue, vValue)
                                 }
                                 await  getSecrets()
-                            }, "small",()=>{}, true, false, true),
+                            }, {variant: "contained", color: "primary"},()=>{}, true, false, true),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light",()=>{}, true, false)
+                            }, {},()=>{}, true, false)
                         ]}
                         requiredFields={[
                             { tip: "secret key is required", value: keyValue }
@@ -189,9 +189,9 @@ function Secrets(props) {
                                                 ButtonDefinition("Delete", async () => {
                                                     await deleteSecret(obj.name)
                                                     await getSecrets()
-                                                }, "small red",()=>{}, true, false),
+                                                }, {variant: "contained", color: "error"},()=>{}, true, false),
                                                 ButtonDefinition("Cancel", () => {
-                                                }, "small light",()=>{}, true, false)
+                                                }, {},()=>{}, true, false)
                                             ]
                                         }   
                                     >

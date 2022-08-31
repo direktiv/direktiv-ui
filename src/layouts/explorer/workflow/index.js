@@ -27,7 +27,7 @@ import WorkflowDiagram from '../../../components/diagram';
 
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
-import Button from '../../../components/button';
+import Button2 from '../../../components/buttonv2';
 import Modal, { ButtonDefinition } from '../../../components/modal';
 
 import { PieChart } from 'react-minimal-pie-chart';
@@ -329,11 +329,12 @@ function WorkingRevision(props) {
                         <FlexBox className="gap editor-footer">
                             <WorkingRevisionErrorBar errors={errors} showErrors={showErrors}/>
                             <div style={{ display: "flex", flex: 1 }}>
-                                <Button 
-                                    className="terminal small" 
+                                <Button2 
+                                    color="terminal"
+                                    variant="contained"
                                     loading={opLoadingStates["IsLoading"]} 
-                                    tip={"Revert workflow to previous revision"}
-                                    disabledTip={"Cannot revert while theres changes"}
+                                    tooltip={"Revert workflow to previous revision"}
+                                    disabledTooltip={"Cannot revert while theres changes"}
                                     disabled={canSave}
                                     onClick={async () => {
                                         setErrors([])
@@ -341,7 +342,7 @@ function WorkingRevision(props) {
                                         setShowErrors(false)
                                 }}>
                                     Revert
-                                </Button>
+                                </Button2>
                             </div>
                             <div style={{display:"flex", flex:1, justifyContent:"center"}}>
                                 <Modal 
@@ -369,9 +370,9 @@ function WorkingRevision(props) {
                                             } else {
                                                 navigate(`/n/${namespace}/instances/${r}`)
                                             }
-                                        }, `small ${tabIndex === 1 && workflowJSONSchema === null ? "disabled" : ""}`, ()=>{}, tabIndex === 0, false),
+                                        }, {variant: "contained", color: "primary", disabled: tabIndex === 1 && workflowJSONSchema === null}, ()=>{}, tabIndex === 0, false),
                                         ButtonDefinition("Cancel", async () => {
-                                        }, "small light", ()=>{}, true, false)
+                                        }, {}, ()=>{}, true, false)
                                     ]}
                                     onOpen={()=>{
                                         try{
@@ -430,10 +431,11 @@ function WorkingRevision(props) {
                             </div>
                             <div style={{ display: "flex", flex: 1, gap: "3px", justifyContent: "flex-end", paddingRight: "10px"}}>
 
-                                <Button 
-                                    tip={"Save workflow to latest"} 
-                                    disabledTip={"No changes to workflow"}
-                                    className="terminal small"
+                                <Button2 
+                                    tooltip={"Save workflow to latest"} 
+                                    disabledTooltip={"No changes to workflow"}
+                                    color="terminal"
+                                    variant="contained"
                                     loading={opLoadingStates["Save"]} 
                                     disabled={!canSave}
                                     onClick={async () => {
@@ -449,12 +451,13 @@ function WorkingRevision(props) {
                                         })
                                 }}>
                                     Save
-                                </Button>
+                                </Button2>
 
-                                <Button 
-                                    tip={"Save latest workflow as new revision"} 
-                                    disabledTip={"Requires save"}
-                                    className="terminal small"
+                                <Button2 
+                                    tooltip={"Save latest workflow as new revision"} 
+                                    disabledTooltip={"Requires save"}
+                                    color="terminal"
+                                    variant="contained"
                                     loading={opLoadingStates["IsLoading"]} 
                                     disabled={canSave}
                                     onClick={async () => {
@@ -476,11 +479,12 @@ function WorkingRevision(props) {
                                         }
                                 }}>
                                     Make Revision
-                                </Button>
+                                </Button2>
 
-                                <Button 
-                                    tip={`${showErrors ? "Hide Problems": "Show Problems"}`} 
-                                    className="terminal small"
+                                <Button2 
+                                    tooltip={`${showErrors ? "Hide Problems": "Show Problems"}`} 
+                                    color="terminal"
+                                    variant="contained"
                                     style={{width:"24px", paddingLeft: "0px", paddingRight: "0px"}}
                                     onClick={async () => {
                                         setShowErrors(!showErrors)
@@ -492,7 +496,7 @@ function WorkingRevision(props) {
                                         <VscChevronUp style={{ width: "80%", height: "80%" }} />
                                         }
                                     </FlexBox>
-                                </Button>
+                                </Button2>
                             </div>
                         </FlexBox>
                     </FlexBox>:""}
@@ -1062,7 +1066,7 @@ function SettingsTab(props) {
                                         <div style={{width:"99.5%", margin:"auto", background: "#E9ECEF", height:"1px"}}/>
                                         <FlexBox className="gap" style={{justifyContent:"flex-end", width:"100%"}}>
                                             { lteStatus ? <Alert className={`${lteStatus} small`}>{lteStatusMessage}</Alert> : <></> }
-                                            <Button onClick={async()=>{
+                                            <Button2 onClick={async()=>{
                                                 try { 
                                                     await setWorkflowLogToEvent(logToEvent)
                                                 } catch(err) {
@@ -1075,7 +1079,7 @@ function SettingsTab(props) {
                                                 setLTEStatusMessage("'Log to Event' value set!")
                                             }} className="small">
                                                 Save
-                                            </Button>
+                                            </Button2>
                                         </FlexBox>
                                     </FlexBox>
                                 </ContentPanelBody>

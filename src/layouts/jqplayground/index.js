@@ -1,7 +1,6 @@
 import { useJQPlayground } from 'direktiv-react-hooks';
 import { useCallback, useEffect, useState } from 'react';
 import { VscFileCode, VscArrowRight } from 'react-icons/vsc';
-import Button from '../../components/button';
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
 import DirektivEditor from '../../components/editor';
 import Alert from '../../components/alert';
@@ -101,14 +100,16 @@ function HowToJQ(){
                             <div>
                                 For information on the JQ syntax, please refer to the offical JQ manual online.
                             </div>
-                            <Button className="small light bold shadow">
-                                <FlexBox className="gap">
-                                    <VscArrowRight className="auto-margin" />
-                                    <a href="https://stedolan.github.io/jq/manual/">
-                                        View JQ Manual
-                                    </a>
-                                </FlexBox>
-                            </Button>
+                            <div>
+                                <Button2 variant='outlined' color="info">
+                                    <FlexBox className="gap">
+                                        <VscArrowRight className="auto-margin" />
+                                        <a href="https://stedolan.github.io/jq/manual/">
+                                            View JQ Manual
+                                        </a>
+                                    </FlexBox>
+                                </Button2>
+                            </div>
                         </FlexBox>
                     </ContentPanelBody>
             </ContentPanel>
@@ -159,14 +160,14 @@ function ExamplesJQ(props){
                                                 {obj.tip}
                                             </td>
                                             <td style={{ width: "20%"}} onClick={()=>loadJQ(obj.filter, obj.json)}>
-                                                <Button className="small light bold shadow">
+                                                <Button2 variant='outlined' color="info">
                                                     <FlexBox className="gap">
                                                         <VscFileCode className="auto-margin" />
                                                         <div>
                                                             Load
                                                         </div>
                                                     </FlexBox>
-                                                </Button>
+                                                </Button2>
                                             </td>
                                         </tr>
                                     )
@@ -186,14 +187,14 @@ function ExamplesJQ(props){
                                                 {obj.tip}
                                             </td>
                                             <td style={{ width: "20%"}} onClick={()=>loadJQ(obj.filter, obj.json)}>
-                                                <Button className="small light bold shadow">
+                                                <Button2 variant='outlined' color="info">
                                                     <FlexBox className="gap">
                                                         <VscFileCode className="auto-margin" />
                                                         <div>
                                                             Load
                                                         </div>
                                                     </FlexBox>
-                                                </Button>
+                                                </Button2>
                                             </td>
                                         </tr>
                                     )
@@ -308,7 +309,7 @@ function JQFilter(props) {
                             <input style={{height:"28px", width:"100%"}} onChange={(e)=>setFilter(e.target.value)} value={query} placeholder={"Enter a Filter to JQ on"} type="text" />
                         </FlexBox>
                         <FlexBox style={{maxWidth:"65px"}}>
-                            <Button2 asyncDisable onClick={()=>execute()}>
+                            <Button2 onClick={()=>execute()}>
                                 Execute
                             </Button2>
                         </FlexBox>

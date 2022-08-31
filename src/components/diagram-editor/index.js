@@ -204,9 +204,9 @@ function FunctionsList(props) {
                             oldfList.push(formData)
                             return [...oldfList]
                         })
-                    }, "small", () => { }, true, false, true),
+                    }, {variant: "contained", color: "primary"}, () => { }, true, false, true),
                     ButtonDefinition("Cancel", async () => {
-                    }, "small light", () => { }, true, false)
+                    }, {}, () => { }, true, false)
                 ]}
                 button={(
                     <div className={`btn function-btn`}>
@@ -897,10 +897,10 @@ export default function DiagramEditor(props) {
                                     })
 
                                     setOldSelectedNodeFormData(selectedNodeFormData)
-                                }, "small", () => { }, true, false),
+                                }, {variant: "contained", color: "primary"}, () => { }, true, false),
                                 ButtonDefinition("Cancel", async () => {
                                     setSelectedNodeFormData(oldSelectedNodeFormData)
-                                }, "small light", () => { }, true, false)
+                                }, {}, () => { }, true, false)
                             ]}
                         >
                             <Form
@@ -950,10 +950,10 @@ export default function DiagramEditor(props) {
                                     })
 
                                     setNewNodeID("")
-                                }, "small", () => { }, true, false),
+                                }, {variant: "contained", color: "primary"}, () => { }, true, false),
                                 ButtonDefinition("Cancel", async () => {
                                     setNewNodeID("")
-                                }, "small light", () => { }, true, false)
+                                }, {}, () => { }, true, false)
                             ]}
                         >
                             <FlexBox className="col center" style={{ margin: "8px 16px 8px 16px" }}>

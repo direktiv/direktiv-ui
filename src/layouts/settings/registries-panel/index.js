@@ -117,7 +117,7 @@ function RegistriesPanel(props){
                                 if(!filledOut) throw new Error("all fields must be filled out")
                                 await createRegistry(url, `${username}:${token}`)
                                 await  getRegistries()
-                            }, "small", ()=>{}, true, false, true),
+                            }, {variant: "contained", color: "primary"}, ()=>{}, true, false, true),
                             ButtonDefinition("Test Connection", async () => {
                                 setURLErr("")
                                 setTokenErr("")
@@ -151,7 +151,7 @@ function RegistriesPanel(props){
                             }, `small ${testConnLoading ? "loading" : ""}`, ()=>{   setTestConnLoading(false)
                                 setSuccessFeedback(false)}, false, false, true),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light", ()=>{}, true, false)
+                            }, {}, ()=>{}, true, false)
                         ]}
                     >
                         <AddRegistryPanel err={err} urlErr={urlErr} userErr={userErr} tokenErr={tokenErr} successMsg={successFeedback} token={token} setToken={setToken} username={username} setUsername={setUsername} url={url} setURL={setURL}/>    
@@ -349,9 +349,9 @@ export function Registries(props) {
                                             ButtonDefinition("Delete", async () => {
                                                     await deleteRegistry(obj.name)
                                                     await getRegistries()
-                                            }, "small red",()=>{}, true, false),
+                                            }, {variant: "contained", color: "error"},()=>{}, true, false),
                                             ButtonDefinition("Cancel", () => {
-                                            }, "small light",()=>{}, true, false)
+                                            }, {},()=>{}, true, false)
                                         ]
                                     }   
                                 >

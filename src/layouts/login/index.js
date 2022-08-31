@@ -1,7 +1,7 @@
 import { useState } from "react"
 import FlexBox from '../../components/flexbox';
 import Logo from '../../assets/nav-logo.png'
-import Button from "../../components/button";
+import Button2 from "../../components/buttonv2";
 
 export default function Login(props) {
     const {setLogin, setAKey} = props
@@ -29,9 +29,9 @@ export default function Login(props) {
                                 <input type="password" value={apiKey} onChange={e=>setApiKey(e.target.value)} placeholder="Enter an apikey..."/> 
                             </div>
                             <div style={{display:"flex", justifyContent:"flex-end"}}>
-                                <Button onClick={setAuth} className="small">
+                                <Button2 onClick={setAuth} className="small">
                                     Login
-                                </Button>
+                                </Button2>
                             </div>
                         </FlexBox>
                         <div>

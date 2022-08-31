@@ -5,7 +5,7 @@ import { useParams } from 'react-router';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AutoSizer } from 'react-virtualized';
 import Alert from '../../components/alert';
-import Button from '../../components/button';
+import Button2 from '../../components/buttonv2';
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
 import WorkflowDiagram from '../../components/diagram';
 import DirektivEditor from '../../components/editor';
@@ -180,14 +180,14 @@ function InstancePage(props) {
                                 {label} 
                                 <FlexBox className="row center-y gap" style={{justifyContent: "flex-end"}}>
                                     { data.status === "running" || data.status === "pending" ? 
-                                    <Button className="small light" onClick={() => {
+                                    <Button2 color="info" variant="outlined" onClick={() => {
                                         cancelInstance()
                                         setLoad(true)
                                     }}>
                                         <span className="red-text">
                                             Cancel
                                         </span>
-                                    </Button>
+                                    </Button2>
                                     :<></>}
                                     {rev === null || rev === ""
                                     ?
@@ -195,16 +195,14 @@ function InstancePage(props) {
                                     </>
                                     :
                                     <Link to={`/n/${namespace}/explorer/${wfName}?${ref==="latest" ? `tab=2` : `tab=1&revision=${rev}&revtab=0` }`}>
-                                        <Button className="small light black">
+                                        <Button2 color="info" variant="outlined">
                                             <span className="hide-600">View</span> Workflow
-                                        </Button>
+                                        </Button2>
                                     </Link>
                                     }
-                                    <Button tip={onlyShow ? "Collapse Window" : "Expand Window"} className="small light black" onClick={()=>toggleFullscreen("logs")}>
-                                        <FlexBox className="col center" style={{fontSize: "15px"}} >
-                                            {onlyShow ? <VscScreenNormal/> :<VscScreenFull />}
-                                        </FlexBox>
-                                    </Button>
+                                    <Button2 tooltip={onlyShow ? "Collapse Window" : "Expand Window"} color="info" variant="outlined" onClick={()=>toggleFullscreen("logs")} style={{marginTop:"2px"}}>
+                                        {onlyShow ? <VscScreenNormal/> :<VscScreenFull />}
+                                    </Button2>
                                 </FlexBox>
                             </FlexBox>
                         </ContentPanelTitle>
@@ -223,11 +221,11 @@ function InstancePage(props) {
                                 Input
                                 </div>
                                 <FlexBox className="row center-y gap" style={{ justifyContent: "flex-end"}}>
-                                    <Button tip={onlyShow ? "Collapse Window" : "Expand Window"} className="small light black" onClick={() => toggleFullscreen("input")}>
+                                    <Button2 tooltip={onlyShow ? "Collapse Window" : "Expand Window"} color="info" variant="outlined" onClick={() => toggleFullscreen("input")}>
                                         <FlexBox className="col center" style={{ fontSize: "15px" }} >
                                             {onlyShow ? <VscScreenNormal /> : <VscScreenFull />}
                                         </FlexBox>
-                                    </Button>
+                                    </Button2>
                                 </FlexBox>
                             </FlexBox>
                         </ContentPanelTitle>
@@ -251,9 +249,9 @@ function InstancePage(props) {
                                 </div>
                                 {tabBtn === 1 && data.invoker.startsWith("instance:") ?
                                     <Link to={`/n/${namespace}/instances/${data.invoker.replace("instance:", "")}`} reloadDocument>
-                                    <Button className="small light">
+                                    <Button2 color="info" variant="outlined">
                                         <span className="hide-600">View</span> Parent
-                                    </Button>
+                                    </Button2>
                                     </Link>
                                     :
                                     <></>
@@ -276,11 +274,11 @@ function InstancePage(props) {
                                 Output
                                 </div>
                                 <FlexBox className="row center-y gap" style={{ justifyContent: "flex-end"}}>
-                                    <Button tip={onlyShow ? "Collapse Window" : "Expand Window"} className="small light black" onClick={() => toggleFullscreen("output")}>
+                                    <Button2 tooltip={onlyShow ? "Collapse Window" : "Expand Window"} color="info" variant="outlined" onClick={() => toggleFullscreen("output")}>
                                         <FlexBox className="col center" style={{ fontSize: "15px" }} >
                                             {onlyShow ? <VscScreenNormal /> : <VscScreenFull />}
                                         </FlexBox>
-                                    </Button>
+                                    </Button2>
                                 </FlexBox>
                             </FlexBox>
                         </ContentPanelTitle>

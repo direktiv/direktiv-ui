@@ -82,9 +82,9 @@ export default function GlobalServicesPanel(props) {
                         actionButtons={[
                             ButtonDefinition("Add", async () => {
                                     await createGlobalService(serviceName, image, parseInt(scale), parseInt(size), cmd)
-                            }, "small", ()=>{}, true, false),
+                            }, {variant: "contained", color: "primary"}, ()=>{}, true, false),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light", ()=>{}, true, false)
+                            }, {}, ()=>{}, true, false)
                         ]}
                     >
                         {config !== null ? 

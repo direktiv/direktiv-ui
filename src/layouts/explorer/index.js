@@ -12,7 +12,6 @@ import { VscAdd, VscClose, VscCloudUpload, VscCode, VscEdit, VscFolderOpened, Vs
 import { useNavigate, useParams } from 'react-router';
 import { Link, useSearchParams } from 'react-router-dom';
 import { AutoSizer } from 'react-virtualized';
-import Button from '../../components/button';
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
 import DirektivEditor from '../../components/editor';
 import FlexBox from '../../components/flexbox';
@@ -370,9 +369,9 @@ function ExplorerList(props) {
                                     if(result.node && result.namespace){
                                         navigate(`/n/${result.namespace}/explorer/${result.node.path.substring(1)}`)
                                     }
-                                }, `small`, ()=>{}, true, false, true),
+                                }, {variant: "contained", color: "primary"}, ()=>{}, true, false, true),
                                 ButtonDefinition("Cancel", () => {
-                                }, "small light", ()=>{}, true, false)
+                                }, {}, ()=>{}, true, false)
                             ]}
 
                             keyDownActions={[
@@ -461,9 +460,9 @@ function ExplorerList(props) {
                                         delete processesMirrorSettings["token"]
                                         await createMirrorNode(name, processesMirrorSettings)
                                     }
-                                }, `small ${name.trim() ? "" : "disabled"}`, () => { }, true, false, true),
+                                }, {variant: "contained", color: "primary", disabled: name.trim().length === 0}, () => { }, true, false, true),
                                 ButtonDefinition("Cancel", () => {
-                                }, "small light", () => { }, true, false)
+                                }, {}, () => { }, true, false)
                             ]}
 
                             keyDownActions={[
@@ -780,9 +779,9 @@ function DirListItem(props) {
                                             let p = path.split('/', -1);
                                             let pLast = p[p.length-1];
                                             await deleteNode(pLast, recursiveDelete)
-                                        }, "small red", ()=>{}, true, false),
+                                        }, {variant: "contained", color: "error"}, ()=>{}, true, false),
                                         ButtonDefinition("Cancel", () => {
-                                        }, "small light", ()=>{}, true, false)
+                                        }, {}, ()=>{}, true, false)
                                     ]
                                 } 
                             >
@@ -898,9 +897,9 @@ function WorkflowListItem(props) {
                                                     let p = path.split('/', -1);
                                                     let pLast = p[p.length-1];
                                                     await deleteNode(pLast, false)
-                                                }, "small red", ()=>{}, true, false),
+                                                }, {variant: "contained", color: "error"}, ()=>{}, true, false),
                                                 ButtonDefinition("Cancel", () => {
-                                                }, "small light", ()=>{}, true, false)
+                                                }, {}, ()=>{}, true, false)
                                             ]
                                         } 
                                     >
@@ -927,7 +926,7 @@ export function ApiFragment(props) {
         <FlexBox className='helper-wrap col'>
             <FlexBox className='helper-title row'>
                 <FlexBox className='row vertical-center'>
-                    <Button className={`btn-method ${method}`}>{method}</Button>
+                    <Button2 className={`btn-method ${method}`}>{method}</Button2>
                     <div className='url'>{url}</div>
                 </FlexBox>
                 <div className='description' style={{textAlign:"right"}}>{description}</div>

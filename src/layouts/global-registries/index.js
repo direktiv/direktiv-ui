@@ -95,7 +95,7 @@ export function GlobalRegistries(){
                             ButtonDefinition("Add", async() => {
                                     await createRegistry(url, `${username}:${token}`)
                                     await  getRegistries()
-                            }, "small", ()=>{}, true, false, true),
+                            }, {variant: "contained", color: "primary"}, ()=>{}, true, false, true),
                             ButtonDefinition("Test Connection", async () => {
                                 setURLErr("")
                                 setTokenErr("")
@@ -129,7 +129,7 @@ export function GlobalRegistries(){
                             }, `small ${testConnLoading ? "loading" : ""}`, ()=>{   setTestConnLoading(false)
                                 setSuccessFeedback(false)}, false, false, true),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light", ()=>{},true, false)
+                            }, {}, ()=>{},true, false)
                         ]}
                     >
                         <AddRegistryPanel err={err} token={token} setToken={setToken} username={username} setUsername={setUsername} url={url} setURL={setURL} successMsg={successFeedback} urlErr={urlErr} userErr={userErr} tokenErr={tokenErr} />    
@@ -220,7 +220,7 @@ export function GlobalPrivateRegistries(){
                             ButtonDefinition("Add", async() => {
                                     await createRegistry(url, `${username}:${token}`)
                                     await  getRegistries()
-                            }, "small", ()=>{}, true, false, true),
+                            }, {variant: "contained", color: "primary"}, ()=>{}, true, false, true),
                             ButtonDefinition("Test Connection", async () => {
                                 setURLErr("")
                                 setTokenErr("")
@@ -251,10 +251,10 @@ export function GlobalPrivateRegistries(){
                                     setErr(resp.message)                                
                                 }
                            
-                            }, `small ${testConnLoading ? "loading" : ""}`, ()=>{   setTestConnLoading(false)
+                            }, {variant: "contained", color: "primary"}, ()=>{   setTestConnLoading(false)
                                 setSuccessFeedback(false)}, false, false, true),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light", ()=>{}, true, false)
+                            }, {}, ()=>{}, true, false)
                         ]}
                     >
                         <AddRegistryPanel err={err} token={token} setToken={setToken} username={username} setUsername={setUsername} url={url} setURL={setURL} successMsg={successFeedback} urlErr={urlErr} userErr={userErr} tokenErr={tokenErr} />    

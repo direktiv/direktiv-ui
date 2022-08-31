@@ -4,7 +4,7 @@ import { VscLayers } from 'react-icons/vsc';
 import { useNavigate, useParams } from "react-router"
 import { Service } from "."
 import Alert from "../../components/alert"
-import Button from "../../components/button"
+import Button2 from "../../components/buttonv2";
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon, ContentPanelFooter } from "../../components/content-panel"
 import FlexBox from "../../components/flexbox"
 import Modal, { ButtonDefinition, KeyDownDefinition } from "../../components/modal"
@@ -155,9 +155,9 @@ function NamespaceRevisions(props) {
                                 actionButtons={[
                                     ButtonDefinition("Add", async () => {
                                         await createNamespaceServiceRevision(image, parseInt(scale), parseInt(size), cmd, parseInt(trafficPercent))
-                                    }, "small", ()=>{}, true, false, true),
+                                    }, {variant: "contained", color: "primary"}, ()=>{}, true, false, true),
                                     ButtonDefinition("Cancel", () => {
-                                    }, "small light", ()=>{}, true, false)
+                                    }, {}, ()=>{}, true, false)
                                 ]}
                             >
                                 {config !== null ? 
@@ -324,7 +324,7 @@ export function UpdateTraffic(props){
                         </ContentPanelBody>
                         <ContentPanelFooter>
                             <FlexBox className="col" style={{alignItems:"flex-end"}}>
-                                <Button className="small" onClick={async ()=>{
+                                <Button2 onClick={async ()=>{
                                     try { 
                                         await setNamespaceServiceRevisionTraffic(revOne, parseInt(tpercent), revTwo, parseInt(100-tpercent))
                                         setErrMsg("")
@@ -337,7 +337,7 @@ export function UpdateTraffic(props){
                                     }
                                 }}>
                                     Save
-                                </Button>
+                                </Button2>
                             </FlexBox>
                         </ContentPanelFooter>
                 </ContentPanel>

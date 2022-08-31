@@ -203,10 +203,10 @@ function NewNamespaceBtn(props) {
                         navigate(`/n/${ns}`)
                     }, 200)
                     setNs("")
-                }, "small", () => { }, true, false, true),
+                }, {variant: "contained", color: "primary"}, () => { }, true, false, true),
                 ButtonDefinition("Cancel", () => {
                     setNs("")
-                }, "small light", () => { }, true, false)
+                }, {}, () => { }, true, false)
             ]}
 
             requiredFields={[

@@ -147,9 +147,9 @@ function NamespaceServices(props) {
                     actionButtons={[
                         ButtonDefinition("Add", async () => {
                             await createNamespaceService(serviceName, image, parseInt(scale), parseInt(size), cmd)
-                        }, "small", ()=>{}, true, false, true),
+                        }, {variant: "contained", color: "primary"}, ()=>{}, true, false, true),
                         ButtonDefinition("Cancel", () => {
-                        }, "small light", ()=>{}, true, false)
+                        }, {}, ()=>{}, true, false)
                     ]}
                     requiredFields={[
                         {tip: "service name is required", value: serviceName},
@@ -254,9 +254,9 @@ export function Service(props) {
                                     await deleteService(name)
                                 }
                              
-                            }, "small red", ()=>{}, true, false),
+                            }, {variant: "contained", color: "error"}, ()=>{}, true, false),
                             ButtonDefinition("Cancel", () => {
-                            }, "small light", ()=>{}, true, false)
+                            }, {}, ()=>{}, true, false)
                         ]}
                     >
                         <FlexBox className="col gap">
@@ -298,7 +298,7 @@ export function Service(props) {
                                     async () => {
                                         await deleteService(name, revision)
                                     },
-                                    "small",
+                                    {variant: "contained", color: "primary"},
                                     () => {
                                         console.log("err func")
                                     },
@@ -308,7 +308,7 @@ export function Service(props) {
                                 ButtonDefinition(
                                     "Cancel", 
                                     () => {},
-                                    "small light",
+                                    {},
                                     () => {},
                                     true,
                                     false

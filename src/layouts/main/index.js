@@ -20,7 +20,7 @@ import GlobalServicesPanel from '../global-services';
 import GlobalRevisionsPanel from '../global-services/revisions';
 import GlobalPodPanel from '../global-services/pod'
 import Loader from '../../components/loader';
-import Button from '../../components/button';
+import Button2 from '../../components/buttonv2';
 import { IoMenu } from 'react-icons/io5';
 import InstancePageWrapper from '../instance';
 // import PermissionsPageWrapper from '../permissions';
@@ -224,19 +224,18 @@ function ResponsiveHeaderBar(props) {
             </FlexBox>
             <div className="menu-toggle-parent" style={{minWidth: "50px", maxWidth: "50px"}}>
                 <div style={{float: "right", marginLeft: "12px"}}>
-                    <Button onClick={(e) => {
+                    <Button2 onClick={(e) => {
                             setToggleResponsive(!toggleResponsive)
                             e.stopPropagation()
-                        }} className="light small" style={{
+                        }} variant="outlined" color="info" style={{
                             marginTop: "5px",
                             marginLeft: "5px",
-                            maxWidth: "32px",
-                            paddingBottom: "8px"
+                            maxWidth: "32px"
                         }}>
-                            <IoMenu className="auto-margin" style={{
-                                fontSize: "18px"
+                            <IoMenu style={{
+                                fontSize: "20px"
                             }} />
-                    </Button>
+                    </Button2>
                 </div>
             </div>
         </FlexBox>
