@@ -46,7 +46,7 @@ const theme = createTheme({
             light: "#e6e6e6"
         },
         error: {
-            main: "#ff616d"
+            main: "#ffc0c4"
         },
         terminal: {
             main: "#355166",

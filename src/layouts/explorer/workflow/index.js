@@ -1042,9 +1042,9 @@ function SettingsTab(props) {
                     <AddWorkflowVariablePanel namespace={namespace} workflow={workflow} />
                 </div>
                 <FlexBox className="gap">
-                    <FlexBox  style={{flex:1, maxHeight: "156px", minWidth:"300px"}}>          
+                    <FlexBox  style={{flex:1, maxHeight: "206px", minWidth:"300px"}}>          
                         <div style={{width: "100%", minHeight: "144px"}}>
-                            <ContentPanel style={{width: "100%", height: "100%"}}>
+                            <ContentPanel style={{width: "100%"}}>
                                 <ContentPanelTitle>
                                     <ContentPanelTitleIcon>
                                         <VscNote/>
@@ -1060,12 +1060,13 @@ function SettingsTab(props) {
                                     alignItems: "center"
                                 }}>
                                     <FlexBox className="gap" style={{flexDirection: "column", alignItems: "center"}}>
+                                        { lteStatus ? <Alert onClose={()=>{setLTEStatus(null)}} style={{width:"90%"}}>{lteStatusMessage}</Alert> : <></> }
+
                                         <FlexBox style={{width:"100%"}}>
                                             <input value={logToEvent} onChange={(e)=>setLogToEvent(e.target.value)} type="text" placeholder="Enter the 'event' type to send logs to" />
                                         </FlexBox>
                                         <div style={{width:"99.5%", margin:"auto", background: "#E9ECEF", height:"1px"}}/>
                                         <FlexBox className="gap" style={{justifyContent:"flex-end", width:"100%"}}>
-                                            { lteStatus ? <Alert className={`${lteStatus} small`}>{lteStatusMessage}</Alert> : <></> }
                                             <Button onClick={async()=>{
                                                 try { 
                                                     await setWorkflowLogToEvent(logToEvent)
@@ -1087,7 +1088,7 @@ function SettingsTab(props) {
                         </div>
                     </FlexBox>
 
-                    <FlexBox style={{flex: 4,maxWidth:"1200px", height:"fit-content", minHeight: "156px"}}>
+                    <FlexBox style={{flex: 4,maxWidth:"1200px", height:"fit-content", minHeight: "151px"}}>
                         {/* <div style={{width: "100%", minHeight: "200px"}}> */}
                             <ContentPanel style={{width: "100%"}}>
                                 <ContentPanelTitle>

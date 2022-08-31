@@ -316,7 +316,7 @@ export function UpdateTraffic(props){
                                     </FlexBox>
                                     <FlexBox>
                                         { errMsg ? 
-                                            <Alert className="critical">{errMsg}</Alert>
+                                            <Alert severity="error" variant="filled" grow onClose={()=>{setErrMsg("")}}>{errMsg}</Alert>
                                         :<></>}
                                     </FlexBox>
                                 </FlexBox>

@@ -144,7 +144,7 @@ export function GlobalRegistries(){
                             :""}
                     </FlexBox>
                     <FlexBox style={{maxHeight: "44px"}}>
-                        <Alert>Once a registry is removed, it can never be restored.</Alert>
+                        <Alert severity="info" grow>Once a registry is removed, it can never be restored.</Alert>
                     </FlexBox>
                 </FlexBox>
             </ContentPanelBody>
@@ -269,7 +269,7 @@ export function GlobalPrivateRegistries(){
                             :""}
                     </FlexBox>
                     <FlexBox style={{maxHeight: "44px"}}>
-                        <Alert>Once a registry is removed, it can never be restored.</Alert>
+                        <Alert severity="info" grow>Once a registry is removed, it can never be restored.</Alert>
                     </FlexBox>
                 </FlexBox>
             </ContentPanelBody>

@@ -112,7 +112,7 @@ function SecretsPanel(props){
                         <Secrets deleteSecret={deleteSecret} getSecrets={getSecrets} secrets={data}  />: ""}
                     </FlexBox>
                     <div>
-                        <Alert>Once a secret is removed, it can never be restored.</Alert>
+                        <Alert severity="info">Once a secret is removed, it can never be restored.</Alert>
                     </div>
                 </FlexBox>
             </ContentPanelBody>

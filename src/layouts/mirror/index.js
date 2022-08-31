@@ -216,7 +216,7 @@ export default function MirrorPage(props) {
                 {
                     errorMsg ?
                         <FlexBox style={{ maxHeight: "50px", paddingRight: "6px", paddingBottom: "8px" }}>
-                            <Alert setErrorMsg={setErrorMsg} className="critical" style={{ height: "100%" }}>{`Error: ${errorMsg}`}</Alert>
+                            <Alert severity="error" variant="filled" onClose={()=>{setErrorMsg(null)}} grow>{`Error: ${errorMsg}`}</Alert>
                         </FlexBox>
                         : <></>
                 }

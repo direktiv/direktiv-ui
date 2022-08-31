@@ -316,7 +316,7 @@ function JQFilter(props) {
                     </FlexBox>
                 </ContentPanelBody>
                 <FlexBox>
-                {error ? <Alert className="error-message"><div><span>error executing JQ command:</span>{error.replace("execute jq: error executing JQ command:", "")}</div></Alert> : null}
+                {error ? <Alert severity="error" variant="filled" grow onClose={()=>{setError(null)}}><div><span>error executing JQ command:</span>{error.replace("execute jq: error executing JQ command:", "")}</div></Alert> : null}
                 </FlexBox>
             </ContentPanel>
         </FlexBox>

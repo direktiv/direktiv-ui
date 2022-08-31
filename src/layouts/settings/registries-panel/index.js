@@ -166,7 +166,7 @@ function RegistriesPanel(props){
                             :""}
                     </FlexBox>
                     <div>
-                        <Alert>Once a registry is removed, it can never be restored.</Alert>
+                        <Alert severity="info">Once a registry is removed, it can never be restored.</Alert>
                     </div>
                 </FlexBox>
             </ContentPanelBody>
@@ -237,12 +237,12 @@ export function AddRegistryPanel(props) {
         <FlexBox className="col gap" style={{fontSize: "12px"}}>
             { successMsg ? 
             <FlexBox>
-                <Alert className="success">Connection seems good!</Alert>
+                <Alert grow>Connection seems good!</Alert>
             </FlexBox>
             :<></>}
             { err ?
             <FlexBox>
-            <Alert className="critical">{err}</Alert>
+            <Alert severity="error" variant="filled" grow>{err}</Alert>
             </FlexBox>
             : <></> }
             <FlexBox className="col">

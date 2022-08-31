@@ -732,7 +732,7 @@ function DirListItem(props) {
                 <FlexBox >
                     {err !== "" ? 
                     <FlexBox>
-                        <Alert className="rename-error critical">{err}</Alert>
+                        <Alert severity="error" variant="filled">{err}</Alert>
                     </FlexBox>
                     :<FlexBox />
                     }
@@ -850,7 +850,7 @@ function WorkflowListItem(props) {
                     <FlexBox>
                         {err !== "" ? 
                         <FlexBox>
-                            <Alert className="rename-error critical">{err}</Alert>
+                            <Alert severity="error" variant="filled">{err}</Alert>
                         </FlexBox>
                         :<FlexBox />
                         }

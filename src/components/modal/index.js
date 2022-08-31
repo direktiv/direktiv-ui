@@ -308,7 +308,7 @@ function ModalOverlay(props) {
                             <ContentPanelBody style={{...contentBodyStyle, overflow: "auto"}}>
                                 <FlexBox className="col gap">
                                     { displayAlert ?
-                                    <Alert  className="critical">{alertMessage}</Alert>
+                                    <Alert  severity="error" variant="filled" onClose={()=>{setDisplayAlert(false)}}>{alertMessage}</Alert>
                                     : <></> }
                                     {children}
                                 </FlexBox>

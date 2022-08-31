@@ -392,7 +392,7 @@ function Input(props) {
     return(
         <FlexBox style={{flexDirection:"column"}}>
             {!input ? 
-            <Alert className="instance-input-banner">No input data was provided</Alert> : null}
+            <Alert severity="info">No input data was provided</Alert> : null}
             <FlexBox style={{overflow: "hidden"}}>
                 {/* <div style={{width: "100%", height: "100%"}}> */}
                     <AutoSizer>
@@ -428,17 +428,17 @@ function Output(props){
         get()
     },[output, load, getOutput, status])
 
-    return(
-        <FlexBox style={{flexDirection:"column"}}>
-        {!output ? 
-            <Alert className="instance-input-banner">No output data was resolved</Alert> : null}
-        <FlexBox style={{padding: "0px", overflow: "hidden"}}>
-            <AutoSizer>
-                {({height, width})=>(
-                    <DirektivEditor disableCursor height={height} width={width} dlang="json" value={output} readonly={true}/>
-                )}
-            </AutoSizer>
-        </FlexBox>
+    return (
+        <FlexBox className="col gap">
+            {!output ?
+                <Alert severity="info">No output data was resolved</Alert> : null}
+            <FlexBox style={{ padding: "0px", overflow: "hidden" }}>
+                <AutoSizer>
+                    {({ height, width }) => (
+                        <DirektivEditor disableCursor height={height} width={width} dlang="json" value={output} readonly={true} />
+                    )}
+                </AutoSizer>
+            </FlexBox>
         </FlexBox>
     )
 }

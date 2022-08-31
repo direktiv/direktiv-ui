@@ -591,7 +591,7 @@ export default function DiagramEditor(props) {
             )}
             <FlexBox id="builder-page" className="col" style={{ paddingRight: "8px", visibility: load ? "hidden" : "visible", maxWidth: load ? "0px" : undefined }}>
                 {error ?
-                    <Alert className="critical" style={{ flex: "0", margin: "3px" }}>{error} </Alert>
+                    <Alert severity="error" variant="filled" onClose={()=>{setError(null)}}>{error} </Alert>
                     :
                     <></>
                 }
