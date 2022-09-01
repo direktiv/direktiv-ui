@@ -1,10 +1,11 @@
 import React from 'react';
 import FlexBox from '../flexbox';
 
-function InvalidWorkflow(props) {
+export interface InvalidWorkflowProps {
+    invalidWorkflow?: string | null
+}
 
-    let { invalidWorkflow } = props;
-
+function InvalidWorkflow({ invalidWorkflow }: InvalidWorkflowProps) {
     return (
         <>
             {invalidWorkflow ?
