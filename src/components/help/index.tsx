@@ -4,18 +4,17 @@ import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css'
 import './style.css';
 
-function HelpIcon(props) {
+export interface HelpIconProps {
+    msg: string
+    zIndex: number
+}
 
-    let {msg, zIndex} = props;
-    if (!msg) {
-        msg = "No help text provided."
-    }
-
+function HelpIcon({ msg = "No help text provided", zIndex = 10}: HelpIconProps) {
     return (
         <>
-            <Tippy content={msg} trigger={'mouseenter focus click'} zIndex={zIndex ? zIndex : 10}>
+            <Tippy content={msg} trigger={'mouseenter focus click'} zIndex={zIndex}>
                 <div className={"iconWrapper"}>
-                    <VscInfo className="grey-text"/>
+                    <VscInfo className="grey-text" />
                 </div>
             </Tippy>
         </>
