@@ -268,7 +268,7 @@ export interface DirektivEditorProps extends React.HTMLAttributes<HTMLDivElement
   value: EditorProps["value"]
   height?: number
   width?: number
-  setDValue: React.Dispatch<React.SetStateAction<string>>
+  setDValue?: React.Dispatch<React.SetStateAction<string>>
   readonly?: boolean
   validate?: boolean
   minimap?: boolean
