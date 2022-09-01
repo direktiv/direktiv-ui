@@ -6,7 +6,7 @@ import MUIAlert, { AlertProps as MUIAlertProps } from '@mui/material/Alert';
 import { styled } from '@mui/material/styles';
 
 
-export interface AlertProps {
+export interface AlertProps extends MUIAlertProps{
     grow?: boolean
 }
 

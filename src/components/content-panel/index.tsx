@@ -3,7 +3,7 @@ import FlexBox from '../flexbox';
 import './style.css';
 
 export interface ContentPanelProps extends React.HTMLAttributes<HTMLDivElement> {
-    grow: boolean
+    grow?: boolean
 }
 
 const ContentPanel: React.FunctionComponent<ContentPanelProps> = ({
