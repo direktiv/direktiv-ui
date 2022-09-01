@@ -11,7 +11,8 @@ const ContentPanel: React.FunctionComponent<ContentPanelProps> = ({
     ...props
 }) => {
     return (
-        <div {...props} className={`content-panel-parent opaque ${props.className ? props.className : ""}`} style={{ display: "flex", flexDirection: "column", flexGrow: grow ? "1" : undefined}} />
+        <div 
+        {...props} style={{ display: "flex", flexDirection: "column", flexGrow: grow ? "1" : undefined, ...props.style}} className={`content-panel-parent opaque ${props.className ? props.className : ""}`}/>
     );
 }
 

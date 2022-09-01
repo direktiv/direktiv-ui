@@ -1,4 +1,4 @@
-import Editor, {useMonaco, loader } from "@monaco-editor/react";
+import Editor, {useMonaco, loader, EditorProps } from "@monaco-editor/react";
 import { useEffect, useState } from "react";
 import './style.css'
 // import * as cobalt from './cobalt.json'
@@ -257,17 +257,44 @@ const cobalt = {
       "editorCursor.foreground": "#FFFFFF",
       "editorWhitespace.foreground": "#FFFFFF26"
     }
-  }
+}
 
+export interface DirektivEditorProps extends React.HTMLAttributes<HTMLDivElement> {
+  saveFn?: () => void
+  noBorderRadius?: boolean
+  options?: EditorProps
+  dvalue: EditorProps["defaultValue"]
+  dlang: string
+  value: EditorProps["value"]
+  height?: number
+  width?: number
+  setDValue: React.Dispatch<React.SetStateAction<string>>
+  readonly?: boolean
+  validate?: boolean
+  minimap?: boolean
+}
 
 // DirektivEditor - Eidtor Component
 // Note: width and height must not have unit suffix. e.g. 400=acceptable, 400% will not work
 // TODO: Support multiple width/height unit
-export default function DirektivEditor(props) {
-    const {saveFn, style, noBorderRadius, options, dvalue, dlang, value, height, width, setDValue, readonly, validate, minimap} = props
+export default function DirektivEditor({
+    saveFn,
+    noBorderRadius,
+    options,
+    dvalue,
+    dlang = "json",
+    value,
+    height,
+    width,
+    setDValue,
+    readonly,
+    validate,
+    minimap,
+ ...props 
+}: DirektivEditorProps) {
     const monaco = useMonaco()
 
-    const [ed, setEditor] = useState(null);
+    const [ed, setEditor] = useState(null as any);
 
     useEffect(()=>{
         if(monaco !== null) {           
@@ -284,11 +311,13 @@ export default function DirektivEditor(props) {
         }
     },[monaco, dlang, validate])
 
-    function handleEditorChange(value, event) {
-      setDValue(value)
+    function handleEditorChange (value: string | undefined) {
+        if (value && setDValue) {
+            setDValue(value)
+        }
     }
 
-    function setCommonEditorTriggers(editor, monaco) {
+    function setCommonEditorTriggers(editor: any, monaco: any) {
       editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_J, ()=>{
         editor.trigger('fold', 'editor.foldAll')
       })
@@ -302,7 +331,7 @@ export default function DirektivEditor(props) {
       ed.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S, saveFn)
     }
 
-    let handleEditorDidMount = function(editor, monaco) {
+    let handleEditorDidMount = function(editor: any, monaco: any) {
       setCommonEditorTriggers(editor, monaco)
       setEditor(editor)
     }
@@ -318,9 +347,8 @@ export default function DirektivEditor(props) {
     }
 
     return (
-      <div className={"monaco-editor monaco-wrapper"} style={{ borderRadius: !noBorderRadius ? "8px" : "0px", width: width, height: height ? height-18 : height, ...style}}>
+      <div {...props} className={`monaco-editor monaco-wrapper ${props.className ? props.className : ""}`} style={{ borderRadius: !noBorderRadius ? "8px" : "0px", width: width, height: height ? height-18 : height, ...props.style}}>
         <Editor
-        
             options={{
                 ...options,
                 readOnly: readonly,
