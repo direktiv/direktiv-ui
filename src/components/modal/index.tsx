@@ -351,11 +351,10 @@ export interface KeyDownDefinition {
 
 export interface ButtonDefinition {
     label: string
-    onClick: (...e: any) => any
+    onClick?: (...e: any) => any
     buttonProps: ButtonProps
-    errFunc: (...e: any) => any
+    errFunc?: (...e: any) => any
     closesModal?: boolean
-    async?: boolean
     validate?: boolean
 }
 
@@ -379,7 +378,10 @@ function generateButtons(
 
         let onClick = async () => {
             try {
-                await btn.onClick()
+                if (btn.onClick){
+                    await btn.onClick()
+                }
+
                 if (btn.closesModal) {
                     onClose()
                 } else {
@@ -387,7 +389,10 @@ function generateButtons(
                     setDisplayAlert(false)
                 }
             } catch (e) {
-                btn.errFunc()
+                if (btn.errFunc){
+                    await btn.errFunc()
+                }
+                
                 if (e instanceof Error) {
                     setAlertMessage(e.message)
                 } else {

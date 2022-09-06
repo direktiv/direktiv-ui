@@ -8,7 +8,7 @@ import { VscTrash, VscCircleLargeFilled } from 'react-icons/vsc';
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from "../../components/content-panel";
 import FlexBox from "../../components/flexbox";
 import { Config, GenerateRandomKey } from "../../util";
-import Modal, { ButtonDefinition, KeyDownDefinition } from "../../components/modal";
+import Modal  from "../../components/modal";
 import {Link} from 'react-router-dom'
 import HelpIcon from "../../components/help"
 import Tippy from '@tippyjs/react';
@@ -107,7 +107,7 @@ function NamespaceServices(props) {
         return <></>
     }
 
-    return(
+    return (
         <ContentPanel style={{width:"100%", minWidth: "300px"}}>
             <ContentPanelTitle>
                 <ContentPanelTitleIcon>
@@ -145,11 +145,28 @@ function NamespaceServices(props) {
                         }, ()=>{}, true)
                     ]}
                     actionButtons={[
-                        ButtonDefinition("Add", async () => {
-                            await createNamespaceService(serviceName, image, parseInt(scale), parseInt(size), cmd)
-                        }, {variant: "contained", color: "primary"}, ()=>{}, true, false, true),
-                        ButtonDefinition("Cancel", () => {
-                        }, {}, ()=>{}, true, false)
+                        {
+                            label: "Add",
+
+                            onClick: async () => {
+                                await createNamespaceService(serviceName, image, parseInt(scale), parseInt(size), cmd)
+                            },
+
+                            buttonProps: {variant: "contained", color: "primary"},
+                            errFunc: ()=>{},
+                            closesModal: true,
+                            validate: true
+                        },
+                        {
+                            label: "Cancel",
+
+                            onClick: () => {
+                            },
+
+                            buttonProps: {},
+                            errFunc: ()=>{},
+                            closesModal: true
+                        }
                     ]}
                     requiredFields={[
                         {tip: "service name is required", value: serviceName},
@@ -198,13 +215,12 @@ function NamespaceServices(props) {
                 </FlexBox>
             </ContentPanelBody>
         </ContentPanel>
-
-    )
+    );
 }
 
 export function Service(props) {
     const {allowRedeploy, name, image, status, conditions, deleteService, url, revision, dontDelete, traffic, latest} = props
-    return(
+    return (
         <div className="col" style={{minWidth: "300px"}}>
             <FlexBox style={{ height:"40px", border:"1px solid #f4f4f4", backgroundColor:"#fcfdfe"}}>
                 <Link to={url} style={{ width: "100%", display: "flex", alignItems: "center" }}>
@@ -247,16 +263,32 @@ export function Service(props) {
                             <ServicesDeleteButton />
                         )}  
                         actionButtons={[
-                            ButtonDefinition("Delete", async () => {
-                                if(revision !== undefined) {
-                                    await deleteService(revision)
-                                }else {
-                                    await deleteService(name)
-                                }
-                             
-                            }, {variant: "contained", color: "error"}, ()=>{}, true, false),
-                            ButtonDefinition("Cancel", () => {
-                            }, {}, ()=>{}, true, false)
+                            {
+                                label: "Delete",
+
+                                onClick: async () => {
+                                    if(revision !== undefined) {
+                                        await deleteService(revision)
+                                    }else {
+                                        await deleteService(name)
+                                    }
+                                 
+                                },
+
+                                buttonProps: {variant: "contained", color: "error"},
+                                errFunc: ()=>{},
+                                closesModal: true
+                            },
+                            {
+                                label: "Cancel",
+
+                                onClick: () => {
+                                },
+
+                                buttonProps: {},
+                                errFunc: ()=>{},
+                                closesModal: true
+                            }
                         ]}
                     >
                         <FlexBox className="col gap">
@@ -293,26 +325,28 @@ export function Service(props) {
                                 auto: true,
                             }}
                             actionButtons={[
-                                ButtonDefinition(
-                                    "Yes", 
-                                    async () => {
+                                {
+                                    label: "Yes",
+
+                                    onClick: async () => {
                                         await deleteService(name, revision)
                                     },
-                                    {variant: "contained", color: "primary"},
-                                    () => {
+
+                                    buttonProps: {variant: "contained", color: "primary"},
+
+                                    errFunc: () => {
                                         console.log("err func")
                                     },
-                                    true,
-                                    true
-                                ),
-                                ButtonDefinition(
-                                    "Cancel", 
-                                    () => {},
-                                    {},
-                                    () => {},
-                                    true,
-                                    false
-                                )
+
+                                    closesModal: true
+                                },
+                                {
+                                    label: "Cancel",
+                                    onClick: () => {},
+                                    buttonProps: {},
+                                    errFunc: () => {},
+                                    closesModal: true
+                                }
                             ]}
                         >
                             <div style={{ textAlign: "center" }}>
@@ -336,7 +370,7 @@ export function Service(props) {
                 <ServiceDetails conditions={conditions} />
             </FlexBox>
         </div>
-    )
+    );
 }
 
 function ServiceDetails(props) {

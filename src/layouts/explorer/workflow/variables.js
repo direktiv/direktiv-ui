@@ -11,7 +11,7 @@ import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIco
 import DirektivEditor from '../../../components/editor';
 import FlexBox from '../../../components/flexbox';
 import HelpIcon from "../../../components/help";
-import Modal, { ButtonDefinition } from '../../../components/modal';
+import Modal from '../../../components/modal';
 import Pagination, { usePageHandler } from '../../../components/pagination';
 import Tabs from '../../../components/tabs';
 import { CanPreviewMimeType, Config, MimeTypeFileExtension } from '../../../util';
@@ -48,7 +48,7 @@ function AddWorkflowVariablePanel(props) {
         return <></>
     }
 
-    return(
+    return (
         <ContentPanel style={{width: "100%", height: "100%"}}>
             <ContentPanelTitle>
                 <ContentPanelTitleIcon>
@@ -80,16 +80,33 @@ function AddWorkflowVariablePanel(props) {
                             setMimeType("application/json")
                         }}
                         actionButtons={[
-                            ButtonDefinition("Add", async () => {
-                                if (document.getElementById("file-picker")) {
-                                    setUploading(true)
-                                    await setWorkflowVariable(encodeURIComponent(keyValue), file, mimeType)
-                                } else {
-                                    await setWorkflowVariable(encodeURIComponent(keyValue), dValue, mimeType)
-                                }
-                            }, {variant: "contained", color: "primary"}, () => { setUploading(false) }, true, false, true),
-                            ButtonDefinition("Cancel", () => {
-                            }, {}, () => { }, true, false)
+                            {
+                                label: "Add",
+
+                                onClick: async () => {
+                                    if (document.getElementById("file-picker")) {
+                                        setUploading(true)
+                                        await setWorkflowVariable(encodeURIComponent(keyValue), file, mimeType)
+                                    } else {
+                                        await setWorkflowVariable(encodeURIComponent(keyValue), dValue, mimeType)
+                                    }
+                                },
+
+                                buttonProps: {variant: "contained", color: "primary"},
+                                errFunc: () => { setUploading(false) },
+                                closesModal: true,
+                                validate: true
+                            },
+                            {
+                                label: "Cancel",
+
+                                onClick: () => {
+                                },
+
+                                buttonProps: {},
+                                errFunc: () => { },
+                                closesModal: true
+                            }
                         ]}
 
                         requiredFields={[
@@ -112,7 +129,7 @@ function AddWorkflowVariablePanel(props) {
                 </FlexBox>:<></>}
             </ContentPanelBody>
         </ContentPanel>
-    )
+    );
 }
 
 export default AddWorkflowVariablePanel;
@@ -217,7 +234,7 @@ function Variable(props) {
 
     let lang = MimeTypeFileExtension(mimeType)
 
-    return(
+    return (
         <tr className="body-row" key={`var-${obj.name}${obj.size}`}>
         <td className="wrap-word variable-name" style={{ width: "180px", maxWidth: "180px", textOverflow:"ellipsis",  overflow:"hidden" }}>
             <Tippy content={obj.name} trigger={'mouseenter focus'} zIndex={10}>
@@ -257,11 +274,27 @@ function Variable(props) {
                         }}
                         actionButtons={
                             [
-                                ButtonDefinition("Save", async () => {
-                                    await setWorkflowVariable(obj.name, val , mimeType)
-                                }, {variant: "contained", color: "primary"}, ()=>{}, true, false),
-                                ButtonDefinition("Cancel", () => {
-                                }, {}, ()=>{}, true, false)
+                                {
+                                    label: "Save",
+
+                                    onClick: async () => {
+                                        await setWorkflowVariable(obj.name, val , mimeType)
+                                    },
+
+                                    buttonProps: {variant: "contained", color: "primary"},
+                                    errFunc: ()=>{},
+                                    closesModal: true
+                                },
+                                {
+                                    label: "Cancel",
+
+                                    onClick: () => {
+                                    },
+
+                                    buttonProps: {},
+                                    errFunc: ()=>{},
+                                    closesModal: true
+                                }
                             ]
                         } 
                     >
@@ -337,12 +370,29 @@ function Variable(props) {
                         }}
                         actionButtons={
                             [
-                                ButtonDefinition("Upload", async () => {
-                                    setUploading(true)
-                                    await setWorkflowVariable(obj.name, file, mimeType)
-                                }, {variant: "contained", color: "primary"}, ()=>{setUploading(false)}, true, false, true),
-                                ButtonDefinition("Cancel", () => {
-                                }, {},()=>{}, true, false)
+                                {
+                                    label: "Upload",
+
+                                    onClick: async () => {
+                                        setUploading(true)
+                                        await setWorkflowVariable(obj.name, file, mimeType)
+                                    },
+
+                                    buttonProps: {variant: "contained", color: "primary"},
+                                    errFunc: ()=>{setUploading(false)},
+                                    closesModal: true,
+                                    validate: true
+                                },
+                                {
+                                    label: "Cancel",
+
+                                    onClick: () => {
+                                    },
+
+                                    buttonProps: {},
+                                    errFunc: ()=>{},
+                                    closesModal: true
+                                }
                             ]
                         } 
 
@@ -375,11 +425,27 @@ function Variable(props) {
                     }}
                     actionButtons={
                         [
-                            ButtonDefinition("Delete", async () => {
-                                    await deleteWorkflowVariable(obj.name)
-                            }, {variant: "contained", color: "error"}, ()=>{}, true, false),
-                            ButtonDefinition("Cancel", () => {
-                            }, {}, ()=>{}, true, false)
+                            {
+                                label: "Delete",
+
+                                onClick: async () => {
+                                        await deleteWorkflowVariable(obj.name)
+                                },
+
+                                buttonProps: {variant: "contained", color: "error"},
+                                errFunc: ()=>{},
+                                closesModal: true
+                            },
+                            {
+                                label: "Cancel",
+
+                                onClick: () => {
+                                },
+
+                                buttonProps: {},
+                                errFunc: ()=>{},
+                                closesModal: true
+                            }
                         ]
                     } 
                 >
@@ -395,7 +461,7 @@ function Variable(props) {
             </FlexBox>
         </td>
     </tr>
-    )
+    );
 }
 
 function VariablesUploadButton() {

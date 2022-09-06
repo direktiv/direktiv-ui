@@ -3,7 +3,7 @@ import './style.css';
 import ContentPanel, {ContentPanelTitle, ContentPanelTitleIcon, ContentPanelBody} from '../../../components/content-panel';
 import FlexBox from '../../../components/flexbox';
 import Alert from '../../../components/alert';
-import Modal, { ButtonDefinition } from '../../../components/modal';
+import Modal  from '../../../components/modal';
 import { VscSettingsGear, VscTrash } from 'react-icons/vsc';
 
 function ScarySettings(props) {
@@ -46,43 +46,58 @@ function Scary(props) {
         delBtnClasses += " disabled"
     }
 
-    return(
-        <>
-        <FlexBox>
-            <FlexBox className="auto-margin" style={{fontSize: "12px", maxWidth: "300px"}}>
-                This will permanently delete the current active namespace and all resources associated with it.
-            </FlexBox>
-            <FlexBox>
-                <Modal title="Delete namespace" 
-                        escapeToCancel
-                        modalStyle={{width: "360px"}}
-                        titleIcon={<VscTrash/>}
-                        button={(
-                            <span>Delete Namespace</span>
-                        )}
-                        buttonProps={{
-                            variant: "contained",
-                            color: "error",
-                            tooltip: "Delete Namespace",
-                            disabledTooltip: "Requires save"
-                        }}
-                        requiredFields={[
-                            {tip: "typing namespace name is required", value: delButtonEnabled ? "valid":""}
-                        ]}
-                        actionButtons={[
-                            ButtonDefinition("Delete", async () => {
-                                await deleteNamespace(namespace)
-                            }, {variant: "contained", color:"error"},()=>{}, true, false, true),
-                            ButtonDefinition("Cancel", () => {
-                            }, {},()=>{}, true, false)
-                        ]}
-                    >
-                        <DeleteNamespaceConfirmationPanel namespace={namespace} setDelButtonEnabled={setDelButtonEnabled} />
-                    </Modal>
-            </FlexBox>
+    return <>
+    <FlexBox>
+        <FlexBox className="auto-margin" style={{fontSize: "12px", maxWidth: "300px"}}>
+            This will permanently delete the current active namespace and all resources associated with it.
         </FlexBox>
-        </>
-    );
+        <FlexBox>
+            <Modal title="Delete namespace" 
+                    escapeToCancel
+                    modalStyle={{width: "360px"}}
+                    titleIcon={<VscTrash/>}
+                    button={(
+                        <span>Delete Namespace</span>
+                    )}
+                    buttonProps={{
+                        variant: "contained",
+                        color: "error",
+                        tooltip: "Delete Namespace",
+                        disabledTooltip: "Requires save"
+                    }}
+                    requiredFields={[
+                        {tip: "typing namespace name is required", value: delButtonEnabled ? "valid":""}
+                    ]}
+                    actionButtons={[
+                        {
+                            label: "Delete",
+
+                            onClick: async () => {
+                                await deleteNamespace(namespace)
+                            },
+
+                            buttonProps: {variant: "contained", color:"error"},
+                            errFunc: ()=>{},
+                            closesModal: true,
+                            validate: true
+                        },
+                        {
+                            label: "Cancel",
+
+                            onClick: () => {
+                            },
+
+                            buttonProps: {},
+                            errFunc: ()=>{},
+                            closesModal: true
+                        }
+                    ]}
+                >
+                    <DeleteNamespaceConfirmationPanel namespace={namespace} setDelButtonEnabled={setDelButtonEnabled} />
+                </Modal>
+        </FlexBox>
+    </FlexBox>
+    </>;
 }
 
 

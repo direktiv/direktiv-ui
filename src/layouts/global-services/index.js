@@ -4,7 +4,7 @@ import {useEffect, useState} from "react"
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from "../../components/content-panel";
 import FlexBox from "../../components/flexbox";
 import { Config, GenerateRandomKey } from "../../util";
-import Modal, { ButtonDefinition, KeyDownDefinition } from "../../components/modal";
+import Modal  from "../../components/modal";
 import { VscLayers } from 'react-icons/vsc';
 import HelpIcon from "../../components/help"
 
@@ -41,7 +41,7 @@ export default function GlobalServicesPanel(props) {
         return <></>
     }
 
-    return(
+    return (
         <FlexBox className="gap wrap" style={{paddingRight:"8px"}}>
             <ContentPanel style={{width:"100%"}}>
                 <ContentPanelTitle>
@@ -80,11 +80,27 @@ export default function GlobalServicesPanel(props) {
                             }, ()=>{}, true)
                         ]}
                         actionButtons={[
-                            ButtonDefinition("Add", async () => {
-                                    await createGlobalService(serviceName, image, parseInt(scale), parseInt(size), cmd)
-                            }, {variant: "contained", color: "primary"}, ()=>{}, true, false),
-                            ButtonDefinition("Cancel", () => {
-                            }, {}, ()=>{}, true, false)
+                            {
+                                label: "Add",
+
+                                onClick: async () => {
+                                        await createGlobalService(serviceName, image, parseInt(scale), parseInt(size), cmd)
+                                },
+
+                                buttonProps: {variant: "contained", color: "primary"},
+                                errFunc: ()=>{},
+                                closesModal: true
+                            },
+                            {
+                                label: "Cancel",
+
+                                onClick: () => {
+                                },
+
+                                buttonProps: {},
+                                errFunc: ()=>{},
+                                closesModal: true
+                            }
                         ]}
                     >
                         {config !== null ? 
@@ -131,5 +147,5 @@ export default function GlobalServicesPanel(props) {
             </ContentPanel>
 
         </FlexBox>
-    )
+    );
 }

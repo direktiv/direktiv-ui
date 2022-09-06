@@ -8,7 +8,7 @@ import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIco
 import FlexBox from '../../components/flexbox';
 import HelpIcon from '../../components/help';
 import HideShowButton from '../../components/hide-show';
-import Modal, { ButtonDefinition } from '../../components/modal';
+import Modal  from '../../components/modal';
 import { ClientFileUpload } from '../../components/navbar';
 
 
@@ -260,7 +260,7 @@ export default function MirrorInfoPanel(props) {
                     <FlexBox style={{ flex: "auto", justifyContent: "right", paddingRight: "6px", alignItems: "unset" }}>
                         <Tippy content={mirrorSettingsValidateMsg} disabled={mirrorSettingsValidateMsg === ""} trigger={'mouseenter focus'} zIndex={10}>
                             <div>                            
-                                <Modal
+                            <Modal
                                     escapeToCancel
                                     activeOverlay
                                     title="Update Mirror Settings"
@@ -282,32 +282,46 @@ export default function MirrorInfoPanel(props) {
                                         disabled: !infoPendingChanges || !mirrorSettingsValid
                                     }}
                                     actionButtons={[
-                                        ButtonDefinition("Update Settings", async () => {
-                                            let newSettings = {
-                                                "url": infoChangesTracker.url ? infoURL : "-",
-                                                "ref": infoChangesTracker.ref ? infoRef : "-",
-                                                "cron": infoChangesTracker.cron ? infoCron : "-",
-                                                "passphrase": infoChangesTracker.passphrase ? infoPassphrase : "-",
-                                                "publicKey": infoChangesTracker.publicKey ? infoPublicKey : "-",
-                                                "privateKey": infoChangesTracker.privateKey ? infoPrivateKey : "-",
-                                            }
+                                        {
+                                            label: "Update Settings",
 
-                                            if (mirrorAuthMethod === "token") {
-                                                newSettings["privateKey"] = ""
-                                                newSettings["publicKey"] = ""
-                                            } else if (mirrorAuthMethod === "none") {
-                                                newSettings["passphrase"] = ""
-                                                newSettings["privateKey"] = ""
-                                                newSettings["publicKey"] = ""
-                                            } else if (mirrorAuthMethod === "ssh" && !infoChangesTracker.passphrase) {
-                                                newSettings["passphrase"] = ""
-                                            }
+                                            onClick: async () => {
+                                                let newSettings = {
+                                                    "url": infoChangesTracker.url ? infoURL : "-",
+                                                    "ref": infoChangesTracker.ref ? infoRef : "-",
+                                                    "cron": infoChangesTracker.cron ? infoCron : "-",
+                                                    "passphrase": infoChangesTracker.passphrase ? infoPassphrase : "-",
+                                                    "publicKey": infoChangesTracker.publicKey ? infoPublicKey : "-",
+                                                    "privateKey": infoChangesTracker.privateKey ? infoPrivateKey : "-",
+                                                }
 
-                                            await updateSettings(newSettings)
+                                                if (mirrorAuthMethod === "token") {
+                                                    newSettings["privateKey"] = ""
+                                                    newSettings["publicKey"] = ""
+                                                } else if (mirrorAuthMethod === "none") {
+                                                    newSettings["passphrase"] = ""
+                                                    newSettings["privateKey"] = ""
+                                                    newSettings["publicKey"] = ""
+                                                } else if (mirrorAuthMethod === "ssh" && !infoChangesTracker.passphrase) {
+                                                    newSettings["passphrase"] = ""
+                                                }
 
-                                            resetStates()
-                                        }, {variant: "contained", color: "primary"}, () => { }, true, false),
-                                        ButtonDefinition("Cancel", () => { }, {}, () => { }, true, false)
+                                                await updateSettings(newSettings)
+
+                                                resetStates()
+                                            },
+
+                                            buttonProps: {variant: "contained", color: "primary"},
+                                            errFunc: () => { },
+                                            closesModal: true
+                                        },
+                                        {
+                                            label: "Cancel",
+                                            onClick: () => { },
+                                            buttonProps: {},
+                                            errFunc: () => { },
+                                            closesModal: true
+                                        }
                                     ]}
                                 >
                                     <FlexBox className="col gap" style={{ height: "fit-content" }}>
@@ -382,7 +396,7 @@ export default function MirrorInfoPanel(props) {
                                                 <textarea className={`info-textarea-value readonly`} readonly={true} rows={5} style={{ width: "100%", resize: "none" }} value={infoPrivateKey} />
                                             </FlexBox> : <></>}
                                     </FlexBox>
-                                </Modal>
+                            </Modal>
                             </div>
                         </Tippy>
                     </FlexBox>

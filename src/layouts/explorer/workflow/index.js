@@ -28,7 +28,7 @@ import WorkflowDiagram from '../../../components/diagram';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import Button from '../../../components/button';
-import Modal, { ButtonDefinition } from '../../../components/modal';
+import Modal from '../../../components/modal';
 
 import { PieChart } from 'react-minimal-pie-chart';
 import { AutoSizer } from "react-virtualized";
@@ -357,22 +357,38 @@ function WorkingRevision(props) {
                                         setWorkflowJSONSchema(null)
                                     }}
                                     actionButtons={[
-                                        ButtonDefinition(`${tabIndex === 0 ? "Run": "Generate JSON"}`, async () => {
-                                            if (tabIndex === 1) {
-                                                inputFormSubmitRef.click()
-                                                return
-                                            }
-                                            let r = ""
-                                            r = await executeWorkflow(input)
-                                            if(r.includes("execute workflow")){
-                                                // is an error
-                                                throw new Error(r)
-                                            } else {
-                                                navigate(`/n/${namespace}/instances/${r}`)
-                                            }
-                                        }, {variant: "contained", color: "primary", disabled: tabIndex === 1 && workflowJSONSchema === null}, ()=>{}, tabIndex === 0, false),
-                                        ButtonDefinition("Cancel", async () => {
-                                        }, {}, ()=>{}, true, false)
+                                        {
+                                            label: `${tabIndex === 0 ? "Run": "Generate JSON"}`,
+
+                                            onClick: async () => {
+                                                if (tabIndex === 1) {
+                                                    inputFormSubmitRef.click()
+                                                    return
+                                                }
+                                                let r = ""
+                                                r = await executeWorkflow(input)
+                                                if(r.includes("execute workflow")){
+                                                    // is an error
+                                                    throw new Error(r)
+                                                } else {
+                                                    navigate(`/n/${namespace}/instances/${r}`)
+                                                }
+                                            },
+
+                                            buttonProps: {variant: "contained", color: "primary", disabled: tabIndex === 1 && workflowJSONSchema === null},
+                                            errFunc: ()=>{},
+                                            closesModal: tabIndex === 0
+                                        },
+                                        {
+                                            label: "Cancel",
+
+                                            onClick: async () => {
+                                            },
+
+                                            buttonProps: {},
+                                            errFunc: ()=>{},
+                                            closesModal: true
+                                        }
                                     ]}
                                     onOpen={()=>{
                                         try{

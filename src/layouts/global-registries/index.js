@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import ContentPanel, {ContentPanelTitle, ContentPanelTitleIcon, ContentPanelBody } from '../../components/content-panel';
-import Modal, { ButtonDefinition, KeyDownDefinition } from '../../components/modal';
+import Modal  from '../../components/modal';
 import FlexBox from '../../components/flexbox';
 import Alert from '../../components/alert';
 import { useGlobalRegistries, useGlobalPrivateRegistries } from 'direktiv-react-hooks';
@@ -92,44 +92,72 @@ export function GlobalRegistries(){
                         ]}
 
                         actionButtons={[
-                            ButtonDefinition("Add", async() => {
-                                    await createRegistry(url, `${username}:${token}`)
-                                    await  getRegistries()
-                            }, {variant: "contained", color: "primary"}, ()=>{}, true, false, true),
-                            ButtonDefinition("Test Connection", async () => {
-                                setURLErr("")
-                                setTokenErr("")
-                                setUserErr("")
-                                setErr("")
-                                let filledOut = true
-                                if(url === ""){
-                                    setURLErr("Please enter a URL...")
-                                    filledOut = false
-                                }
-                                if(username === "") {
-                                    setUserErr("Please enter a username...")
-                                    filledOut = false
-                                }
-                                if(token === "") {
-                                    setTokenErr("Please enter a token...")
-                                    filledOut = false
-                                }
-                                if(!filledOut) throw new Error("all fields must be filled out")
-                                setTestConnLoading(true)
-                                let resp = await TestRegistry(url, username, token)
-                                if (resp.success) {
-                                    setTestConnLoading(false)
-                                    setSuccessFeedback(true)
-                                } else {
-                                    setTestConnLoading(false)
-                                    setSuccessFeedback(false)
-                                    setErr(resp.message)                                
-                                }
-                           
-                            }, `small ${testConnLoading ? "loading" : ""}`, ()=>{   setTestConnLoading(false)
-                                setSuccessFeedback(false)}, false, false, true),
-                            ButtonDefinition("Cancel", () => {
-                            }, {}, ()=>{},true, false)
+                            {
+                                label: "Add",
+
+                                onClick: async() => {
+                                        await createRegistry(url, `${username}:${token}`)
+                                        await  getRegistries()
+                                },
+
+                                buttonProps: {variant: "contained", color: "primary"},
+                                errFunc: ()=>{},
+                                closesModal: true,
+                                validate: true
+                            },
+                            {
+                                label: "Test Connection",
+
+                                onClick: async () => {
+                                    setURLErr("")
+                                    setTokenErr("")
+                                    setUserErr("")
+                                    setErr("")
+                                    let filledOut = true
+                                    if(url === ""){
+                                        setURLErr("Please enter a URL...")
+                                        filledOut = false
+                                    }
+                                    if(username === "") {
+                                        setUserErr("Please enter a username...")
+                                        filledOut = false
+                                    }
+                                    if(token === "") {
+                                        setTokenErr("Please enter a token...")
+                                        filledOut = false
+                                    }
+                                    if(!filledOut) throw new Error("all fields must be filled out")
+                                    setTestConnLoading(true)
+                                    let resp = await TestRegistry(url, username, token)
+                                    if (resp.success) {
+                                        setTestConnLoading(false)
+                                        setSuccessFeedback(true)
+                                    } else {
+                                        setTestConnLoading(false)
+                                        setSuccessFeedback(false)
+                                        setErr(resp.message)                                
+                                    }
+                               
+                                },
+
+                                buttonProps: `small ${testConnLoading ? "loading" : ""}`,
+
+                                errFunc: ()=>{   setTestConnLoading(false)
+                                    setSuccessFeedback(false)},
+
+                                closesModal: false,
+                                validate: true
+                            },
+                            {
+                                label: "Cancel",
+
+                                onClick: () => {
+                                },
+
+                                buttonProps: {},
+                                errFunc: ()=>{},
+                                closesModal: true
+                            }
                         ]}
                     >
                         <AddRegistryPanel err={err} token={token} setToken={setToken} username={username} setUsername={setUsername} url={url} setURL={setURL} successMsg={successFeedback} urlErr={urlErr} userErr={userErr} tokenErr={tokenErr} />    
@@ -149,7 +177,7 @@ export function GlobalRegistries(){
                 </FlexBox>
             </ContentPanelBody>
         </ContentPanel>
-    )
+    );
 }
 
 export function GlobalPrivateRegistries(){
@@ -217,44 +245,72 @@ export function GlobalPrivateRegistries(){
                         ]}
 
                         actionButtons={[
-                            ButtonDefinition("Add", async() => {
-                                    await createRegistry(url, `${username}:${token}`)
-                                    await  getRegistries()
-                            }, {variant: "contained", color: "primary"}, ()=>{}, true, false, true),
-                            ButtonDefinition("Test Connection", async () => {
-                                setURLErr("")
-                                setTokenErr("")
-                                setUserErr("")
-                                setErr("")
-                                let filledOut = true
-                                if(url === ""){
-                                    setURLErr("Please enter a URL...")
-                                    filledOut = false
-                                }
-                                if(username === "") {
-                                    setUserErr("Please enter a username...")
-                                    filledOut = false
-                                }
-                                if(token === "") {
-                                    setTokenErr("Please enter a token...")
-                                    filledOut = false
-                                }
-                                if(!filledOut) throw new Error("all fields must be filled out")
-                                setTestConnLoading(true)
-                                let resp = await TestRegistry(url, username, token)
-                                if (resp.success) {
-                                    setTestConnLoading(false)
-                                    setSuccessFeedback(true)
-                                } else {
-                                    setTestConnLoading(false)
-                                    setSuccessFeedback(false)
-                                    setErr(resp.message)                                
-                                }
-                           
-                            }, {variant: "contained", color: "primary"}, ()=>{   setTestConnLoading(false)
-                                setSuccessFeedback(false)}, false, false, true),
-                            ButtonDefinition("Cancel", () => {
-                            }, {}, ()=>{}, true, false)
+                            {
+                                label: "Add",
+
+                                onClick: async() => {
+                                        await createRegistry(url, `${username}:${token}`)
+                                        await  getRegistries()
+                                },
+
+                                buttonProps: {variant: "contained", color: "primary"},
+                                errFunc: ()=>{},
+                                closesModal: true,
+                                validate: true
+                            },
+                            {
+                                label: "Test Connection",
+
+                                onClick: async () => {
+                                    setURLErr("")
+                                    setTokenErr("")
+                                    setUserErr("")
+                                    setErr("")
+                                    let filledOut = true
+                                    if(url === ""){
+                                        setURLErr("Please enter a URL...")
+                                        filledOut = false
+                                    }
+                                    if(username === "") {
+                                        setUserErr("Please enter a username...")
+                                        filledOut = false
+                                    }
+                                    if(token === "") {
+                                        setTokenErr("Please enter a token...")
+                                        filledOut = false
+                                    }
+                                    if(!filledOut) throw new Error("all fields must be filled out")
+                                    setTestConnLoading(true)
+                                    let resp = await TestRegistry(url, username, token)
+                                    if (resp.success) {
+                                        setTestConnLoading(false)
+                                        setSuccessFeedback(true)
+                                    } else {
+                                        setTestConnLoading(false)
+                                        setSuccessFeedback(false)
+                                        setErr(resp.message)                                
+                                    }
+                               
+                                },
+
+                                buttonProps: {variant: "contained", color: "primary"},
+
+                                errFunc: ()=>{   setTestConnLoading(false)
+                                    setSuccessFeedback(false)},
+
+                                closesModal: false,
+                                validate: true
+                            },
+                            {
+                                label: "Cancel",
+
+                                onClick: () => {
+                                },
+
+                                buttonProps: {},
+                                errFunc: ()=>{},
+                                closesModal: true
+                            }
                         ]}
                     >
                         <AddRegistryPanel err={err} token={token} setToken={setToken} username={username} setUsername={setUsername} url={url} setURL={setURL} successMsg={successFeedback} urlErr={urlErr} userErr={userErr} tokenErr={tokenErr} />    
@@ -274,5 +330,5 @@ export function GlobalPrivateRegistries(){
                 </FlexBox>
             </ContentPanelBody>
         </ContentPanel>
-    )
+    );
 }

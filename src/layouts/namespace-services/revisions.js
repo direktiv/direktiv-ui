@@ -7,7 +7,7 @@ import Alert from "../../components/alert"
 import Button from "../../components/button";
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon, ContentPanelFooter } from "../../components/content-panel"
 import FlexBox from "../../components/flexbox"
-import Modal, { ButtonDefinition, KeyDownDefinition } from "../../components/modal"
+import Modal  from "../../components/modal"
 import { Config } from "../../util"
 import Tippy from '@tippyjs/react'
 import 'tippy.js/dist/tippy.css'
@@ -118,7 +118,7 @@ function NamespaceRevisions(props) {
         return <></>
     }
 
-    return(
+    return (
         <FlexBox className="gap wrap" style={{paddingRight: "8px"}}>
             <FlexBox style={{flex: 6}}>
                 <ContentPanel style={{width: "100%"}}>
@@ -153,11 +153,28 @@ function NamespaceRevisions(props) {
                                     {tip: "image is required", value: image}
                                 ]}
                                 actionButtons={[
-                                    ButtonDefinition("Add", async () => {
-                                        await createNamespaceServiceRevision(image, parseInt(scale), parseInt(size), cmd, parseInt(trafficPercent))
-                                    }, {variant: "contained", color: "primary"}, ()=>{}, true, false, true),
-                                    ButtonDefinition("Cancel", () => {
-                                    }, {}, ()=>{}, true, false)
+                                    {
+                                        label: "Add",
+
+                                        onClick: async () => {
+                                            await createNamespaceServiceRevision(image, parseInt(scale), parseInt(size), cmd, parseInt(trafficPercent))
+                                        },
+
+                                        buttonProps: {variant: "contained", color: "primary"},
+                                        errFunc: ()=>{},
+                                        closesModal: true,
+                                        validate: true
+                                    },
+                                    {
+                                        label: "Cancel",
+
+                                        onClick: () => {
+                                        },
+
+                                        buttonProps: {},
+                                        errFunc: ()=>{},
+                                        closesModal: true
+                                    }
                                 ]}
                             >
                                 {config !== null ? 
@@ -210,7 +227,7 @@ function NamespaceRevisions(props) {
             </FlexBox>
             <UpdateTraffic setNamespaceServiceRevisionTraffic={setNamespaceServiceRevisionTraffic} service={service} revisions={revisions} traffic={traffic}/>
         </FlexBox>
-    )
+    );
 }
 
 export function UpdateTraffic(props){

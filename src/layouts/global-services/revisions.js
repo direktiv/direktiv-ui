@@ -5,7 +5,7 @@ import { Service } from "../namespace-services"
 import { RevisionCreatePanel, UpdateTraffic } from "../namespace-services/revisions"
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from "../../components/content-panel"
 import FlexBox from "../../components/flexbox"
-import Modal, { ButtonDefinition, KeyDownDefinition } from "../../components/modal"
+import Modal  from "../../components/modal"
 import { Config } from "../../util"
 import { useGlobalService } from "direktiv-react-hooks"
 
@@ -54,7 +54,7 @@ export default function GlobalRevisionsPanel(props){
         return <></>
     }
 
-    return(
+    return (
         <FlexBox className="gap wrap" style={{paddingRight:"8px"}}>
             <FlexBox  className="gap">
                     <FlexBox>
@@ -90,11 +90,28 @@ export default function GlobalRevisionsPanel(props){
                                     {tip: "image is required", value: image}
                                 ]}
                                 actionButtons={[
-                                    ButtonDefinition("Add", async () => {
-                                        await createGlobalServiceRevision(image, parseInt(scale), parseInt(size), cmd, parseInt(trafficPercent))
-                                    }, {variant: "contained", color: "primary"}, ()=>{}, true, false, true),
-                                    ButtonDefinition("Cancel", () => {
-                                    }, {}, ()=>{}, true, false)
+                                    {
+                                        label: "Add",
+
+                                        onClick: async () => {
+                                            await createGlobalServiceRevision(image, parseInt(scale), parseInt(size), cmd, parseInt(trafficPercent))
+                                        },
+
+                                        buttonProps: {variant: "contained", color: "primary"},
+                                        errFunc: ()=>{},
+                                        closesModal: true,
+                                        validate: true
+                                    },
+                                    {
+                                        label: "Cancel",
+
+                                        onClick: () => {
+                                        },
+
+                                        buttonProps: {},
+                                        errFunc: ()=>{},
+                                        closesModal: true
+                                    }
                                 ]}
                             >
                                 {config !== null ? 
@@ -153,5 +170,5 @@ export default function GlobalRevisionsPanel(props){
                     }
                     </FlexBox>
         </FlexBox>
-    )
+    );
 }

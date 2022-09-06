@@ -9,7 +9,7 @@ import Button from '../../components/button';
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from '../../components/content-panel';
 import FlexBox from '../../components/flexbox';
 import Loader from '../../components/loader';
-import { ButtonDefinition, ModalHeadless } from '../../components/modal';
+import { ModalHeadless } from '../../components/modal';
 import { Config } from '../../util';
 import ActivityTable from './activities';
 import MirrorInfoPanel from './info';
@@ -136,10 +136,24 @@ export default function MirrorPage(props) {
                         width: "300px"
                     }}
                     actionButtons={[
-                        ButtonDefinition("Sync", async () => {
-                            await syncRef.current(true)
-                        }, {variant: "contained", color: "primary"}, () => { }, true, false),
-                        ButtonDefinition("Cancel", () => { }, {}, () => { }, true, false)
+                        {
+                            label: "Sync",
+
+                            onClick: async () => {
+                                await syncRef.current(true)
+                            },
+
+                            buttonProps: {variant: "contained", color: "primary"},
+                            errFunc: () => { },
+                            closesModal: true
+                        },
+                        {
+                            label: "Cancel",
+                            onClick: () => { },
+                            buttonProps: {},
+                            errFunc: () => { },
+                            closesModal: true
+                        }
                     ]}
                 >
                     <FlexBox className="col gap" style={{ paddingTop: "8px" }}>

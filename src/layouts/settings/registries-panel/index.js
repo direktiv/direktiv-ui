@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import ContentPanel, {ContentPanelTitle, ContentPanelTitleIcon, ContentPanelBody } from '../../../components/content-panel';
-import Modal, { ButtonDefinition, KeyDownDefinition } from '../../../components/modal';
+import Modal  from '../../../components/modal';
 import FlexBox from '../../../components/flexbox';
 import {SecretsDeleteButton} from '../secrets-panel';
 import Alert from '../../../components/alert';
@@ -96,62 +96,90 @@ function RegistriesPanel(props){
                             {tip: "token is required", value: token}
                         ]}
                         actionButtons={[
-                            ButtonDefinition("Add", async() => {
-                                setURLErr("")
-                                setTokenErr("")
-                                setUserErr("")
-                                setErr("")
-                                let filledOut = true
-                                if(url === ""){
-                                    setURLErr("Please enter a URL...")
-                                    filledOut = false
-                                }
-                                if(username === "") {
-                                    setUserErr("Please enter a username...")
-                                    filledOut = false
-                                }
-                                if(token === "") {
-                                    setTokenErr("Please enter a token...")
-                                    filledOut = false
-                                }
-                                if(!filledOut) throw new Error("all fields must be filled out")
-                                await createRegistry(url, `${username}:${token}`)
-                                await  getRegistries()
-                            }, {variant: "contained", color: "primary"}, ()=>{}, true, false, true),
-                            ButtonDefinition("Test Connection", async () => {
-                                setURLErr("")
-                                setTokenErr("")
-                                setUserErr("")
-                                setErr("")
-                                let filledOut = true
-                                if(url === ""){
-                                    setURLErr("Please enter a URL...")
-                                    filledOut = false
-                                }
-                                if(username === "") {
-                                    setUserErr("Please enter a username...")
-                                    filledOut = false
-                                }
-                                if(token === "") {
-                                    setTokenErr("Please enter a token...")
-                                    filledOut = false
-                                }
-                                if(!filledOut) throw new Error("all fields must be filled out")
-                                setTestConnLoading(true)
-                                let resp = await TestRegistry(url, username, token)
-                                if (resp.success) {
-                                    setTestConnLoading(false)
-                                    setSuccessFeedback(true)
-                                } else {
-                                    setTestConnLoading(false)
-                                    setSuccessFeedback(false)
-                                    setErr(resp.message)                                
-                                }
-                           
-                            }, `small ${testConnLoading ? "loading" : ""}`, ()=>{   setTestConnLoading(false)
-                                setSuccessFeedback(false)}, false, false, true),
-                            ButtonDefinition("Cancel", () => {
-                            }, {}, ()=>{}, true, false)
+                            {
+                                label: "Add",
+
+                                onClick: async() => {
+                                    setURLErr("")
+                                    setTokenErr("")
+                                    setUserErr("")
+                                    setErr("")
+                                    let filledOut = true
+                                    if(url === ""){
+                                        setURLErr("Please enter a URL...")
+                                        filledOut = false
+                                    }
+                                    if(username === "") {
+                                        setUserErr("Please enter a username...")
+                                        filledOut = false
+                                    }
+                                    if(token === "") {
+                                        setTokenErr("Please enter a token...")
+                                        filledOut = false
+                                    }
+                                    if(!filledOut) throw new Error("all fields must be filled out")
+                                    await createRegistry(url, `${username}:${token}`)
+                                    await  getRegistries()
+                                },
+
+                                buttonProps: {variant: "contained", color: "primary"},
+                                errFunc: ()=>{},
+                                closesModal: true,
+                                validate: true
+                            },
+                            {
+                                label: "Test Connection",
+
+                                onClick: async () => {
+                                    setURLErr("")
+                                    setTokenErr("")
+                                    setUserErr("")
+                                    setErr("")
+                                    let filledOut = true
+                                    if(url === ""){
+                                        setURLErr("Please enter a URL...")
+                                        filledOut = false
+                                    }
+                                    if(username === "") {
+                                        setUserErr("Please enter a username...")
+                                        filledOut = false
+                                    }
+                                    if(token === "") {
+                                        setTokenErr("Please enter a token...")
+                                        filledOut = false
+                                    }
+                                    if(!filledOut) throw new Error("all fields must be filled out")
+                                    setTestConnLoading(true)
+                                    let resp = await TestRegistry(url, username, token)
+                                    if (resp.success) {
+                                        setTestConnLoading(false)
+                                        setSuccessFeedback(true)
+                                    } else {
+                                        setTestConnLoading(false)
+                                        setSuccessFeedback(false)
+                                        setErr(resp.message)                                
+                                    }
+                               
+                                },
+
+                                buttonProps: `small ${testConnLoading ? "loading" : ""}`,
+
+                                errFunc: ()=>{   setTestConnLoading(false)
+                                    setSuccessFeedback(false)},
+
+                                closesModal: false,
+                                validate: true
+                            },
+                            {
+                                label: "Cancel",
+
+                                onClick: () => {
+                                },
+
+                                buttonProps: {},
+                                errFunc: ()=>{},
+                                closesModal: true
+                            }
                         ]}
                     >
                         <AddRegistryPanel err={err} urlErr={urlErr} userErr={userErr} tokenErr={tokenErr} successMsg={successFeedback} token={token} setToken={setToken} username={username} setUsername={setUsername} url={url} setURL={setURL}/>    
@@ -171,7 +199,7 @@ function RegistriesPanel(props){
                 </FlexBox>
             </ContentPanelBody>
         </ContentPanel>
-    )
+    );
 }
 
 export default RegistriesPanel;
@@ -311,63 +339,76 @@ export function AddRegistryPanel(props) {
 export function Registries(props) {
     const {registries, deleteRegistry, getRegistries} = props
 
-    return(
-        <>
-            <FlexBox className="col gap" style={{ maxHeight: "236px", overflowY: "auto" }}>
-            {registries.length === 0 ? 
-                     <FlexBox className="secret-tuple empty-content">
-                     <FlexBox className="key">No registries are stored...</FlexBox>
-                     <FlexBox className="val"></FlexBox>
-                     <FlexBox className="val"></FlexBox>
-                     <FlexBox className="actions">
-                     </FlexBox>
+    return <>
+        <FlexBox className="col gap" style={{ maxHeight: "236px", overflowY: "auto" }}>
+        {registries.length === 0 ? 
+                 <FlexBox className="secret-tuple empty-content">
+                 <FlexBox className="key">No registries are stored...</FlexBox>
+                 <FlexBox className="val"></FlexBox>
+                 <FlexBox className="val"></FlexBox>
+                 <FlexBox className="actions">
                  </FlexBox>
-            :
-            <>
-            {registries.map((obj)=>{
-                    return (
-                        <FlexBox key={obj.name} className="secret-tuple">
-                            <FlexBox className="key">{obj.name} <span className="muted-text" style={{ marginLeft: "8px" }}>({obj.user})</span></FlexBox>
-                            <FlexBox className="val"></FlexBox>
-                            <FlexBox className="val"></FlexBox>
-                            <FlexBox className="actions">
-                                <Modal 
-                                    escapeToCancel
-                                    modalStyle={{width: "400px"}}
-                                    style={{
-                                        flexDirection: "row-reverse",
-                                        marginRight: "8px"
-                                    }}
-                                    title="Remove registry" 
-                                    titleIcon={<VscTrash/>}
-                                    button={(
-                                        <SecretsDeleteButton/>
-                                    )} 
-                                    actionButtons={
-                                        [
-                                            // label, onClick, classList, closesModal, async
-                                            ButtonDefinition("Delete", async () => {
+             </FlexBox>
+        :
+        <>
+        {registries.map((obj)=>{
+                return (
+                    <FlexBox key={obj.name} className="secret-tuple">
+                        <FlexBox className="key">{obj.name} <span className="muted-text" style={{ marginLeft: "8px" }}>({obj.user})</span></FlexBox>
+                        <FlexBox className="val"></FlexBox>
+                        <FlexBox className="val"></FlexBox>
+                        <FlexBox className="actions">
+                            <Modal 
+                                escapeToCancel
+                                modalStyle={{width: "400px"}}
+                                style={{
+                                    flexDirection: "row-reverse",
+                                    marginRight: "8px"
+                                }}
+                                title="Remove registry" 
+                                titleIcon={<VscTrash/>}
+                                button={(
+                                    <SecretsDeleteButton/>
+                                )} 
+                                actionButtons={
+                                    [
+                                        {
+                                            label: "Delete",
+
+                                            onClick: async () => {
                                                     await deleteRegistry(obj.name)
                                                     await getRegistries()
-                                            }, {variant: "contained", color: "error"},()=>{}, true, false),
-                                            ButtonDefinition("Cancel", () => {
-                                            }, {},()=>{}, true, false)
-                                        ]
-                                    }   
-                                >
-                                    <FlexBox className="col gap">
-                                        <FlexBox>
-                                            Are you sure you want to remove '{obj.name}'?
-                                            <br/>
-                                            This action cannot be undone.
-                                        </FlexBox>
+                                            },
+
+                                            buttonProps: {variant: "contained", color: "error"},
+                                            errFunc: ()=>{},
+                                            closesModal: true
+                                        },
+                                        {
+                                            label: "Cancel",
+
+                                            onClick: () => {
+                                            },
+
+                                            buttonProps: {},
+                                            errFunc: ()=>{},
+                                            closesModal: true
+                                        }
+                                    ]
+                                }   
+                            >
+                                <FlexBox className="col gap">
+                                    <FlexBox>
+                                        Are you sure you want to remove '{obj.name}'?
+                                        <br/>
+                                        This action cannot be undone.
                                     </FlexBox>
-                                </Modal>
-                            </FlexBox>
+                                </FlexBox>
+                            </Modal>
                         </FlexBox>
-                    )
-                })}</>}
-            </FlexBox>
-        </>
-    );
+                    </FlexBox>
+                );
+            })}</>}
+        </FlexBox>
+    </>;
 }

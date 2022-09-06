@@ -17,7 +17,7 @@ import DirektivEditor from '../../components/editor';
 import FlexBox from '../../components/flexbox';
 import HelpIcon from "../../components/help";
 import Loader from '../../components/loader';
-import Modal, { ButtonDefinition, KeyDownDefinition } from '../../components/modal';
+import Modal  from '../../components/modal';
 import Pagination, { usePageHandler } from '../../components/pagination';
 import { Config, GenerateRandomKey } from '../../util';
 import WorkflowPage from './workflow';
@@ -364,14 +364,31 @@ function ExplorerList(props) {
                                 setName("")
                             }}
                             actionButtons={[
-                                ButtonDefinition("Add", async () => {
-                                    const result = await createNode(name, "workflow", wfData)
-                                    if(result.node && result.namespace){
-                                        navigate(`/n/${result.namespace}/explorer/${result.node.path.substring(1)}`)
-                                    }
-                                }, {variant: "contained", color: "primary"}, ()=>{}, true, false, true),
-                                ButtonDefinition("Cancel", () => {
-                                }, {}, ()=>{}, true, false)
+                                {
+                                    label: "Add",
+
+                                    onClick: async () => {
+                                        const result = await createNode(name, "workflow", wfData)
+                                        if(result.node && result.namespace){
+                                            navigate(`/n/${result.namespace}/explorer/${result.node.path.substring(1)}`)
+                                        }
+                                    },
+
+                                    buttonProps: {variant: "contained", color: "primary"},
+                                    errFunc: ()=>{},
+                                    closesModal: true,
+                                    validate: true
+                                },
+                                {
+                                    label: "Cancel",
+
+                                    onClick: () => {
+                                    },
+
+                                    buttonProps: {},
+                                    errFunc: ()=>{},
+                                    closesModal: true
+                                }
                             ]}
 
                             keyDownActions={[
@@ -442,27 +459,44 @@ function ExplorerList(props) {
                                 setTabIndex(0)
                             }}
                             actionButtons={[
-                                ButtonDefinition("Add", async () => {
-                                    if (tabIndex === 0) {
-                                        await createNode(name, "directory")
-                                    } else {
-                                        let processesMirrorSettings = JSON.parse(JSON.stringify(mirrorSettings))
-                                        if (mirrorAuthMethod === "token") {
-                                            processesMirrorSettings["passphrase"] = processesMirrorSettings["token"]
-                                            processesMirrorSettings["privateKey"] = ""
-                                            processesMirrorSettings["publicKey"] = ""
-                                        } else if (mirrorAuthMethod === "none") {
-                                            processesMirrorSettings["passphrase"] = ""
-                                            processesMirrorSettings["privateKey"] = ""
-                                            processesMirrorSettings["publicKey"] = ""
-                                        }
+                                {
+                                    label: "Add",
 
-                                        delete processesMirrorSettings["token"]
-                                        await createMirrorNode(name, processesMirrorSettings)
-                                    }
-                                }, {variant: "contained", color: "primary", disabled: name.trim().length === 0}, () => { }, true, false, true),
-                                ButtonDefinition("Cancel", () => {
-                                }, {}, () => { }, true, false)
+                                    onClick: async () => {
+                                        if (tabIndex === 0) {
+                                            await createNode(name, "directory")
+                                        } else {
+                                            let processesMirrorSettings = JSON.parse(JSON.stringify(mirrorSettings))
+                                            if (mirrorAuthMethod === "token") {
+                                                processesMirrorSettings["passphrase"] = processesMirrorSettings["token"]
+                                                processesMirrorSettings["privateKey"] = ""
+                                                processesMirrorSettings["publicKey"] = ""
+                                            } else if (mirrorAuthMethod === "none") {
+                                                processesMirrorSettings["passphrase"] = ""
+                                                processesMirrorSettings["privateKey"] = ""
+                                                processesMirrorSettings["publicKey"] = ""
+                                            }
+
+                                            delete processesMirrorSettings["token"]
+                                            await createMirrorNode(name, processesMirrorSettings)
+                                        }
+                                    },
+
+                                    buttonProps: {variant: "contained", color: "primary", disabled: name.trim().length === 0},
+                                    errFunc: () => { },
+                                    closesModal: true,
+                                    validate: true
+                                },
+                                {
+                                    label: "Cancel",
+
+                                    onClick: () => {
+                                    },
+
+                                    buttonProps: {},
+                                    errFunc: () => { },
+                                    closesModal: true
+                                }
                             ]}
 
                             keyDownActions={[
@@ -696,7 +730,7 @@ function DirListItem(props) {
     const [recursiveDelete, setRecursiveDelete] = useState(false)
 
 
-    return(
+    return (
         <div style={{cursor:"pointer"}} onClick={(e)=>{
             resetQueryParams()
             navigate(`/n/${namespace}/explorer/${path.substring(1)}`)
@@ -773,13 +807,29 @@ function DirListItem(props) {
                                 }}
                                 actionButtons={
                                     [
-                                        ButtonDefinition("Delete", async () => {
-                                            let p = path.split('/', -1);
-                                            let pLast = p[p.length-1];
-                                            await deleteNode(pLast, recursiveDelete)
-                                        }, {variant: "contained", color: "error"}, ()=>{}, true, false),
-                                        ButtonDefinition("Cancel", () => {
-                                        }, {}, ()=>{}, true, false)
+                                        {
+                                            label: "Delete",
+
+                                            onClick: async () => {
+                                                let p = path.split('/', -1);
+                                                let pLast = p[p.length-1];
+                                                await deleteNode(pLast, recursiveDelete)
+                                            },
+
+                                            buttonProps: {variant: "contained", color: "error"},
+                                            errFunc: ()=>{},
+                                            closesModal: true
+                                        },
+                                        {
+                                            label: "Cancel",
+
+                                            onClick: () => {
+                                            },
+
+                                            buttonProps: {},
+                                            errFunc: ()=>{},
+                                            closesModal: true
+                                        }
                                     ]
                                 } 
                             >
@@ -807,7 +857,7 @@ function DirListItem(props) {
                 </FlexBox>
             </FlexBox>
         </div>
-    )
+    );
 }
 
 function WorkflowListItem(props) {
@@ -819,7 +869,7 @@ function WorkflowListItem(props) {
     const [rename, setRename] = useState(false)
     const [err, setErr] = useState("")
 
-    return(
+    return (
         <div style={{cursor:"pointer"}} onClick={()=>{
             navigate(`/n/${namespace}/explorer/${path.substring(1)}`)
         }} className="explorer-item">
@@ -891,13 +941,29 @@ function WorkflowListItem(props) {
                                         }}
                                         actionButtons={
                                             [
-                                                ButtonDefinition("Delete", async () => {
-                                                    let p = path.split('/', -1);
-                                                    let pLast = p[p.length-1];
-                                                    await deleteNode(pLast, false)
-                                                }, {variant: "contained", color: "error"}, ()=>{}, true, false),
-                                                ButtonDefinition("Cancel", () => {
-                                                }, {}, ()=>{}, true, false)
+                                                {
+                                                    label: "Delete",
+
+                                                    onClick: async () => {
+                                                        let p = path.split('/', -1);
+                                                        let pLast = p[p.length-1];
+                                                        await deleteNode(pLast, false)
+                                                    },
+
+                                                    buttonProps: {variant: "contained", color: "error"},
+                                                    errFunc: ()=>{},
+                                                    closesModal: true
+                                                },
+                                                {
+                                                    label: "Cancel",
+
+                                                    onClick: () => {
+                                                    },
+
+                                                    buttonProps: {},
+                                                    errFunc: ()=>{},
+                                                    closesModal: true
+                                                }
                                             ]
                                         } 
                                     >
@@ -915,7 +981,7 @@ function WorkflowListItem(props) {
                 </FlexBox>
             </FlexBox>
         </div>
-    )
+    );
 }
 
 export function ApiFragment(props) {

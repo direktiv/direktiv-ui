@@ -4,8 +4,7 @@ import Logo from '../../assets/nav-logo.png'
 import FlexBox from '../flexbox';
 import NamespaceSelector from '../namespace-selector';
 
-import Modal, { KeyDownDefinition } from '../modal';
-import { ButtonDefinition } from '../modal';
+import Modal  from '../modal';
 import {VscAdd,  VscFolderOpened, VscGraph, VscLayers, VscServer,  VscSettingsGear,  VscSymbolEvent, VscVmRunning, VscPlayCircle, VscCloudUpload} from 'react-icons/vsc';
 
 import { Link, matchPath, useLocation, useNavigate } from 'react-router-dom';
@@ -181,32 +180,49 @@ function NewNamespaceBtn(props) {
             ]}
 
             actionButtons={[
-                ButtonDefinition("Add", async () => {
-                    if (tabIndex === 0) {
-                        await createNamespace(ns)
-                    } else {
-                        let processesMirrorSettings = JSON.parse(JSON.stringify(mirrorSettings))
-                        if (mirrorAuthMethod === "token") {
-                            processesMirrorSettings["passphrase"] = processesMirrorSettings["token"]
-                            processesMirrorSettings["privateKey"] = ""
-                            processesMirrorSettings["publicKey"] = ""
-                        } else if (mirrorAuthMethod === "none") {
-                            processesMirrorSettings["passphrase"] = ""
-                            processesMirrorSettings["privateKey"] = ""
-                            processesMirrorSettings["publicKey"] = ""
-                        }
+                {
+                    label: "Add",
 
-                        delete processesMirrorSettings["token"]
-                        await createMirrorNamespace(ns, processesMirrorSettings)
-                    }
-                    setTimeout(() => {
-                        navigate(`/n/${ns}`)
-                    }, 200)
-                    setNs("")
-                }, {variant: "contained", color: "primary"}, () => { }, true, false, true),
-                ButtonDefinition("Cancel", () => {
-                    setNs("")
-                }, {}, () => { }, true, false)
+                    onClick: async () => {
+                        if (tabIndex === 0) {
+                            await createNamespace(ns)
+                        } else {
+                            let processesMirrorSettings = JSON.parse(JSON.stringify(mirrorSettings))
+                            if (mirrorAuthMethod === "token") {
+                                processesMirrorSettings["passphrase"] = processesMirrorSettings["token"]
+                                processesMirrorSettings["privateKey"] = ""
+                                processesMirrorSettings["publicKey"] = ""
+                            } else if (mirrorAuthMethod === "none") {
+                                processesMirrorSettings["passphrase"] = ""
+                                processesMirrorSettings["privateKey"] = ""
+                                processesMirrorSettings["publicKey"] = ""
+                            }
+
+                            delete processesMirrorSettings["token"]
+                            await createMirrorNamespace(ns, processesMirrorSettings)
+                        }
+                        setTimeout(() => {
+                            navigate(`/n/${ns}`)
+                        }, 200)
+                        setNs("")
+                    },
+
+                    buttonProps: {variant: "contained", color: "primary"},
+                    errFunc: () => { },
+                    closesModal: true,
+                    validate: true
+                },
+                {
+                    label: "Cancel",
+
+                    onClick: () => {
+                        setNs("")
+                    },
+
+                    buttonProps: {},
+                    errFunc: () => { },
+                    closesModal: true
+                }
             ]}
 
             requiredFields={[

@@ -6,7 +6,7 @@ import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIco
 import DirektivEditor from '../../components/editor';
 import FlexBox from '../../components/flexbox';
 import HelpIcon from "../../components/help";
-import Modal, { ButtonDefinition } from '../../components/modal';
+import Modal  from '../../components/modal';
 import { Config } from '../../util';
 
 import * as dayjs from "dayjs";
@@ -117,11 +117,27 @@ function EventsPage(props) {
                                                                             color: "info"
                                                                         }}
                                                                         actionButtons={[
-                                                                            ButtonDefinition("Retrigger", async () => {
-                                                                                await replayEvent(obj.id)
-                                                                            }, {variant: "contained", color: "primary"}, () => { }, true, true),
-                                                                            ButtonDefinition("Cancel", async () => {
-                                                                            }, {}, () => { }, true, false)
+                                                                            {
+                                                                                label: "Retrigger",
+
+                                                                                onClick: async () => {
+                                                                                    await replayEvent(obj.id)
+                                                                                },
+
+                                                                                buttonProps: {variant: "contained", color: "primary"},
+                                                                                errFunc: () => { },
+                                                                                closesModal: true
+                                                                            },
+                                                                            {
+                                                                                label: "Cancel",
+
+                                                                                onClick: async () => {
+                                                                                },
+
+                                                                                buttonProps: {},
+                                                                                errFunc: () => { },
+                                                                                closesModal: true
+                                                                            }
                                                                         ]}
                                                                     >
                                                                         <FlexBox style={{ overflow: "hidden" }}>
@@ -145,8 +161,16 @@ function EventsPage(props) {
                                                                             color: "info"
                                                                         }}
                                                                         actionButtons={[
-                                                                            ButtonDefinition("Close", async () => {
-                                                                            }, {}, () => { }, true, false)
+                                                                            {
+                                                                                label: "Close",
+
+                                                                                onClick: async () => {
+                                                                                },
+
+                                                                                buttonProps: {},
+                                                                                errFunc: () => { },
+                                                                                closesModal: true
+                                                                            }
                                                                         ]}
                                                                     >
                                                                         <FlexBox className="col" style={{ overflow: "hidden" }}>
@@ -287,10 +311,24 @@ function SendEventModal(props) {
                 <span>Send New Event</span>
             )}
             actionButtons={[
-                ButtonDefinition("Send", async () => {
-                    await sendEvent(eventData)
-                }, {variant: "contained", color: "primary"}, ()=>{}, true, false),
-                ButtonDefinition("Cancel", () => {}, {}, ()=>{}, true, false)
+                {
+                    label: "Send",
+
+                    onClick: async () => {
+                        await sendEvent(eventData)
+                    },
+
+                    buttonProps: {variant: "contained", color: "primary"},
+                    errFunc: ()=>{},
+                    closesModal: true
+                },
+                {
+                    label: "Cancel",
+                    onClick: () => {},
+                    buttonProps: {},
+                    errFunc: ()=>{},
+                    closesModal: true
+                }
             ]}
             noPadding
         >
