@@ -6,7 +6,7 @@ import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIco
 import DirektivEditor from '../../components/editor';
 import FlexBox from '../../components/flexbox';
 import HelpIcon from "../../components/help";
-import Modal, { ButtonDefinition } from '../../components/modal';
+import Modal  from '../../components/modal';
 import { Config } from '../../util';
 
 import * as dayjs from "dayjs";
@@ -49,14 +49,14 @@ function EventsPage(props) {
     let {eventHistory, eventListeners, eventListenersPageInfo, eventHistoryPageInfo, sendEvent, replayEvent} = useEvents(Config.url, true, namespace, localStorage.getItem("apikey"), {listeners: [listenersPageHandler.pageParams], history: [historyPageHandler.pageParams]})
     return (
         <>
-            <FlexBox className="gap col" style={{ paddingRight: "8px" }}>
+            <FlexBox col gap style={{ paddingRight: "8px" }}>
                 <FlexBox>
                     <ContentPanel style={{ width: "100%" }}>
                         <ContentPanelTitle>
                             <ContentPanelTitleIcon>
                                 <VscCloud />
                             </ContentPanelTitleIcon>
-                            <FlexBox style={{ display: "flex", alignItems: "center" }} className="gap">
+                            <FlexBox style={{ display: "flex", alignItems: "center" }} gap>
                                 <div>
                                     Cloud Events History
                                 </div>
@@ -65,7 +65,7 @@ function EventsPage(props) {
                             <SendEventModal sendEvent={sendEvent} />
                         </ContentPanelTitle>
                         <ContentPanelBody>
-                            <FlexBox className="col" style={{ justifyContent: "space-between" }}>
+                            <FlexBox col style={{ justifyContent: "space-between" }}>
                                 <div style={{ maxHeight: "40vh", overflowY: "auto", fontSize: "12px", minWidth: "100%" }}>
                                     <table className="cloudevents-table" style={{ minWidth: "440px", width: "100%" }}>
                                         <thead>
@@ -117,11 +117,27 @@ function EventsPage(props) {
                                                                             color: "info"
                                                                         }}
                                                                         actionButtons={[
-                                                                            ButtonDefinition("Retrigger", async () => {
-                                                                                await replayEvent(obj.id)
-                                                                            }, {variant: "contained", color: "primary"}, () => { }, true, true),
-                                                                            ButtonDefinition("Cancel", async () => {
-                                                                            }, {}, () => { }, true, false)
+                                                                            {
+                                                                                label: "Retrigger",
+
+                                                                                onClick: async () => {
+                                                                                    await replayEvent(obj.id)
+                                                                                },
+
+                                                                                buttonProps: {variant: "contained", color: "primary"},
+                                                                                errFunc: () => { },
+                                                                                closesModal: true
+                                                                            },
+                                                                            {
+                                                                                label: "Cancel",
+
+                                                                                onClick: async () => {
+                                                                                },
+
+                                                                                buttonProps: {},
+                                                                                errFunc: () => { },
+                                                                                closesModal: true
+                                                                            }
                                                                         ]}
                                                                     >
                                                                         <FlexBox style={{ overflow: "hidden" }}>
@@ -145,11 +161,19 @@ function EventsPage(props) {
                                                                             color: "info"
                                                                         }}
                                                                         actionButtons={[
-                                                                            ButtonDefinition("Close", async () => {
-                                                                            }, {}, () => { }, true, false)
+                                                                            {
+                                                                                label: "Close",
+
+                                                                                onClick: async () => {
+                                                                                },
+
+                                                                                buttonProps: {},
+                                                                                errFunc: () => { },
+                                                                                closesModal: true
+                                                                            }
                                                                         ]}
                                                                     >
-                                                                        <FlexBox className="col" style={{ overflow: "hidden" }}>
+                                                                        <FlexBox col style={{ overflow: "hidden" }}>
                                                                             <AutoSizer>
                                                                                 {({ height, width }) => (
                                                                                     <DirektivEditor noBorderRadius value={atob(obj.cloudevent)} readonly={true} dlang="plaintext"
@@ -175,7 +199,7 @@ function EventsPage(props) {
                                         }
                                     </table>
                                 </div>
-                                <FlexBox className="row" style={{justifyContent:"flex-end", paddingBottom:"1em", flexGrow: 0}}>
+                                <FlexBox row style={{justifyContent:"flex-end", paddingBottom:"1em", flexGrow: 0}}>
                                     <Pagination pageHandler={historyPageHandler} pageInfo={eventHistoryPageInfo} />
                                 </FlexBox>
                             </FlexBox>
@@ -188,7 +212,7 @@ function EventsPage(props) {
                             <ContentPanelTitleIcon>
                                 <VscDebugStepInto />
                             </ContentPanelTitleIcon>
-                            <FlexBox style={{ display: "flex", alignItems: "center" }} className="gap">
+                            <FlexBox style={{ display: "flex", alignItems: "center" }} gap>
                                 <div>
                                     Active Event Listeners
                                 </div>
@@ -196,7 +220,7 @@ function EventsPage(props) {
                             </FlexBox>
                         </ContentPanelTitle>
                         <ContentPanelBody>
-                            <FlexBox className="col" style={{ justifyContent: "space-between" }}>
+                            <FlexBox col style={{ justifyContent: "space-between" }}>
                                 <div style={{ maxHeight: "40vh", overflowY: "auto", fontSize: "12px" }}>
                                     <table className="event-listeners-table" style={{ width: "100%" }}>
                                         <thead>
@@ -252,7 +276,7 @@ function EventsPage(props) {
                                         }
                                     </table>
                                 </div>
-                                <FlexBox className="row" style={{justifyContent:"flex-end", paddingBottom:"1em", flexGrow: 0}}>
+                                <FlexBox row style={{justifyContent:"flex-end", paddingBottom:"1em", flexGrow: 0}}>
                                     <Pagination pageHandler={listenersPageHandler} pageInfo={eventListenersPageInfo} />
                                 </FlexBox>
                             </FlexBox>
@@ -287,14 +311,28 @@ function SendEventModal(props) {
                 <span>Send New Event</span>
             )}
             actionButtons={[
-                ButtonDefinition("Send", async () => {
-                    await sendEvent(eventData)
-                }, {variant: "contained", color: "primary"}, ()=>{}, true, false),
-                ButtonDefinition("Cancel", () => {}, {}, ()=>{}, true, false)
+                {
+                    label: "Send",
+
+                    onClick: async () => {
+                        await sendEvent(eventData)
+                    },
+
+                    buttonProps: {variant: "contained", color: "primary"},
+                    errFunc: ()=>{},
+                    closesModal: true
+                },
+                {
+                    label: "Cancel",
+                    onClick: () => {},
+                    buttonProps: {},
+                    errFunc: ()=>{},
+                    closesModal: true
+                }
             ]}
             noPadding
         >
-            <FlexBox className="col gap" style={{overflow: "hidden"}}>
+            <FlexBox col gap style={{overflow: "hidden"}}>
                 <FlexBox style={{ minHeight: "40vh", minWidth: "70vw" }}>
                     <AutoSizer>
                         {({height, width})=>(

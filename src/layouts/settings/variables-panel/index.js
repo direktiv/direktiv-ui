@@ -10,7 +10,7 @@ import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIco
 import DirektivEditor from '../../../components/editor';
 import FlexBox from '../../../components/flexbox';
 import HelpIcon from '../../../components/help';
-import Modal, { ButtonDefinition } from '../../../components/modal';
+import Modal  from '../../../components/modal';
 import Pagination, { usePageHandler } from '../../../components/pagination';
 import Tabs from '../../../components/tabs';
 import { CanPreviewMimeType, Config, MimeTypeFileExtension } from '../../../util';
@@ -53,7 +53,7 @@ function VariablesPanel(props){
                 <ContentPanelTitleIcon>
                     <VscVariableGroup />
                 </ContentPanelTitleIcon>
-                <FlexBox style={{ display: "flex", alignItems: "center" }} className="gap">
+                <FlexBox style={{ display: "flex", alignItems: "center" }} gap>
                     <div>
                         Variables
                     </div>
@@ -83,28 +83,45 @@ function VariablesPanel(props){
                             { tip: "variable key name is required", value: keyValue }
                         ]}
                         actionButtons={[
-                            ButtonDefinition("Add", async () => {
-                                if (document.getElementById("file-picker")) {
-                                    setUploading(true)
-                                    if (keyValue.trim() === "") {
-                                        throw new Error("Variable key name needs to be provided.")
+                            {
+                                label: "Add",
+
+                                onClick: async () => {
+                                    if (document.getElementById("file-picker")) {
+                                        setUploading(true)
+                                        if (keyValue.trim() === "") {
+                                            throw new Error("Variable key name needs to be provided.")
+                                        }
+                                        if (!file) {
+                                            throw new Error("Variable file needs to be provided.")
+                                        }
+                                        await setNamespaceVariable(encodeURIComponent(keyValue), file, mimeType)
+                                    } else {
+                                        if (keyValue.trim() === "") {
+                                            throw new Error("Variable key name needs to be provided.")
+                                        }
+                                        if (mimeType === "") {
+                                            throw new Error("Variable mimetype needs to be provided.")
+                                        }
+                                        await setNamespaceVariable(encodeURIComponent(keyValue), dValue, mimeType)
                                     }
-                                    if (!file) {
-                                        throw new Error("Variable file needs to be provided.")
-                                    }
-                                    await setNamespaceVariable(encodeURIComponent(keyValue), file, mimeType)
-                                } else {
-                                    if (keyValue.trim() === "") {
-                                        throw new Error("Variable key name needs to be provided.")
-                                    }
-                                    if (mimeType === "") {
-                                        throw new Error("Variable mimetype needs to be provided.")
-                                    }
-                                    await setNamespaceVariable(encodeURIComponent(keyValue), dValue, mimeType)
-                                }
-                            }, {variant: "contained", color: "primary"}, () => { setUploading(false) }, true, false, true),
-                            ButtonDefinition("Cancel", () => {
-                            }, {}, () => { }, true, false)
+                                },
+
+                                buttonProps: {variant: "contained", color: "primary"},
+                                errFunc: () => { setUploading(false) },
+                                closesModal: true,
+                                validate: true
+                            },
+                            {
+                                label: "Cancel",
+
+                                onClick: () => {
+                                },
+
+                                buttonProps: {},
+                                errFunc: () => { },
+                                closesModal: true
+                            }
                         ]}
                     >
                         <AddVariablePanel mimeType={mimeType} setMimeType={setMimeType} file={file} setFile={setFile} setKeyValue={setKeyValue} keyValue={keyValue} dValue={dValue} setDValue={setDValue} />
@@ -113,17 +130,17 @@ function VariablesPanel(props){
             </ContentPanelTitle>
             <ContentPanelBody style={{ minHeight: "180px" }}>
                 {data !== null ?
-                    <FlexBox className="col" style={{ justifyContent: "space-between" }}>
+                    <FlexBox col style={{ justifyContent: "space-between" }}>
                         <div>
                             <Variables namespace={namespace} deleteNamespaceVariable={deleteNamespaceVariable} setNamespaceVariable={setNamespaceVariable} getNamespaceVariable={getNamespaceVariable} variables={data} getNamespaceVariableBlob={getNamespaceVariableBlob} />
                         </div>
-                        <FlexBox className="row" style={{ justifyContent: "flex-end", paddingBottom: "1em", flexGrow: 0 }}>
+                        <FlexBox row style={{ justifyContent: "flex-end", paddingBottom: "1em", flexGrow: 0 }}>
                             <Pagination pageHandler={pageHandler} pageInfo={pageInfo} />
                         </FlexBox>
                     </FlexBox> : <></>}
             </ContentPanelBody>
         </ContentPanel>
-    )
+    );
 }
 
 export default VariablesPanel;
@@ -206,7 +223,7 @@ function AddVariablePanel(props) {
                             <option value="text/css">css</option>
                         </select>
                     </div>
-                    <FlexBox className="gap" style={{maxHeight: "600px"}}>
+                    <FlexBox gap style={{maxHeight: "600px"}}>
                         <FlexBox style={{overflow:"hidden"}}>
                         <AutoSizer>
                             {({height, width})=>(
@@ -221,7 +238,7 @@ function AddVariablePanel(props) {
                     <div style={{width: "100%", paddingRight: "12px", display: "flex"}}>
                         <input value={keyValue} onChange={(e)=>setKeyValue(e.target.value)} autoFocus placeholder="Enter variable key name" />
                     </div>
-                    <FlexBox className="gap">
+                    <FlexBox gap>
                         <VariableFilePicker setKeyValue={setKeyValue} setMimeType={setMimeType} mimeType={mimeType} file={file} setFile={setFile} id="add-variable-panel" />
                     </FlexBox>
                 </FlexBox>
@@ -260,7 +277,7 @@ function Variable(props) {
 
     let lang = MimeTypeFileExtension(mimeType)
 
-    return(
+    return (
         <tr className="body-row" key={`var-${obj.name}${obj.size}`}>
         <td className="wrap-word" style={{ width: "180px", maxWidth: "180px", textOverflow:"ellipsis",  overflow:"hidden" }}>
             <Tippy content={obj.name} trigger={'mouseenter focus'} zIndex={10}>
@@ -300,16 +317,32 @@ function Variable(props) {
                         }}
                         actionButtons={
                             [
-                                ButtonDefinition("Save", async () => {
-                                        await setNamespaceVariable(obj.name, val , mimeType)
-                                }, {variant: "contained", color: "primary"},()=>{}, true, false),
-                                ButtonDefinition("Cancel", () => {
-                                }, {},()=>{}, true, false)
+                                {
+                                    label: "Save",
+
+                                    onClick: async () => {
+                                            await setNamespaceVariable(obj.name, val , mimeType)
+                                    },
+
+                                    buttonProps: {variant: "contained", color: "primary"},
+                                    errFunc: ()=>{},
+                                    closesModal: true
+                                },
+                                {
+                                    label: "Cancel",
+
+                                    onClick: () => {
+                                    },
+
+                                    buttonProps: {},
+                                    errFunc: ()=>{},
+                                    closesModal: true
+                                }
                             ]
                         } 
                     >
-                        <FlexBox className="col gap" style={{fontSize: "12px", minHeight: "500px"}}>
-                            <FlexBox className="gap" style={{flexGrow: 1}}>
+                        <FlexBox col gap style={{fontSize: "12px", minHeight: "500px"}}>
+                            <FlexBox gap style={{flexGrow: 1}}>
                                 <FlexBox style={{overflow:"hidden"}}>
                                     {CanPreviewMimeType(mimeType) ?                                
                                     <AutoSizer>
@@ -326,7 +359,7 @@ function Variable(props) {
                                     }
                                 </FlexBox>
                             </FlexBox>
-                            <FlexBox className="gap" style={{flexGrow: 0, flexShrink: 1}}>
+                            <FlexBox gap style={{flexGrow: 0, flexShrink: 1}}>
                                 <FlexBox>
                                     <select style={{width:"100%"}} defaultValue={mimeType} onChange={(e)=>setType(e.target.value)}>
                                         <option value="">Choose a mimetype</option>
@@ -379,12 +412,29 @@ function Variable(props) {
                     }}
                     actionButtons={
                         [
-                            ButtonDefinition("Upload", async () => {
-                                setUploading(true)
-                                await setNamespaceVariable(obj.name, file, mimeType)
-                            }, {variant: "contained", color: "primary"},()=>{setUploading(false)}, true, false, true),
-                            ButtonDefinition("Cancel", () => {
-                            }, {}, ()=>{}, true, false)
+                            {
+                                label: "Upload",
+
+                                onClick: async () => {
+                                    setUploading(true)
+                                    await setNamespaceVariable(obj.name, file, mimeType)
+                                },
+
+                                buttonProps: {variant: "contained", color: "primary"},
+                                errFunc: ()=>{setUploading(false)},
+                                closesModal: true,
+                                validate: true
+                            },
+                            {
+                                label: "Cancel",
+
+                                onClick: () => {
+                                },
+
+                                buttonProps: {},
+                                errFunc: ()=>{},
+                                closesModal: true
+                            }
                         ]
                     } 
 
@@ -392,7 +442,7 @@ function Variable(props) {
                         {tip: "file is required", value: file}
                     ]}
                 >
-                    <FlexBox className="col gap">
+                    <FlexBox col gap>
                         <VariableFilePicker setMimeType={setType} id="modal-file-picker" file={file} setFile={setFile} />
                     </FlexBox>
                 </Modal>
@@ -412,15 +462,31 @@ function Variable(props) {
                     }}
                     actionButtons={
                         [
-                            ButtonDefinition("Delete", async () => {
-                                await deleteNamespaceVariable(obj.name)
-                            }, {variant: "contained", color: "error"}, ()=>{}, true, false),
-                            ButtonDefinition("Cancel", () => {
-                            }, {}, ()=>{}, true, false)
+                            {
+                                label: "Delete",
+
+                                onClick: async () => {
+                                    await deleteNamespaceVariable(obj.name)
+                                },
+
+                                buttonProps: {variant: "contained", color: "error"},
+                                errFunc: ()=>{},
+                                closesModal: true
+                            },
+                            {
+                                label: "Cancel",
+
+                                onClick: () => {
+                                },
+
+                                buttonProps: {},
+                                errFunc: ()=>{},
+                                closesModal: true
+                            }
                         ]
                     } 
                 >
-                        <FlexBox className="col gap">
+                        <FlexBox col gap>
                     <FlexBox >
                         Are you sure you want to delete '{obj.name}'?
                         <br/>
@@ -433,7 +499,7 @@ function Variable(props) {
         
         </td>
     </tr>
-    )
+    );
 }
 
 function VariablesUploadButton() {

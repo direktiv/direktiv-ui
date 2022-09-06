@@ -4,7 +4,7 @@ import {useEffect, useState} from "react"
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from "../../components/content-panel";
 import FlexBox from "../../components/flexbox";
 import { Config, GenerateRandomKey } from "../../util";
-import Modal, { ButtonDefinition, KeyDownDefinition } from "../../components/modal";
+import Modal  from "../../components/modal";
 import { VscLayers } from 'react-icons/vsc';
 import HelpIcon from "../../components/help"
 
@@ -41,14 +41,14 @@ export default function GlobalServicesPanel(props) {
         return <></>
     }
 
-    return(
-        <FlexBox className="gap wrap" style={{paddingRight:"8px"}}>
+    return (
+        <FlexBox gap wrap style={{paddingRight:"8px"}}>
             <ContentPanel style={{width:"100%"}}>
                 <ContentPanelTitle>
                     <ContentPanelTitleIcon>
                         <VscLayers/>
                     </ContentPanelTitleIcon>
-                    <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
+                    <FlexBox style={{display:"flex", alignItems:"center"}} gap>
                         <div>
                             Services 
                         </div>
@@ -76,15 +76,38 @@ export default function GlobalServicesPanel(props) {
                             auto: true,
                         }}
                         keyDownActions={[
-                            KeyDownDefinition("Enter", async () => {
-                            }, ()=>{}, true)
+                            {
+                                code: "Enter",
+
+                                fn: async () => {
+                                },
+
+                                errFunc: ()=>{},
+                                closeModal: true
+                            }
                         ]}
                         actionButtons={[
-                            ButtonDefinition("Add", async () => {
-                                    await createGlobalService(serviceName, image, parseInt(scale), parseInt(size), cmd)
-                            }, {variant: "contained", color: "primary"}, ()=>{}, true, false),
-                            ButtonDefinition("Cancel", () => {
-                            }, {}, ()=>{}, true, false)
+                            {
+                                label: "Add",
+
+                                onClick: async () => {
+                                        await createGlobalService(serviceName, image, parseInt(scale), parseInt(size), cmd)
+                                },
+
+                                buttonProps: {variant: "contained", color: "primary"},
+                                errFunc: ()=>{},
+                                closesModal: true
+                            },
+                            {
+                                label: "Cancel",
+
+                                onClick: () => {
+                                },
+
+                                buttonProps: {},
+                                errFunc: ()=>{},
+                                closesModal: true
+                            }
                         ]}
                     >
                         {config !== null ? 
@@ -96,12 +119,12 @@ export default function GlobalServicesPanel(props) {
                 </div>
                 </ContentPanelTitle>
                 <ContentPanelBody className="secrets-panel">
-                    <FlexBox className="gap col">
-                        <FlexBox className="col gap">
+                    <FlexBox col gap>
+                        <FlexBox col gap>
                         {data.length === 0 ?
                      <div className="col">
                      <FlexBox style={{ height:"40px", }}>
-                             <FlexBox className="gap" style={{alignItems:"center", paddingLeft:"8px"}}>
+                             <FlexBox gap style={{alignItems:"center", paddingLeft:"8px"}}>
                                  <div style={{fontSize:"10pt", }}>
                                      No services have been created.
                                  </div>
@@ -131,5 +154,5 @@ export default function GlobalServicesPanel(props) {
             </ContentPanel>
 
         </FlexBox>
-    )
+    );
 }

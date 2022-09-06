@@ -3,7 +3,7 @@ import MUIButton, { ButtonProps as MUIButtonProps } from '@mui/material/Button';
 import { styled } from '@mui/material/styles';
 import * as React from 'react';
 
-interface ButtonProps extends MUIButtonProps {
+export interface ButtonProps extends MUIButtonProps {
     tooltip?: string;
     disabledTooltip?: string;
     asyncDisable?: boolean;

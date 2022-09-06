@@ -17,7 +17,7 @@ import DirektivEditor from '../../components/editor';
 import FlexBox from '../../components/flexbox';
 import HelpIcon from "../../components/help";
 import Loader from '../../components/loader';
-import Modal, { ButtonDefinition, KeyDownDefinition } from '../../components/modal';
+import Modal  from '../../components/modal';
 import Pagination, { usePageHandler } from '../../components/pagination';
 import { Config, GenerateRandomKey } from '../../util';
 import WorkflowPage from './workflow';
@@ -141,7 +141,7 @@ export function SearchBar(props) {
 
     return(
         <div className="explorer-searchbar" style={{height: "29px", ...style}}>
-            <FlexBox className="" style={{height: "100%"}}>
+            <FlexBox  style={{height: "100%"}}>
                 <VscSearch className="auto-margin" />
                 <input value={inputVal} onChange={(e)=>{setInputVal(e.target.value)}} placeholder={"Search items"} style={{ boxSizing: "border-box" }}></input>
             </FlexBox>
@@ -248,7 +248,7 @@ function ExplorerList(props) {
 
         setBreadcrumbChildrenRef.current((
             isReadOnly ? (
-                <FlexBox className="center row gap" style={{ justifyContent: "flex-end", paddingRight: "6px" }}>
+                <FlexBox center row gap style={{ justifyContent: "flex-end", paddingRight: "6px" }}>
                      <MirrorReadOnlyBadge/>
                 </FlexBox>) : (<></>)
         ))
@@ -298,9 +298,9 @@ function ExplorerList(props) {
         <>
         { data !== null && data?.node?.type === "workflow" ? 
         <WorkflowPage namespace={namespace}/> : 
-        <FlexBox className="col gap"  style={{paddingRight: "8px"}}>
+        <FlexBox col gap  style={{paddingRight: "8px"}}>
         <Loader load={load} timer={1000}>
-        <FlexBox className="gap" style={{maxHeight: "32px"}}>
+        <FlexBox gap style={{maxHeight: "32px"}}>
             <FlexBox>
                 <div>
                     <Modal
@@ -341,7 +341,7 @@ function ExplorerList(props) {
                 <ContentPanelTitleIcon>
                     <VscFolderOpened/>
                 </ContentPanelTitleIcon>
-                <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
+                <FlexBox style={{display:"flex", alignItems:"center"}} gap>
                     <div>
                         Explorer
                     </div>
@@ -364,24 +364,49 @@ function ExplorerList(props) {
                                 setName("")
                             }}
                             actionButtons={[
-                                ButtonDefinition("Add", async () => {
-                                    const result = await createNode(name, "workflow", wfData)
-                                    if(result.node && result.namespace){
-                                        navigate(`/n/${result.namespace}/explorer/${result.node.path.substring(1)}`)
-                                    }
-                                }, {variant: "contained", color: "primary"}, ()=>{}, true, false, true),
-                                ButtonDefinition("Cancel", () => {
-                                }, {}, ()=>{}, true, false)
+                                {
+                                    label: "Add",
+
+                                    onClick: async () => {
+                                        const result = await createNode(name, "workflow", wfData)
+                                        if(result.node && result.namespace){
+                                            navigate(`/n/${result.namespace}/explorer/${result.node.path.substring(1)}`)
+                                        }
+                                    },
+
+                                    buttonProps: {variant: "contained", color: "primary"},
+                                    errFunc: ()=>{},
+                                    closesModal: true,
+                                    validate: true
+                                },
+                                {
+                                    label: "Cancel",
+
+                                    onClick: () => {
+                                    },
+
+                                    buttonProps: {},
+                                    errFunc: ()=>{},
+                                    closesModal: true
+                                }
                             ]}
 
                             keyDownActions={[
-                                KeyDownDefinition("Enter", async () => {
-                                    if(name.trim()) {
-                                        await createNode(name, "workflow", wfData)
-                                    } else {
-                                        throw new Error("Please fill in name")
-                                    }
-                                }, ()=>{}, true, "workflow-name")
+                                {
+                                    code: "Enter",
+
+                                    fn: async () => {
+                                        if(name.trim()) {
+                                            await createNode(name, "workflow", wfData)
+                                        } else {
+                                            throw new Error("Please fill in name")
+                                        }
+                                    },
+
+                                    errFunc: ()=>{},
+                                    closeModal: true,
+                                    id: "workflow-name"
+                                }
                             ]}
 
                             requiredFields={[
@@ -389,7 +414,7 @@ function ExplorerList(props) {
                                 {tip: "workflow cannot be empty", value: wfData}
                             ]}
                         >
-                            <FlexBox className="col gap" style={{fontSize: "12px", minHeight: "500px", minWidth: "550px"}}>
+                            <FlexBox col gap style={{fontSize: "12px", minHeight: "500px", minWidth: "550px"}}>
                                 <div style={{width: "100%", paddingRight: "12px", display: "flex"}}>
                                     <input id={"workflow-name"} value={name} onChange={(e)=>setName(e.target.value)} autoFocus placeholder="Enter workflow name"/>
                                 </div>
@@ -405,7 +430,7 @@ function ExplorerList(props) {
                                         )
                                     })}
                                 </select>
-                                <FlexBox className="gap">
+                                <FlexBox gap>
                                     <FlexBox style={{overflow:"hidden"}}>
                                     <AutoSizer>
                                         {({height, width})=>(
@@ -442,37 +467,61 @@ function ExplorerList(props) {
                                 setTabIndex(0)
                             }}
                             actionButtons={[
-                                ButtonDefinition("Add", async () => {
-                                    if (tabIndex === 0) {
-                                        await createNode(name, "directory")
-                                    } else {
-                                        let processesMirrorSettings = JSON.parse(JSON.stringify(mirrorSettings))
-                                        if (mirrorAuthMethod === "token") {
-                                            processesMirrorSettings["passphrase"] = processesMirrorSettings["token"]
-                                            processesMirrorSettings["privateKey"] = ""
-                                            processesMirrorSettings["publicKey"] = ""
-                                        } else if (mirrorAuthMethod === "none") {
-                                            processesMirrorSettings["passphrase"] = ""
-                                            processesMirrorSettings["privateKey"] = ""
-                                            processesMirrorSettings["publicKey"] = ""
-                                        }
+                                {
+                                    label: "Add",
 
-                                        delete processesMirrorSettings["token"]
-                                        await createMirrorNode(name, processesMirrorSettings)
-                                    }
-                                }, {variant: "contained", color: "primary", disabled: name.trim().length === 0}, () => { }, true, false, true),
-                                ButtonDefinition("Cancel", () => {
-                                }, {}, () => { }, true, false)
+                                    onClick: async () => {
+                                        if (tabIndex === 0) {
+                                            await createNode(name, "directory")
+                                        } else {
+                                            let processesMirrorSettings = JSON.parse(JSON.stringify(mirrorSettings))
+                                            if (mirrorAuthMethod === "token") {
+                                                processesMirrorSettings["passphrase"] = processesMirrorSettings["token"]
+                                                processesMirrorSettings["privateKey"] = ""
+                                                processesMirrorSettings["publicKey"] = ""
+                                            } else if (mirrorAuthMethod === "none") {
+                                                processesMirrorSettings["passphrase"] = ""
+                                                processesMirrorSettings["privateKey"] = ""
+                                                processesMirrorSettings["publicKey"] = ""
+                                            }
+
+                                            delete processesMirrorSettings["token"]
+                                            await createMirrorNode(name, processesMirrorSettings)
+                                        }
+                                    },
+
+                                    buttonProps: {variant: "contained", color: "primary", disabled: name.trim().length === 0},
+                                    errFunc: () => { },
+                                    closesModal: true,
+                                    validate: true
+                                },
+                                {
+                                    label: "Cancel",
+
+                                    onClick: () => {
+                                    },
+
+                                    buttonProps: {},
+                                    errFunc: () => { },
+                                    closesModal: true
+                                }
                             ]}
 
                             keyDownActions={[
-                                KeyDownDefinition("Enter", async () => {
-                                    if (tabIndex === 0) {
-                                        await createNode(name, "directory")
-                                    } else {
-                                        await createMirrorNode(name, mirrorSettings)
-                                    }
-                                }, () => { }, true)
+                                {
+                                    code: "Enter",
+
+                                    fn: async () => {
+                                        if (tabIndex === 0) {
+                                            await createNode(name, "directory")
+                                        } else {
+                                            await createMirrorNode(name, mirrorSettings)
+                                        }
+                                    },
+
+                                    errFunc: () => { },
+                                    closeModal: true
+                                }
                             ]}
 
                             requiredFields={[
@@ -494,22 +543,22 @@ function ExplorerList(props) {
                                 style={{ minWidth: "300px" }}
                                 headers={["Standard", "Mirror"]}
                                 tabs={[(
-                                    <FlexBox className="col gap-md" style={{ paddingRight: "12px" }}>
-                                        <FlexBox className="row gap-sm" style={{ justifyContent: "flex-start" }}>
+                                    <FlexBox col gap="sm" style={{ paddingRight: "12px" }}>
+                                        <FlexBox row gap="sm" style={{ justifyContent: "flex-start" }}>
                                             <span className={`input-title`}>Directory*</span>
                                         </FlexBox>
                                         <input value={name} onChange={(e) => setName(e.target.value)} autoFocus placeholder="Enter a directory name" />
                                     </FlexBox>
                                 ), (
-                                    <FlexBox className="col gap">
-                                        <FlexBox className="col gap-md" style={{ paddingRight: "12px" }}>
-                                            <FlexBox className="row gap-sm" style={{ justifyContent: "flex-start" }}>
+                                    <FlexBox col gap>
+                                        <FlexBox col gap="sm" style={{ paddingRight: "12px" }}>
+                                            <FlexBox row gap="sm" style={{ justifyContent: "flex-start" }}>
                                                 <span className={`input-title`}>Directory*</span>
                                             </FlexBox>
                                             <input autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter a directory name" />
                                         </FlexBox>
-                                        <FlexBox className="col gap-md">
-                                            <FlexBox className="row gap-sm" style={{ justifyContent: "flex-start" }}>
+                                        <FlexBox col gap="sm">
+                                            <FlexBox row gap="sm" style={{ justifyContent: "flex-start" }}>
                                                 <span className={`input-title`}>Authentication Method</span>
                                             </FlexBox>
                                             <div style={{ width: "100%", paddingRight: "12px", display: "flex" }}>
@@ -531,8 +580,8 @@ function ExplorerList(props) {
 
                                             return (
                                                 <FlexBox key={`input-new-ns-${key}`} className="col gap-sm" style={{ paddingRight: "12px" }}>
-                                                    <FlexBox className="row" style={{ justifyContent: "space-between" }}>
-                                                        <FlexBox className="row gap-sm" style={{ justifyContent: "flex-start" }}>
+                                                    <FlexBox row style={{ justifyContent: "space-between" }}>
+                                                        <FlexBox row gap="sm" style={{ justifyContent: "flex-start" }}>
                                                             <span className={`input-title`}>{mirrorSettingInfoMetaInfo[key].plainName}{mirrorSettingInfoMetaInfo[key].required ? "*" : ""}</span>
                                                             {
                                                                 mirrorSettingInfoMetaInfo[key].info ?
@@ -564,7 +613,7 @@ function ExplorerList(props) {
                                                                 }}
                                                                     zIndex={10}>
                                                                     <div className='input-title-button'>
-                                                                        <FlexBox className="row gap-sm center" style={{ justifyContent: "flex-end", marginRight: "-6px", fontWeight: "normal" }}>
+                                                                        <FlexBox center row gap="sm" style={{ justifyContent: "flex-end", marginRight: "-6px", fontWeight: "normal" }}>
                                                                             <span onClick={(e) => {
                                                                             }}>Upload</span>
                                                                             <VscCloudUpload />
@@ -604,11 +653,11 @@ function ExplorerList(props) {
                             <></>
                     }
                     <div className="explorer-sort-by explorer-action-btn hide-600">
-                    <FlexBox className="gap" style={{marginRight: "8px"}}>
-                        <FlexBox className="center">
+                    <FlexBox gap style={{marginRight: "8px"}}>
+                        <FlexBox center >
                             Sort by:
                         </FlexBox>
-                        <FlexBox className="center">
+                        <FlexBox center >
                             <select onChange={(e)=>{
                                 setOrderFieldKey(e.target.value)
                                 setQueryParams([])
@@ -629,7 +678,7 @@ function ExplorerList(props) {
                 </FlexBox>
             </ContentPanelTitle>
             <ContentPanelBody style={{height:"100%"}}>
-                <FlexBox className="col">
+                <FlexBox col>
                     {data === null || pageInfo === null ?
                         <div className="explorer-item">
                             <FlexBox className="explorer-item-container">
@@ -675,7 +724,7 @@ function ExplorerList(props) {
                     </FlexBox>
             </ContentPanelBody>
         </ContentPanel>
-        <FlexBox className="row" style={{justifyContent:"flex-end", paddingBottom:"1em", flexGrow: 0}}>
+        <FlexBox row style={{justifyContent:"flex-end", paddingBottom:"1em", flexGrow: 0}}>
                 <Pagination pageHandler={pageHandler} pageInfo={pageInfo}/>
         </FlexBox>
     </Loader>
@@ -696,12 +745,12 @@ function DirListItem(props) {
     const [recursiveDelete, setRecursiveDelete] = useState(false)
 
 
-    return(
+    return (
         <div style={{cursor:"pointer"}} onClick={(e)=>{
             resetQueryParams()
             navigate(`/n/${namespace}/explorer/${path.substring(1)}`)
         }} className={`explorer-item`}>
-            <FlexBox className="col">
+            <FlexBox col>
                 <FlexBox className="explorer-item-container gap wrap">
                     <FlexBox className="explorer-item-icon">
                         { isGit ?
@@ -732,7 +781,7 @@ function DirListItem(props) {
                 <FlexBox >
                     {err !== "" ? 
                     <FlexBox>
-                        <Alert className="rename-error critical">{err}</Alert>
+                        <Alert severity="error" variant="filled">{err}</Alert>
                     </FlexBox>
                     :<FlexBox />
                     }
@@ -773,18 +822,34 @@ function DirListItem(props) {
                                 }}
                                 actionButtons={
                                     [
-                                        ButtonDefinition("Delete", async () => {
-                                            let p = path.split('/', -1);
-                                            let pLast = p[p.length-1];
-                                            await deleteNode(pLast, recursiveDelete)
-                                        }, {variant: "contained", color: "error"}, ()=>{}, true, false),
-                                        ButtonDefinition("Cancel", () => {
-                                        }, {}, ()=>{}, true, false)
+                                        {
+                                            label: "Delete",
+
+                                            onClick: async () => {
+                                                let p = path.split('/', -1);
+                                                let pLast = p[p.length-1];
+                                                await deleteNode(pLast, recursiveDelete)
+                                            },
+
+                                            buttonProps: {variant: "contained", color: "error"},
+                                            errFunc: ()=>{},
+                                            closesModal: true
+                                        },
+                                        {
+                                            label: "Cancel",
+
+                                            onClick: () => {
+                                            },
+
+                                            buttonProps: {},
+                                            errFunc: ()=>{},
+                                            closesModal: true
+                                        }
                                     ]
                                 } 
                             >
-                                    <FlexBox className="col gap">
-                                <FlexBox className="center-y gap" style={{fontWeight:"bold"}}>
+                                    <FlexBox col gap>
+                                <FlexBox gap center="y" style={{fontWeight:"bold"}}>
                                     Recursive Delete:
                                     <label className="switch">
                                         <input onChange={()=>{
@@ -807,7 +872,7 @@ function DirListItem(props) {
                 </FlexBox>
             </FlexBox>
         </div>
-    )
+    );
 }
 
 function WorkflowListItem(props) {
@@ -819,11 +884,11 @@ function WorkflowListItem(props) {
     const [rename, setRename] = useState(false)
     const [err, setErr] = useState("")
 
-    return(
+    return (
         <div style={{cursor:"pointer"}} onClick={()=>{
             navigate(`/n/${namespace}/explorer/${path.substring(1)}`)
         }} className="explorer-item">
-            <FlexBox className="col">
+            <FlexBox col>
                 <FlexBox className="explorer-item-container gap wrap">
                     <FlexBox className="explorer-item-icon">
                         <FcWorkflow className="auto-margin" />
@@ -850,7 +915,7 @@ function WorkflowListItem(props) {
                     <FlexBox>
                         {err !== "" ? 
                         <FlexBox>
-                            <Alert className="rename-error critical">{err}</Alert>
+                            <Alert severity="error" variant="filled">{err}</Alert>
                         </FlexBox>
                         :<FlexBox />
                         }
@@ -891,17 +956,33 @@ function WorkflowListItem(props) {
                                         }}
                                         actionButtons={
                                             [
-                                                ButtonDefinition("Delete", async () => {
-                                                    let p = path.split('/', -1);
-                                                    let pLast = p[p.length-1];
-                                                    await deleteNode(pLast, false)
-                                                }, {variant: "contained", color: "error"}, ()=>{}, true, false),
-                                                ButtonDefinition("Cancel", () => {
-                                                }, {}, ()=>{}, true, false)
+                                                {
+                                                    label: "Delete",
+
+                                                    onClick: async () => {
+                                                        let p = path.split('/', -1);
+                                                        let pLast = p[p.length-1];
+                                                        await deleteNode(pLast, false)
+                                                    },
+
+                                                    buttonProps: {variant: "contained", color: "error"},
+                                                    errFunc: ()=>{},
+                                                    closesModal: true
+                                                },
+                                                {
+                                                    label: "Cancel",
+
+                                                    onClick: () => {
+                                                    },
+
+                                                    buttonProps: {},
+                                                    errFunc: ()=>{},
+                                                    closesModal: true
+                                                }
                                             ]
                                         } 
                                     >
-                                            <FlexBox className="col gap">
+                                            <FlexBox col gap>
                                         <FlexBox >
                                             Are you sure you want to delete '{name}'?
                                             <br/>
@@ -915,7 +996,7 @@ function WorkflowListItem(props) {
                 </FlexBox>
             </FlexBox>
         </div>
-    )
+    );
 }
 
 export function ApiFragment(props) {

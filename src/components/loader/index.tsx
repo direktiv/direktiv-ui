@@ -1,16 +1,21 @@
 import { useEffect, useState } from "react"
 import './style.css'
 
+export interface LoaderProps {
+    children?: React.ReactNode
+    timer: number
+    load: boolean
+}
 
-export default function Loader(props) {
 
-    const {load, children, timer} = props
+export default function Loader({children, timer, load}: LoaderProps) {
+
     const [display, setDisplay] = useState(false)
-    const [timeoutTimer, setTimeoutTimer] = useState(null)
+    const [timeoutTimer, setTimeoutTimer] = useState(undefined as NodeJS.Timeout | undefined)
 
     // show loader if timer is hit set timeout to set display to true
     useEffect(()=>{
-        if(timer !== null && load) {
+        if(load) {
             let t = setTimeout(()=>{
                 setDisplay(true)
             }, timer)

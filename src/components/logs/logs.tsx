@@ -96,7 +96,7 @@ export default function Logs({ logItems, wordWrap, autoScroll, setAutoScroll, ov
         }}>
             {
                 logItems === null || logItems === undefined ?
-                    <FlexBox className="row center gap" style={{ fontSize: "18px" }}>
+                    <FlexBox center row gap style={{ fontSize: "18px" }}>
                         <VscLayers /> {overrideLoadingMsg ? overrideLoadingMsg : "Loading Data"}
                     </FlexBox>
                     :
@@ -123,7 +123,7 @@ export default function Logs({ logItems, wordWrap, autoScroll, setAutoScroll, ov
                                     </AutoSizer>
                                 </DynamicListContext.Provider>
                                 :
-                                <FlexBox className="row center gap" style={{ fontSize: "18px" }}>
+                                <FlexBox center row gap style={{ fontSize: "18px" }}>
                                     <VscInbox />  {overrideNoDataMsg ? overrideNoDataMsg : "No Data"}
                                 </FlexBox>
                         }
@@ -219,14 +219,14 @@ export function LogFooterButtons({ follow, setFollow, wordWrap, setWordWrap, dat
                     copyTextToClipboard(createClipboardData(data))
                 }
             }}>
-                <FlexBox className="row center gap-sm">
+                <FlexBox center row gap="sm">
                     <VscCopy /> Copy <span className='hide-1000'>to Clipboard</span>
                 </FlexBox>
             </Button>
             {
                 follow !== undefined && setFollow !== undefined ?
                     <Button color="terminal" variant="contained" onClick={() => setFollow(!follow)}>
-                        <FlexBox className="row center gap-sm">
+                        <FlexBox center row gap="sm">
                             {follow ? <><VscEyeClosed /> Stop <span className='hide-1000'>watching</span></> :
                                 <><VscEye /> Follow <span className='hide-1000'>logs</span></>}
                         </FlexBox>
@@ -239,7 +239,7 @@ export function LogFooterButtons({ follow, setFollow, wordWrap, setWordWrap, dat
                     <Button color="terminal" variant="contained" tooltip={wordWrap ? "Disable word wrapping" : "Enable word wrapping"} onClick={() => {
                         setWordWrap(!wordWrap)
                     }}>
-                        <FlexBox className="row center gap-sm">
+                        <FlexBox center row gap="sm">
                             {wordWrap ? <><VscWholeWord /> Whole<span className='hide-1000'>{` Word`}</span></> :
                                 <><VscWordWrap /> Wrap<span className='hide-1000'>{` Word`}</span></>}
                         </FlexBox>
