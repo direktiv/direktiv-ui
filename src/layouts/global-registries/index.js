@@ -79,10 +79,17 @@ export function GlobalRegistries(){
                             setTestConnLoading(false)
                         }}
                         keyDownActions={[
-                            KeyDownDefinition("Enter", async () => {
-                                    await createRegistry(url, `${username}:${token}`)
-                                    await  getRegistries()
-                            }, ()=>{}, true)
+                            {
+                                code: "Enter",
+
+                                fn: async () => {
+                                        await createRegistry(url, `${username}:${token}`)
+                                        await  getRegistries()
+                                },
+
+                                errFunc: ()=>{},
+                                closeModal: true
+                            }
                         ]}
 
                         requiredFields={[
@@ -232,10 +239,17 @@ export function GlobalPrivateRegistries(){
                             setUsername("")
                         }}
                         keyDownActions={[
-                            KeyDownDefinition("Enter", async () => {
-                                    await createRegistry(url, `${username}:${token}`)
-                                    await getRegistries()
-                            }, ()=>{}, true)
+                            {
+                                code: "Enter",
+
+                                fn: async () => {
+                                        await createRegistry(url, `${username}:${token}`)
+                                        await getRegistries()
+                                },
+
+                                errFunc: ()=>{},
+                                closeModal: true
+                            }
                         ]}
 
                         requiredFields={[

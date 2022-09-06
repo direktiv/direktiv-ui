@@ -83,8 +83,15 @@ export default function GlobalRevisionsPanel(props){
                                     auto: true,
                                 }}
                                 keyDownActions={[
-                                    KeyDownDefinition("Enter", async () => {
-                                    },()=>{}, true)
+                                    {
+                                        code: "Enter",
+
+                                        fn: async () => {
+                                        },
+
+                                        errFunc: ()=>{},
+                                        closeModal: true
+                                    }
                                 ]}
                                 requiredFields={[
                                     {tip: "image is required", value: image}

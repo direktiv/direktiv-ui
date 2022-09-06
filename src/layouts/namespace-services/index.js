@@ -141,8 +141,15 @@ function NamespaceServices(props) {
                         auto: true,
                     }}
                     keyDownActions={[
-                        KeyDownDefinition("Enter", async () => {
-                        }, ()=>{}, true)
+                        {
+                            code: "Enter",
+
+                            fn: async () => {
+                            },
+
+                            errFunc: ()=>{},
+                            closeModal: true
+                        }
                     ]}
                     actionButtons={[
                         {

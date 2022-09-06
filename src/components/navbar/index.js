@@ -170,13 +170,20 @@ function NewNamespaceBtn(props) {
             }}
 
             keyDownActions={[
-                KeyDownDefinition("Enter", async () => {
-                    await createNamespace(ns)
-                    setTimeout(() => {
-                        navigate(`/n/${ns}`)
-                    }, 200)
-                    setNs("")
-                }, () => { }, true)
+                {
+                    code: "Enter",
+
+                    fn: async () => {
+                        await createNamespace(ns)
+                        setTimeout(() => {
+                            navigate(`/n/${ns}`)
+                        }, 200)
+                        setNs("")
+                    },
+
+                    errFunc: () => { },
+                    closeModal: true
+                }
             ]}
 
             actionButtons={[

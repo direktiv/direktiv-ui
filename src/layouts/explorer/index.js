@@ -392,13 +392,21 @@ function ExplorerList(props) {
                             ]}
 
                             keyDownActions={[
-                                KeyDownDefinition("Enter", async () => {
-                                    if(name.trim()) {
-                                        await createNode(name, "workflow", wfData)
-                                    } else {
-                                        throw new Error("Please fill in name")
-                                    }
-                                }, ()=>{}, true, "workflow-name")
+                                {
+                                    code: "Enter",
+
+                                    fn: async () => {
+                                        if(name.trim()) {
+                                            await createNode(name, "workflow", wfData)
+                                        } else {
+                                            throw new Error("Please fill in name")
+                                        }
+                                    },
+
+                                    errFunc: ()=>{},
+                                    closeModal: true,
+                                    id: "workflow-name"
+                                }
                             ]}
 
                             requiredFields={[
@@ -500,13 +508,20 @@ function ExplorerList(props) {
                             ]}
 
                             keyDownActions={[
-                                KeyDownDefinition("Enter", async () => {
-                                    if (tabIndex === 0) {
-                                        await createNode(name, "directory")
-                                    } else {
-                                        await createMirrorNode(name, mirrorSettings)
-                                    }
-                                }, () => { }, true)
+                                {
+                                    code: "Enter",
+
+                                    fn: async () => {
+                                        if (tabIndex === 0) {
+                                            await createNode(name, "directory")
+                                        } else {
+                                            await createMirrorNode(name, mirrorSettings)
+                                        }
+                                    },
+
+                                    errFunc: () => { },
+                                    closeModal: true
+                                }
                             ]}
 
                             requiredFields={[

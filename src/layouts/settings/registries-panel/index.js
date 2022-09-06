@@ -67,28 +67,35 @@ function RegistriesPanel(props){
                             setTestConnLoading(false)
                         }}
                         keyDownActions={[
-                            KeyDownDefinition("Enter", async () => {
-                                setURLErr("")
-                                setTokenErr("")
-                                setUserErr("")
-                                setErr("")
-                                let filledOut = true
-                                if(url === ""){
-                                    setURLErr("url must be filled out")
-                                    filledOut = false
-                                }
-                                if(username === "") {
-                                    setUserErr("username must be filled out")
-                                    filledOut = false
-                                }
-                                if(token === "") {
-                                    setTokenErr("token must be filled out")
-                                    filledOut = false
-                                }
-                                if(!filledOut) throw new Error("all fields must be filled out")
-                                await createRegistry(url, `${username}:${token}`)
-                                await getRegistries()
-                            }, ()=>{}, true)
+                            {
+                                code: "Enter",
+
+                                fn: async () => {
+                                    setURLErr("")
+                                    setTokenErr("")
+                                    setUserErr("")
+                                    setErr("")
+                                    let filledOut = true
+                                    if(url === ""){
+                                        setURLErr("url must be filled out")
+                                        filledOut = false
+                                    }
+                                    if(username === "") {
+                                        setUserErr("username must be filled out")
+                                        filledOut = false
+                                    }
+                                    if(token === "") {
+                                        setTokenErr("token must be filled out")
+                                        filledOut = false
+                                    }
+                                    if(!filledOut) throw new Error("all fields must be filled out")
+                                    await createRegistry(url, `${username}:${token}`)
+                                    await getRegistries()
+                                },
+
+                                errFunc: ()=>{},
+                                closeModal: true
+                            }
                         ]}
                         requiredFields={[
                             {tip: "url is required", value: url},
