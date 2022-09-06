@@ -54,7 +54,7 @@ function AddWorkflowVariablePanel(props) {
                 <ContentPanelTitleIcon>
                     <VscVariableGroup />
                 </ContentPanelTitleIcon>
-                <FlexBox style={{ display: "flex", alignItems: "center" }} className="gap">
+                <FlexBox style={{ display: "flex", alignItems: "center" }} gap>
                     <div>
                         Variables
                     </div>
@@ -119,11 +119,11 @@ function AddWorkflowVariablePanel(props) {
             </ContentPanelTitle>
             <ContentPanelBody>
                 {data !== null ?
-                <FlexBox className="col">
+                <FlexBox col>
                     <div>
                     <Variables namespace={namespace} deleteWorkflowVariable={deleteWorkflowVariable} setWorkflowVariable={setWorkflowVariable} getWorkflowVariable={getWorkflowVariable} getWorkflowVariableBlob={getWorkflowVariableBlob} variables={data}/>
                     </div>
-                    <FlexBox className="row" style={{justifyContent:"flex-end", paddingBottom:"1em", flexGrow: 0}}>
+                    <FlexBox row style={{justifyContent:"flex-end", paddingBottom:"1em", flexGrow: 0}}>
                         <Pagination pageHandler={pageHandler} pageInfo={pageInfo}/>
                     </FlexBox>
                 </FlexBox>:<></>}
@@ -179,7 +179,7 @@ function AddVariablePanel(props) {
                             <option value="text/css">css</option>
                         </select>
                     </div>
-                    <FlexBox className="gap" style={{maxHeight: "600px"}}>
+                    <FlexBox gap style={{maxHeight: "600px"}}>
                         <FlexBox style={{overflow:"hidden"}}>
                         <AutoSizer>
                             {({height, width})=>(
@@ -194,7 +194,7 @@ function AddVariablePanel(props) {
                     <div style={{width: "100%", display: "flex"}}>
                         <input value={keyValue} onChange={(e)=>setKeyValue(e.target.value)} autoFocus placeholder="Enter variable key name" />
                     </div>
-                    <FlexBox className="gap">
+                    <FlexBox gap>
                         <VariableFilePicker setKeyValue={setKeyValue} setMimeType={setMimeType} mimeType={mimeType} file={file} setFile={setFile} id="add-variable-panel" />
                     </FlexBox>
                 </FlexBox>
@@ -298,8 +298,8 @@ function Variable(props) {
                             ]
                         } 
                     >
-                        <FlexBox className="col gap" style={{fontSize: "12px",minHeight: "500px"}}>
-                            <FlexBox className="gap" style={{flexGrow: 1}}>
+                        <FlexBox col gap style={{fontSize: "12px",minHeight: "500px"}}>
+                            <FlexBox gap style={{flexGrow: 1}}>
                                 <FlexBox style={{overflow:"hidden"}}>
                                 {CanPreviewMimeType(mimeType) ?   
                                 <AutoSizer>
@@ -316,7 +316,7 @@ function Variable(props) {
                                 }
                                 </FlexBox>
                             </FlexBox>
-                            <FlexBox className="gap" style={{flexGrow: 0, flexShrink: 1}}>
+                            <FlexBox gap style={{flexGrow: 0, flexShrink: 1}}>
                                 <FlexBox>
                                     <select style={{width:"100%"}} defaultValue={mimeType} onChange={(e)=>setType(e.target.value)}>
                                         <option value="">Choose a mimetype</option>
@@ -400,7 +400,7 @@ function Variable(props) {
                             {tip: "file is required", value: file}
                         ]}
                     >
-                        <FlexBox className="col gap">
+                        <FlexBox col gap>
                             <VariableFilePicker setMimeType={setType} id="modal-file-picker" file={file} setFile={setFile} />
                         </FlexBox>
                     </Modal>
@@ -449,7 +449,7 @@ function Variable(props) {
                         ]
                     } 
                 >
-                        <FlexBox className="col gap">
+                        <FlexBox col gap>
                     <FlexBox >
                         Are you sure you want to delete '{obj.name}'?
                         <br/>

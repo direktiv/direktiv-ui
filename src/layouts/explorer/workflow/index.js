@@ -132,7 +132,7 @@ function InitialWorkflowHook(props){
                 block={tabBlocker}
                 setBlock={setTabBlocker}
                 blockMsg={"Warning Unsaved Changes. Are you sure you want to leave?"}/>
-                <FlexBox className="col gap">
+                <FlexBox col gap>
                     { activeTab === 0 ? 
                         <OverviewTab getSuccessFailedMetrics={getSuccessFailedMetrics} router={router} namespace={namespace} getInstancesForWorkflow={getInstancesForWorkflow} filepath={filepath}/>
                     :<></>}
@@ -180,8 +180,8 @@ function WorkingRevisionErrorBar(props) {
 
     return (
         <div className={`editor-drawer ${showErrors ? "expanded" : ""}`}>
-            <FlexBox className="col">
-                <FlexBox className="row" style={{ justifyContent: "flex-start", alignItems: "center", borderBottom: "1px solid #536470", padding: "6px 10px 6px 10px" }}>
+            <FlexBox col>
+                <FlexBox row style={{ justifyContent: "flex-start", alignItems: "center", borderBottom: "1px solid #536470", padding: "6px 10px 6px 10px" }}>
                     <div style={{ paddingRight: "6px" }}>
                         Problem
                     </div>
@@ -189,12 +189,12 @@ function WorkingRevisionErrorBar(props) {
                         <pre style={{ margin: "0px", fontSize: "medium" }}>{errors.length}</pre>
                     </div>
                 </FlexBox>
-                <FlexBox className="col" style={{ padding: "6px 10px 6px 10px", overflowY: "scroll" }}>
+                <FlexBox col style={{ padding: "6px 10px 6px 10px", overflowY: "scroll" }}>
                     {errors.length > 0 ?
                         <>
                             {errors.map((err) => {
                                 return (
-                                    <FlexBox className="row" style={{ justifyContent: "flex-start", alignItems: "center", paddingBottom: "4px" }}>
+                                    <FlexBox row style={{ justifyContent: "flex-start", alignItems: "center", paddingBottom: "4px" }}>
                                         <VscError style={{ paddingRight: "6px", color: "#ec4f79" }} />
                                         <div>
                                             {err}
@@ -205,7 +205,7 @@ function WorkingRevisionErrorBar(props) {
 
                         </>
                         :
-                        <FlexBox className="row" style={{ justifyContent: "flex-start", alignItems: "center" }}>
+                        <FlexBox row style={{ justifyContent: "flex-start", alignItems: "center" }}>
                             <VscPass style={{ paddingRight: "6px", color: "#28a745" }} />
                             <div>
                                 No Errors
@@ -312,7 +312,7 @@ function WorkingRevision(props) {
                     <ContentPanelTitleIcon>
                         <VscFileCode />
                     </ContentPanelTitleIcon>
-                    <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
+                    <FlexBox style={{display:"flex", alignItems:"center"}} gap>
                         <div>
                             Active Revision
                         </div>
@@ -322,7 +322,7 @@ function WorkingRevision(props) {
                 </ContentPanelTitle>
                 <ContentPanelBody style={{padding: "0px"}}>
                 {tabBtn === 0 ?
-                    <FlexBox className="col" style={{ overflow: "hidden" }}>
+                    <FlexBox col style={{ overflow: "hidden" }}>
                         <FlexBox>
                             <DirektivEditor saveFn={saveFn} style={{borderRadius: "0px"}} dlang="yaml" value={workflow} dvalue={oldWf} setDValue={setWorkflow} disableBottomRadius={true}/>
                         </FlexBox>
@@ -426,7 +426,7 @@ function WorkingRevision(props) {
                                                         )}
                                                     </AutoSizer>
                                                 </FlexBox>
-                                            ), (<FlexBox className="col" style={{ overflow: "hidden" }}>
+                                            ), (<FlexBox col style={{ overflow: "hidden" }}>
                                                 {workflowJSONSchema === null ?
                                                     <div className='container-alert' style={{ textAlign: "center", height: "80%" }}>
                                                         Workflow first state must be a validate state to generate form.
@@ -505,7 +505,7 @@ function WorkingRevision(props) {
                                     onClick={async () => {
                                         setShowErrors(!showErrors)
                                 }}>
-                                    <FlexBox className="center">
+                                    <FlexBox center >
                                         {showErrors?
                                         <VscChevronDown style={{ width: "80%", height: "80%" }} />
                                         :
@@ -688,14 +688,14 @@ function OverviewTab(props) {
     return(
         <>
             <div className="gap">
-                <FlexBox className="gap wrap">
+                <FlexBox gap wrap>
                     <FlexBox style={{ minWidth: "370px", width:"60%", maxHeight: "342px"}}>
                         <ContentPanel style={{ width: "100%", minWidth: "300px", overflowY: "auto"}}>
                             <ContentPanelTitle>
                                 <ContentPanelTitleIcon>
                                     <VscVmRunning />
                                 </ContentPanelTitleIcon>
-                                <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
+                                <FlexBox style={{display:"flex", alignItems:"center"}} gap>
                                     <div>
                                         Instances
                                     </div>
@@ -703,7 +703,7 @@ function OverviewTab(props) {
                                 </FlexBox>
                             </ContentPanelTitle>
                             <WorkflowInstances instances={instances} namespace={namespace} />
-                            <FlexBox className="row" style={{justifyContent:"flex-end", paddingBottom:"1em", flexGrow: 0}}>
+                            <FlexBox row style={{justifyContent:"flex-end", paddingBottom:"1em", flexGrow: 0}}>
                                 <Pagination pageHandler={pageHandler} pageInfo={pageInfo}/>
                             </FlexBox>
                         </ContentPanel>
@@ -714,7 +714,7 @@ function OverviewTab(props) {
                                 <ContentPanelTitleIcon>
                                     <VscPieChart />
                                 </ContentPanelTitleIcon>
-                                <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
+                                <FlexBox style={{display:"flex", alignItems:"center"}} gap>
                                     <div>
                                         Success/Failure Rate
                                     </div>
@@ -734,7 +734,7 @@ function OverviewTab(props) {
                         <ContentPanelTitleIcon>
                             <VscTypeHierarchySub />
                         </ContentPanelTitleIcon>
-                        <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
+                        <FlexBox style={{display:"flex", alignItems:"center"}} gap>
                             <div>
                                 Traffic Distribution
                             </div>
@@ -750,7 +750,7 @@ function OverviewTab(props) {
                         <ContentPanelTitleIcon>
                             <VscLayers />
                         </ContentPanelTitleIcon>
-                        <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
+                        <FlexBox style={{display:"flex", alignItems:"center"}} gap>
                             <div>
                                 Workflow Services
                             </div>
@@ -831,7 +831,7 @@ function SuccessFailureGraph(props){
     }
 
     return(
-        <FlexBox className="col" style={{maxHeight:"250px", marginTop:"20px"}}>
+        <FlexBox col style={{maxHeight:"250px", marginTop:"20px"}}>
             <PieChart
                 totalValue={total}
                 label=""
@@ -854,7 +854,7 @@ function SuccessFailureGraph(props){
             </defs>
             </PieChart>
             <FlexBox style={{marginTop:"10px", gap:"50px"}}>
-                <FlexBox className="col">
+                <FlexBox col>
                     <FlexBox style={{justifyContent:"center", alignItems:"center", gap:"5px", fontWeight:"bold", fontSize:"12pt"}}>
                         <div style={{height:"8px", width:"8px", background:"linear-gradient(180deg, #1FEAC5 0%, #25B49A 100%)"}} />
                         Success
@@ -863,7 +863,7 @@ function SuccessFailureGraph(props){
                         {metrics[0].percentage}%
                     </FlexBox>
                 </FlexBox>
-                <FlexBox className="col">
+                <FlexBox col>
                     <FlexBox style={{justifyContent:"center", alignItems:"center", gap:"5px", fontWeight:"bold", fontSize:"12pt"}}>
                         <div style={{height:"8px", width:"8px", background:"linear-gradient(180deg, #F3537E 0%, #DE184D 100%)"}} />
                         Failure
@@ -889,9 +889,9 @@ function TrafficDistribution(props) {
     if (routes.length === 0) {
         return (
             <ContentPanelBody>
-                <FlexBox className="col gap" style={{justifyContent:"center"}}>
+                <FlexBox col gap style={{justifyContent:"center"}}>
                     <Slider className="traffic-distribution" disabled={true}/>
-                    <FlexBox className="col" style={{fontSize:"10pt", marginTop:"5px", maxHeight:"20px", color: "#C1C5C8"}}>
+                    <FlexBox col style={{fontSize:"10pt", marginTop:"5px", maxHeight:"20px", color: "#C1C5C8"}}>
                         latest<span style={{fontSize:"8pt"}}>100%</span>
                     </FlexBox>
                 </FlexBox>
@@ -902,25 +902,25 @@ function TrafficDistribution(props) {
 
     return(
         <ContentPanelBody>
-            <FlexBox className="col gap" style={{justifyContent:'center'}}>
+            <FlexBox col gap style={{justifyContent:'center'}}>
                 <FlexBox style={{fontSize:"10pt", marginTop:"5px", maxHeight:"20px", color: "#C1C5C8"}}>
                     {routes[0] ? 
-                    <FlexBox className="col">
+                    <FlexBox col>
                         <span title={routes[0].ref}>{routes[0].ref.substr(0, 8)}</span>
                     </FlexBox>:""}
                     {routes[1] ? 
-                    <FlexBox className="col" style={{ textAlign:'right'}}>
+                    <FlexBox col style={{ textAlign:'right'}}>
                         <span title={routes[1].ref}>{routes[1].ref.substr(0,8)}</span>
                     </FlexBox>:""}
                 </FlexBox>
                 <Slider value={routes[0] ? routes.length === 2 ? `${routes[0].weight}`: `100` : 0} className="traffic-distribution" disabled={true}/>
                 <FlexBox style={{fontSize:"10pt", marginTop:"5px", maxHeight:"50px", color: "#C1C5C8"}}>
                     {routes[0] ? 
-                    <FlexBox className="col">
+                    <FlexBox col>
                         <span>{routes.length === 2 ? `${routes[0].weight}%`: `100%`}</span>
                     </FlexBox>:""}
                     {routes[1] ? 
-                    <FlexBox className="col" style={{ textAlign:'right'}}>
+                    <FlexBox col style={{ textAlign:'right'}}>
                         <span>{routes[1].weight}%</span>
                     </FlexBox>:""}
                 </FlexBox>
@@ -936,7 +936,7 @@ function WorkflowServices(props) {
     if (data === null) {
         return     <div className="col">
         <FlexBox style={{ height:"40px", }}>
-                <FlexBox className="gap" style={{alignItems:"center", paddingLeft:"8px"}}>
+                <FlexBox gap style={{alignItems:"center", paddingLeft:"8px"}}>
                     <div style={{fontSize:"10pt", }}>
                         No services have been created.
                     </div>
@@ -951,11 +951,11 @@ function WorkflowServices(props) {
 
     return(
         <ContentPanelBody>
-            <FlexBox className="col gap">
+            <FlexBox col gap>
                 {data.length === 0 ? 
                        <div className="col">
                        <FlexBox style={{ height:"40px", }}>
-                               <FlexBox className="gap" style={{alignItems:"center", paddingLeft:"8px"}}>
+                               <FlexBox gap style={{alignItems:"center", paddingLeft:"8px"}}>
                                    <div style={{fontSize:"10pt", }}>
                                        No services have been created.
                                    </div>
@@ -1057,7 +1057,7 @@ function SettingsTab(props) {
                 <div style={{width: "100%"}}>
                     <AddWorkflowVariablePanel namespace={namespace} workflow={workflow} />
                 </div>
-                <FlexBox className="gap">
+                <FlexBox gap>
                     <FlexBox  style={{flex:1, maxHeight: "206px", minWidth:"300px"}}>          
                         <div style={{width: "100%", minHeight: "144px"}}>
                             <ContentPanel style={{width: "100%"}}>
@@ -1065,7 +1065,7 @@ function SettingsTab(props) {
                                     <ContentPanelTitleIcon>
                                         <VscNote/>
                                     </ContentPanelTitleIcon>
-                                    <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
+                                    <FlexBox style={{display:"flex", alignItems:"center"}} gap>
                                         <div>
                                             Log to Event
                                         </div>
@@ -1075,14 +1075,14 @@ function SettingsTab(props) {
                                 <ContentPanelBody className="col" style={{
                                     alignItems: "center"
                                 }}>
-                                    <FlexBox className="gap" style={{flexDirection: "column", alignItems: "center"}}>
+                                    <FlexBox gap style={{flexDirection: "column", alignItems: "center"}}>
                                         { lteStatus ? <Alert onClose={()=>{setLTEStatus(null)}} style={{width:"90%"}}>{lteStatusMessage}</Alert> : <></> }
 
                                         <FlexBox style={{width:"100%"}}>
                                             <input value={logToEvent} onChange={(e)=>setLogToEvent(e.target.value)} type="text" placeholder="Enter the 'event' type to send logs to" />
                                         </FlexBox>
                                         <div style={{width:"99.5%", margin:"auto", background: "#E9ECEF", height:"1px"}}/>
-                                        <FlexBox className="gap" style={{justifyContent:"flex-end", width:"100%"}}>
+                                        <FlexBox gap style={{justifyContent:"flex-end", width:"100%"}}>
                                             <Button onClick={async()=>{
                                                 try { 
                                                     await setWorkflowLogToEvent(logToEvent)
@@ -1111,7 +1111,7 @@ function SettingsTab(props) {
                                     <ContentPanelTitleIcon>
                                         <VscTag/>
                                     </ContentPanelTitleIcon>
-                                    <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
+                                    <FlexBox style={{display:"flex", alignItems:"center"}} gap>
                                         <div>
                                             Add Attributes
                                         </div>

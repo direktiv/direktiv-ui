@@ -225,7 +225,7 @@ function FunctionsList(props) {
                     auto: true
                 }}
             >
-                <FlexBox className="col" style={{ height: "45vh", minWidth: "250px", minHeight: "200px", justifyContent: "space-between" }}>
+                <FlexBox col style={{ height: "45vh", minWidth: "250px", minHeight: "200px", justifyContent: "space-between" }}>
                     <div style={{ overflow: "auto" }}>
                         <Form
                             id={"builder-form"}
@@ -597,7 +597,7 @@ export default function DiagramEditor(props) {
             ) : (
                 <> </>
             )}
-            <FlexBox id="builder-page" className="col" style={{ paddingRight: "8px", visibility: load ? "hidden" : "visible", maxWidth: load ? "0px" : undefined }}>
+            <FlexBox id="builder-page" col style={{ paddingRight: "8px", visibility: load ? "hidden" : "visible", maxWidth: load ? "0px" : undefined }}>
                 {error ?
                     <Alert severity="error" variant="filled" onClose={()=>{setError(null)}}>{error} </Alert>
                     :
@@ -998,8 +998,8 @@ export default function DiagramEditor(props) {
                                 }
                             ]}
                         >
-                            <FlexBox className="col center" style={{ margin: "8px 16px 8px 16px" }}>
-                                <FlexBox className="row center">
+                            <FlexBox col center style={{ margin: "8px 16px 8px 16px" }}>
+                                <FlexBox row center>
                                     <span style={{ whiteSpace: "nowrap", paddingRight: "6px" }}>
                                         Node ID:
                                     </span>

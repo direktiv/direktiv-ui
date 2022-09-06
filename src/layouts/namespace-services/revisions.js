@@ -32,13 +32,13 @@ export function RevisionCreatePanel(props){
     const {image, setImage, scale, setScale, size, setSize, cmd, setCmd, traffic, setTraffic, maxScale} = props
 
     return(
-        <FlexBox className="col gap" style={{fontSize: "12px"}}>
-            <FlexBox className="col gap">
-                    <FlexBox className="col" style={{paddingRight:"10px"}}>
+        <FlexBox col gap style={{fontSize: "12px"}}>
+            <FlexBox col gap>
+                    <FlexBox col style={{paddingRight:"10px"}}>
                         Image
                         <input value={image} onChange={(e)=>setImage(e.target.value)} placeholder="Enter an image name" />
                     </FlexBox>
-                    <FlexBox className="col" style={{paddingRight:"10px"}}>
+                    <FlexBox col style={{paddingRight:"10px"}}>
                         Scale
                         <Tippy content={scale} trigger={"mouseenter click"}>
                             <input type="range" style={{paddingLeft:"0px"}} min={"0"} max={maxScale.toString()} value={scale.toString()} onChange={(e)=>setScale(e.target.value)} />
@@ -48,7 +48,7 @@ export function RevisionCreatePanel(props){
                             <option style={{flex:"auto", textAlign:"right", lineHeight:"10px", paddingRight:"5px" }} value={maxScale} label={maxScale}/>
                         </datalist>
                     </FlexBox>
-                    <FlexBox className="col" style={{paddingRight:"10px"}}>
+                    <FlexBox col style={{paddingRight:"10px"}}>
                         Size
                         <input list="sizeMarks" style={{paddingLeft:"0px"}} type="range" min={"0"} value={size.toString()}  max={"2"} onChange={(e)=>setSize(e.target.value)}/>
                         <datalist style={{display:"flex", alignItems:'center'}} id="sizeMarks">
@@ -57,11 +57,11 @@ export function RevisionCreatePanel(props){
                             <option style={{flex:"auto", textAlign:"right", lineHeight:"10px" }} value="2" label="large"/>
                         </datalist>
                     </FlexBox>
-                    <FlexBox className="col" style={{paddingRight:"10px"}}>
+                    <FlexBox col style={{paddingRight:"10px"}}>
                         CMD
                         <input value={cmd} onChange={(e)=>setCmd(e.target.value)} placeholder="Enter the CMD for a service" />
                     </FlexBox>
-                    <FlexBox className="col" style={{paddingRight:"10px"}}>
+                    <FlexBox col style={{paddingRight:"10px"}}>
                         Traffic
                         <Tippy content={`${traffic}%`} trigger={"mouseenter click"}>
                             <input type="range" style={{paddingLeft:"0px"}} min={"0"} max="100" value={traffic.toString()} onChange={(e)=>setTraffic(e.target.value)} />
@@ -119,7 +119,7 @@ function NamespaceRevisions(props) {
     }
 
     return (
-        <FlexBox className="gap wrap" style={{paddingRight: "8px"}}>
+        <FlexBox gap wrap style={{paddingRight: "8px"}}>
             <FlexBox style={{flex: 6}}>
                 <ContentPanel style={{width: "100%"}}>
                     <ContentPanelTitle>
@@ -198,8 +198,8 @@ function NamespaceRevisions(props) {
                     </ContentPanelTitle>
                     <ContentPanelBody>
 
-                        <FlexBox className="gap col">
-                            <FlexBox className="gap col">
+                        <FlexBox col gap>
+                            <FlexBox col gap>
                                 {revisions.sort((a, b)=> (a.created > b.created) ? -1 : 1).map((obj, i) => {
 
                                     let dontDelete = false
@@ -263,7 +263,7 @@ export function UpdateTraffic(props){
 
     return(
         <FlexBox style={{flex: 1, minWidth: "370px"}}>
-            <FlexBox className="gap" style={{fontSize:"12px", maxHeight: "fit-content"}}>
+            <FlexBox gap style={{fontSize:"12px", maxHeight: "fit-content"}}>
                 <ContentPanel style={{width:"100%", height:"fit-content"}}>
                     <ContentPanelTitle>
                         <ContentPanelTitleIcon>
@@ -274,9 +274,9 @@ export function UpdateTraffic(props){
                         </FlexBox>
                     </ContentPanelTitle>
                         <ContentPanelBody className="secrets-panel">
-                            <FlexBox className="gap col" style={{}}>
-                                <FlexBox className="col gap">
-                                    <FlexBox className="col" style={{paddingRight:"4px"}}>
+                            <FlexBox col gap style={{}}>
+                                <FlexBox col gap>
+                                    <FlexBox col style={{paddingRight:"4px"}}>
                                         <span style={{fontWeight:"bold"}}>Rev 1</span>
                                         <select value={revOne} onChange={(e)=>{
                                             if(e.target.value === "") {
@@ -296,7 +296,7 @@ export function UpdateTraffic(props){
                                             })}
                                         </select>
                                     </FlexBox>
-                                    <FlexBox className="col" style={{paddingRight:"4px"}}>
+                                    <FlexBox col style={{paddingRight:"4px"}}>
                                         <span style={{fontWeight:"bold"}}>Rev 2</span>
                                         <select value={revTwo} onChange={(e)=>{
                                             if(e.target.value === "") {
@@ -316,7 +316,7 @@ export function UpdateTraffic(props){
                                             })}
                                         </select>
                                     </FlexBox>
-                                    <FlexBox className="col" style={{paddingRight:"10px"}}>
+                                    <FlexBox col style={{paddingRight:"10px"}}>
                                         <span style={{fontWeight:"bold"}}>Traffic Distribution</span>
                                         <FlexBox>
                                             <FlexBox>
@@ -347,7 +347,7 @@ export function UpdateTraffic(props){
                             </FlexBox>
                         </ContentPanelBody>
                         <ContentPanelFooter>
-                            <FlexBox className="col" style={{alignItems:"flex-end"}}>
+                            <FlexBox col style={{alignItems:"flex-end"}}>
                                 <Button onClick={async ()=>{
                                     try { 
                                         await setNamespaceServiceRevisionTraffic(revOne, parseInt(tpercent), revTwo, parseInt(100-tpercent))

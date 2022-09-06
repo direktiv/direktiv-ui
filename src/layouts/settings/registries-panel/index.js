@@ -36,7 +36,7 @@ function RegistriesPanel(props){
                 <ContentPanelTitleIcon>
                     <VscServer />
                 </ContentPanelTitleIcon>
-                <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
+                <FlexBox style={{display:"flex", alignItems:"center"}} gap>
                     <div>
                         Container Registries   
                     </div>
@@ -194,7 +194,7 @@ function RegistriesPanel(props){
                 </div>
             </ContentPanelTitle>
             <ContentPanelBody className="secrets-panel">
-                <FlexBox className="gap col">
+                <FlexBox col gap>
                     <FlexBox>
                         {data !== null ? 
                         <Registries deleteRegistry={deleteRegistry} getRegistries={getRegistries} registries={data}/>
@@ -269,7 +269,7 @@ export function AddRegistryPanel(props) {
     const {err, successMsg, url, setURL, token, setToken, username, setUsername, urlErr, userErr, tokenErr} = props
 
     return (
-        <FlexBox className="col gap" style={{fontSize: "12px"}}>
+        <FlexBox col gap style={{fontSize: "12px"}}>
             { successMsg ? 
             <FlexBox>
                 <Alert grow>Connection seems good!</Alert>
@@ -280,9 +280,9 @@ export function AddRegistryPanel(props) {
             <Alert severity="error" variant="filled" grow>{err}</Alert>
             </FlexBox>
             : <></> }
-            <FlexBox className="col">
+            <FlexBox col>
             <FlexBox style={{flexDirection:"column"}}>
-                <FlexBox className="gap">
+                <FlexBox gap>
                 Registry URL <HelpIcon msg={`An example of url for Docker is https://index.docker.io or for Google https://gcr.io`}/>
                 </FlexBox>
                 <FlexBox style={{paddingRight:"8px"}}>
@@ -301,9 +301,9 @@ export function AddRegistryPanel(props) {
                 }
           
             </FlexBox>
-            <FlexBox className="col">
+            <FlexBox col>
                 <FlexBox style={{flexDirection:"column"}}>
-                <FlexBox className="gap">
+                <FlexBox gap>
                 Username 
                 </FlexBox>
                 <FlexBox style={{paddingRight:"8px"}}>
@@ -320,9 +320,9 @@ export function AddRegistryPanel(props) {
                 ""  
                 }
             </FlexBox>
-            <FlexBox className="col gap">
+            <FlexBox col gap>
                 <FlexBox style={{flexDirection:"column"}}>
-                <FlexBox className="gap">
+                <FlexBox gap>
                 Password
                 </FlexBox>
                 <FlexBox style={{paddingRight:"8px"}}>
@@ -347,7 +347,7 @@ export function Registries(props) {
     const {registries, deleteRegistry, getRegistries} = props
 
     return <>
-        <FlexBox className="col gap" style={{ maxHeight: "236px", overflowY: "auto" }}>
+        <FlexBox col gap style={{ maxHeight: "236px", overflowY: "auto" }}>
         {registries.length === 0 ? 
                  <FlexBox className="secret-tuple empty-content">
                  <FlexBox className="key">No registries are stored...</FlexBox>
@@ -404,7 +404,7 @@ export function Registries(props) {
                                     ]
                                 }   
                             >
-                                <FlexBox className="col gap">
+                                <FlexBox col gap>
                                     <FlexBox>
                                         Are you sure you want to remove '{obj.name}'?
                                         <br/>

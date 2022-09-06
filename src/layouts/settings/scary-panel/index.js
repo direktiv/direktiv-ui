@@ -20,7 +20,7 @@ function ScarySettings(props) {
                     </FlexBox>
                 </ContentPanelTitle>
                 <ContentPanelBody className="secrets-panel">
-                    <FlexBox className="gap col">
+                    <FlexBox col gap>
                         <FlexBox className="scary-settings"> 
                             <Scary namespace={namespace} deleteErr={deleteErr} deleteNamespace={deleteNamespace}/>
                         </FlexBox>
@@ -108,8 +108,8 @@ function DeleteNamespaceConfirmationPanel(props) {
     const [inputValue, setInputValue] = useState("")
 
     return (
-        <FlexBox className="col" style={{fontSize: "12px"}}>
-            <FlexBox className="col">
+        <FlexBox col style={{fontSize: "12px"}}>
+            <FlexBox col>
                 <p>
                     Are you sure you want to delete this namespace?<br/> This action <b>can not be undone!</b>
                 </p>

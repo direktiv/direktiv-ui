@@ -39,7 +39,7 @@ function NavBar(props) {
         <>
             <ResponsiveNavbar toggled={toggleResponsive} setToggled={setToggleResponsive} />
             <FlexBox onClick={onClick} style={{...style}} className={className}>
-                <FlexBox className="col tall" style={{ gap: "12px" }}>
+                <FlexBox col tall style={{ gap: "12px" }}>
                     <FlexBox className="navbar-logo">
                         <img alt="logo" src={Logo} />
                     </FlexBox>
@@ -258,13 +258,13 @@ function NewNamespaceBtn(props) {
                     </FlexBox>), (
                     <FlexBox key={`form-new-ns-mirror`} className="col gap">
                         <FlexBox key={`input-new-ns-name`} className="col gap-md" style={{ paddingRight: "12px" }}>
-                            <FlexBox className="row gap-sm" style={{ justifyContent: "flex-start" }}>
+                            <FlexBox row gap="sm" style={{ justifyContent: "flex-start" }}>
                                 <span className={`input-title`}>Namespace*</span>
                             </FlexBox>
                             <input autoFocus value={ns} onChange={(e) => setNs(e.target.value)} placeholder="Enter namespace name" />
                         </FlexBox>
                         <FlexBox key={`input-new-ns-auth`} className="col gap-md">
-                            <FlexBox className="row gap-sm" style={{ justifyContent: "flex-start" }}>
+                            <FlexBox row gap="sm" style={{ justifyContent: "flex-start" }}>
                                 <span className={`input-title`}>Authentication Method</span>
                             </FlexBox>
                             <div style={{ width: "100%", paddingRight: "12px", display: "flex" }}>
@@ -286,8 +286,8 @@ function NewNamespaceBtn(props) {
 
                             return (
                                 <FlexBox key={`input-new-ns-${key}`} className="col gap-sm" style={{ paddingRight: "12px" }}>
-                                    <FlexBox className="row" style={{ justifyContent: "space-between" }}>
-                                        <FlexBox className="row gap-sm" style={{ justifyContent: "flex-start" }}>
+                                    <FlexBox row style={{ justifyContent: "space-between" }}>
+                                        <FlexBox row gap="sm" style={{ justifyContent: "flex-start" }}>
                                             <span className={`input-title`}>{mirrorSettingInfoMetaInfo[key].plainName}{mirrorSettingInfoMetaInfo[key].required ? "*" : ""}</span>
                                             {
                                                 mirrorSettingInfoMetaInfo[key].info ?
@@ -319,7 +319,7 @@ function NewNamespaceBtn(props) {
                                                 }}
                                                     zIndex={9999}>
                                                     <div className='input-title-button'>
-                                                        <FlexBox className="row gap-sm center" style={{ justifyContent: "flex-end", marginRight: "-6px" }}>
+                                                        <FlexBox center row gap="sm" style={{ justifyContent: "flex-end", marginRight: "-6px" }}>
                                                             <span onClick={(e) => {
                                                             }}>Upload</span>
                                                             <VscCloudUpload />

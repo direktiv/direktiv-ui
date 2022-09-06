@@ -51,8 +51,8 @@ export default function JQPlayground() {
     return(
         <FlexBox id="jq-page" className="col gap" style={{paddingRight:"8px"}}>
             <JQFilter data={input} query={filter} error={error} setFilter={setFilter} executeJQ={executeAndSave} setError={setError}/>
-            <FlexBox className="gap col" >
-                <FlexBox className="gap wrap">
+            <FlexBox col gap >
+                <FlexBox gap wrap>
                     <FlexBox style={{minWidth:"380px"}}>
                         <JQInput input={input} setInput={setInput}/>
                     </FlexBox>
@@ -61,7 +61,7 @@ export default function JQPlayground() {
                     </FlexBox>
                 </FlexBox>
             </FlexBox>
-            <FlexBox className="gap col" >
+            <FlexBox col gap >
                 <FlexBox className="gap box-wrap">
                     <HowToJQ />
                     <ExamplesJQ cheatSheet={cheatSheet} setFilter={setFilter} setInput={setInput} executeJQ={executeAndSave} setError={setError}/>
@@ -79,7 +79,7 @@ function HowToJQ(){
                         <ContentPanelTitleIcon>
                             <VscFileCode/>
                         </ContentPanelTitleIcon>
-                        <FlexBox className="gap" style={{ alignItems: "center"}}>
+                        <FlexBox gap style={{ alignItems: "center"}}>
                             <div>
                                 How it works
                             </div>
@@ -87,7 +87,7 @@ function HowToJQ(){
                         </FlexBox>
                     </ContentPanelTitle>
                     <ContentPanelBody>
-                        <FlexBox className="col gap" style={{fontSize:"10pt"}}>
+                        <FlexBox col gap style={{fontSize:"10pt"}}>
                             <span style={{fontWeight:"bold"}}>JQ Playground is an envrioment where you can quickly test your jq commands against JSON.</span>
                             <span>There are two inputs in the playground:</span>
                             <ul>
@@ -102,7 +102,7 @@ function HowToJQ(){
                             </div>
                             <div>
                                 <Button variant='outlined' color="info">
-                                    <FlexBox className="gap">
+                                    <FlexBox gap>
                                         <VscArrowRight className="auto-margin" />
                                         <a href="https://stedolan.github.io/jq/manual/">
                                             View JQ Manual
@@ -139,7 +139,7 @@ function ExamplesJQ(props){
                         <ContentPanelTitleIcon>
                             <VscFileCode/>
                         </ContentPanelTitleIcon>
-                        <FlexBox className="gap" style={{ alignItems: "center" }}>
+                        <FlexBox gap style={{ alignItems: "center" }}>
                             <div>
                                 Cheatsheet
                             </div>
@@ -161,7 +161,7 @@ function ExamplesJQ(props){
                                             </td>
                                             <td style={{ width: "20%"}} onClick={()=>loadJQ(obj.filter, obj.json)}>
                                                 <Button variant='outlined' color="info">
-                                                    <FlexBox className="gap">
+                                                    <FlexBox gap>
                                                         <VscFileCode className="auto-margin" />
                                                         <div>
                                                             Load
@@ -188,7 +188,7 @@ function ExamplesJQ(props){
                                             </td>
                                             <td style={{ width: "20%"}} onClick={()=>loadJQ(obj.filter, obj.json)}>
                                                 <Button variant='outlined' color="info">
-                                                    <FlexBox className="gap">
+                                                    <FlexBox gap>
                                                         <VscFileCode className="auto-margin" />
                                                         <div>
                                                             Load
@@ -226,7 +226,7 @@ function JQOutput(props) {
                     <ContentPanelTitleIcon>
                         <VscFileCode/>
                     </ContentPanelTitleIcon>
-                    <FlexBox className="gap" style={{ alignItems: "center" }}>
+                    <FlexBox gap style={{ alignItems: "center" }}>
                         <div>
                             Output
                         </div>
@@ -250,7 +250,7 @@ function JQInput(props) {
                     <ContentPanelTitleIcon>
                         <VscFileCode/>
                     </ContentPanelTitleIcon>
-                    <FlexBox className="gap" style={{ alignItems: "center" }}>
+                    <FlexBox gap style={{ alignItems: "center" }}>
                         <div>
                             Input
                         </div>
@@ -296,7 +296,7 @@ function JQFilter(props) {
                     <ContentPanelTitleIcon>
                         <VscFileCode/>
                     </ContentPanelTitleIcon>
-                    <FlexBox className="gap" style={{ alignItems: "center" }}>
+                    <FlexBox gap style={{ alignItems: "center" }}>
                         <div>
                             JQ Filter
                         </div>

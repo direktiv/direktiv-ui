@@ -13,7 +13,7 @@ import { VscAdd, VscServer } from 'react-icons/vsc';
 
 export default function GlobalRegistriesPanel(){
     return(
-        <FlexBox className="gap wrap" style={{ paddingRight: "8px" }}>
+        <FlexBox gap wrap style={{ paddingRight: "8px" }}>
             <FlexBox  style={{ minWidth: "380px" }}>
                 <GlobalRegistries />
             </FlexBox>
@@ -47,7 +47,7 @@ export function GlobalRegistries(){
                 <ContentPanelTitleIcon>
                     <VscServer />
                 </ContentPanelTitleIcon>
-                <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
+                <FlexBox style={{display:"flex", alignItems:"center"}} gap>
                     <div>
                         Container Registries  
                     </div>
@@ -172,7 +172,7 @@ export function GlobalRegistries(){
                 </div>
             </ContentPanelTitle>
             <ContentPanelBody className="secrets-panel">
-                <FlexBox className="gap col">
+                <FlexBox col gap>
                     <FlexBox>
                         {data !== null ? 
                         <Registries deleteRegistry={deleteRegistry} getRegistries={getRegistries} registries={data}/>
@@ -214,7 +214,7 @@ export function GlobalPrivateRegistries(){
                 <ContentPanelTitleIcon>
                     <VscServer />
                 </ContentPanelTitleIcon>
-                <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
+                <FlexBox style={{display:"flex", alignItems:"center"}} gap>
                     <div>
                         Private Container Registries  
                     </div>
@@ -332,7 +332,7 @@ export function GlobalPrivateRegistries(){
                 </div>
             </ContentPanelTitle>
             <ContentPanelBody className="secrets-panel">
-                <FlexBox className="gap col">
+                <FlexBox col gap>
                     <FlexBox>
                         {data !== null ? 
                         <Registries deleteRegistry={deleteRegistry} getRegistries={getRegistries} registries={data}/>

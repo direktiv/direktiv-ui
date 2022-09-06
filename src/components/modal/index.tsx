@@ -257,7 +257,7 @@ function ModalOverlay({
                     onClose()
                 }
             }}>
-                <FlexBox className="tall">
+                <FlexBox tall>
                     <div style={{ display: "flex", width: "100%", justifyContent: "center", ...modalStyle }} className="modal-body auto-margin" onClick={(e) => {
                         e.stopPropagation()
                     }}>
@@ -289,7 +289,7 @@ function ModalOverlay({
                                 </FlexBox>
                             </ContentPanelTitle>
                             <ContentPanelBody style={{ ...contentBodyStyle, overflow: "auto" }}>
-                                <FlexBox className="col gap">
+                                <FlexBox col gap>
                                     {displayAlert ?
                                         <Alert severity="error" variant="filled" onClose={() => { setDisplayAlert(false) }}>{alertMessage}</Alert>
                                         : <></>}

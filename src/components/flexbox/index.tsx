@@ -1,23 +1,17 @@
 import React, { useMemo } from 'react';
 import './style.css';
 
-export enum FlexBoxGapSize {
-    Medium = "md",
-    SMALL = "sm",
-}
-
-export enum FlexBoxCenterAxis {
-    CENTERY = "y",
-    CENTERX = "x",
-    CENTERXY = "xy",
-}
+type FlexBoxCenterAxis  = "y" | "x" | "xy" | boolean;
+type FlexBoxGapSize  = "md" | "sm" | boolean;
 
 export interface FlexBoxProps extends React.HTMLAttributes<HTMLDivElement> {
     hide?: boolean
     col?: boolean
     row?: boolean
-    gap?: FlexBoxGapSize | boolean
-    center?: FlexBoxCenterAxis | boolean
+    gap?: FlexBoxGapSize
+    center?: FlexBoxCenterAxis
+    tall?: boolean
+    wrap?: boolean
 }
 
 const FlexBox: React.FunctionComponent<FlexBoxProps> = ({
@@ -26,6 +20,8 @@ const FlexBox: React.FunctionComponent<FlexBoxProps> = ({
     row,
     gap,
     center,
+    tall,
+    wrap,
     ...props
 }) => {
     const className = useMemo(() => {
@@ -44,16 +40,25 @@ const FlexBox: React.FunctionComponent<FlexBoxProps> = ({
             clsName += ` row`
         }
 
+        if (tall) {
+            clsName += ` tall`
+        }
+
+        if (wrap) {
+            clsName += ` wrap`
+        }
+
         if (gap) {
             switch (gap) {
                 case true: {
-                    // fallthrough
-                }
-                case FlexBoxGapSize.Medium: {
                     clsName += ` gap-md`
                     break;
                 }
-                case FlexBoxGapSize.SMALL: {
+                case "md": {
+                    clsName += ` gap-md`
+                    break;
+                }
+                case "sm": {
                     clsName += ` gap-sm`
                     break;
                 }
@@ -63,17 +68,18 @@ const FlexBox: React.FunctionComponent<FlexBoxProps> = ({
         if (center) {
             switch (center) {
                 case true: {
-                    // fallthrough
-                }
-                case FlexBoxCenterAxis.CENTERXY: {
                     clsName += ` center`
                     break;
                 }
-                case FlexBoxCenterAxis.CENTERX: {
+                case "xy": {
+                    clsName += ` center`
+                    break;
+                }
+                case "x": {
                     clsName += ` center-x`
                     break;
                 }
-                case FlexBoxCenterAxis.CENTERY: {
+                case "y": {
                     clsName += ` center-y`
                     break;
                 }

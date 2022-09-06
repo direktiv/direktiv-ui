@@ -42,13 +42,13 @@ export default function GlobalServicesPanel(props) {
     }
 
     return (
-        <FlexBox className="gap wrap" style={{paddingRight:"8px"}}>
+        <FlexBox gap wrap style={{paddingRight:"8px"}}>
             <ContentPanel style={{width:"100%"}}>
                 <ContentPanelTitle>
                     <ContentPanelTitleIcon>
                         <VscLayers/>
                     </ContentPanelTitleIcon>
-                    <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
+                    <FlexBox style={{display:"flex", alignItems:"center"}} gap>
                         <div>
                             Services 
                         </div>
@@ -119,12 +119,12 @@ export default function GlobalServicesPanel(props) {
                 </div>
                 </ContentPanelTitle>
                 <ContentPanelBody className="secrets-panel">
-                    <FlexBox className="gap col">
-                        <FlexBox className="col gap">
+                    <FlexBox col gap>
+                        <FlexBox col gap>
                         {data.length === 0 ?
                      <div className="col">
                      <FlexBox style={{ height:"40px", }}>
-                             <FlexBox className="gap" style={{alignItems:"center", paddingLeft:"8px"}}>
+                             <FlexBox gap style={{alignItems:"center", paddingLeft:"8px"}}>
                                  <div style={{fontSize:"10pt", }}>
                                      No services have been created.
                                  </div>

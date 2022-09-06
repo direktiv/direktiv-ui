@@ -256,7 +256,7 @@ export default function MirrorInfoPanel(props) {
                 <ContentPanelTitleIcon>
                     <VscAdd />
                 </ContentPanelTitleIcon>
-                <FlexBox className="gap" style={{ alignItems: "center" }}><span className="hide-600">Mirror</span> Info
+                <FlexBox gap style={{ alignItems: "center" }}><span className="hide-600">Mirror</span> Info
                     <FlexBox style={{ flex: "auto", justifyContent: "right", paddingRight: "6px", alignItems: "unset" }}>
                         <Tippy content={mirrorSettingsValidateMsg} disabled={mirrorSettingsValidateMsg === ""} trigger={'mouseenter focus'} zIndex={10}>
                             <div>                            
@@ -324,7 +324,7 @@ export default function MirrorInfoPanel(props) {
                                         }
                                     ]}
                                 >
-                                    <FlexBox className="col gap" style={{ height: "fit-content" }}>
+                                    <FlexBox col gap style={{ height: "fit-content" }}>
                                         <FlexBox className="col center info-update-label">
                                             The following changes will been made
                                         </FlexBox>
@@ -340,56 +340,56 @@ export default function MirrorInfoPanel(props) {
                                             <></>
                                         }
                                         {infoChangesTracker.url ?
-                                            <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
-                                                <FlexBox className="col gap-sm center-x" style={{}}>
+                                            <FlexBox col gap style={{ paddingRight: "10px" }}>
+                                                <FlexBox col gap="sm" center="x"  style={{}}>
                                                     <span className={`input-title readonly`} >URL</span>
                                                     { infoURL === "" ? <span className={`input-description readonly`}> Warning: URL will be deleted</span> : <></>}
                                                 </FlexBox>
                                                 <input className={`info-input-value readonly`} value={infoURL} />
                                             </FlexBox> : <></>}
                                         {infoChangesTracker.ref ?
-                                            <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
-                                                <FlexBox className="col gap-sm center-x" style={{}}>
+                                            <FlexBox col gap style={{ paddingRight: "10px" }}>
+                                                <FlexBox col gap="sm" center="x"  style={{}}>
                                                     <span className={`input-title readonly`} >Ref</span>
                                                     { infoRef === "" ? <span className={`input-description readonly`}> Warning: Ref will be deleted</span> : <></>}
                                                 </FlexBox>
                                                 <input className={`info-input-value readonly`} value={infoRef} />
                                             </FlexBox> : <></>}
                                         {infoChangesTracker.cron ?
-                                            <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
-                                                <FlexBox className="col gap-sm center-x" style={{}}>
+                                            <FlexBox col gap style={{ paddingRight: "10px" }}>
+                                                <FlexBox col gap="sm" center="x"  style={{}}>
                                                     <span className={`input-title readonly`} >Cron</span>
                                                     { infoCron === "" ? <span className={`input-description readonly`}> Warning: Cron will be deleted</span> : <></>}
                                                 </FlexBox>
                                                 <input className={`info-input-value readonly`} readonly={true} value={infoCron} />
                                             </FlexBox> : <></>}
                                         {infoChangesTracker.passphrase && mirrorAuthMethod === "token" ?
-                                            <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
-                                                <FlexBox className="col gap-sm center-x" style={{}}>
+                                            <FlexBox col gap style={{ paddingRight: "10px" }}>
+                                                <FlexBox col gap="sm" center="x"  style={{}}>
                                                     <span className={`input-title readonly`} >Token</span>
                                                     { infoPassphrase === "" ? <span className={`input-description readonly`}> Warning: Token will be deleted</span> : <></>}
                                                 </FlexBox>
                                                 <textarea className={`info-textarea-value readonly`} readonly={true} rows={5} style={{ width: "100%", resize: "none" }} value={infoPassphrase} />
                                             </FlexBox> : <></>}
                                         {infoChangesTracker.passphrase && mirrorAuthMethod === "ssh" ?
-                                            <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
-                                                <FlexBox className="col gap-sm center-x" style={{}}>
+                                            <FlexBox col gap style={{ paddingRight: "10px" }}>
+                                                <FlexBox col gap="sm" center="x"  style={{}}>
                                                     <span className={`input-title readonly`} >Passphrase</span>
                                                     { infoPassphrase === "" ? <span className={`input-description readonly`}> Warning: Passphrase will be deleted</span> : <></>}
                                                 </FlexBox>
                                                 <input className={`info-input-value readonly`} readonly={true} type="password" value={infoPassphrase} />
                                             </FlexBox> : <></>}
                                         {infoChangesTracker.publicKey && mirrorAuthMethod === "ssh" ?
-                                            <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
-                                                <FlexBox className="col gap-sm center-x" style={{}}>
+                                            <FlexBox col gap style={{ paddingRight: "10px" }}>
+                                                <FlexBox col gap="sm" center="x"  style={{}}>
                                                     <span className={`input-title readonly`} >Public Key</span>
                                                     { infoPublicKey === "" ? <span className={`input-description readonly`}> Warning: Public Key will be deleted</span> : <></>}
                                                 </FlexBox>
                                                 <textarea className={`info-textarea-value readonly`} readonly={true} rows={5} style={{ width: "100%", resize: "none" }} value={infoPublicKey} />
                                             </FlexBox> : <></>}
                                         {infoChangesTracker.privateKey && mirrorAuthMethod === "ssh" ?
-                                            <FlexBox className="col gap" style={{ paddingRight: "10px" }}>
-                                                <FlexBox className="col gap-sm center-x" style={{}}>
+                                            <FlexBox col gap style={{ paddingRight: "10px" }}>
+                                                <FlexBox col gap="sm" center="x"  style={{}}>
                                                     <span className={`input-title readonly`} >Private Key</span>
                                                     { infoPrivateKey === "" ? <span className={`input-description readonly`}> Warning: Private Key will be deleted</span> : <></>}
                                                 </FlexBox>
@@ -403,9 +403,9 @@ export default function MirrorInfoPanel(props) {
                 </FlexBox>
             </ContentPanelTitle>
             <ContentPanelBody style={{ overflow: "auto" }}>
-                <FlexBox className="col gap" style={{ height: "fit-content" }}>
-                    <FlexBox className="col gap-md" style={{ }}>
-                        <FlexBox className="row gap-sm" style={{ justifyContent: "flex-start" }}>
+                <FlexBox col gap style={{ height: "fit-content" }}>
+                    <FlexBox col gap="sm" style={{ }}>
+                        <FlexBox row gap="sm" style={{ justifyContent: "flex-start" }}>
                             <span className={`input-title`}>Authentication Method</span>
                         </FlexBox>
                         <div style={{ width: "100%", paddingRight: "12px", display: "flex" }}>
@@ -424,9 +424,9 @@ export default function MirrorInfoPanel(props) {
                             </select>
                         </div>
                     </FlexBox>
-                    <FlexBox className="col gap-md" style={{ paddingRight: "10px" }}>
-                        <FlexBox className="row" style={{ justifyContent: "space-between" }}>
-                            <FlexBox className="row gap-sm" style={{ justifyContent: "flex-start" }}>
+                    <FlexBox col gap="sm" style={{ paddingRight: "10px" }}>
+                        <FlexBox row style={{ justifyContent: "space-between" }}>
+                            <FlexBox row gap="sm" style={{ justifyContent: "flex-start" }}>
                                 <span className={`input-title ${infoChangesTracker.url ? "edited" : ""}`}>URL</span>
                                 <HelpIcon msg={mirrorSettingInfoMetaInfo["url"].info} />
                             </FlexBox>
@@ -446,9 +446,9 @@ export default function MirrorInfoPanel(props) {
                             })
                         }} placeholder={mirrorSettingInfoMetaInfo["url"].placeholder} />
                     </FlexBox>
-                    <FlexBox className="col gap-md" style={{ paddingRight: "10px" }}>
-                        <FlexBox className="row" style={{ justifyContent: "space-between" }}>
-                            <FlexBox className="row gap-sm" style={{ justifyContent: "flex-start" }}>
+                    <FlexBox col gap="sm" style={{ paddingRight: "10px" }}>
+                        <FlexBox row style={{ justifyContent: "space-between" }}>
+                            <FlexBox row gap="sm" style={{ justifyContent: "flex-start" }}>
                                 <span className={`input-title ${infoChangesTracker.ref ? "edited" : ""}`}>Ref</span>
                                 <HelpIcon msg={mirrorSettingInfoMetaInfo["ref"].info} />
                             </FlexBox>
@@ -468,9 +468,9 @@ export default function MirrorInfoPanel(props) {
                             })
                         }} placeholder={mirrorSettingInfoMetaInfo["ref"].placeholder} />
                     </FlexBox>
-                    <FlexBox className="col gap-md" style={{ paddingRight: "10px" }}>
-                        <FlexBox className="row" style={{ justifyContent: "space-between" }}>
-                            <FlexBox className="row gap-sm" style={{ justifyContent: "flex-start" }}>
+                    <FlexBox col gap="sm" style={{ paddingRight: "10px" }}>
+                        <FlexBox row style={{ justifyContent: "space-between" }}>
+                            <FlexBox row gap="sm" style={{ justifyContent: "flex-start" }}>
                                 <span className={`input-title ${infoChangesTracker.cron ? "edited" : ""}`}>Cron</span>
                                 <HelpIcon msg={mirrorSettingInfoMetaInfo["cron"].info} />
                             </FlexBox>
@@ -494,9 +494,9 @@ export default function MirrorInfoPanel(props) {
                     {/* PERSONAL ACCESS TOKEN Auth Inputs */}
                     {
                         mirrorAuthMethod === "token" ?
-                            <FlexBox className="col gap-md" style={{ paddingRight: "10px" }}>
-                                <FlexBox className="row" style={{ justifyContent: "space-between" }}>
-                                    <FlexBox className="row gap-sm" style={{ justifyContent: "flex-start" }}>
+                            <FlexBox col gap="sm" style={{ paddingRight: "10px" }}>
+                                <FlexBox row style={{ justifyContent: "space-between" }}>
+                                    <FlexBox row gap="sm" style={{ justifyContent: "flex-start" }}>
                                         <span className={`input-title ${infoChangesTracker.passphrase ? "edited" : ""}`}>Token</span>
                                         <HelpIcon msg={mirrorSettingInfoMetaInfo["token"].info} />
                                     </FlexBox>
@@ -522,9 +522,9 @@ export default function MirrorInfoPanel(props) {
                     {
                         mirrorAuthMethod === "ssh" ?
                             <>
-                                <FlexBox className="col gap-md" style={{ paddingRight: "10px" }}>
-                                    <FlexBox className="row" style={{ justifyContent: "space-between" }}>
-                                        <FlexBox className="row gap-sm" style={{ justifyContent: "flex-start" }}>
+                                <FlexBox col gap="sm" style={{ paddingRight: "10px" }}>
+                                    <FlexBox row style={{ justifyContent: "space-between" }}>
+                                        <FlexBox row gap="sm" style={{ justifyContent: "flex-start" }}>
                                             <span className={`input-title ${infoChangesTracker.passphrase ? "edited" : ""}`}>Passphrase</span>
                                             <HelpIcon msg={mirrorSettingInfoMetaInfo["passphrase"].info} />
                                             <HideShowButton show={showPassphrase} setShow={setShowPassphrase} field={"Passphrase"}/>
@@ -545,13 +545,13 @@ export default function MirrorInfoPanel(props) {
                                         })
                                     }} placeholder={passphrasePlaceholder()} />
                                 </FlexBox>
-                                <FlexBox className="col gap-md" style={{ paddingRight: "10px" }}>
-                                    <FlexBox className="row" style={{ justifyContent: "space-between" }}>
-                                        <FlexBox className="row gap-sm" style={{ justifyContent: "flex-start" }}>
+                                <FlexBox col gap="sm" style={{ paddingRight: "10px" }}>
+                                    <FlexBox row style={{ justifyContent: "space-between" }}>
+                                        <FlexBox row gap="sm" style={{ justifyContent: "flex-start" }}>
                                             <span className={`input-title ${infoChangesTracker.publicKey ? "edited" : ""}`}>Public Key</span>
                                             <HelpIcon msg={mirrorSettingInfoMetaInfo["publicKey"].info} />
                                         </FlexBox>
-                                        <FlexBox className="row gap" style={{ justifyContent: "flex-end", gap: "12px" }}>
+                                        <FlexBox row gap style={{ justifyContent: "flex-end", gap: "12px" }}>
                                             <ClientFileUpload
                                                 setFile={(fileData) => {
                                                     setInfoPublicKey(fileData)
@@ -574,7 +574,7 @@ export default function MirrorInfoPanel(props) {
                                                 }}
                                                     zIndex={10}>
                                                     <div className='input-title-button'>
-                                                        <FlexBox className="row gap-sm center" style={{ justifyContent: "flex-end", marginRight: "-6px" }}>
+                                                        <FlexBox center row gap="sm" style={{ justifyContent: "flex-end", marginRight: "-6px" }}>
                                                             <span onClick={(e) => {
                                                             }}>Upload</span>
                                                             <VscCloudUpload />
@@ -599,13 +599,13 @@ export default function MirrorInfoPanel(props) {
                                         })
                                     }} placeholder={publicKeyPlaceholder()} />
                                 </FlexBox>
-                                <FlexBox className="col gap-md" style={{ paddingRight: "10px" }}>
-                                    <FlexBox className="row" style={{ justifyContent: "space-between" }}>
-                                        <FlexBox className="row gap-sm" style={{ justifyContent: "flex-start" }}>
+                                <FlexBox col gap="sm" style={{ paddingRight: "10px" }}>
+                                    <FlexBox row style={{ justifyContent: "space-between" }}>
+                                        <FlexBox row gap="sm" style={{ justifyContent: "flex-start" }}>
                                             <span className={`input-title ${infoChangesTracker.privateKey ? "edited" : ""}`} >Private Key</span>
                                             <HelpIcon msg={mirrorSettingInfoMetaInfo["privateKey"].info} />
                                         </FlexBox>
-                                        <FlexBox className="row gap" style={{ justifyContent: "flex-end", gap: "12px" }}>
+                                        <FlexBox row gap style={{ justifyContent: "flex-end", gap: "12px" }}>
                                             <ClientFileUpload
                                                 setFile={(fileData) => {
                                                     setInfoPrivateKey(fileData)
@@ -628,7 +628,7 @@ export default function MirrorInfoPanel(props) {
                                                 }}
                                                     zIndex={10}>
                                                     <div className='input-title-button'>
-                                                        <FlexBox className="row gap-sm center" style={{ justifyContent: "flex-end", marginRight: "-6px" }}>
+                                                        <FlexBox center row gap="sm" style={{ justifyContent: "flex-end", marginRight: "-6px" }}>
                                                             <span onClick={(e) => {
                                                             }}>Upload</span>
                                                             <VscCloudUpload />

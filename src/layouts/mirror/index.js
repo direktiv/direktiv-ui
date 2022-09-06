@@ -111,11 +111,11 @@ export default function MirrorPage(props) {
         }
 
         setBreadcrumbChildrenRef.current((
-            <FlexBox className="center row gap" style={{ justifyContent: "flex-end", paddingRight: "6px" }}>
+            <FlexBox center row gap style={{ justifyContent: "flex-end", paddingRight: "6px" }}>
                 <Button tooltip={"Sync mirror with remote"} disabledTooltip={"Cannot sync mirror while Writable"} disabled={!isReadOnly} variant="outlined" color="info" onClick={()=>{
                     setSyncVisible(!syncVisible)
                 }}>
-                    <FlexBox className="row center gap-sm">
+                    <FlexBox center row gap="sm">
                         <VscSync />
                         Sync
                     </FlexBox>
@@ -156,7 +156,7 @@ export default function MirrorPage(props) {
                         }
                     ]}
                 >
-                    <FlexBox className="col gap" style={{ paddingTop: "8px" }}>
+                    <FlexBox col gap style={{ paddingTop: "8px" }}>
                         <FlexBox className="col center info-update-label">
                           Fetch and sync mirror with latest content from remote repository?
                         </FlexBox>
@@ -182,7 +182,7 @@ export default function MirrorPage(props) {
                         }
                     }
                 }}>
-                    <FlexBox className="row center gap-sm">
+                    <FlexBox center row gap="sm">
                         {isReadOnly ?
                             <>
 
@@ -234,16 +234,16 @@ export default function MirrorPage(props) {
                         </FlexBox>
                         : <></>
                 }
-                <FlexBox className="col gap" style={{ paddingRight: "8px" }}>
+                <FlexBox col gap style={{ paddingRight: "8px" }}>
                     {/* <BreadcrumbCorner>
                     </BreadcrumbCorner> */}
-                    <FlexBox className="row gap wrap" style={{ flex: "1 1 0%", maxHeight: "65vh" }}>
+                    <FlexBox row gap wrap style={{ flex: "1 1 0%", maxHeight: "65vh" }}>
                         <ContentPanel id={`panel-activity-list`} style={{ flex: 2, width: "100%", minHeight: "60vh", maxHeight: "55vh" }}>
                             <ContentPanelTitle>
                                 <ContentPanelTitleIcon>
                                     <VscAdd />
                                 </ContentPanelTitleIcon>
-                                <FlexBox className="gap" style={{ alignItems: "center" }}>Activity List</FlexBox>
+                                <FlexBox gap style={{ alignItems: "center" }}>Activity List</FlexBox>
                             </ContentPanelTitle>
                             <ContentPanelBody style={{ overflow: "auto" }}>
                                 <FlexBox style={{ flexShrink: "1", height: "fit-content" }}>
@@ -259,7 +259,7 @@ export default function MirrorPage(props) {
                             <ContentPanelTitleIcon>
                                 <VscAdd />
                             </ContentPanelTitleIcon>
-                            <FlexBox className="gap" style={{ alignItems: "center" }}>Activity Logs</FlexBox>
+                            <FlexBox gap style={{ alignItems: "center" }}>Activity Logs</FlexBox>
                         </ContentPanelTitle>
                         <ContentPanelBody>
                             <ActivityLogs activity={activity} namespace={namespace} setErrorMsg={setErrorMsg} />
@@ -277,7 +277,7 @@ export function MirrorReadOnlyBadge(props) {
         <Tippy content={`This mirrors contents are currently read-only. This can be unlocked in mirror setttings`} trigger={'mouseenter focus'} zIndex={10}>
             <div>
                 <Button variant="contained" color="info" disabled style={{ borderRadius:"20px" }}>
-                    <FlexBox className="row center gap-sm">
+                    <FlexBox center row gap="sm">
                         <VscLock />ReadOnly
                     </FlexBox>
                 </Button>
@@ -299,7 +299,7 @@ export function MirrorWritableBadge(props) {
                         borderRadius:"20px"
                     }
                 }}>
-                    <FlexBox className="row center gap-sm">
+                    <FlexBox center row gap="sm">
                         <VscUnlock />Writable
                     </FlexBox>
                 </Button>

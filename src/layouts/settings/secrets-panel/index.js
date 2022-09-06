@@ -31,7 +31,7 @@ function SecretsPanel(props){
                 <ContentPanelTitleIcon>
                     <VscLock />
                 </ContentPanelTitleIcon>
-                <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
+                <FlexBox style={{display:"flex", alignItems:"center"}} gap>
                     <div>
                         Secrets
                     </div>
@@ -113,7 +113,7 @@ function SecretsPanel(props){
                     <div style={{width: "100%", paddingRight: "12px", display: "flex"}}>
                     <input value={keyValue} onChange={(e)=>setKeyValue(e.target.value)} autoFocus placeholder="Enter key" />
                     </div>
-                    <FlexBox id="file-picker" className="gap">
+                    <FlexBox id="file-picker" gap>
                         <SecretFilePicker file={file} setFile={setFile} id="add-secret-panel"/>
                     </FlexBox>
                 </FlexBox>
@@ -123,7 +123,7 @@ function SecretsPanel(props){
                 </div>
             </ContentPanelTitle>
             <ContentPanelBody className="secrets-panel">
-                <FlexBox className="gap col">
+                <FlexBox col gap>
                     <FlexBox className="secrets-list"> 
                     {data !== null ? 
                         <Secrets deleteSecret={deleteSecret} getSecrets={getSecrets} secrets={data}  />: ""}
@@ -168,7 +168,7 @@ function Secrets(props) {
     const {secrets, deleteSecret, getSecrets} = props
 
     return <>
-        <FlexBox className="col gap" style={{ maxHeight: "236px", overflowY: "auto" }}>
+        <FlexBox col gap style={{ maxHeight: "236px", overflowY: "auto" }}>
                 {secrets.length === 0 ?
                          <FlexBox className="secret-tuple empty-content" >
                          <FlexBox className="key">No secrets are stored...</FlexBox>
@@ -226,7 +226,7 @@ function Secrets(props) {
                                         ]
                                     }   
                                 >
-                                    <FlexBox className="col gap">
+                                    <FlexBox col gap>
                                         <FlexBox >
                                             Are you sure you want to delete '{obj.name}'?
                                             <br/>
@@ -254,13 +254,13 @@ function AddSecretPanel(props) {
     const {keyValue, vValue, setKeyValue, setVValue} = props
 
     return (
-        <FlexBox className="col gap" style={{fontSize: "12px", width: "400px"}}>
-            <FlexBox className="gap">
+        <FlexBox col gap style={{fontSize: "12px", width: "400px"}}>
+            <FlexBox gap>
                 <FlexBox>
                     <input value={keyValue} onChange={(e)=>setKeyValue(e.target.value)} autoFocus placeholder="Enter key" />
                 </FlexBox>
             </FlexBox>
-            <FlexBox className="gap" style={{minHeight:"250px"}}>
+            <FlexBox gap style={{minHeight:"250px"}}>
                 <FlexBox style={{overflow:"hidden"}}>
                     <AutoSizer>
                         {({height, width})=>(

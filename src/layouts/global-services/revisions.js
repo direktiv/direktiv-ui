@@ -55,8 +55,8 @@ export default function GlobalRevisionsPanel(props){
     }
 
     return (
-        <FlexBox className="gap wrap" style={{paddingRight:"8px"}}>
-            <FlexBox  className="gap">
+        <FlexBox gap wrap style={{paddingRight:"8px"}}>
+            <FlexBox  gap>
                     <FlexBox>
                         <ContentPanel style={{width:"100%"}}>
                         <ContentPanelTitle>
@@ -134,8 +134,8 @@ export default function GlobalRevisionsPanel(props){
                         </div>
                         </ContentPanelTitle>
                             <ContentPanelBody className="secrets-panel">
-                                <FlexBox className="gap col">
-                                    <FlexBox className="col gap">
+                                <FlexBox col gap>
+                                    <FlexBox col gap>
                                         {
                                             revisions.sort((a, b)=> (a.created > b.created) ? -1 : 1).map((obj, key)=>{
                                             let dontDelete = false

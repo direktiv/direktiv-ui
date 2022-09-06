@@ -95,7 +95,7 @@ function NamespaceNavigation(props){
             <FlexBox className="breadcrumbs-row">
                 { namespace? <Breadcrumbs namespace={namespace} additionalChildren={breadcrumbChildren}/> :<></>}
             </FlexBox>
-            <FlexBox className="col" style={{paddingBottom: "8px"}}>
+            <FlexBox col style={{paddingBottom: "8px"}}>
                 {namespaces !== null ? 
                 <Routes>
                     <Route path="/" element={

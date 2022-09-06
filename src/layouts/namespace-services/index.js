@@ -24,7 +24,7 @@ export default function ServicesPanel(props) {
         return <></>
     }
     return(
-        <FlexBox className="gap wrap" style={{paddingRight:"8px"}}>
+        <FlexBox gap wrap style={{paddingRight:"8px"}}>
             <NamespaceServices namespace={namespace}/>
         </FlexBox>
     )
@@ -34,17 +34,17 @@ export function ServiceCreatePanel(props) {
     const {name, setName, image, setImage, scale, setScale, size, setSize, cmd, setCmd, maxScale} = props
 
     return(
-        <FlexBox className="col gap" style={{fontSize: "12px"}}>
-                <FlexBox className="col gap">
-                    <FlexBox className="col" style={{paddingRight:"10px"}}>
+        <FlexBox col gap style={{fontSize: "12px"}}>
+                <FlexBox col gap>
+                    <FlexBox col style={{paddingRight:"10px"}}>
                         Name
                         <input value={name} onChange={(e)=>setName(e.target.value)} placeholder="Enter name for service" />
                     </FlexBox>
-                    <FlexBox className="col" style={{paddingRight:"10px"}}>
+                    <FlexBox col style={{paddingRight:"10px"}}>
                         Image
                         <input value={image} onChange={(e)=>setImage(e.target.value)} placeholder="Enter an image name" />
                     </FlexBox>
-                    <FlexBox className="col" style={{paddingRight:"10px"}}>
+                    <FlexBox col style={{paddingRight:"10px"}}>
                         Scale
                         <Tippy content={scale} trigger={"mouseenter click"}>
                             <input type="range" style={{paddingLeft:"0px"}} min={"0"} max={maxScale.toString()} value={scale.toString()} onChange={(e)=>setScale(e.target.value)} />
@@ -54,7 +54,7 @@ export function ServiceCreatePanel(props) {
                             <option style={{flex:"auto", textAlign:"right", lineHeight:"10px", paddingRight:"5px" }} value={maxScale} label={maxScale}/>
                         </datalist>
                     </FlexBox>
-                    <FlexBox className="col" style={{paddingRight:"10px"}}>
+                    <FlexBox col style={{paddingRight:"10px"}}>
                         Size
                         <input list="sizeMarks" style={{paddingLeft:"0px"}} type="range" min={"0"} value={size.toString()}  max={"2"} onChange={(e)=>setSize(e.target.value)}/>
                         <datalist style={{display:"flex", alignItems:'center'}} id="sizeMarks">
@@ -63,7 +63,7 @@ export function ServiceCreatePanel(props) {
                             <option style={{flex:"auto", textAlign:"right", lineHeight:"10px" }} value="2" label="large"/>
                         </datalist>
                     </FlexBox>
-                    <FlexBox className="col" style={{paddingRight:"10px"}}>
+                    <FlexBox col style={{paddingRight:"10px"}}>
                         CMD
                         <input value={cmd} onChange={(e)=>setCmd(e.target.value)} placeholder="Enter the CMD for a service" />
                     </FlexBox>
@@ -113,7 +113,7 @@ function NamespaceServices(props) {
                 <ContentPanelTitleIcon>
                     <VscLayers/>
                 </ContentPanelTitleIcon>
-                <FlexBox style={{display:"flex", alignItems:"center"}} className="gap">
+                <FlexBox style={{display:"flex", alignItems:"center"}} gap>
                             <div>
                                 Services 
                             </div>
@@ -189,12 +189,12 @@ function NamespaceServices(props) {
             </div>
             </ContentPanelTitle>
             <ContentPanelBody className="secrets-panel">
-                <FlexBox className="gap col">
-                    <FlexBox className="col gap">
+                <FlexBox col gap>
+                    <FlexBox col gap>
                         {data.length === 0 ?
                         <div className="col">
                         <FlexBox style={{ height:"40px", }}>
-                                <FlexBox className="gap" style={{alignItems:"center", paddingLeft:"8px"}}>
+                                <FlexBox gap style={{alignItems:"center", paddingLeft:"8px"}}>
                                     <div style={{fontSize:"10pt", }}>
                                         No services have been created.
                                     </div>
@@ -231,7 +231,7 @@ export function Service(props) {
         <div className="col" style={{minWidth: "300px"}}>
             <FlexBox style={{ height:"40px", border:"1px solid #f4f4f4", backgroundColor:"#fcfdfe"}}>
                 <Link to={url} style={{ width: "100%", display: "flex", alignItems: "center" }}>
-                    <FlexBox className="gap" style={{alignItems:"center", paddingLeft:"8px"}}>
+                    <FlexBox gap style={{alignItems:"center", paddingLeft:"8px"}}>
                         <ServiceStatus status={status} />
                         <div style={{fontWeight:"bold"}}>
                             {name}
@@ -298,7 +298,7 @@ export function Service(props) {
                             }
                         ]}
                     >
-                        <FlexBox className="col gap">
+                        <FlexBox col gap>
                             <FlexBox >
                                 Are you sure you want to delete '{name}'?
                                 <br/>
@@ -415,12 +415,12 @@ function Condition(props){
 
     return (
         <li style={{ display: "flex", gap: "8px" }}>
-            <FlexBox className="col">
-                <FlexBox className="gap">
+            <FlexBox col>
+                <FlexBox gap>
                     <div>
                         <ServiceStatus status={status}/>
                     </div>
-                    <FlexBox className="gap">
+                    <FlexBox gap>
                         <FlexBox>
                             {name}
                         </FlexBox>

@@ -53,14 +53,14 @@ function NamespaceSelector(props) {
     return (
         <div ref={wrapperRef} style={{width: "100%"}}>
             {(!!namespace) &&
-                <FlexBox className="col gap">
+                <FlexBox col gap>
                     <FlexBox onClick={() => {
                         setShowSelector(!showSelector)
                     }} style={{...style, maxHeight: "64px"}} className={className + " ns-hover"}>
 
                         <FlexBox className={namespaceSelectorClass}>
                             <NamespaceListItem disabled namespace={namespace} label="ACTIVE NAMESPACE" loading={loading} />
-                            <FlexBox className="tall">
+                            <FlexBox tall>
                                 <div className="auto-margin grey-text">
                                     <VscChevronDown className={chevronClass} style={{ marginTop: "8px" }} />
                                 </div>
@@ -105,14 +105,14 @@ function NamespaceListItem(props) {
     return (
         <NamespaceListItemLink disabled={disabled} namespace={namespace} setShowSelector={setShowSelector}>
             <FlexBox className={className} style={{height: "45px", minHeight: "44px", maxHeight: "45px"}}>
-                <FlexBox className="">
+                <FlexBox >
                     <FlexBox className="namespace-selector-logo">
                         <div className="auto-margin" style={{paddingTop: "3px", marginLeft: "3px", filter: "opacity(60%)"}}>
                             <Identicon string={namespace} size={39} />
                         </div>
                     </FlexBox>
                     
-                    <FlexBox className="col">
+                    <FlexBox col>
                      {namespace.length > 15 ? 
                      <Tippy content={namespace}>
                      <div className="auto-margin" style={{marginLeft: "8px"}}>

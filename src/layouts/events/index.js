@@ -49,14 +49,14 @@ function EventsPage(props) {
     let {eventHistory, eventListeners, eventListenersPageInfo, eventHistoryPageInfo, sendEvent, replayEvent} = useEvents(Config.url, true, namespace, localStorage.getItem("apikey"), {listeners: [listenersPageHandler.pageParams], history: [historyPageHandler.pageParams]})
     return (
         <>
-            <FlexBox className="gap col" style={{ paddingRight: "8px" }}>
+            <FlexBox col gap style={{ paddingRight: "8px" }}>
                 <FlexBox>
                     <ContentPanel style={{ width: "100%" }}>
                         <ContentPanelTitle>
                             <ContentPanelTitleIcon>
                                 <VscCloud />
                             </ContentPanelTitleIcon>
-                            <FlexBox style={{ display: "flex", alignItems: "center" }} className="gap">
+                            <FlexBox style={{ display: "flex", alignItems: "center" }} gap>
                                 <div>
                                     Cloud Events History
                                 </div>
@@ -65,7 +65,7 @@ function EventsPage(props) {
                             <SendEventModal sendEvent={sendEvent} />
                         </ContentPanelTitle>
                         <ContentPanelBody>
-                            <FlexBox className="col" style={{ justifyContent: "space-between" }}>
+                            <FlexBox col style={{ justifyContent: "space-between" }}>
                                 <div style={{ maxHeight: "40vh", overflowY: "auto", fontSize: "12px", minWidth: "100%" }}>
                                     <table className="cloudevents-table" style={{ minWidth: "440px", width: "100%" }}>
                                         <thead>
@@ -173,7 +173,7 @@ function EventsPage(props) {
                                                                             }
                                                                         ]}
                                                                     >
-                                                                        <FlexBox className="col" style={{ overflow: "hidden" }}>
+                                                                        <FlexBox col style={{ overflow: "hidden" }}>
                                                                             <AutoSizer>
                                                                                 {({ height, width }) => (
                                                                                     <DirektivEditor noBorderRadius value={atob(obj.cloudevent)} readonly={true} dlang="plaintext"
@@ -199,7 +199,7 @@ function EventsPage(props) {
                                         }
                                     </table>
                                 </div>
-                                <FlexBox className="row" style={{justifyContent:"flex-end", paddingBottom:"1em", flexGrow: 0}}>
+                                <FlexBox row style={{justifyContent:"flex-end", paddingBottom:"1em", flexGrow: 0}}>
                                     <Pagination pageHandler={historyPageHandler} pageInfo={eventHistoryPageInfo} />
                                 </FlexBox>
                             </FlexBox>
@@ -212,7 +212,7 @@ function EventsPage(props) {
                             <ContentPanelTitleIcon>
                                 <VscDebugStepInto />
                             </ContentPanelTitleIcon>
-                            <FlexBox style={{ display: "flex", alignItems: "center" }} className="gap">
+                            <FlexBox style={{ display: "flex", alignItems: "center" }} gap>
                                 <div>
                                     Active Event Listeners
                                 </div>
@@ -220,7 +220,7 @@ function EventsPage(props) {
                             </FlexBox>
                         </ContentPanelTitle>
                         <ContentPanelBody>
-                            <FlexBox className="col" style={{ justifyContent: "space-between" }}>
+                            <FlexBox col style={{ justifyContent: "space-between" }}>
                                 <div style={{ maxHeight: "40vh", overflowY: "auto", fontSize: "12px" }}>
                                     <table className="event-listeners-table" style={{ width: "100%" }}>
                                         <thead>
@@ -276,7 +276,7 @@ function EventsPage(props) {
                                         }
                                     </table>
                                 </div>
-                                <FlexBox className="row" style={{justifyContent:"flex-end", paddingBottom:"1em", flexGrow: 0}}>
+                                <FlexBox row style={{justifyContent:"flex-end", paddingBottom:"1em", flexGrow: 0}}>
                                     <Pagination pageHandler={listenersPageHandler} pageInfo={eventListenersPageInfo} />
                                 </FlexBox>
                             </FlexBox>
@@ -332,7 +332,7 @@ function SendEventModal(props) {
             ]}
             noPadding
         >
-            <FlexBox className="col gap" style={{overflow: "hidden"}}>
+            <FlexBox col gap style={{overflow: "hidden"}}>
                 <FlexBox style={{ minHeight: "40vh", minWidth: "70vw" }}>
                     <AutoSizer>
                         {({height, width})=>(
