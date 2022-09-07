@@ -2,9 +2,16 @@ import React from 'react';
 import FlexBox from '../flexbox';
 
 export interface InvalidWorkflowProps {
-    invalidWorkflow?: string | null
+    /**
+    * Invalid workflow error message
+    */
+    invalidWorkflow?: string | null;
 }
 
+/**
+* UI Component card used for displaying error messages thrown while interfacing with invalid workflow.
+* Is only rendered if invalidWorkflow is not null.
+*/
 function InvalidWorkflow({ invalidWorkflow }: InvalidWorkflowProps) {
     return (
         <>

@@ -5,12 +5,27 @@ import 'tippy.js/dist/tippy.css'
 import './style.css';
 
 export interface HideShowButtonProps {
+    /**
+    * Sets field name that will be used on tooltip.
+    */
     field: string
+    /**
+    * z-index of component.
+    */
     zIndex: number
+    /**
+    * If button is currenlty is show or hide state.
+    */
     show: boolean
+    /**
+    * OnClick callback to set show state. The show state should be declared on the parent.
+    */
     setShow?: React.Dispatch<React.SetStateAction<boolean>>
 }
 
+/**
+* Simple Hide/Show button that can be used for input fields with sensitive data.
+*/
 function HideShowButton({field = "field", zIndex = 10, show = false, setShow}: HideShowButtonProps) {
     return (
         <>

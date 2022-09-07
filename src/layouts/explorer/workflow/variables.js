@@ -476,7 +476,7 @@ function VariablesDownloadButton(props) {
     const {onClick} = props
 
     return (
-        <Button onClick={onClick} auto={true} variant={"text"} color={"info"}>
+        <Button onClick={onClick} auto variant={"text"} color={"info"}>
             <VscCloudDownload/>
         </Button>
     )

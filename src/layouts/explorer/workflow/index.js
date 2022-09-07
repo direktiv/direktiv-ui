@@ -324,7 +324,7 @@ function WorkingRevision(props) {
                 {tabBtn === 0 ?
                     <FlexBox col style={{ overflow: "hidden" }}>
                         <FlexBox>
-                            <DirektivEditor saveFn={saveFn} style={{borderRadius: "0px"}} dlang="yaml" value={workflow} dvalue={oldWf} setDValue={setWorkflow} disableBottomRadius={true}/>
+                            <DirektivEditor saveFn={saveFn} style={{borderRadius: "0px"}} dlang="yaml" value={workflow} dvalue={oldWf} setDValue={setWorkflow}/>
                         </FlexBox>
                         <FlexBox className="gap editor-footer">
                             <WorkingRevisionErrorBar errors={errors} showErrors={showErrors}/>

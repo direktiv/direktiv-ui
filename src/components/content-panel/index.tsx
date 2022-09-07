@@ -3,13 +3,23 @@ import FlexBox from '../flexbox';
 import './style.css';
 
 export interface ContentPanelProps extends React.HTMLAttributes<HTMLDivElement> {
+    /**
+    * If true, expand to available space when inside a flex container by setting flex-grow to 1 
+    */
     grow?: boolean
 }
 
-const ContentPanel: React.FunctionComponent<ContentPanelProps> = ({
+/**
+* Primary "card" designed container used in direktiv UI. This component "ContentPanel" has four children jsx items used to structure its contents.
+* * ContentPanelTitle - Header bar of container used for title.
+* * ContentPanelTitleIcon - Child Item of ContentPanelTitle and is used for icons in the Header.
+* * ContentPanelBody - Main body of content.
+* * ContentPanelFooter - Footer bar of container.
+*/
+function ContentPanel({
     grow = false,
     ...props
-}) => {
+}: ContentPanelProps) {
     return (
         <div 
         {...props} style={{ display: "flex", flexDirection: "column", flexGrow: grow ? "1" : undefined, ...props.style}} className={`content-panel-parent opaque ${props.className ? props.className : ""}`}/>

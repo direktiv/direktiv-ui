@@ -9,11 +9,12 @@ export interface ButtonProps extends MUIButtonProps {
     asyncDisable?: boolean;
     auto?: boolean;
     disableShadows?: boolean;
+    loading?: boolean; // ???
 }
 
 const DirektivButton = styled(MUIButton, {
     shouldForwardProp: (prop) => prop !== 'success',
-})<ButtonProps>(({ theme, color, size, auto, variant, disabledTooltip, disabled, disableShadows }) => ({
+})<ButtonProps>(({ theme, color, size, auto, variant, disabledTooltip, disabled, disableShadows, loading }) => ({
     // Defaults
     textTransform: "none",
     fontSize: "0.8rem",
