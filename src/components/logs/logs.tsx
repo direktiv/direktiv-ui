@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import { createContext, CSSProperties, forwardRef, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { VscCopy, VscEye, VscEyeClosed, VscInbox, VscLayers, VscWholeWord, VscWordWrap } from "react-icons/vsc";
+import utc from "dayjs/plugin/utc";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { VariableSizeList } from "react-window";
 import { copyTextToClipboard } from "../../util";
@@ -8,13 +9,29 @@ import Button from "../button";
 import FlexBox from "../flexbox";
 import "./style.css";
 
+dayjs.extend(utc)
 export interface LogsProps {
     logItems?: LogItem[]
+    /**
+    * Enables word wrapping on log lines
+    */
     wordWrap: boolean
+    /**
+    * If enabled, scrolls to bottom of list
+    */
     autoScroll: boolean
-    setAutoScroll: React.Dispatch<React.SetStateAction<boolean>> | null
-    overrideNoDataMsg: string
-    overrideLoadingMsg: string
+    /**
+    * React Set State for autoscroll. This is used for setting autoScroll to false when user scrolls up.
+    */
+    setAutoScroll?: React.Dispatch<React.SetStateAction<boolean>>
+    /**
+    * Message to display when logItems is length of 0
+    */
+    overrideNoDataMsg?: string
+    /**
+    * Message to display when logItems is undefined
+    */
+    overrideLoadingMsg?: string
 }
 
 export interface LogItem {
@@ -26,8 +43,11 @@ export const DynamicListContext = createContext<
     Partial<{ setSize: (index: number, size: number) => void }>
 >({});
 
-
-export default function Logs({ logItems, wordWrap, autoScroll, setAutoScroll, overrideLoadingMsg, overrideNoDataMsg }: LogsProps) {
+/**
+* Logs component that only renders the visible log items of a list. 
+* Supports auto scrolling to bottom as logs change, and word wrapping.
+*/
+function Logs({ logItems, wordWrap = false, autoScroll = false, setAutoScroll, overrideLoadingMsg, overrideNoDataMsg }: LogsProps) {
     const listRef = useRef<VariableSizeList | null>(null);
 
     const sizeMap = useRef<{ [key: string]: number }>({});
@@ -133,12 +153,14 @@ export default function Logs({ logItems, wordWrap, autoScroll, setAutoScroll, ov
     )
 }
 
+export default Logs
+
 interface ListRowProps {
     index: number;
     width: number;
     data: LogItem[];
     style: CSSProperties;
-    wordWrap: boolean
+    wordWrap?: boolean
 }
 
 const innerElementType = forwardRef(({ style, ...rest }: any, ref) => (

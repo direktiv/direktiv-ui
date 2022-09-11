@@ -11,8 +11,15 @@ import Identicon from 'react-identicons';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 
+/**
+* Interactable expandable list of available namespaces to select current namespace. List namespaces are links
+* and the parent should handle the state of namespace be extracting it from the route. 
+* * Props
+*   * namespace: Currently selected namespace. This value is handled by the parent and based on the current route.
+*   * namespaces: Array of available namespaces.
+*/
 function NamespaceSelector(props) {
-    let {style, className, namespaces, namespace, toggleResponsive} = props;
+    let {style, className, namespaces, namespace} = props;
     const [showSelector, setShowSelector] = useState(false);
     const wrapperRef = useRef(null);
     useOutsideCallback(wrapperRef, showSelector ? ()=>{
@@ -70,7 +77,7 @@ function NamespaceSelector(props) {
                     <FlexBox className={selectorBorderClass}>
                     <FlexBox className={selectorClass}>
                         {namespaces !== null ?
-                        <NamespaceList toggleResponsive={toggleResponsive} setShowSelector={setShowSelector} namespaces={namespaces}/>:""}
+                        <NamespaceList setShowSelector={setShowSelector} namespaces={namespaces}/>:""}
                     </FlexBox>
                     </FlexBox>
                 </FlexBox>

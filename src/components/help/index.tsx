@@ -5,10 +5,19 @@ import 'tippy.js/dist/tippy.css'
 import './style.css';
 
 export interface HelpIconProps {
+    /**
+    * Tooltip message.
+    */
     msg: string
+    /**
+    * z-index of component.
+    */
     zIndex: number
 }
 
+/**
+* Simple Help Icon that will display a message as a tooltip on hover.
+*/
 function HelpIcon({ msg = "No help text provided", zIndex = 10}: HelpIconProps) {
     return (
         <>

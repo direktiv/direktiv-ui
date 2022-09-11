@@ -260,31 +260,69 @@ const cobalt = {
 }
 
 export interface DirektivEditorProps extends React.HTMLAttributes<HTMLDivElement> {
+  /**
+  * Callback function for CRTL+S shortcut is pressed when editor is in focus. 
+  */
   saveFn?: () => void
+  /**
+  * Removes border radius of editor component.
+  */
   noBorderRadius?: boolean
+  /**
+  * Additional Monaco Editor options
+  */
   options?: EditorProps
+  /**
+  * Default value for editor to display.
+  */
   dvalue: EditorProps["defaultValue"]
+  /**
+  * Monaco supported Language for editor to use. Example: 'json', 'yaml'
+  */
   dlang: string
+  /**
+  * Value of editor's content.
+  */
   value: EditorProps["value"]
+  /**
+  * Editor Height. Editor height is calculated by subtracting 18 to this value.
+  */
   height?: number
+  /**
+  * Editor Width.
+  */
   width?: number
   setDValue?: React.Dispatch<React.SetStateAction<string>>
+  /**
+  * Sets editor to Read Only mode.
+  */
   readonly?: boolean
+  /**
+  * Toggle editor validation on value.
+  */
   validate?: boolean
+  /**
+  * Toggles minimap in editor.
+  */
   minimap?: boolean
 }
 
 // DirektivEditor - Eidtor Component
 // Note: width and height must not have unit suffix. e.g. 400=acceptable, 400% will not work
 // TODO: Support multiple width/height unit
-export default function DirektivEditor({
+
+/**
+* Logs component that only renders the visible log items of a list. 
+* Supports auto scrolling to bottom as logs change, and word wrapping.
+*/
+function DirektivEditor({
     saveFn,
     noBorderRadius,
     options,
     dvalue,
     dlang = "json",
     value,
-    height,
+    height = 400,
     width,
     setDValue,
     readonly,
@@ -374,3 +412,5 @@ export default function DirektivEditor({
       </div>
     )
 }
+
+export default DirektivEditor
