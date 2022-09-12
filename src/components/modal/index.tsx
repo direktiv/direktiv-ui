@@ -13,15 +13,35 @@ import 'tippy.js/dist/tippy.css';
 import Button, { ButtonProps } from '../button';
 
 export interface RequiredField {
+    /**
+    * Tooltip to display if field is invalid.
+    */
     tip: string;
-    value: string;
+    /*
+    * Value to validate. Will be set as invalid if null, undefined or a empty string.
+    */
+    value?: any;
+    /**
+    * If set will be used instead of value to validate. Will be set to invalid if condition is false.
+    */
+    condition?: boolean;
 }
 
 export interface ModalHeadlessProps extends ModalOverlayProps {
+    /**
+    * State on whether modal is currently visible.
+    */
     visible?: boolean
+    /**
+    * Set State on whether modal is currently visible.
+    */
     setVisible: (visible: boolean) => any
 }
 
+
+/**
+* Modal component were the visibility state is managed externally in the parents state.
+*/
 export function ModalHeadless({
     visible,
     setVisible,
@@ -47,13 +67,28 @@ export function ModalHeadless({
 }
 
 export interface ModalProps extends ModalHeadlessProps {
-    button?: boolean
+    /**
+    * Button React Node that will open Modal on click.
+    */
+    button?: React.ReactNode
+    /**
+    * Button Props for `button` React Node that will open Modal on click.
+    */
     buttonProps?: ButtonProps
+    /**
+    * Disables Modal open button.
+    */
     buttonDisabled?: boolean
-    label: string
+    /**
+    * If no button is passed to Modal props, a button will automatically be created containing this label.
+    */
+    label?: string
 }
 
 
+/**
+* Modal component were the visibility state is managed by a child button component.
+*/
 function Modal({
     button,
     buttonProps,
@@ -102,20 +137,61 @@ function Modal({
 export default Modal;
 
 export interface ModalOverlayProps {
+    /**
+    * Maximise Modal width and height.
+    */
     maximised?: boolean
+    /**
+    * Remove padding from Modal overlay.
+    */
     noPadding?: boolean
+    /**
+    * Icon that will be placed in the Modal's header
+    */
     titleIcon?: React.ReactNode
+    /**
+    * Title label that will be placed in the Modal's header
+    */
     title: string
-    children?: boolean
+    /**
+    * Children of Modal overlay.
+    */
+    children?: React.ReactNode
+    /**
+    * Automatically add close button to Modal header.
+    */
     withCloseButton?: boolean
+    /**
+    * TODO
+    */
     activeOverlay?: boolean
+    /**
+    * CSS Properties to be applied to modal element.
+    */
     modalStyle?: React.CSSProperties
+    /**
+    * Listen for escape keypress, and close modal when pressed.
+    */
     escapeToCancel?: boolean
+    /**
+    * Required fields to validate. To be used in conjunction with `actionButtons` validate `property`.
+    */
     requiredFields?: RequiredField[]
+    /**
+    * Function that runs when Modal opens.
+    */
     onOpen: (...e: any) => any
+    /**
+    * Function that runs when Modal closes.
+    */
     onClose: (...e: any) => any
-
+    /**
+    * Buttons that will be added to Modal footer.
+    */
     actionButtons?: ButtonDefinition[]
+    /**
+    * Key down event listners on Modal.
+    */
     keyDownActions?: KeyDownDefinition[]
 }
 
@@ -144,7 +220,21 @@ function ModalOverlay({
 
         for (let i = 0; i < reqFields.length; i++) {
             const rField = reqFields[i];
-            if (rField.value === null || rField.value === "") {
+            if (rField.condition !== undefined) {
+                if (!rField.condition) {
+                    tipMessages.push(rField.tip)
+                }
+                continue
+            }
+
+            // Check if value is set
+            if (!rField.value === null || rField.value === undefined) {
+                tipMessages.push(rField.tip)
+                continue
+            }
+
+            const rFieldType = typeof rField.value
+            if (rFieldType === "string" &&  rField.value === ""){
                 tipMessages.push(rField.tip)
             }
         }
@@ -328,9 +418,21 @@ function ModalOverlay({
 // }
 
 export interface KeyDownDefinition {
+    /**
+    * Key code for add event listener that will trigger `fn`.
+    */
     code: string,
+    /**
+    * Function that runs when action key is press.
+    */
     fn: (...e: any) => any
+    /**
+    * Callback function to run if fn throws an error.
+    */
     errFunc: (...e: any) => any
+    /**
+    * Closes modal on key down.
+    */
     closeModal?: boolean
     id?: string
 }
@@ -350,11 +452,29 @@ export interface KeyDownDefinition {
 // }
 
 export interface ButtonDefinition {
+    /**
+    * Label to be placed in action button.
+    */
     label: string
+    /**
+    * Function that runs when action button is clicked.
+    */
     onClick?: (...e: any) => any
-    buttonProps: ButtonProps
+    /**
+    * Button Props for this action button.
+    */
+    buttonProps?: ButtonProps
+    /**
+    * Callback function to run if onClick throws an error.
+    */
     errFunc?: (...e: any) => any
+    /**
+    * Closes modal on click.
+    */
     closesModal?: boolean
+    /**
+    * If true, button will be disabled if any modal required fields are invalid.
+    */
     validate?: boolean
 }
 

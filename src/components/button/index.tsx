@@ -4,10 +4,22 @@ import { styled } from '@mui/material/styles';
 import * as React from 'react';
 
 export interface ButtonProps extends MUIButtonProps {
+    /**
+    * Tooltip to show on hover.
+    */
     tooltip?: string;
+    /**
+    * Tooltip to show on hover when disabled is true. If unset, disabled tooltip will default to tooltip.
+    */
     disabledTooltip?: string;
     asyncDisable?: boolean;
+    /**
+    *Auto expand height and width.
+    */
     auto?: boolean;
+    /**
+    * Disables shadows on button.
+    */
     disableShadows?: boolean;
     loading?: boolean; // ???
 }
@@ -85,7 +97,7 @@ const DirektivButton = styled(MUIButton, {
     }),
 }));
 
-export default function Button(props: ButtonProps) {
+function Button(props: ButtonProps) {
     const [isOnClick, setIsOnClick] = React.useState(false)
     const tooltipText = React.useMemo(()=>{
         const disabled = isOnClick || props.disabled
@@ -102,7 +114,7 @@ export default function Button(props: ButtonProps) {
 
     return (
         <Tooltip title={tooltipText} placement="top" arrow>
-            <DirektivButton variant="contained" color="primary" disableRipple disabled={isOnClick} size="small" {...props} onClick={async (e) => {
+            <DirektivButton variant="contained" color="primary" disableRipple size="small" {...props} disabled={isOnClick || props.disabled} onClick={async (e) => {
                 if (props.onClick === undefined) {
                     return
                 }
@@ -122,3 +134,5 @@ export default function Button(props: ButtonProps) {
         </Tooltip>
     )
 }
+
+export default Button

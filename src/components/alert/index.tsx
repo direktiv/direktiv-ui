@@ -8,10 +8,13 @@ import { styled } from '@mui/material/styles';
 
 export interface AlertProps extends MUIAlertProps{
     /**
-     * What background color to use
+     * Sets width to 100%.
      */
     grow?: boolean;
-    severity?: 'success' | 'info' | 'warning' | 'error'
+    /**
+    * The severity of the alert. This defines the color and icon used.
+    */
+    severity: 'success' | 'info' | 'warning' | 'error'
 }
 
 const DirektivAlert = styled(MUIAlert, {
@@ -32,16 +35,17 @@ const DirektivAlert = styled(MUIAlert, {
 }));
 
 /**
- * Primary UI component for user interaction
+ * Component that displays a short simple message in a Alert container. 
  */
-const Alert = ({
+function Alert({
+    severity = "info",
     ...props
-  }: AlertProps) => {
+  }: AlertProps) {
     return (
         <DirektivAlert iconMapping={{
             error: <VscWarning fontSize="inherit" />
           }}
-          {...props} />
+          {...props} severity={severity}/>
     )
 }
 
