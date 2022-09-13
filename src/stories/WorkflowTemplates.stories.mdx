@@ -1,0 +1,227 @@
+import { Meta } from '@storybook/addon-docs';
+import Code from './assets/code-brackets.svg';
+import Colors from './assets/colors.svg';
+import Comments from './assets/comments.svg';
+import Direction from './assets/direction.svg';
+import Flow from './assets/flow.svg';
+import Plugin from './assets/plugin.svg';
+import NewWorkflow from "./assets/new-workflow.png"
+import Repo from './assets/repo.svg';
+import StackAlt from './assets/stackalt.svg';
+
+<Meta title="Systems/Workflow Templates" />
+
+<style>
+  {`
+    .subheading {
+      --mediumdark: '#999999';
+      font-weight: 900;
+      font-size: 13px;
+      color: #999;
+      letter-spacing: 6px;
+      line-height: 24px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      margin-top: 40px;
+    }
+
+    .link-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-template-rows: 1fr 1fr;
+      row-gap: 10px;
+    }
+
+    @media (min-width: 620px) {
+      .link-list {
+        row-gap: 20px;
+        column-gap: 20px;
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media all and (-ms-high-contrast:none) {
+    .link-list {
+        display: -ms-grid;
+        -ms-grid-columns: 1fr 1fr;
+        -ms-grid-rows: 1fr 1fr;
+      }
+    }
+
+    .link-item {
+      display: block;
+      padding: 20px 30px 20px 15px;
+      border: 1px solid #00000010;
+      border-radius: 5px;
+      transition: background 150ms ease-out, border 150ms ease-out, transform 150ms ease-out;
+      color: #333333;
+      display: flex;
+      align-items: flex-start;
+    }
+
+    .link-item:hover {
+      border-color: #1EA7FD50;
+      transform: translate3d(0, -3px, 0);
+      box-shadow: rgba(0, 0, 0, 0.08) 0 3px 10px 0;
+    }
+
+    .link-item:active {
+      border-color: #1EA7FD;
+      transform: translate3d(0, 0, 0);
+    }
+
+    .link-item strong {
+      font-weight: 700;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .link-item img {
+      height: 40px;
+      width: 40px;
+      margin-right: 15px;
+      flex: none;
+    }
+
+    .link-item span {
+      font-size: 14px;
+      line-height: 20px;
+    }
+
+    a, a:hover, a:visited, a:active {
+      color: rgb(30, 167, 253);
+      text-decoration: rgb(30, 167, 253);
+    }
+
+    .tip {
+      display: inline-block;
+      border-radius: 1em;
+      font-size: 11px;
+      line-height: 12px;
+      font-weight: 700;
+      background: #E7FDD8;
+      color: #66BF3C;
+      padding: 4px 12px;
+      margin-right: 10px;
+      vertical-align: top;
+    }
+
+    .tip-wrapper {
+      font-size: 13px;
+      line-height: 20px;
+      margin-top: 40px;
+      margin-bottom: 40px;
+    }
+
+    .tip-wrapper code {
+      font-size: 12px;
+      display: inline-block;
+    }
+    .center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      width: 50%;
+    }
+  `}
+</style>
+
+# Workflow Templates
+
+When creating a new Workflow the user is presented with multiple templates to select from to use a base. However if the specification of a workflow changes, or additional new templates are requested you may need to update the workflow templates.
+
+<img src={NewWorkflow} alt="new-workflow" class="center"/>
+
+Workflow templates need to changes in the [direktiv-react-hooks](https://github.com/direktiv/direktiv-react-hooks) package. This document will guide you on how to update the workflow templates.
+
+<div className="subheading">How to update</div>
+
+Workflow templates are defined and exported from [nodes/template.js](https://github.com/direktiv/direktiv-react-hooks/blob/main/src/nodes/templates.js) in the [direktiv-react-hooks](https://github.com/direktiv/direktiv-react-hooks) package. 
+```js
+export const noop = {name: "noop", data: `description: A simple 'no-op' state that returns 'Hello world!'
+states:
+- id: helloworld
+  type: noop
+  transform:
+    result: Hello world!
+`}
+...
+export const Templates = {
+    noop,
+    action,
+    consumeEvent,
+    delay,
+    error,
+    foreach,
+    generateEvent,
+    generateSolveEvent,
+    getAndSet,
+    parallel,
+    validate,
+    switchState,
+    eventXor,
+    eventAnd,
+}
+```
+To edit an existing template simply update the constants defined in [nodes/template.js](https://github.com/direktiv/direktiv-react-hooks/blob/main/src/nodes/templates.js). If a new template needs to be added, a new constant will need to be defined and added the the `Templates` const export in [nodes/template.js](https://github.com/direktiv/direktiv-react-hooks/blob/main/src/nodes/templates.js).
+
+<div className="subheading">Example - Edit noop template</div>
+
+```js
+export const noop = {name: "noop", data: `description: A simple 'no-op' state that returns 'Hello world!'
+states:
+- id: helloworld
+  type: noop
+  transform:
+    result: Hello world! V2
+`}
+...
+```
+
+<div className="subheading">Example - Add new template</div>
+
+```js
+export const fakerAPI = {name: "noop", data: `functions:
+- id: get
+  image: direktiv/request:v4
+  type: knative-workflow
+
+states:
+  #
+  # HTTP GET Fake person from fakerapi
+  # Transform data to get data out of body
+  #
+  - id: get-fake-persons
+    transform: "jq({person: .return.body.data[0]})" # This line can commented out to see complete action return
+    type: action
+    action:
+      function: get
+      input: 
+        method: "GET"
+        url: "https://fakerapi.it/api/v1/persons?_quantity=1"
+`}
+...
+export const Templates = {
+    noop,
+    action,
+    consumeEvent,
+    delay,
+    error,
+    foreach,
+    generateEvent,
+    generateSolveEvent,
+    getAndSet,
+    parallel,
+    validate,
+    switchState,
+    eventXor,
+    eventAnd,
+    fakerAPI
+}
+```
+
+<div className="subheading">Updating UI to reflect changes</div>
+
+Once changes have been made to the [direktiv-react-hooks](https://github.com/direktiv/direktiv-react-hooks) package. You will need to publish a new version of [direktiv-react-hooks](https://github.com/direktiv/direktiv-react-hooks) to npm and update its dependencies on [direktiv-ui](https://github.com/direktiv/direktiv-ui) repository to see the changes.
+
+Workflow templates are used in the frontend with the `useNodes` [direktiv-react-hooks](https://github.com/direktiv/direktiv-react-hooks) hook. 

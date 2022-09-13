@@ -1,35 +1,60 @@
 import React, { useMemo } from 'react';
 import './style.css';
 
-type FlexBoxCenterAxis  = "y" | "x" | "xy" | boolean;
-type FlexBoxGapSize  = "md" | "sm" | boolean;
+export type FlexBoxCenterAxis  = "y" | "x" | "xy" | boolean;
+export type FlexBoxGapSize  = "md" | "sm" | boolean;
 
 export interface FlexBoxProps extends React.HTMLAttributes<HTMLDivElement> {
+    /**
+    * Hides component if true.
+    */
     hide?: boolean
+    /**
+    * Set flex direction to column.
+    */
     col?: boolean
+    /**
+    * Set flex direction to row.
+    */
     row?: boolean
-    gap?: FlexBoxGapSize
+    /**
+    * If true or "xy" aligns children to the center on both the X and Y axis.
+    * Alternatively children can be aligned along a single axis, by using "x" or "y".
+    */
     center?: FlexBoxCenterAxis
+    /**
+    * If true and "md" space children with a gap. Alternatively the gap can be smaller, by using "sm".
+    */
+    gap?: FlexBoxGapSize
+    /**
+    * Sets component height to 100%
+    */
     tall?: boolean
+    /**
+    * Enables wrapping on children components.
+    */
     wrap?: boolean
 }
 
-const FlexBox: React.FunctionComponent<FlexBoxProps> = ({
+/**
+* A flex display based div component. It's a basic layout element designed to speed to the use of flexbox css properties.
+*/
+function FlexBox({
     hide,
     col,
     row,
-    gap,
     center,
+    gap,
     tall,
-    wrap,
+    wrap ,
     ...props
-}) => {
+}: FlexBoxProps){
     const className = useMemo(() => {
         const prefix = "flex-box"
         let clsName = props.className ? props.className : ""
 
         if (hide) {
-            clsName += ` ${hide}`
+            clsName += ` hide`
         }
 
         if (col) {
