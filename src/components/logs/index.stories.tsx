@@ -1,5 +1,6 @@
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 import '../../App.css';
+import './style.css'
 import FlexBox from '../flexbox';
 
 import Logs, { LogItem } from './logs';
