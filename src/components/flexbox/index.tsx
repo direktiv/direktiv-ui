@@ -47,11 +47,12 @@ function FlexBox({
     gap,
     tall,
     wrap ,
+    className ,
     ...props
 }: FlexBoxProps){
-    const className = useMemo(() => {
+    const classes = useMemo(() => {
         const prefix = "flex-box"
-        let clsName = props.className ? props.className : ""
+        let clsName = className ? className : ""
 
         if (hide) {
             clsName += ` hide`
@@ -112,10 +113,10 @@ function FlexBox({
         }
 
         return `${prefix} ${clsName}`
-    }, [props, hide, col, row, gap, center])
+    }, [className, hide, col, row, gap, center, tall, wrap])
 
     return (
-        <div {...props} className={className} />
+        <div {...props} className={classes} />
     );
 }
 

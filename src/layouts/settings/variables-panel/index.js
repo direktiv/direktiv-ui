@@ -107,7 +107,7 @@ function VariablesPanel(props){
                                     }
                                 },
 
-                                buttonProps: {variant: "contained", color: "primary"},
+                                buttonProps: {variant: "contained", color: "primary", loading: uploading},
                                 errFunc: () => { setUploading(false) },
                                 closesModal: true,
                                 validate: true
@@ -420,7 +420,7 @@ function Variable(props) {
                                     await setNamespaceVariable(obj.name, file, mimeType)
                                 },
 
-                                buttonProps: {variant: "contained", color: "primary"},
+                                buttonProps: {variant: "contained", color: "primary", loading: uploading},
                                 errFunc: ()=>{setUploading(false)},
                                 closesModal: true,
                                 validate: true

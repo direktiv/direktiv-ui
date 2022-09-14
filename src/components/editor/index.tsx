@@ -322,7 +322,7 @@ function DirektivEditor({
     dvalue,
     dlang = "json",
     value,
-    height = 400,
+    height,
     width,
     setDValue,
     readonly,

@@ -1,9 +1,7 @@
-import React from 'react';
-import './style.css';
-import FlexBox from '../flexbox';
-import { VscChromeClose, VscWarning } from 'react-icons/vsc';
 import MUIAlert, { AlertProps as MUIAlertProps } from '@mui/material/Alert';
 import { styled } from '@mui/material/styles';
+import { VscWarning } from 'react-icons/vsc';
+import './style.css';
 
 
 export interface AlertProps extends MUIAlertProps{

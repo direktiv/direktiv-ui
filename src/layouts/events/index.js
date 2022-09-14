@@ -6,7 +6,7 @@ import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIco
 import DirektivEditor from '../../components/editor';
 import FlexBox from '../../components/flexbox';
 import HelpIcon from "../../components/help";
-import Modal  from '../../components/modal';
+import Modal from '../../components/modal';
 import { Config } from '../../util';
 
 import * as dayjs from "dayjs";
@@ -47,6 +47,7 @@ function EventsPage(props) {
     const listenersPageHandler = usePageHandler(PAGE_SIZE)
 
     let {eventHistory, eventListeners, eventListenersPageInfo, eventHistoryPageInfo, sendEvent, replayEvent} = useEvents(Config.url, true, namespace, localStorage.getItem("apikey"), {listeners: [listenersPageHandler.pageParams], history: [historyPageHandler.pageParams]})
+    
     return (
         <>
             <FlexBox col gap style={{ paddingRight: "8px" }}>
@@ -193,9 +194,18 @@ function EventsPage(props) {
                                                     </tr>
                                                 })}
                                             </tbody> :
-                                            <FlexBox className='table-no-content'>
-                                                No cloud events history
-                                            </FlexBox>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <div>
+                                                            
+                                                        </div>
+                                                        <FlexBox className='table-no-content'>
+                                                            No cloud events history
+                                                        </FlexBox>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
                                         }
                                     </table>
                                 </div>
@@ -270,9 +280,16 @@ function EventsPage(props) {
                                                     )
                                                 })}
                                             </tbody> :
-                                            <FlexBox className='table-no-content'>
-                                                No active event listeners
-                                            </FlexBox>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <FlexBox className='table-no-content'>
+                                                            No active event listeners
+                                                        </FlexBox>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+
                                         }
                                     </table>
                                 </div>

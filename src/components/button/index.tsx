@@ -25,7 +25,7 @@ export interface ButtonProps extends MUIButtonProps {
 }
 
 const DirektivButton = styled(MUIButton, {
-    shouldForwardProp: (prop) => prop !== 'success',
+    shouldForwardProp: (prop) => prop !== 'auto' && prop !== 'disabledTooltip' && prop !== 'disableShadows' && prop !== 'loading',
 })<ButtonProps>(({ theme, color, size, auto, variant, disabledTooltip, disabled, disableShadows, loading }) => ({
     // Defaults
     textTransform: "none",
@@ -97,35 +97,35 @@ const DirektivButton = styled(MUIButton, {
     }),
 }));
 
-function Button(props: ButtonProps) {
+function Button({tooltip, onClick, asyncDisable, disabledTooltip, disabled, ...props}: ButtonProps) {
     const [isOnClick, setIsOnClick] = React.useState(false)
     const tooltipText = React.useMemo(()=>{
-        const disabled = isOnClick || props.disabled
-        if (disabled) {
-            if (props.disabledTooltip !== undefined){
-                return props.disabledTooltip
+        const isDisabled = isOnClick || disabled
+        if (isDisabled) {
+            if (disabledTooltip !== undefined){
+                return disabledTooltip
             }
 
             return ""
         }
 
-        return props.tooltip ? props.tooltip : ""
-    },[props, isOnClick])
+        return tooltip ? tooltip : ""
+    },[disabledTooltip, tooltip, isOnClick, disabled])
 
     return (
         <Tooltip title={tooltipText} placement="top" arrow>
-            <DirektivButton variant="contained" color="primary" disableRipple size="small" {...props} disabled={isOnClick || props.disabled} onClick={async (e) => {
-                if (props.onClick === undefined) {
+            <DirektivButton variant="contained" color="primary" disableRipple size="small" {...props} disabled={isOnClick || disabled} disabledTooltip={disabledTooltip} onClick={async (e) => {
+                if (onClick === undefined) {
                     return
                 }
 
-                if (props.asyncDisable) {
+                if (asyncDisable) {
                     setIsOnClick(true)
                 }
 
-                await props.onClick(e)
+                await onClick(e)
 
-                if (props.asyncDisable) {
+                if (asyncDisable) {
                     setIsOnClick(false)
                 }
 

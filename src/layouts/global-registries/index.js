@@ -307,7 +307,7 @@ export function GlobalPrivateRegistries(){
                                
                                 },
 
-                                buttonProps: {variant: "contained", color: "primary"},
+                                buttonProps: {variant: "contained", color: "primary", loading: testConnLoading},
 
                                 errFunc: ()=>{   setTestConnLoading(false)
                                     setSuccessFeedback(false)},

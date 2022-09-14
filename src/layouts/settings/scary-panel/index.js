@@ -41,10 +41,10 @@ function Scary(props) {
     const [delButtonEnabled, setDelButtonEnabled] = useState(false)
     // deleteErr gets filled in when someone attempts to delete a namespace and an error happens
 
-    let delBtnClasses = "small red";
-    if (!delButtonEnabled) {
-        delBtnClasses += " disabled"
-    }
+    // let delBtnClasses = "small red";
+    // if (!delButtonEnabled) {
+    //     delBtnClasses += " disabled"
+    // }
 
     return <>
     <FlexBox>

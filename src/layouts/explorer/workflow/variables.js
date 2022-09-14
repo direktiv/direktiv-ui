@@ -70,7 +70,7 @@ function AddWorkflowVariablePanel(props) {
                             <VscAdd />
                         )}
                         buttonProps={{
-                            auto: true,
+                            auto: true
                         }}
                         onClose={() => {
                             setKeyValue("")
@@ -92,7 +92,7 @@ function AddWorkflowVariablePanel(props) {
                                     }
                                 },
 
-                                buttonProps: {variant: "contained", color: "primary"},
+                                buttonProps: {variant: "contained", color: "primary", loading: uploading},
                                 errFunc: () => { setUploading(false) },
                                 closesModal: true,
                                 validate: true
@@ -378,7 +378,7 @@ function Variable(props) {
                                         await setWorkflowVariable(obj.name, file, mimeType)
                                     },
 
-                                    buttonProps: {variant: "contained", color: "primary"},
+                                    buttonProps: {variant: "contained", color: "primary", loading:uploading},
                                     errFunc: ()=>{setUploading(false)},
                                     closesModal: true,
                                     validate: true
