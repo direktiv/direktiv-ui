@@ -16,7 +16,7 @@ export interface AlertProps extends MUIAlertProps{
 }
 
 const DirektivAlert = styled(MUIAlert, {
-    shouldForwardProp: (prop) => prop !== 'success',
+    shouldForwardProp: (prop) => prop !== 'grow',
 })<AlertProps>(({ theme, variant, severity, grow }) => ({
     ...(grow && {
         width: "100%",

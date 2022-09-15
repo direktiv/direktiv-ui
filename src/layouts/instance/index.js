@@ -435,7 +435,7 @@ function Output(props){
             <FlexBox style={{ padding: "0px", overflow: "hidden" }}>
                 <AutoSizer>
                     {({ height, width }) => (
-                        <DirektivEditor disableCursor height={height} width={width} dlang="json" value={output} readonly={true} />
+                        <DirektivEditor height={height} width={width} dlang="json" value={output} readonly={true} />
                     )}
                 </AutoSizer>
             </FlexBox>

@@ -198,7 +198,11 @@ function Secrets(props) {
                                     title="Remove secret" 
                                     button={(
                                         <SecretsDeleteButton/>
-                                    )} 
+                                    )}
+                                    buttonProps={{
+                                        variant: "text",
+                                        color: "info"
+                                    }} 
                                     actionButtons={
                                         [
                                             {
@@ -244,7 +248,7 @@ function Secrets(props) {
 
 export function SecretsDeleteButton(props) {
     return (
-        <div className="secrets-delete-btn red-text">
+        <div className="red-text" style={{display: "flex", alignItems: "center", height: "100%"}}>
             <VscTrash />
         </div>
     )
@@ -264,7 +268,7 @@ function AddSecretPanel(props) {
                 <FlexBox style={{overflow:"hidden"}}>
                     <AutoSizer>
                         {({height, width})=>(
-                            <DirektivEditor width={width} dValue={vValue} setDValue={setVValue} height={height}/>
+                            <DirektivEditor width={width} dvalue={vValue} setDValue={setVValue} height={height}/>
                         )}
                         </AutoSizer>
                     </FlexBox>

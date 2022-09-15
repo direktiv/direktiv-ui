@@ -34,7 +34,7 @@ const DirektivButton = styled(MUIButton, {
     minWidth: "auto",
     height: "auto",
     fontWeight: "bold",
-    "&:visited":{
+    "&:visited": {
         color: color !== undefined && color !== "inherit" ? theme.palette[color].main : undefined
     },
     "&.MuiButton-sizeSmall": {
@@ -77,7 +77,7 @@ const DirektivButton = styled(MUIButton, {
     // Support Disabled Tooltips
     ...(disabledTooltip !== undefined && {
         "&:disabled": {
-            pointerEvents:"auto",
+            pointerEvents: "auto",
         },
         ...(disabled && {
             "&:hover": {
@@ -93,16 +93,16 @@ const DirektivButton = styled(MUIButton, {
         height: "auto !important"
     }),
     ...(disableShadows && {
-        boxShadow: undefined 
+        boxShadow: undefined
     }),
 }));
 
-function Button({tooltip, onClick, asyncDisable, disabledTooltip, disabled, ...props}: ButtonProps) {
+function Button({ tooltip, onClick, asyncDisable, disabledTooltip, disabled, ...props }: ButtonProps) {
     const [isOnClick, setIsOnClick] = React.useState(false)
-    const tooltipText = React.useMemo(()=>{
+    const tooltipText = React.useMemo(() => {
         const isDisabled = isOnClick || disabled
         if (isDisabled) {
-            if (disabledTooltip !== undefined){
+            if (disabledTooltip !== undefined) {
                 return disabledTooltip
             }
 
@@ -110,27 +110,27 @@ function Button({tooltip, onClick, asyncDisable, disabledTooltip, disabled, ...p
         }
 
         return tooltip ? tooltip : ""
-    },[disabledTooltip, tooltip, isOnClick, disabled])
+    }, [disabledTooltip, tooltip, isOnClick, disabled])
 
     return (
         <Tooltip title={tooltipText} placement="top" arrow>
-            <DirektivButton variant="contained" color="primary" disableRipple size="small" {...props} disabled={isOnClick || disabled} disabledTooltip={disabledTooltip} onClick={async (e) => {
-                if (onClick === undefined) {
-                    return
+                <DirektivButton variant="contained" color="primary" disableRipple size="small" {...props} disabled={isOnClick || disabled} disabledTooltip={disabledTooltip} onClick={async (e) => {
+                    if (onClick === undefined) {
+                        return
+                    }
+
+                    if (asyncDisable) {
+                        setIsOnClick(true)
+                    }
+
+                    await onClick(e)
+
+                    if (asyncDisable) {
+                        setIsOnClick(false)
+                    }
+
                 }
-
-                if (asyncDisable) {
-                    setIsOnClick(true)
-                }
-
-                await onClick(e)
-
-                if (asyncDisable) {
-                    setIsOnClick(false)
-                }
-
-            }
-            } />
+                } />
         </Tooltip>
     )
 }

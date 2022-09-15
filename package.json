@@ -67,7 +67,8 @@
     "build-storybook": "build-storybook -s public"
   },
   "resolutions": {
-    "babel-loader": "8.1.0"
+    "babel-loader": "8.1.0",
+    "react-error-overlay": "6.0.9"
   },
   "eslintConfig": {
     "extends": [
@@ -113,6 +114,7 @@
     "@types/react-virtualized": "^9.21.21",
     "@types/react-window": "^1.8.5",
     "encoding": "^0.1.13",
+    "react-error-overlay": "6.0.9",
     "storybook-addon-react-router-v6": "^0.2.1",
     "yalc": "^1.0.0-pre.53"
   }

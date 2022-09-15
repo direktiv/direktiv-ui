@@ -114,7 +114,6 @@ export function GlobalRegistries(){
                             },
                             {
                                 label: "Test Connection",
-
                                 onClick: async () => {
                                     setURLErr("")
                                     setTokenErr("")
@@ -147,7 +146,7 @@ export function GlobalRegistries(){
                                
                                 },
 
-                                buttonProps: `small ${testConnLoading ? "loading" : ""}`,
+                                buttonProps:  {variant: "contained", color: "primary", loading: testConnLoading},
 
                                 errFunc: ()=>{   setTestConnLoading(false)
                                     setSuccessFeedback(false)},

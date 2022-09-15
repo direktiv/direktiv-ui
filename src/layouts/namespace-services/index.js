@@ -2,7 +2,7 @@ import { useNamespaceServices } from "direktiv-react-hooks";
 import {VscLayers, VscChevronDown, VscChevronRight, VscRefresh} from 'react-icons/vsc';
 
 import "./style.css"
-import {useEffect, useState} from "react"
+import {useEffect, useState, useMemo} from "react"
 import { VscTrash, VscCircleLargeFilled } from 'react-icons/vsc';
 
 import ContentPanel, { ContentPanelBody, ContentPanelTitle, ContentPanelTitleIcon } from "../../components/content-panel";
@@ -268,7 +268,10 @@ export function Service(props) {
                         }}
                         button={(
                             <ServicesDeleteButton />
-                        )}  
+                        )}
+                        buttonProps={{
+                            color: "info"
+                        }} 
                         actionButtons={[
                             {
                                 label: "Delete",
@@ -484,16 +487,22 @@ function Condition(props){
 }
 
 export function ServiceStatus(props) {
-    const {status} = props
+    const color =  useMemo(()=>{
+        if (props.status) {
+            switch (props.status) {
+                case "False":
+                    return "#FF616D"
+                case "Unknown":
+                    return "#082032"
+                default:
+                    break;
+            }
+        }
 
-    let color = "#66DE93"
-    if (status === "False") {
-        color = "#FF616D"
-    }
+        // default status color
+        return "#66DE93"
 
-    if (status === "Unknown") {
-        color = "#082032"
-    }
+    },[props])
 
     return(
         <div>   
@@ -502,14 +511,10 @@ export function ServiceStatus(props) {
     )
 }
 
-function ServicesDeleteButton(props) {
-    const {onClick} = props
-
+function ServicesDeleteButton() {
     return (
-        <FlexBox onClick={onClick} className="col red-text" style={{height: "100%", textAlign:"right", width:"30px"}}>
-            <div className="secrets-delete-btn" style={{height: "100%", display: "flex", paddingRight: "8px" }}>
-                <VscTrash className="auto-margin" />
-            </div>
-        </FlexBox>
+        <div className="red-text" style={{ display: "flex", alignItems: "center", height: "100%" }}>
+            <VscTrash className="auto-margin" />
+        </div>
     )
 }

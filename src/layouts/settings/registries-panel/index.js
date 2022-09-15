@@ -169,7 +169,7 @@ function RegistriesPanel(props){
                                
                                 },
 
-                                buttonProps: `small ${testConnLoading ? "loading" : ""}`,
+                                buttonProps: {variant: "contained", color: "primary", loading: testConnLoading},
 
                                 errFunc: ()=>{   setTestConnLoading(false)
                                     setSuccessFeedback(false)},

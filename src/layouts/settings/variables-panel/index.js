@@ -124,7 +124,7 @@ function VariablesPanel(props){
                             }
                         ]}
                     >
-                        <AddVariablePanel mimeType={mimeType} setMimeType={setMimeType} file={file} setFile={setFile} setKeyValue={setKeyValue} keyValue={keyValue} dValue={dValue} setDValue={setDValue} />
+                        <AddVariablePanel mimeType={mimeType} setMimeType={setMimeType} file={file} setFile={setFile} setKeyValue={setKeyValue} keyValue={keyValue} dvalue={dValue} setDValue={setDValue} />
                     </Modal>
                 </div>
             </ContentPanelTitle>

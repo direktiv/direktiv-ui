@@ -197,9 +197,6 @@ function EventsPage(props) {
                                             <tbody>
                                                 <tr>
                                                     <td>
-                                                        <div>
-                                                            
-                                                        </div>
                                                         <FlexBox className='table-no-content'>
                                                             No cloud events history
                                                         </FlexBox>
