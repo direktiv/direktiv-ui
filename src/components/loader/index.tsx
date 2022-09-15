@@ -37,7 +37,7 @@ function Loader({ children, timer=1000, load }: LoaderProps) {
     // check if load has been changed to true
     useEffect(() => {
         // if its finished loading and timeoutTimer isn't null show children
-        if (!load && timeoutTimer !== null) {
+        if (!load && !timeoutTimer) {
             clearTimeout(timeoutTimer)
             setDisplay(false)
         }
