@@ -26,7 +26,7 @@ const {data, err, templates, pageInfo, createNode, createMirrorNode, deleteNode,
 
 <div className="subheading">Manipulating pageParams</div>
 
-The state of `pageHandler.pageParams` from the previous example can be manipulated using the Pagination component. Simply passed it to the pageHandler prop and the Pagination component will automatically `pageParams` when the user changes pages.
+The state of `pageHandler.pageParams` from the previous example can be manipulated using the Pagination component. Simply pass it to the pageHandler prop and the Pagination component will automatically update `pageParams` when the user changes pages.
 
 ```js
 const PAGE_SIZE = 10
@@ -38,7 +38,7 @@ const {data, err, templates, pageInfo, createNode, createMirrorNode, deleteNode,
 ...
 ```
 
-For example: If we take the example above: If the user clicked the next page button to go to page 2 on the Pagination component `pageHandler` will updates its `pageParams` property to equal `limit=10&offset=10`. This change to `pageParams` is what ultimately changes the `data` being returned from the `useNodes` direktiv-react-hook.
+If we take the example above were the user clicked the next page button to go to page 2 on the Pagination component, The `pageHandler` hook will update its `pageParams` property to equal `limit=10&offset=10`. This change to `pageParams` is what ultimately changes the `data` being returned from the `useNodes` direktiv-react-hook.
 
 <div className="subheading">usePageHandler Functions</div>
 

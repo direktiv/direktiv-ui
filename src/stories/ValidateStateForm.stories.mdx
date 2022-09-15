@@ -51,7 +51,7 @@ When the user presses the Run Button on the workflow page the `onOpen` event fun
 3. If the first workflow is a validate state, save its schema property to the React state `workflowJSONSchema` to be used later when generating the form. Note: The schema property in a validate state follows the same specification as a JSON schema. 
 
 After the onOpen function is complete, the Modal will open to one of two views:
-1. A Editor window for user to set instance input as JSON (`default`).
+1. A Editor window for the user to set instance input as JSON (`default`).
 2. A Form that has been generated from the schema in the `workflowJSONSchema` state.
 
 If `workflowJSONSchema` is set (first state is type validate), then a HTLM form will be generated and rendered using the [@rjsf/core](https://www.npmjs.com/package/@rjsf/core) package.

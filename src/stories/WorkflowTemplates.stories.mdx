@@ -6,11 +6,11 @@ import "./stories.css"
 
 # Workflow Templates
 
-When creating a new Workflow the user is presented with multiple templates to select from to use a base. However if the specification of a workflow changes, or additional new templates are requested you may need to update the workflow templates.
+When creating a new Workflow the user is presented with multiple templates to select from to use as a base. However if the specification of a workflow changes, or additional new templates are requested you may need to update the workflow templates.
 
 <img src={NewWorkflow} alt="new-workflow" class="center"/>
 
-Workflow templates need to changes in the [direktiv-react-hooks](https://github.com/direktiv/direktiv-react-hooks) package. This document will guide you on how to update the workflow templates.
+Workflow templates need to be changed in the [direktiv-react-hooks](https://github.com/direktiv/direktiv-react-hooks) package. This document will guide you on how to update the workflow templates.
 
 <div className="subheading">How to update</div>
 
@@ -94,7 +94,7 @@ export const Templates = {
     switchState,
     eventXor,
     eventAnd,
-    fakerAPI
+    fakerAPI // <---- New Template
 }
 ```
 
