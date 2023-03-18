@@ -83,7 +83,7 @@ function NamespaceServices(props) {
     const [cmd, setCmd] = useState("")
     const [maxScale, setMaxScale] = useState(0)
 
-    const {data, err, config, getNamespaceConfig, getNamespaceServices, createNamespaceService, deleteNamespaceService} = useNamespaceServices(Config.url, true, namespace, localStorage.getItem("apikey"))
+    const {data, err, config, getNamespaceConfig, getNamespaceServices, createNamespaceService, deleteNamespaceService} = useNamespaceServices(Config.url, false, namespace, localStorage.getItem("apikey"))
 
     useEffect(()=>{
         async function getcfg() {

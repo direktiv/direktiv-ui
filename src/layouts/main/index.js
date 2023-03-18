@@ -158,7 +158,7 @@ function MainLayout(props) {
  
     const [namespace, setNamespace] = useState(null)
     const [toggleResponsive, setToggleResponsive] = useState(false);
-    const {data, err, createNamespace, createMirrorNamespace, deleteNamespace} = useNamespaces(Config.url, true, akey)
+    const {data, err, createNamespace, createMirrorNamespace, deleteNamespace} = useNamespaces(Config.url, false, akey)
 
     // const [versions, setVersions] = useState(false)
     
