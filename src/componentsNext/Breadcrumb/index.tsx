@@ -53,7 +53,12 @@ const Breadcrumb = () => {
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button size="sm" variant="ghost" circle>
+              <Button
+                size="sm"
+                variant="ghost"
+                circle
+                data-testid="dropdown-trg-namespace"
+              >
                 <ChevronsUpDown />
               </Button>
             </DropdownMenuTrigger>

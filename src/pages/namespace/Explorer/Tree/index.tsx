@@ -122,6 +122,7 @@ const ExplorerPage: FC = () => {
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button
+                                data-testid="dropdown-trg-dir-actions"
                                 variant="ghost"
                                 size="sm"
                                 onClick={(e) => e.preventDefault()}
@@ -134,6 +135,7 @@ const ExplorerPage: FC = () => {
                               <DropdownMenuLabel>Edit</DropdownMenuLabel>
                               <DropdownMenuSeparator />
                               <DialogTrigger
+                                data-testid="dir-actions-delete"
                                 onClick={() => {
                                   setDeleteNode(file);
                                 }}
@@ -144,6 +146,7 @@ const ExplorerPage: FC = () => {
                                 </DropdownMenuItem>
                               </DialogTrigger>
                               <DialogTrigger
+                                data-testid="dir-actions-rename"
                                 onClick={() => {
                                   setRenameNode(file);
                                 }}
