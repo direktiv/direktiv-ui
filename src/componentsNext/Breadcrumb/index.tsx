@@ -48,7 +48,7 @@ const Breadcrumb = () => {
       <BreadcrumbLink noArrow>
         <Link to={pages.explorer.createHref({ namespace })}>
           <Home />
-          {namespace}
+          <span data-testid="breadcrumb-namespace">{namespace}</span>
         </Link>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DropdownMenu>
@@ -87,7 +87,7 @@ const Breadcrumb = () => {
               )}
               <DropdownMenuSeparator />
               <DialogTrigger>
-                <DropdownMenuItem>
+                <DropdownMenuItem data-testid="new-namespace">
                   <PlusCircle className="mr-2 h-4 w-4" />
                   <span>Create new namespace</span>
                 </DropdownMenuItem>
