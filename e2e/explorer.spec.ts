@@ -13,9 +13,26 @@ import {
 import { expect, test } from "@playwright/test";
 
 let namespace = "";
+let forceInWebkit = { force: false };
 
-test.beforeEach(async () => {
+const setForceInWebkit = (browserName) => {
+  /**
+   * This is intended as a temporary workaround until we know more.
+   * When running tests locally in webkit, some elements are not clickable due
+   * to the actionability checks described here:
+   * https://playwright.dev/docs/actionability
+   *
+   * This overrides the actionability checks, but only locally in webkit,
+   * as it is probably good to rely on the actionability checks overall.
+   */
+  if (browserName === "webkit" && !process.env.CI) {
+    forceInWebkit = { force: true };
+  }
+};
+
+test.beforeEach(async ({ browserName }) => {
   namespace = await createNamespace();
+  setForceInWebkit(browserName);
 });
 
 test.afterEach(async () => {
@@ -37,8 +54,10 @@ test("it is possible to navigate to a namespace via breadcrumbs", async ({
   // at this point, any namespace may be loaded.
   // let's navigate to the test's namespace via breadcrumbs.
 
-  await page.getByTestId("dropdown-trg-namespace").click();
-  await page.getByRole("menuitemradio", { name: namespace }).click();
+  await page.getByTestId("dropdown-trg-namespace").click(forceInWebkit);
+  await page
+    .getByRole("menuitemradio", { name: namespace })
+    .click(forceInWebkit);
 
   await expect(page, "the namespace is reflected in the url").toHaveURL(
     `/${namespace}/explorer/tree`
@@ -75,8 +94,8 @@ test("it is possible to create a namespace via breadcrumbs", async ({
 
   // create new namespace
   const newNamespace = createNamespaceName();
-  await page.getByTestId("dropdown-trg-namespace").click();
-  await page.getByTestId("new-namespace").click();
+  await page.getByTestId("dropdown-trg-namespace").click(forceInWebkit);
+  await page.getByTestId("new-namespace").click(forceInWebkit);
   await page.getByTestId("new-namespace-name").fill(newNamespace);
   await page.getByTestId("new-namespace-submit").click();
 
@@ -109,8 +128,8 @@ test("it is possible to create a folder", async ({ page }) => {
   const folderName = "awesome-folder";
 
   // create folder
-  await page.getByTestId("dropdown-trg-new").click();
-  await page.getByTestId("new-dir").click();
+  await page.getByTestId("dropdown-trg-new").click(forceInWebkit);
+  await page.getByTestId("new-dir").click(forceInWebkit);
   await page.getByPlaceholder("folder-name").fill(folderName);
   await page.getByRole("button", { name: "Create" }).click();
 
@@ -165,8 +184,8 @@ test("it is possible to create a workflow", async ({ page }) => {
   const filename = "awesome-workflow.yaml";
 
   // create workflow
-  await page.getByTestId("dropdown-trg-new").click();
-  await page.getByTestId("new-workflow").click();
+  await page.getByTestId("dropdown-trg-new").click(forceInWebkit);
+  await page.getByTestId("new-workflow").click(forceInWebkit);
   await page.getByTestId("new-workflow-name").fill(filename);
   await page.getByTestId("new-workflow-editor").fill(workflowExamples.noop);
   await page.getByTestId("new-workflow-submit").click();
@@ -233,9 +252,9 @@ test(`it is possible to delete a worfklow`, async ({ page }) => {
   await page
     .getByTestId(`explorer-item-${name}`)
     .getByTestId("dropdown-trg-node-actions")
-    .click();
-  await page.getByTestId("node-actions-delete").click();
-  await page.getByTestId("node-delete-confirm").click();
+    .click(forceInWebkit);
+  await page.getByTestId("node-actions-delete").click(forceInWebkit);
+  await page.getByTestId("node-delete-confirm").click(forceInWebkit);
 
   await expect(
     page.getByTestId(`explorer-item-${name}`),
@@ -246,7 +265,7 @@ test(`it is possible to delete a worfklow`, async ({ page }) => {
   await expect(nodeExists).toBeFalsy();
 });
 
-test(`it is possible to rename a workflow`, async ({ page }) => {
+test("it is possible to rename a workflow", async ({ page }) => {
   const oldname = "old-name.yaml";
   const newname = "new-name.yaml";
   await createWorkflow(namespace, oldname);
@@ -265,8 +284,8 @@ test(`it is possible to rename a workflow`, async ({ page }) => {
   await page
     .getByTestId(`explorer-item-${oldname}`)
     .getByTestId("dropdown-trg-node-actions")
-    .click();
-  await page.getByTestId("node-actions-rename").click();
+    .click(forceInWebkit);
+  await page.getByTestId("node-actions-rename").click(forceInWebkit);
   await page.getByTestId("node-rename-input").fill(newname);
   await page.getByTestId("node-rename-submit").click();
 
@@ -287,7 +306,7 @@ test(`it is possible to rename a workflow`, async ({ page }) => {
   await expect(isRenamed).toBeTruthy();
 });
 
-test(`it is possible to delete a directory`, async ({ page }) => {
+test("it is possible to delete a directory", async ({ page }) => {
   const name = "directory";
   await createDirectory(namespace, name);
 
@@ -305,9 +324,9 @@ test(`it is possible to delete a directory`, async ({ page }) => {
   await page
     .getByTestId(`explorer-item-${name}`)
     .getByTestId("dropdown-trg-node-actions")
-    .click();
-  await page.getByTestId("node-actions-delete").click();
-  await page.getByTestId("node-delete-confirm").click();
+    .click(forceInWebkit);
+  await page.getByTestId("node-actions-delete").click(forceInWebkit);
+  await page.getByTestId("node-delete-confirm").click(forceInWebkit);
 
   await expect(
     page.getByTestId(`explorer-item-${name}`),
@@ -319,7 +338,7 @@ test(`it is possible to delete a directory`, async ({ page }) => {
 });
 
 // API currently returns a 500 error when trying to rename directory
-test(`it is possible to rename a directory`, async ({ page }) => {
+test("it is possible to rename a directory", async ({ page }) => {
   const oldname = "old-name";
   const newname = "new-name";
   await createDirectory(namespace, oldname);
@@ -338,8 +357,8 @@ test(`it is possible to rename a directory`, async ({ page }) => {
   await page
     .getByTestId(`explorer-item-${oldname}`)
     .getByTestId("dropdown-trg-node-actions")
-    .click();
-  await page.getByTestId("node-actions-rename").click();
+    .click(forceInWebkit);
+  await page.getByTestId("node-actions-rename").click(forceInWebkit);
   await page.getByTestId("node-rename-input").fill(newname);
   await page.getByTestId("node-rename-submit").click();
 
