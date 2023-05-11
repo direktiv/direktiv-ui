@@ -1,18 +1,11 @@
 import "./style.css";
 
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 
 import FlexBox from "../flexbox";
 import { GenerateRandomKey } from "../../util";
 import React from "react";
 import useBreadcrumbs from "use-react-router-breadcrumbs";
-
-const routes = [
-  { path: "/jq", breadcrumb: "JQ Playground" },
-  // { path: '/g/services', breadcrumb: 'Global Services' },
-  // { path: '/g/registries', breadcrumb: 'Global Registries'},
-  { path: "/n/:namespace/services", breadcrumb: "Namespace Services" },
-];
 
 export interface BreadcrumbsProps {
   /**
@@ -30,6 +23,32 @@ export interface BreadcrumbsProps {
  *   This component requires to be a descendant of a react-router Router.
  */
 function Breadcrumbs({ namespace, additionalChildren }: BreadcrumbsProps) {
+  const location = useLocation();
+
+  const segments = location.pathname.split("/");
+  const length = segments.length;
+
+  // Custom breadcrumb names
+  const routes = [
+    { path: "/jq", breadcrumb: "JQ Playground" },
+    // { path: '/g/services', breadcrumb: 'Global Services' },
+    // { path: '/g/registries', breadcrumb: 'Global Registries'},
+    { path: "/n/:namespace/services", breadcrumb: "Namespace Services" },
+  ];
+
+  /**
+   * Temporary workaround until we upgrade to the new UI. useBreadcrumbs capitalizes all
+   * breadcrumbs and removes dashes. We don't want that for namespaces and uuids.
+   * The only way to override this is to provide custom route objects.
+   * This generates route objects based on the current url.
+   */
+  for (let i = 2; i < length; i++) {
+    routes.push({
+      path: segments.slice(0, i + 1).join("/"),
+      breadcrumb: segments[i],
+    });
+  }
+
   const breadcrumbs = useBreadcrumbs(routes);
   const [searchParams] = useSearchParams(); // removed 'setSearchParams' from square brackets (this should not affect anything: search 'destructuring assignment')
 
