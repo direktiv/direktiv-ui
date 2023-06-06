@@ -19,7 +19,7 @@ interface RootProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 export const DropdownButtonRoot = React.forwardRef<HTMLDivElement, RootProps>(
-  ({ onClick, block, children, ...props }, ref) => (
+  ({ onClick, block, children, loading, ...props }, ref) => (
     <div
       ref={ref}
       {...props}
@@ -38,6 +38,8 @@ export const DropdownButtonRoot = React.forwardRef<HTMLDivElement, RootProps>(
                 ...{
                   ...props,
                   ...child.props,
+                  key: `primaryButton`,
+                  loading,
                 },
               });
             }
@@ -45,8 +47,8 @@ export const DropdownButtonRoot = React.forwardRef<HTMLDivElement, RootProps>(
               ...{
                 ...props,
                 ...child.props,
-                loading: undefined,
-                disabled: props.loading,
+                disabled: loading,
+                key: `dropdownButton`,
               },
             });
           }
