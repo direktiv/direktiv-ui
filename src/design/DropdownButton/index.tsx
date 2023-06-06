@@ -47,22 +47,21 @@ const ButtonColorClass = (variant: string | undefined) => {
 export const PrimaryButton = React.forwardRef<
   HTMLButtonElement,
   HTMLAttributes<HTMLButtonElement> & ButtonProps
->(({ variant, children, ...props }, ref) => {
-  return (
-    <Button
-      variant={variant}
-      ref={ref}
-      {...props}
-      className={clsx(
-        "flex flex-1 flex-row rounded-none rounded-l-md",
-        ButtonColorClass(variant),
-        ButtonFragmentClass
-      )}
-    >
-      {children}
-    </Button>
-  );
-});
+>(({ variant, children, ...props }, ref) => (
+  <Button
+    variant={variant}
+    ref={ref}
+    {...props}
+    className={clsx(
+      "flex flex-1 flex-row rounded-none rounded-l-md",
+      ButtonColorClass(variant),
+      ButtonFragmentClass
+    )}
+  >
+    {children}
+  </Button>
+));
+
 PrimaryButton.displayName = "PrimaryButton";
 
 export const DropdownButton = React.forwardRef<

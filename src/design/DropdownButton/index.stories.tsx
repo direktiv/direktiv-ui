@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from "@storybook/react";
 import { DropdownButton, DropdownButtonRoot, PrimaryButton } from ".";
-import { GitBranchIcon, Users } from "lucide-react";
 import { DropdownMenuGroup, DropdownMenuItem } from "../Dropdown";
+import { GitBranchIcon, Users } from "lucide-react";
+import type { Meta, StoryObj } from "@storybook/react";
 
 const meta = {
   title: "Components/DropdownButton",
