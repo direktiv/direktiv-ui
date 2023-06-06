@@ -35,31 +35,84 @@ export const Default: Story = {
 };
 
 export const Variants = () => (
-  <DropdownButtonRoot>
-    <PrimaryButton variant="destructive">
-      Review
-      <GitBranchIcon />
-    </PrimaryButton>
-    <DropdownButton variant="primary">
-      <DropdownMenuGroup>
-        <DropdownMenuItem>
-          <Users className="mr-2 h-4 w-4" />
-          <span>Team</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          <span>New Team</span>
-        </DropdownMenuItem>
-      </DropdownMenuGroup>
-    </DropdownButton>
-  </DropdownButtonRoot>
+  <div className="flex flex-col gap-2">
+    <DropdownButtonRoot variant="primary">
+      <PrimaryButton>
+        Review
+        <GitBranchIcon />
+      </PrimaryButton>
+      <DropdownButton>
+        <DropdownMenuGroup>
+          <DropdownMenuItem>
+            <Users className="mr-2 h-4 w-4" />
+            <span>Team</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <span>New Team</span>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+      </DropdownButton>
+    </DropdownButtonRoot>
+    <DropdownButtonRoot variant="destructive">
+      <PrimaryButton>
+        Review
+        <GitBranchIcon />
+      </PrimaryButton>
+      <DropdownButton>
+        <DropdownMenuGroup>
+          <DropdownMenuItem>
+            <Users className="mr-2 h-4 w-4" />
+            <span>Team</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <span>New Team</span>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+      </DropdownButton>
+    </DropdownButtonRoot>
+    <DropdownButtonRoot variant="outline">
+      <PrimaryButton>
+        Review
+        <GitBranchIcon />
+      </PrimaryButton>
+      <DropdownButton>
+        <DropdownMenuGroup>
+          <DropdownMenuItem>
+            <Users className="mr-2 h-4 w-4" />
+            <span>Team</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <span>New Team</span>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+      </DropdownButton>
+    </DropdownButtonRoot>
+    <DropdownButtonRoot>
+      <PrimaryButton>
+        Review
+        <GitBranchIcon />
+      </PrimaryButton>
+      <DropdownButton>
+        <DropdownMenuGroup>
+          <DropdownMenuItem>
+            <Users className="mr-2 h-4 w-4" />
+            <span>Team</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <span>New Team</span>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+      </DropdownButton>
+    </DropdownButtonRoot>
+  </div>
 );
 export const Disabled = () => (
-  <DropdownButtonRoot disabled>
-    <PrimaryButton variant="destructive">
+  <DropdownButtonRoot>
+    <PrimaryButton>
       Review
       <GitBranchIcon />
     </PrimaryButton>
-    <DropdownButton variant="primary">
+    <DropdownButton>
       <DropdownMenuGroup>
         <DropdownMenuItem>
           <Users className="mr-2 h-4 w-4" />
@@ -73,13 +126,13 @@ export const Disabled = () => (
   </DropdownButtonRoot>
 );
 export const ButtonSize = () => (
-  <div>
-    <DropdownButtonRoot>
-      <PrimaryButton variant="destructive" size="lg">
+  <div className="flex flex-col gap-2">
+    <DropdownButtonRoot size="lg">
+      <PrimaryButton>
         LG Button
         <GitBranchIcon />
       </PrimaryButton>
-      <DropdownButton variant="primary" size="lg">
+      <DropdownButton>
         <DropdownMenuGroup>
           <DropdownMenuItem>
             <Users className="mr-2 h-4 w-4" />
@@ -91,12 +144,12 @@ export const ButtonSize = () => (
         </DropdownMenuGroup>
       </DropdownButton>
     </DropdownButtonRoot>
-    <DropdownButtonRoot>
-      <PrimaryButton variant="destructive" size="sm">
+    <DropdownButtonRoot size="md">
+      <PrimaryButton>
         SM Button
         <GitBranchIcon />
       </PrimaryButton>
-      <DropdownButton variant="primary" size="sm">
+      <DropdownButton>
         <DropdownMenuGroup>
           <DropdownMenuItem>
             <Users className="mr-2 h-4 w-4" />
@@ -132,12 +185,12 @@ export const ButtonBlock = () => (
 );
 
 export const ButtonLoading = () => (
-  <DropdownButtonRoot block disabled>
-    <PrimaryButton variant="destructive" loading>
+  <DropdownButtonRoot loading>
+    <PrimaryButton>
       Review
       <GitBranchIcon />
     </PrimaryButton>
-    <DropdownButton variant="primary">
+    <DropdownButton>
       <DropdownMenuGroup>
         <DropdownMenuItem>
           <Users className="mr-2 h-4 w-4" />

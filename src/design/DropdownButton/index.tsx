@@ -10,25 +10,52 @@ import { ChevronDown } from "lucide-react";
 import clsx from "clsx";
 import { twMerge } from "tailwind-merge";
 
-interface RootProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface RootProps extends HTMLAttributes<HTMLDivElement> {
   block?: boolean;
+  size?: "md" | "lg";
+  loading?: boolean;
+  variant?: "destructive" | "outline" | "primary";
+  disabled?: boolean;
 }
-export const DropdownButtonRoot = React.forwardRef<
-  HTMLButtonElement,
-  RootProps
->(({ block, children, ...props }, ref) => (
-  <button
-    ref={ref}
-    {...props}
-    className={clsx(
-      block ? "w-full" : "w-fit",
-      "flex flex-row",
-      "disabled:pointer-events-none disabled:opacity-50"
-    )}
-  >
-    <DropdownMenu>{children}</DropdownMenu>
-  </button>
-));
+
+export const DropdownButtonRoot = React.forwardRef<HTMLDivElement, RootProps>(
+  ({ onClick, block, children, ...props }, ref) => (
+    <div
+      ref={ref}
+      {...props}
+      onClick={onClick}
+      className={clsx(
+        block ? "w-full" : "w-fit",
+        "flex flex-row",
+        "disabled:pointer-events-none disabled:opacity-50"
+      )}
+    >
+      <DropdownMenu>
+        {(Array.isArray(children) ? children : [children]).map(
+          (child, index) => {
+            if (index === 0) {
+              return React.createElement(child.type, {
+                ...{
+                  ...props,
+                  ...child.props,
+                },
+              });
+            }
+            return React.createElement(child.type, {
+              ...{
+                ...props,
+                ...child.props,
+                loading: undefined,
+                disabled: props.loading,
+              },
+            });
+          }
+        )}
+      </DropdownMenu>
+    </div>
+  )
+);
+
 DropdownButtonRoot.displayName = "DropdownButtonRoot";
 
 const ButtonFragmentClass = clsx(
