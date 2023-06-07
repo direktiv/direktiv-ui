@@ -107,7 +107,7 @@ export const Variants = () => (
   </div>
 );
 export const Disabled = () => (
-  <DropdownButtonRoot>
+  <DropdownButtonRoot disabled>
     <PrimaryButton>
       Review
       <GitBranchIcon />

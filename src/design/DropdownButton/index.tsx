@@ -47,7 +47,7 @@ export const DropdownButtonRoot = React.forwardRef<HTMLDivElement, RootProps>(
               ...{
                 ...props,
                 ...child.props,
-                disabled: loading,
+                disabled: props.disabled || loading,
                 key: `dropdownButton`,
               },
             });
@@ -62,7 +62,7 @@ DropdownButtonRoot.displayName = "DropdownButtonRoot";
 
 const ButtonFragmentClass = clsx(
   "active:scale-100 active:outline-none active:ring-0 active:ring-offset-0",
-  "border-2 focus:ring-0 focus:ring-offset-0"
+  "border focus:ring-0 focus:ring-offset-0"
 );
 
 const ButtonColorClass = (variant: string | undefined) => {

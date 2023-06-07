@@ -1,17 +1,16 @@
-import { Bug, GitBranchPlus, GitMerge, Play, Save, Undo } from "lucide-react";
+import { Bug, GitBranchPlus, Play, Save, Undo } from "lucide-react";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "~/design/Dropdown";
+  DropdownButton,
+  DropdownButtonRoot,
+  PrimaryButton,
+} from "~/design/DropdownButton";
 import { FC, useEffect, useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "~/design/Popover";
 
 import Button from "~/design/Button";
 import { Card } from "~/design/Card";
+import { DropdownMenuItem } from "~/design/Dropdown";
 import Editor from "~/design/Editor";
-import { RxChevronDown } from "react-icons/rx";
 import { useCreateRevision } from "~/api/tree/mutate/createRevision";
 import { useNodeContent } from "~/api/tree/query/node";
 import { useRevertRevision } from "~/api/tree/mutate/revertRevision";
@@ -104,30 +103,19 @@ const WorkflowEditor: FC<{
             </PopoverContent>
           </Popover>
         )}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              disabled={hasUnsavedChanged}
-              data-testid="workflow-editor-btn-revision"
-            >
-              <GitMerge />
-              {t("pages.explorer.workflow.editor.revisionsBtn")}
-              <RxChevronDown />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-60">
-            <DropdownMenuItem
-              onClick={() => {
-                createRevision({
-                  path,
-                });
-              }}
-              data-testid="workflow-editor-btn-make-revision"
-            >
-              <GitBranchPlus className="mr-2 h-4 w-4" />
-              {t("pages.explorer.workflow.editor.makeRevision")}
-            </DropdownMenuItem>
+        <DropdownButtonRoot variant="outline" disabled={hasUnsavedChanged}>
+          <PrimaryButton
+            onClick={() => {
+              createRevision({
+                path,
+              });
+            }}
+            data-testid="workflow-editor-btn-make-revision"
+          >
+            <GitBranchPlus className="mr-2 h-4 w-4" />
+            {t("pages.explorer.workflow.editor.makeRevision")}
+          </PrimaryButton>
+          <DropdownButton data-testid="workflow-editor-btn-revision-drop">
             <DropdownMenuItem
               onClick={() => {
                 revertRevision({
@@ -139,8 +127,8 @@ const WorkflowEditor: FC<{
               <Undo className="mr-2 h-4 w-4" />
               {t("pages.explorer.workflow.editor.revertToPrevious")}
             </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+          </DropdownButton>
+        </DropdownButtonRoot>
         <Button variant="outline">
           <Play />
           {t("pages.explorer.workflow.editor.runBtn")}
