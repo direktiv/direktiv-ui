@@ -2,6 +2,7 @@ import { DropdownButton, DropdownButtonRoot, PrimaryButton } from ".";
 import { DropdownMenuGroup, DropdownMenuItem } from "../Dropdown";
 import { GitBranchIcon, Users } from "lucide-react";
 import type { Meta, StoryObj } from "@storybook/react";
+import Button from "../Button";
 
 const meta = {
   title: "Components/DropdownButton",
@@ -127,6 +128,18 @@ export const Disabled = () => (
 );
 export const ButtonSize = () => (
   <div className="flex flex-col gap-2">
+    <div className="flex flex-wrap gap-5">
+      <Button size="sm">
+        <GitBranchIcon /> Small Button
+      </Button>
+      <Button>
+        <GitBranchIcon /> Default Button
+      </Button>
+      <Button size="lg">
+        <GitBranchIcon /> Large Button
+      </Button>
+    </div>
+
     <DropdownButtonRoot size="lg">
       <PrimaryButton>
         LG Button
