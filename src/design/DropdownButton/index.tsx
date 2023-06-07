@@ -65,7 +65,7 @@ const ButtonFragmentClass = clsx(
   "border focus:ring-0 focus:ring-offset-0"
 );
 
-const ButtonColorClass = (variant: string | undefined) => {
+const ButtonColorClass = (variant?: string) => {
   if (!variant) {
     return "dark:bg-gray-dark-1 dark:hover:bg-gray-dark-3 dark:active:bg-gray-dark-4  dark:text-gray-dark-11 dark:border-gray-dark-10 bg-gray-1 hover:bg-gray-3 active:bg-gray-4 text-gray-11 border-gray-10";
   } else {
