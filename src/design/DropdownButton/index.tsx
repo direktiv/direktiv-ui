@@ -97,7 +97,7 @@ export const DropdownButton = React.forwardRef<
   HTMLButtonElement,
   ButtonHTMLAttributes<HTMLButtonElement> & ButtonProps
 >(({ children, variant, ...props }, ref) => (
-  <div className="flex ">
+  <div className="flex">
     <DropdownMenuTrigger asChild ref={ref} {...props}>
       <Button
         variant={variant}
