@@ -9,7 +9,7 @@ import ContentPanel, {
 } from "../../components/content-panel";
 import Pagination, { usePageHandler } from "../../components/pagination";
 import { VscClose, VscCloud, VscDebugStepInto, VscPlay } from "react-icons/vsc";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { AutoSizer } from "react-virtualized";
 import { Config } from "../../util";
@@ -78,6 +78,11 @@ function EventsPage(props) {
 
   const historyPageHandler = usePageHandler(PAGE_SIZE);
   const listenersPageHandler = usePageHandler(PAGE_SIZE);
+
+  // Reset pagination when filter params have changed
+  useEffect(() => {
+    historyPageHandler.updatePage(1);
+  }, [historyPageHandler, queryFilters]);
 
   const {
     eventHistory,
