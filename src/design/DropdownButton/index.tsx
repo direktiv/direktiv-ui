@@ -1,4 +1,3 @@
-import Button, { ButtonProps } from "../Button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -6,13 +5,14 @@ import {
 } from "../Dropdown";
 import React, { ButtonHTMLAttributes, HTMLAttributes } from "react";
 
+import Button from "../Button";
 import { ChevronDown } from "lucide-react";
 import clsx from "clsx";
 import { twMerge } from "tailwind-merge";
 
 interface RootProps extends HTMLAttributes<HTMLDivElement> {
   block?: boolean;
-  size?: "md" | "lg";
+  size?: "sm" | "lg";
   loading?: boolean;
   variant?: "destructive" | "outline" | "primary";
   disabled?: boolean;
@@ -65,25 +65,15 @@ const ButtonFragmentClass = clsx(
   "border focus:ring-0 focus:ring-offset-0"
 );
 
-const ButtonColorClass = (variant?: string) => {
-  if (!variant) {
-    return "dark:bg-gray-dark-1 dark:hover:bg-gray-dark-3 dark:active:bg-gray-dark-4  dark:text-gray-dark-11 dark:border-gray-dark-10 bg-gray-1 hover:bg-gray-3 active:bg-gray-4 text-gray-11 border-gray-10";
-  } else {
-    return "";
-  }
-};
-
 export const PrimaryButton = React.forwardRef<
   HTMLButtonElement,
-  HTMLAttributes<HTMLButtonElement> & ButtonProps
->(({ variant, children, ...props }, ref) => (
+  HTMLAttributes<HTMLButtonElement>
+>(({ children, ...props }, ref) => (
   <Button
-    variant={variant}
     ref={ref}
     {...props}
     className={clsx(
       "flex flex-1 flex-row rounded-none rounded-l-md",
-      ButtonColorClass(variant),
       ButtonFragmentClass
     )}
   >
@@ -95,16 +85,13 @@ PrimaryButton.displayName = "PrimaryButton";
 
 export const DropdownButton = React.forwardRef<
   HTMLButtonElement,
-  ButtonHTMLAttributes<HTMLButtonElement> & ButtonProps
->(({ children, variant, ...props }, ref) => (
+  ButtonHTMLAttributes<HTMLButtonElement>
+>(({ children, ...props }, ref) => (
   <div className="flex">
     <DropdownMenuTrigger asChild ref={ref} {...props}>
       <Button
-        variant={variant}
-        icon
         className={twMerge(
           ButtonFragmentClass,
-          ButtonColorClass(variant),
           "rounded-none rounded-r-md border-l-0"
         )}
       >
