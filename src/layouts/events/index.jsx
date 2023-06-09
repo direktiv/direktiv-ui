@@ -8,7 +8,8 @@ import ContentPanel, {
   ContentPanelTitleIcon,
 } from "../../components/content-panel";
 import Pagination, { usePageHandler } from "../../components/pagination";
-import { VscCloud, VscDebugStepInto, VscPlay } from "react-icons/vsc";
+import { VscClose, VscCloud, VscDebugStepInto, VscPlay } from "react-icons/vsc";
+import { useEffect, useMemo, useState } from "react";
 
 import { AutoSizer } from "react-virtualized";
 import { Config } from "../../util";
@@ -19,8 +20,8 @@ import { Link } from "react-router-dom";
 import Modal from "../../components/modal";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useApiKey } from "../../util/apiKeyProvider";
+import { useDebouncedCallback } from "use-debounce";
 import { useEvents } from "../../hooks";
-import { useState } from "react";
 import utc from "dayjs/plugin/utc";
 
 dayjs.extend(utc);
@@ -39,14 +40,62 @@ export default EventsPageWrapper;
 
 const PAGE_SIZE = 8;
 
+// how long to wait after typing before triggering a new request
+const DEBOUNCE_FILTER = 500;
+
 function EventsPage(props) {
   const { namespace } = props;
   const [apiKey] = useApiKey();
+
+  const [filterByType, setFilterByType] = useState("");
+  const [filterCreatedBefore, setFilterCreatedBefore] = useState("");
+  const [filterCreatedAfter, setFilterCreatedAfter] = useState("");
+  const [oldQueryFilters, setOldQueryFilters] = useState([]);
+
+  const debouncedSetFilterByType = useDebouncedCallback(
+    (value) => setFilterByType(value),
+    DEBOUNCE_FILTER
+  );
+
+  const queryFilters = useMemo(() => {
+    const newFilters = [];
+    if (filterByType !== "") {
+      newFilters.push(
+        `filter.field=TYPE&filter.type=MATCH&filter.val=${filterByType}`
+      );
+    }
+
+    if (filterCreatedBefore !== "") {
+      newFilters.push(
+        `filter.field=CREATED&filter.type=BEFORE&filter.val=${encodeURIComponent(
+          new Date(filterCreatedBefore).toISOString()
+        )}`
+      );
+    }
+
+    if (filterCreatedAfter !== "") {
+      newFilters.push(
+        `filter.field=CREATED&filter.type=AFTER&filter.val=${encodeURIComponent(
+          new Date(filterCreatedAfter).toISOString()
+        )}`
+      );
+    }
+
+    return newFilters;
+  }, [filterByType, filterCreatedBefore, filterCreatedAfter]);
 
   // errHistory and errListeners TODO show error if one
 
   const historyPageHandler = usePageHandler(PAGE_SIZE);
   const listenersPageHandler = usePageHandler(PAGE_SIZE);
+
+  // Reset pagination when filter params have changed
+  useEffect(() => {
+    if (oldQueryFilters !== queryFilters) {
+      historyPageHandler.updatePage(1);
+      setOldQueryFilters(queryFilters);
+    }
+  }, [historyPageHandler, queryFilters, oldQueryFilters]);
 
   const {
     eventHistory,
@@ -57,11 +106,112 @@ function EventsPage(props) {
     replayEvent,
   } = useEvents(Config.url, true, namespace, apiKey, {
     listeners: [listenersPageHandler.pageParams],
-    history: [historyPageHandler.pageParams],
+    history: [historyPageHandler.pageParams, ...queryFilters],
   });
 
   return (
     <>
+      <FlexBox
+        className="gap instance-filter"
+        style={{
+          justifyContent: "space-between",
+          alignItems: "center",
+          paddingBottom: "8px",
+          flexGrow: "0",
+        }}
+      >
+        <FlexBox col gap>
+          {/* FILTERS START */}
+
+          <FlexBox
+            className="gap instance-filter"
+            style={{
+              justifyContent: "space-between",
+              alignItems: "center",
+              paddingBottom: "8px",
+              flexGrow: "0",
+            }}
+          >
+            <FlexBox col gap>
+              <FlexBox row gap center="y">
+                Filter History by Type
+                {filterByType === "" ? null : (
+                  <div
+                    className="filter-close-btn"
+                    onClick={() => {
+                      setFilterByType("");
+                    }}
+                  >
+                    <VscClose />
+                  </div>
+                )}
+              </FlexBox>
+              <input
+                type="search"
+                placeholder="Event Type"
+                defaultValue={filterByType}
+                onChange={(e) => {
+                  debouncedSetFilterByType(e.target.value);
+                }}
+              />
+            </FlexBox>
+            <FlexBox col gap>
+              <FlexBox row gap center="y">
+                Filter Created Before
+                {filterCreatedBefore === "" ? null : (
+                  <div
+                    className="filter-close-btn"
+                    onClick={() => {
+                      setFilterCreatedBefore("");
+                    }}
+                  >
+                    <VscClose />
+                  </div>
+                )}
+              </FlexBox>
+              <input
+                type="datetime-local"
+                style={{
+                  color: `${filterCreatedBefore === "" ? "gray" : "#082032"}`,
+                }}
+                value={filterCreatedBefore}
+                required
+                onChange={(e) => {
+                  setFilterCreatedBefore(e.target.value);
+                }}
+              />
+            </FlexBox>
+            <FlexBox col gap>
+              <FlexBox row gap center="y">
+                Filter Created After
+                {filterCreatedAfter === "" ? null : (
+                  <div
+                    className="filter-close-btn"
+                    onClick={() => {
+                      setFilterCreatedAfter("");
+                    }}
+                  >
+                    <VscClose />
+                  </div>
+                )}
+              </FlexBox>
+              <input
+                type="datetime-local"
+                style={{
+                  color: `${filterCreatedAfter === "" ? "gray" : "#082032"}`,
+                }}
+                value={filterCreatedAfter}
+                required
+                onChange={(e) => {
+                  setFilterCreatedAfter(e.target.value);
+                }}
+              />
+            </FlexBox>
+          </FlexBox>
+
+          {/* FILTERS END */}
+        </FlexBox>
+      </FlexBox>
       <FlexBox col gap style={{ paddingRight: "8px" }}>
         <FlexBox>
           <ContentPanel style={{ width: "100%" }}>
@@ -128,7 +278,7 @@ function EventsPage(props) {
                               {dayjs
                                 .utc(obj.receivedAt)
                                 .local()
-                                .format("HH:mm:ss a")}
+                                .format("DD MMM YYYY HH:mm:ss")}
                             </td>
                             <td
                               style={{
