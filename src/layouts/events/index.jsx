@@ -20,6 +20,7 @@ import { Link } from "react-router-dom";
 import Modal from "../../components/modal";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useApiKey } from "../../util/apiKeyProvider";
+import { useDebouncedCallback } from "use-debounce";
 import { useEvents } from "../../hooks";
 import utc from "dayjs/plugin/utc";
 
@@ -39,6 +40,9 @@ export default EventsPageWrapper;
 
 const PAGE_SIZE = 8;
 
+// how long to wait after typing before triggering a new request
+const DEBOUNCE_FILTER = 500;
+
 function EventsPage(props) {
   const { namespace } = props;
   const [apiKey] = useApiKey();
@@ -47,6 +51,11 @@ function EventsPage(props) {
   const [filterCreatedBefore, setFilterCreatedBefore] = useState("");
   const [filterCreatedAfter, setFilterCreatedAfter] = useState("");
   const [oldQueryFilters, setOldQueryFilters] = useState([]);
+
+  const debouncedSetFilterByType = useDebouncedCallback(
+    (value) => setFilterByType(value),
+    DEBOUNCE_FILTER
+  );
 
   const queryFilters = useMemo(() => {
     const newFilters = [];
@@ -140,9 +149,9 @@ function EventsPage(props) {
               <input
                 type="search"
                 placeholder="Event Type"
-                value={filterByType}
+                defaultValue={filterByType}
                 onChange={(e) => {
-                  setFilterByType(e.target.value);
+                  debouncedSetFilterByType(e.target.value);
                 }}
               />
             </FlexBox>
