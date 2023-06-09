@@ -46,6 +46,7 @@ function EventsPage(props) {
   const [filterByType, setFilterByType] = useState("");
   const [filterCreatedBefore, setFilterCreatedBefore] = useState("");
   const [filterCreatedAfter, setFilterCreatedAfter] = useState("");
+  const [oldQueryFilters, setOldQueryFilters] = useState([]);
 
   const queryFilters = useMemo(() => {
     const newFilters = [];
@@ -81,8 +82,11 @@ function EventsPage(props) {
 
   // Reset pagination when filter params have changed
   useEffect(() => {
-    historyPageHandler.updatePage(1);
-  }, [historyPageHandler, queryFilters]);
+    if (oldQueryFilters !== queryFilters) {
+      historyPageHandler.updatePage(1);
+      setOldQueryFilters(queryFilters);
+    }
+  }, [historyPageHandler, queryFilters, oldQueryFilters]);
 
   const {
     eventHistory,
