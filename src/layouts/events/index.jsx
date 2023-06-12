@@ -43,6 +43,18 @@ const PAGE_SIZE = 8;
 // how long to wait after typing before triggering a new request
 const DEBOUNCE_FILTER = 500;
 
+const defaultBeforeDate = dayjs()
+  .add(1, "day")
+  .hour(0)
+  .minute(0)
+  .format("YYYY-MM-DDTHH:mm");
+
+const defaultAfterDate = dayjs()
+  .subtract(7, "day")
+  .hour(0)
+  .minute(0)
+  .format("YYYY-MM-DDTHH:mm");
+
 function EventsPage(props) {
   const { namespace } = props;
   const [apiKey] = useApiKey();
@@ -61,7 +73,7 @@ function EventsPage(props) {
     const newFilters = [];
     if (filterByType !== "") {
       newFilters.push(
-        `filter.field=TYPE&filter.type=MATCH&filter.val=${filterByType}`
+        `filter.field=TYPE&filter.type=CONTAINS&filter.val=${filterByType}`
       );
     }
 
@@ -174,7 +186,7 @@ function EventsPage(props) {
                 style={{
                   color: `${filterCreatedBefore === "" ? "gray" : "#082032"}`,
                 }}
-                value={filterCreatedBefore}
+                defaultValue={defaultBeforeDate}
                 required
                 onChange={(e) => {
                   setFilterCreatedBefore(e.target.value);
@@ -200,7 +212,7 @@ function EventsPage(props) {
                 style={{
                   color: `${filterCreatedAfter === "" ? "gray" : "#082032"}`,
                 }}
-                value={filterCreatedAfter}
+                defaultValue={defaultAfterDate}
                 required
                 onChange={(e) => {
                   setFilterCreatedAfter(e.target.value);
