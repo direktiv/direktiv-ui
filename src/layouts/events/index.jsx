@@ -1,7 +1,5 @@
 import "./style.css";
 
-import * as dayjs from "dayjs";
-
 import ContentPanel, {
   ContentPanelBody,
   ContentPanelTitle,
@@ -18,6 +16,8 @@ import FlexBox from "../../components/flexbox";
 import HelpIcon from "../../components/help";
 import { Link } from "react-router-dom";
 import Modal from "../../components/modal";
+import dayjs from "dayjs";
+import objectSupport from "dayjs/plugin/objectSupport";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useApiKey } from "../../util/apiKeyProvider";
 import { useDebouncedCallback } from "use-debounce";
@@ -26,6 +26,7 @@ import utc from "dayjs/plugin/utc";
 
 dayjs.extend(utc);
 dayjs.extend(relativeTime);
+dayjs.extend(objectSupport);
 
 function EventsPageWrapper(props) {
   const { namespace } = props;
