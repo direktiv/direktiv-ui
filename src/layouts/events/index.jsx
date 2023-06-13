@@ -60,6 +60,7 @@ function EventsPage(props) {
   const [apiKey] = useApiKey();
 
   const [filterByType, setFilterByType] = useState("");
+  const [filterByText, setFilterByText] = useState("");
   const [filterCreatedBefore, setFilterCreatedBefore] = useState("");
   const [filterCreatedAfter, setFilterCreatedAfter] = useState("");
   const [oldQueryFilters, setOldQueryFilters] = useState([]);
@@ -69,11 +70,22 @@ function EventsPage(props) {
     DEBOUNCE_FILTER
   );
 
+  const debouncedSetFilterByText = useDebouncedCallback(
+    (value) => setFilterByText(value),
+    DEBOUNCE_FILTER
+  );
+
   const queryFilters = useMemo(() => {
     const newFilters = [];
     if (filterByType !== "") {
       newFilters.push(
         `filter.field=TYPE&filter.type=CONTAINS&filter.val=${filterByType}`
+      );
+    }
+
+    if (filterByText !== "") {
+      newFilters.push(
+        `&filter.field=TEXT&filter.type=CONTAINS&filter.val=${filterByText}`
       );
     }
 
@@ -94,7 +106,7 @@ function EventsPage(props) {
     }
 
     return newFilters;
-  }, [filterByType, filterCreatedBefore, filterCreatedAfter]);
+  }, [filterByType, filterByText, filterCreatedBefore, filterCreatedAfter]);
 
   // errHistory and errListeners TODO show error if one
 
@@ -136,11 +148,11 @@ function EventsPage(props) {
           {/* FILTERS START */}
 
           <FlexBox
-            className="gap instance-filter"
+            className="gap event-filter"
             style={{
               justifyContent: "space-between",
               alignItems: "center",
-              paddingBottom: "8px",
+              paddingRight: "8px",
               flexGrow: "0",
             }}
           >
@@ -158,14 +170,41 @@ function EventsPage(props) {
                   </div>
                 )}
               </FlexBox>
-              <input
-                type="search"
-                placeholder="Event Type"
-                defaultValue={filterByType}
-                onChange={(e) => {
-                  debouncedSetFilterByType(e.target.value);
-                }}
-              />
+              <FlexBox row gap center="y">
+                <input
+                  type="search"
+                  placeholder="Event Type"
+                  defaultValue={filterByType}
+                  onChange={(e) => {
+                    debouncedSetFilterByType(e.target.value);
+                  }}
+                />
+              </FlexBox>
+            </FlexBox>
+            <FlexBox col gap>
+              <FlexBox row gap center="y">
+                Filter by Text
+                {filterByType === "" ? null : (
+                  <div
+                    className="filter-close-btn"
+                    onClick={() => {
+                      setFilterByText("");
+                    }}
+                  >
+                    <VscClose />
+                  </div>
+                )}
+              </FlexBox>
+              <FlexBox row gap center="y">
+                <input
+                  type="search"
+                  placeholder="Event Text"
+                  defaultValue={filterByText}
+                  onChange={(e) => {
+                    debouncedSetFilterByText(e.target.value);
+                  }}
+                />
+              </FlexBox>
             </FlexBox>
             <FlexBox col gap>
               <FlexBox row gap center="y">
@@ -181,17 +220,19 @@ function EventsPage(props) {
                   </div>
                 )}
               </FlexBox>
-              <input
-                type="datetime-local"
-                style={{
-                  color: `${filterCreatedBefore === "" ? "gray" : "#082032"}`,
-                }}
-                defaultValue={defaultBeforeDate}
-                required
-                onChange={(e) => {
-                  setFilterCreatedBefore(e.target.value);
-                }}
-              />
+              <FlexBox row gap center="y">
+                <input
+                  type="datetime-local"
+                  style={{
+                    color: `${filterCreatedBefore === "" ? "gray" : "#082032"}`,
+                  }}
+                  defaultValue={defaultBeforeDate}
+                  required
+                  onChange={(e) => {
+                    setFilterCreatedBefore(e.target.value);
+                  }}
+                />
+              </FlexBox>
             </FlexBox>
             <FlexBox col gap>
               <FlexBox row gap center="y">
@@ -207,22 +248,24 @@ function EventsPage(props) {
                   </div>
                 )}
               </FlexBox>
-              <input
-                type="datetime-local"
-                style={{
-                  color: `${filterCreatedAfter === "" ? "gray" : "#082032"}`,
-                }}
-                defaultValue={defaultAfterDate}
-                required
-                onChange={(e) => {
-                  setFilterCreatedAfter(e.target.value);
-                }}
-              />
+              <FlexBox row gap center="y">
+                <input
+                  type="datetime-local"
+                  style={{
+                    color: `${filterCreatedAfter === "" ? "gray" : "#082032"}`,
+                  }}
+                  defaultValue={defaultAfterDate}
+                  required
+                  onChange={(e) => {
+                    setFilterCreatedAfter(e.target.value);
+                  }}
+                />
+              </FlexBox>
             </FlexBox>
           </FlexBox>
-
-          {/* FILTERS END */}
         </FlexBox>
+
+        {/* FILTERS END */}
       </FlexBox>
       <FlexBox col gap style={{ paddingRight: "8px" }}>
         <FlexBox>
