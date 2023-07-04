@@ -94,24 +94,13 @@ const WorkflowRevisionsPage = () => {
           </DialogContent>
         </Dialog>
       </div>
-      <Popover>
-        <PopoverTrigger asChild>
-          <Card className="grow p-4" data-testid="revisions-detail-editor">
-            <Editor
-              value={workflowData}
-              theme={theme ?? undefined}
-              options={{ readOnly: true }}
-            />
-          </Card>
-        </PopoverTrigger>
-        <PopoverContent asChild>
-          <Alert variant="info" className="min-w-max">
-            {t(
-              "pages.explorer.tree.workflow.revisions.overview.detail.readOnlyNote"
-            )}
-          </Alert>
-        </PopoverContent>
-      </Popover>
+      <Card className="grow p-4" data-testid="revisions-detail-editor">
+        <Editor
+          value={workflowData}
+          theme={theme ?? undefined}
+          options={{ readOnly: true }}
+        />
+      </Card>
     </div>
   );
 };
