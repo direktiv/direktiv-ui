@@ -35,7 +35,9 @@ jobs:
         run: curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
       - name: install a db
         run: KUBECONFIG=/etc/rancher/k3s/k3s.yaml helm repo add bitnami https://charts.bitnami.com/bitnami && KUBECONFIG=/etc/rancher/k3s/k3s.yaml helm install psql-single bitnami/postgresql --set postgresqlUsername=direktiv --set postgresqlPassword=direktivdirektiv
-      - name: install direktiv 
+      - name: add repo
+        run: helm repo add direktiv https://chart.direktiv.io
+      - name: install direktiv
         run: KUBECONFIG=/etc/rancher/k3s/k3s.yaml helm install -f direktiv.yaml -n direktiv direktiv direktiv/direktiv
       - name: Wait for direktiv-flow pod to be ready
         run: |
