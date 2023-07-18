@@ -29,7 +29,7 @@ jobs:
       - name: setup helm
         run: curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
       - name: install a db
-        run: helm repo add bitnami https://charts.bitnami.com/bitnami && helm install psql-single bitnami/postgresql --set postgresqlUsername=direktiv --set postgresqlPassword=direktivdirektiv
+        run: helm repo add bitnami https://charts.bitnami.com/bitnami && helm install psql-single bitnami/postgresql
       - name: add repo
         run: helm repo add direktiv https://chart.direktiv.io
       - name: Clone direktiv-charts repository
@@ -79,7 +79,8 @@ jobs:
             user: "postgres"
             password: "$(kubectl get secret --namespace default psql-single-postgresql -o jsonpath="{.data.postgres-password}" | base64 -d)"
             name: "postgres"
-            sslmode: disable"
+            sslmode: "disable"
+    
           EOF
       - name: Install direktiv chart
         run: |
