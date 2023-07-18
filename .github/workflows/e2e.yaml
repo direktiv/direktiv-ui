@@ -2,6 +2,9 @@ name: E2E Playwright local Tests
 on: pull_request
 env:
   KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+  DIRECTIV_INGRESS_IP: ${{ steps.getInternalIP.outputs.internal_ip }}
+  VITE_E2E_UI_HOST: ${{ env.DIRECTIV_INGRESS_IP }}
+  VITE_E2E_UI_PORT: 80
 jobs:
   test:
     timeout-minutes: 60
@@ -99,14 +102,18 @@ jobs:
           kubectl get all
       - name: Run Playwright tests
         run: yarn playwright test --workers 8
-  
+      - name: Get Internal IP
+        id: getInternalIP
+        run: |
+          internal_ip=$(kubectl get service direktiv-ingress-nginx-controller -o jsonpath='{.spec.clusterIP}')
+          echo "::set-output name=internal_ip::$internal_ip"
         #run: yarn jest
         env:
-          VITE_E2E_UI_HOST: 127.0.0.0
-          VITE_E2E_UI_PORT: 80
+          #VITE_E2E_UI_HOST: 127.0.0.0
+          #VITE_E2E_UI_PORT: 80
           VITE_DEV_API_DOMAIN: admin
           #VITE_E2E_UI_HOST: ${{ vars.VITE_E2E_UI_HOST }}
-          #VITE_E2E_UI_PORT: ${{ vars.VITE_E2E_UI_PORT }}
+          
           #VITE_DEV_API_DOMAIN: ${{ vars.VITE_DEV_API_DOMAIN }}
       - uses: actions/upload-artifact@v3
         if: always()
