@@ -114,7 +114,7 @@ jobs:
           echo "DIRECTIV_INGRESS_IP=${{ steps.getInternalIP.outputs.internal_ip }}" >> $GITHUB_ENV
           echo "VITE_DEV_API_DOMAIN=${{ steps.getInternalIP.outputs.internal_ip }}" >> $GITHUB_ENV
       - name: Run Playwright tests
-        run: yarn playwright test --workers 8
+        run: yarn playwright test --workers 1
         #run: yarn jest
         env:
           VITE_E2E_UI_HOST: http://localhost
