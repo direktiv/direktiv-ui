@@ -38,7 +38,7 @@ jobs:
       - name: add repo
         run: helm repo add direktiv https://chart.direktiv.io
       - name: install direktiv
-        run: KUBECONFIG=/etc/rancher/k3s/k3s.yaml helm install -f direktiv.yaml -n direktiv direktiv direktiv/direktiv
+        run: KUBECONFIG=/etc/rancher/k3s/k3s.yaml helm install direktiv direktiv/direktiv
       - name: Wait for direktiv-flow pod to be ready
         run: |
             while ! kubectl wait --for=condition=Ready pod -l app=direktiv-flow --timeout=300s; do sleep 10; done
