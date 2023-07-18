@@ -27,15 +27,15 @@ jobs:
       - name: setup helm
         run: curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
       - name: install a db
-        run: helm repo add bitnami https://charts.bitnami.com/bitnami && helm install psql-single bitnami/postgresql
+        run: KUBECONFIG=/etc/rancher/k3s/k3s.yaml helm repo add bitnami https://charts.bitnami.com/bitnami && KUBECONFIG=/etc/rancher/k3s/k3s.yaml helm install psql-single bitnami/postgresql
       - name: waiting for db to launch
-        run: while ! kubectl get secret --namespace default psql-single-postgresql; do sleep 2; done
+        run: KUBECONFIG=/etc/rancher/k3s/k3s.yaml while ! kubectl get secret --namespace default psql-single-postgresql; do sleep 2; done
       - name: create config
-        run: 'echo "database:\n  host: \"psql-single-postgresql\"\n  port: 5432\n  user: \"postgres\"\n  password: \"$(kubectl get secret --namespace default psql-single-postgresql -o jsonpath="{.data.postgres-password}" | base64 -d)\"\n  name: \"postgres\"\n  sslmode: disable" >> dev.yaml' 
+        run: 'KUBECONFIG=/etc/rancher/k3s/k3s.yaml echo "database:\n  host: \"psql-single-postgresql\"\n  port: 5432\n  user: \"postgres\"\n  password: \"$(kubectl get secret --namespace default psql-single-postgresql -o jsonpath="{.data.postgres-password}" | base64 -d)\"\n  name: \"postgres\"\n  sslmode: disable" >> dev.yaml' 
       - name: install direktiv 
-        run: helm install -f direktiv.yaml -n direktiv direktiv direktiv/direktiv
+        run: KUBECONFIG=/etc/rancher/k3s/k3s.yaml helm install -f direktiv.yaml -n direktiv direktiv direktiv/direktiv
       - name: get ip
-        run: kubectl -n direktiv get services direktiv-ingress-nginx-controller --output jsonpath='{.status.loadBalancer.ingress[0].ip}'
+        run: KUBECONFIG=/etc/rancher/k3s/k3s.yaml kubectl -n direktiv get services direktiv-ingress-nginx-controller --output jsonpath='{.status.loadBalancer.ingress[0].ip}'
       - name: Run Playwright tests
         run: yarn playwright test --workers 8
   
