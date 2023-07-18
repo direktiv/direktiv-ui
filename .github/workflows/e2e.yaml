@@ -73,7 +73,7 @@ jobs:
           helm install direktiv -f dev.yaml ./direktiv-charts/charts/direktiv/
       - name: Wait for direktiv-flow pod to be ready
         run: |
-          while ! kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance=direktiv --timeout=20s; do
+          while ! kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance=direktiv --timeout=300s; do
             echo "Listing all pods:"
             kubectl get pods -l app.kubernetes.io/instance=direktiv
             kubectl describe deployments/direktiv-flow
