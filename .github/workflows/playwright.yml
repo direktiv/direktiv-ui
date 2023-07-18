@@ -23,7 +23,8 @@ jobs:
       - name: Install Playwright Browsers
         run: yarn playwright install --with-deps
       - name: Run Playwright tests
-        run: yarn playwright test
+        run: yarn playwright test --headless
+        #run: yarn jest
         env:
           VITE_E2E_UI_HOST: ${{ vars.VITE_E2E_UI_HOST }}
           VITE_E2E_UI_PORT: ${{ vars.VITE_E2E_UI_PORT }}
