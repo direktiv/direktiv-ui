@@ -35,12 +35,12 @@ jobs:
       - name: Clone direktiv-charts repository
         run: |
           git clone https://github.com/direktiv/direktiv-charts.git direktiv-charts
-          git -C direktiv-charts checkout temp-remove-secrets
+          git -C direktiv-charts checkout one-binary
           helm dependency update direktiv-charts/charts/direktiv
       - name: Create dev.yaml file
         run: |
           cat <<EOF > dev.yaml
-          registry: localhost:5000
+          registry: github.io
           pullPolicy: Always
           debug: "true"
 
