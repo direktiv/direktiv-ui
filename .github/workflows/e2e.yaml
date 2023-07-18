@@ -16,6 +16,13 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
       - name: Install dependencies
         run: yarn
         env:
@@ -29,7 +36,7 @@ jobs:
       - name: install a db
         run: KUBECONFIG=/etc/rancher/k3s/k3s.yaml helm repo add bitnami https://charts.bitnami.com/bitnami && KUBECONFIG=/etc/rancher/k3s/k3s.yaml helm install psql-single bitnami/postgresql
       - name: waiting for db to launch
-        run: KUBECONFIG=/etc/rancher/k3s/k3s.yaml while ! kubectl get secret --namespace default psql-single-postgresql; do sleep 2; done
+        run: KUBECONFIG=/etc/rancher/k3s/k3s.yaml; while ! kubectl get secret --namespace default psql-single-postgresql; do sleep 2; done
       - name: create config
         run: 'KUBECONFIG=/etc/rancher/k3s/k3s.yaml echo "database:\n  host: \"psql-single-postgresql\"\n  port: 5432\n  user: \"postgres\"\n  password: \"$(kubectl get secret --namespace default psql-single-postgresql -o jsonpath="{.data.postgres-password}" | base64 -d)\"\n  name: \"postgres\"\n  sslmode: disable" >> dev.yaml' 
       - name: install direktiv 
