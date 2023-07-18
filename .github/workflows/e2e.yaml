@@ -22,6 +22,13 @@ jobs:
           key: ${{ runner.os }}-apt-packages-${{ hashFiles('**/apt.lock') }}
           restore-keys: |
             ${{ runner.os }}-apt-packages-
+      - name: Cache Yarn packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
       - name: setup k3s
         run: curl -sfL https://get.k3s.io | sh -s - --disable traefik --write-kubeconfig-mode=644
       - name: setup helm
@@ -105,16 +112,13 @@ jobs:
       - name: Set Environment Variables
         run: |
           echo "DIRECTIV_INGRESS_IP=${{ steps.getInternalIP.outputs.internal_ip }}" >> $GITHUB_ENV
-          echo "VITE_E2E_UI_HOST=${{ steps.getInternalIP.outputs.internal_ip }}" >> $GITHUB_ENV
+          echo "VITE_DEV_API_DOMAIN=${{ steps.getInternalIP.outputs.internal_ip }}" >> $GITHUB_ENV
       - name: Run Playwright tests
         run: yarn playwright test --workers 8
         #run: yarn jest
         env:
-          VITE_E2E_UI_PORT: 80
-          VITE_DEV_API_DOMAIN: admin
-          #VITE_E2E_UI_HOST: ${{ vars.VITE_E2E_UI_HOST }}
-          
-          #VITE_DEV_API_DOMAIN: ${{ vars.VITE_DEV_API_DOMAIN }}
+          VITE_E2E_UI_PORT: ${{ vars.VITE_DEV_API_DOMAIN }}
+          VITE_E2E_UI_HOST: ${{ vars.VITE_E2E_UI_HOST }}
       - uses: actions/upload-artifact@v3
         if: always()
         with:
