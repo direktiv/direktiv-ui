@@ -117,8 +117,8 @@ jobs:
         run: yarn playwright test --workers 8
         #run: yarn jest
         env:
-          VITE_E2E_UI_PORT: ${{ vars.VITE_DEV_API_DOMAIN }}
-          VITE_E2E_UI_HOST: ${{ vars.VITE_E2E_UI_HOST }}
+          VITE_E2E_UI_HOST: http://localhost
+          VITE_E2E_UI_PORT: 3333
       - uses: actions/upload-artifact@v3
         if: always()
         with:
