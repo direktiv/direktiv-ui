@@ -15,15 +15,13 @@ jobs:
           key: ${{ runner.os }}-playwright-browsers-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-playwright-browsers-
-      - uses: actions/setup-node@v3
+      - name: Cache Ubuntu packages
+        uses: actions/cache@v2
         with:
-          node-version: 18
-      - name: Install dependencies
-        run: yarn
-        env:
-          CI: true
-      - name: Install Playwright Browsers
-        run: yarn playwright install --with-deps
+          path: /var/cache/apt/archives
+          key: ${{ runner.os }}-apt-packages-${{ hashFiles('**/apt.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-apt-packages-
       - name: setup k3s
         run: curl -sfL https://get.k3s.io | sh -s - --disable traefik --write-kubeconfig-mode=644
       - name: setup helm
@@ -85,13 +83,20 @@ jobs:
       - name: Install direktiv chart
         run: |
           helm install direktiv -f dev.yaml ./direktiv-charts/charts/direktiv/
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Install dependencies
+        run: yarn
+        env:
+          CI: true
+      - name: Install Playwright Browsers
+        run: yarn playwright install --with-deps
       - name: Wait for direktiv-flow pod to be ready
         run: |
           kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance=direktiv --timeout=800s
           echo "Listing all pods:"
-          kubectl get pods -l app.kubernetes.io/instance=direktiv
-          kubectl describe deployments/direktiv-flow
-          kubectl logs deployments/direktiv-flow
+          kubectl get all
       - name: Run Playwright tests
         run: yarn playwright test --workers 8
   
