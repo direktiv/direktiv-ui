@@ -18,13 +18,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-      - name: Cache Node.js dependencies
-        uses: actions/cache@v2
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
       - name: Install dependencies
         run: yarn
         env:
@@ -39,11 +32,47 @@ jobs:
         run: helm repo add bitnami https://charts.bitnami.com/bitnami && helm install psql-single bitnami/postgresql --set postgresqlUsername=direktiv --set postgresqlPassword=direktivdirektiv
       - name: add repo
         run: helm repo add direktiv https://chart.direktiv.io
-      - name: install direktiv
-        run: helm install direktiv direktiv/direktiv
+      - name: Clone direktiv-charts repository
+        run: |
+          git clone https://github.com/direktiv/direktiv-charts.git direktiv-charts
+          git -C direktiv-charts checkout temp-remove-secrets
+      - name: Create dev.yaml file
+        run: |
+          cat <<EOF > dev.yaml
+          registry: localhost:5000
+          pullPolicy: Always
+          debug: "true"
+
+          secrets:
+            image: "h8718/direktiv_075_ev"
+            tag: "latest"
+
+          flow:
+            image: "h8718/direktiv_075_ev"
+            dbimage: "h8718/direktiv_075_ev"
+            tag: "latest"
+
+          ui:
+            image: "ui"
+            tag: "latest"
+
+          api:
+            image: "h8718/direktiv_075_ev"
+            tag: "latest"
+
+          functions:
+            namespace: direktiv-services-direktiv
+            image: "h8718/direktiv_075_ev"
+            tag: "latest"
+            sidecar: "h8718/direktiv_075_ev"
+            initPodImage: "init-pod"
+          EOF
+      - name: Install direktiv chart
+        run: |
+          helm install direktiv -f dev.yaml direktiv-charts/direktiv
       - name: Wait for direktiv-flow pod to be ready
         run: |
-          while ! kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance=direktiv --timeout=10s; do
+          while ! kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance=direktiv --timeout=100s; do
             echo "Listing all pods:"
             kubectl get pods -l app.kubernetes.io/instance=direktiv
             kubectl logs deployments/direktiv-flow
