@@ -37,10 +37,13 @@ jobs:
           git clone https://github.com/direktiv/direktiv-charts.git direktiv-charts
           git -C direktiv-charts checkout one-binary
           helm dependency update direktiv-charts/charts/direktiv
+      - name: Wait for direktiv-flow pod to be ready
+        run: |
+          kubectl get secret --namespace default psql-single-postgresql --timeout=80s
       - name: Create dev.yaml file
         run: |
           cat <<EOF > dev.yaml
-          registry: github.io
+          registry: docker.io
           pullPolicy: Always
           debug: "true"
 
@@ -54,7 +57,7 @@ jobs:
             tag: "latest"
 
           ui:
-            image: "ui"
+            image: "direktiv/ui"
             tag: "latest"
 
           api:
@@ -67,19 +70,24 @@ jobs:
             tag: "latest"
             sidecar: "h8718/direktiv_075_ev"
             initPodImage: "direktiv/direktiv-init-pod"
+          database:
+            host: "psql-single-postgresql"
+            port: 5432
+            user: "postgres"
+            password: "$(kubectl get secret --namespace default psql-single-postgresql -o jsonpath="{.data.postgres-password}" | base64 -d)"
+            name: "postgres"
+            sslmode: disable"
           EOF
       - name: Install direktiv chart
         run: |
           helm install direktiv -f dev.yaml ./direktiv-charts/charts/direktiv/
       - name: Wait for direktiv-flow pod to be ready
         run: |
-          while ! kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance=direktiv --timeout=800s; do
-            echo "Listing all pods:"
-            kubectl get pods -l app.kubernetes.io/instance=direktiv
-            kubectl describe deployments/direktiv-flow
-            kubectl logs deployments/direktiv-flow
-            sleep 10
-          done
+          kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance=direktiv --timeout=800s
+          echo "Listing all pods:"
+          kubectl get pods -l app.kubernetes.io/instance=direktiv
+          kubectl describe deployments/direktiv-flow
+          kubectl logs deployments/direktiv-flow
       - name: Run Playwright tests
         run: yarn playwright test --workers 8
   
