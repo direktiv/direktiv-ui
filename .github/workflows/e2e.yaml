@@ -69,7 +69,7 @@ jobs:
           EOF
       - name: Install direktiv chart
         run: |
-          helm install direktiv -f dev.yaml direktiv-charts/direktiv
+          helm install direktiv -f dev.yaml ./direktiv-charts/charts/direktiv/
       - name: Wait for direktiv-flow pod to be ready
         run: |
           while ! kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance=direktiv --timeout=100s; do
