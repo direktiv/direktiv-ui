@@ -43,7 +43,11 @@ jobs:
         run: helm install direktiv direktiv/direktiv
       - name: Wait for direktiv-flow pod to be ready
         run: |
-            while ! kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance=direktiv --timeout=300s; do sleep 10; done
+          while ! kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance=direktiv --timeout=300s; do
+            echo "Listing all pods:"
+            kubectl get pods -l app.kubernetes.io/instance=direktiv
+            sleep 10
+          done
       - name: Run Playwright tests
         run: yarn playwright test --workers 8
   
