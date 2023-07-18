@@ -19,6 +19,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /var/lib/docker
+          key: ${{ runner.os }}-docker-${{ hashFiles('**/Dockerfile') }}
+          restore-keys: |
+            ${{ runner.os }}-docker-
+
       - name: Log in to the Container registry
         uses: docker/login-action@v2
         with:

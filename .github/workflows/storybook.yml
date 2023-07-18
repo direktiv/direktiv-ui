@@ -13,6 +13,8 @@ jobs:
           fetch-depth: 0 # chromatic needs all commits
       - name: Install dependencies
         run: yarn
+        env:
+          CI: true
       - name: Publish to Chromatic
         uses: chromaui/action@v1
         with:

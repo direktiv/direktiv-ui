@@ -10,6 +10,12 @@ jobs:
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v3
+      - name: Cache node modules
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: ${{ runner.os }}-yarn-
       - name: run linter, typecheck, prettier and make testbuild
         uses: actions/setup-node@v3
         with:
