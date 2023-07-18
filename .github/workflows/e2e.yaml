@@ -2,9 +2,6 @@ name: E2E Playwright local Tests
 on: pull_request
 env:
   KUBECONFIG: /etc/rancher/k3s/k3s.yaml
-  DIRECTIV_INGRESS_IP: ${{ steps.getInternalIP.outputs.internal_ip }}
-  VITE_E2E_UI_HOST: ${{ env.DIRECTIV_INGRESS_IP }}
-  VITE_E2E_UI_PORT: 80
 jobs:
   test:
     timeout-minutes: 60
@@ -100,17 +97,20 @@ jobs:
           kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance=direktiv --timeout=800s
           echo "Listing all pods:"
           kubectl get all
-      - name: Run Playwright tests
-        run: yarn playwright test --workers 8
       - name: Get Internal IP
         id: getInternalIP
         run: |
           internal_ip=$(kubectl get service direktiv-ingress-nginx-controller -o jsonpath='{.spec.clusterIP}')
           echo "::set-output name=internal_ip::$internal_ip"
+      - name: Set Environment Variables
+        run: |
+          echo "DIRECTIV_INGRESS_IP=${{ steps.getInternalIP.outputs.internal_ip }}" >> $GITHUB_ENV
+          echo "VITE_E2E_UI_HOST=${{ steps.getInternalIP.outputs.internal_ip }}" >> $GITHUB_ENV
+      - name: Run Playwright tests
+        run: yarn playwright test --workers 8
         #run: yarn jest
         env:
-          #VITE_E2E_UI_HOST: 127.0.0.0
-          #VITE_E2E_UI_PORT: 80
+          VITE_E2E_UI_PORT: 80
           VITE_DEV_API_DOMAIN: admin
           #VITE_E2E_UI_HOST: ${{ vars.VITE_E2E_UI_HOST }}
           
