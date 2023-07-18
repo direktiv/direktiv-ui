@@ -39,7 +39,10 @@ jobs:
           helm dependency update direktiv-charts/charts/direktiv
       - name: Wait for direktiv-flow pod to be ready
         run: |
-          kubectl get secret --namespace default psql-single-postgresql --timeout=80s
+          while ! kubectl get secret --namespace default psql-single-postgresql
+          do
+              sleep 2
+          done
       - name: Create dev.yaml file
         run: |
           cat <<EOF > dev.yaml
