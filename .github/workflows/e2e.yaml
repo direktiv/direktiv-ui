@@ -8,22 +8,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Cache Playwright browsers
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-browsers-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-playwright-browsers-
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - name: Install dependencies
-        run: yarn
-        env:
-          CI: true
-      - name: Install Playwright Browsers
-        run: yarn playwright install --with-deps
+      # - name: Cache Playwright browsers
+      #   uses: actions/cache@v2
+      #   with:
+      #     path: ~/.cache/ms-playwright
+      #     key: ${{ runner.os }}-playwright-browsers-${{ hashFiles('**/yarn.lock') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-playwright-browsers-
+      # - uses: actions/setup-node@v3
+      #   with:
+      #     node-version: 18
+      # - name: Install dependencies
+      #   run: yarn
+      #   env:
+      #     CI: true
+      # - name: Install Playwright Browsers
+      #   run: yarn playwright install --with-deps
       - name: setup k3s
         run: curl -sfL https://get.k3s.io | sh -s - --disable traefik --write-kubeconfig-mode=644
       - name: setup helm
@@ -66,16 +66,17 @@ jobs:
             image: "h8718/direktiv_075_ev"
             tag: "latest"
             sidecar: "h8718/direktiv_075_ev"
-            initPodImage: "init-pod"
+            initPodImage: "direktiv/direktiv-init-pod"
           EOF
       - name: Install direktiv chart
         run: |
           helm install direktiv -f dev.yaml ./direktiv-charts/charts/direktiv/
       - name: Wait for direktiv-flow pod to be ready
         run: |
-          while ! kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance=direktiv --timeout=100s; do
+          while ! kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance=direktiv --timeout=20s; do
             echo "Listing all pods:"
             kubectl get pods -l app.kubernetes.io/instance=direktiv
+            kubectl describe deployments/direktiv-flow
             kubectl logs deployments/direktiv-flow
             sleep 10
           done
