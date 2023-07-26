@@ -4,8 +4,8 @@ import {
   actionRevertRevision,
   actionWaitForSuccessToast,
 } from "./utils";
-import { createNamespace, deleteNamespace } from "../../utils/namespace";
 
+import { createNamespace } from "../../utils/namespace";
 import { createWorkflow } from "../../utils/node";
 import { faker } from "@faker-js/faker";
 
@@ -19,7 +19,6 @@ test.beforeEach(async () => {
 });
 
 test.afterEach(async () => {
-  await deleteNamespace(namespace);
   namespace = "";
 });
 

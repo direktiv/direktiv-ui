@@ -1,7 +1,7 @@
-import { createNamespace, deleteNamespace } from "../../../utils/namespace";
 import { expect, test } from "@playwright/test";
 
 import { noop as basicWorkflow } from "~/pages/namespace/Explorer/Tree/NewWorkflow/templates";
+import { createNamespace } from "../../../utils/namespace";
 import { createWorkflow } from "~/api/tree/mutate/createWorkflow";
 import { createWorkflowWithThreeRevisions } from "../../../utils/revisions";
 import { faker } from "@faker-js/faker";
@@ -14,7 +14,6 @@ test.beforeEach(async () => {
 });
 
 test.afterEach(async () => {
-  await deleteNamespace(namespace);
   namespace = "";
 });
 

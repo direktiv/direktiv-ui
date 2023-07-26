@@ -1,7 +1,7 @@
 import { Page, expect, test } from "@playwright/test";
 import { actionDeleteRevision, actionWaitForSuccessToast } from "../utils";
-import { createNamespace, deleteNamespace } from "../../../utils/namespace";
 
+import { createNamespace } from "../../../utils/namespace";
 import { createWorkflow } from "../../../utils/node";
 import { createWorkflowWithThreeRevisions } from "../../../utils/revisions";
 import { faker } from "@faker-js/faker";
@@ -13,7 +13,6 @@ test.beforeEach(async () => {
 });
 
 test.afterEach(async () => {
-  await deleteNamespace(namespace);
   namespace = "";
 });
 

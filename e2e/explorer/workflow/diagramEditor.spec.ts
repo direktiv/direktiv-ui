@@ -1,7 +1,7 @@
 import { Page, expect, test } from "@playwright/test";
-import { createNamespace, deleteNamespace } from "../../utils/namespace";
 
 import { consumeEvent as consumeEventWorkflow } from "~/pages/namespace/Explorer/Tree/NewWorkflow/templates";
+import { createNamespace } from "../../utils/namespace";
 import { createRevision } from "~/api/tree/mutate/createRevision";
 import { createWorkflow } from "~/api/tree/mutate/createWorkflow";
 import { faker } from "@faker-js/faker";
@@ -44,7 +44,6 @@ test.beforeEach(async () => {
 });
 
 test.afterEach(async () => {
-  await deleteNamespace(namespace);
   namespace = "";
 });
 

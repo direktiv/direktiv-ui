@@ -2,7 +2,6 @@ import {
   checkIfNamespaceExists,
   createNamespace,
   createNamespaceName,
-  deleteNamespace,
 } from "../utils/namespace";
 import {
   checkIfNodeExists,
@@ -18,7 +17,6 @@ test.beforeEach(async () => {
 });
 
 test.afterEach(async () => {
-  await deleteNamespace(namespace);
   namespace = "";
 });
 
@@ -96,9 +94,6 @@ test("it is possible to create a namespace via breadcrumbs", async ({
   // make sure namespace exists in backend
   const namespaceCreated = await checkIfNamespaceExists(newNamespace);
   await expect(namespaceCreated).toBeTruthy;
-
-  // cleanup
-  await deleteNamespace(newNamespace);
 });
 
 test("it is possible to create a folder", async ({ page }) => {

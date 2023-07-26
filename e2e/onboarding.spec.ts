@@ -1,5 +1,6 @@
-import { createNamespaceName, deleteNamespace } from "./utils/namespace";
 import { expect, test } from "@playwright/test";
+
+import { createNamespaceName } from "./utils/namespace";
 
 test("if no namespaces exist, it renders the onboarding page", async ({
   page,
@@ -57,7 +58,4 @@ test("if no namespaces exist, it renders the onboarding page", async ({
     page.getByTestId("breadcrumb-namespace"),
     "the breadcrumb shows the new namespace"
   ).toHaveText(namespace);
-
-  // cleanup
-  await deleteNamespace(namespace);
 });

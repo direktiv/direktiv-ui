@@ -1,4 +1,3 @@
-import { createNamespace, deleteNamespace } from "../../utils/namespace";
 import { expect, test } from "@playwright/test";
 import {
   parentWorkflow as parentWorkflowContent,
@@ -6,6 +5,7 @@ import {
   workflowThatFails as workflowThatFailsContent,
 } from "./utils";
 
+import { createNamespace } from "../../utils/namespace";
 import { createWorkflow } from "~/api/tree/mutate/createWorkflow";
 import { faker } from "@faker-js/faker";
 import { getInstances } from "~/api/instances/query/get";
@@ -41,7 +41,6 @@ test.beforeEach(async () => {
 });
 
 test.afterEach(async () => {
-  await deleteNamespace(namespace);
   namespace = "";
 });
 

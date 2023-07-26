@@ -74,6 +74,8 @@ export default defineConfig({
     // },
   ],
 
+  globalSetup: "./e2e/globalSetup",
+
   /* Run your local dev server before starting the tests */
   webServer: {
     command: `yarn run vite --port ${process.env.VITE_E2E_UI_PORT}`,
