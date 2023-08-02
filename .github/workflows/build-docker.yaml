@@ -2,7 +2,7 @@ name: Create and push PR Docker image
 
 on:
   push:
-    branches: [ "feature/redesign", "**/dir-**" ]
+    branches: [ "feature/redesign", "**/dir-**", "**/hotfix/**" ]
 
 env:
   REGISTRY: ghcr.io
