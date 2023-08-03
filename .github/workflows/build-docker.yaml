@@ -92,15 +92,6 @@ jobs:
       NOMAD_VAR_IMAGE: ghcr.io/${{ github.repository }}:sha-${{ github.sha }}
 
     steps:
-      - name: Parse Deployment Response
-        id: parse-deployment
-        run: |
-          echo "Parsing Deployment Response..."
-          echo "$DEPLOYMENT_RESPONSE" > deployment_response.json
-          deployment_id=$(jq -r '.id' deployment_response.json)
-          echo "Deployment ID: $deployment_id"
-          echo "::set-output name=deployment_id::$deployment_id"
-
       - uses: actions/checkout@v2
       - uses: lucasmelin/setup-nomad@v1
         with:
