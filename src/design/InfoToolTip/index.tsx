@@ -4,7 +4,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "~/design/Tooltip";
+} from "../Tooltip";
 
 import { Info } from "lucide-react";
 
