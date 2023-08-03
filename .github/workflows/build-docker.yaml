@@ -81,3 +81,18 @@ jobs:
         run: |
           echo '### Review App 🚀' >> $GITHUB_STEP_SUMMARY
           echo "[${GITHUB_REF////-}](https://direktiv-ui-${GITHUB_REF////-}.direktiv.dev)" >> $GITHUB_STEP_SUMMARY
+
+      - name: Set Deployment Status (Success)
+        if: ${{ always() }}
+        run: |
+          echo "Setting Deployment Status (Success)..."
+          curl -X POST \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${{ github.repository }}/deployments/$deployment_id/statuses" \
+            -d '{
+              "state": "success",
+              "environment": "review",
+              "description": "Deployment successful!",
+              "target_url": "https://direktiv-ui-${GITHUB_REF////-}.direktiv.dev"
+            }'
