@@ -125,11 +125,7 @@ const Create = ({ onSuccess }: CreateProps) => {
             {!testLoading && testSuccessful === null && <CircleDashed />}
             {t("pages.settings.registries.create.testConnectionBtn")}
           </Button>
-          <Button
-            data-testid="registry-create-submit"
-            type="submit"
-            variant="primary"
-          >
+          <Button data-testid="registry-create-submit" type="submit">
             {t("components.button.label.create")}
           </Button>
         </DialogFooter>
