@@ -1,0 +1,122 @@
+name: E2E Playwright local Tests
+on: pull_request
+env:
+  KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: [self-hosted, runner1]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Cache Playwright browsers
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-browsers-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-browsers-
+      - name: Cache Ubuntu packages
+        uses: actions/cache@v2
+        with:
+          path: /var/cache/apt/archives
+          key: ${{ runner.os }}-apt-packages-${{ hashFiles('**/apt.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-apt-packages-
+      - name: Cache Yarn packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: setup k3s
+        run: curl -sfL https://get.k3s.io | sh -s - --disable traefik --write-kubeconfig-mode=644
+      - name: setup helm
+        run: curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+      - name: install a db
+        run: helm repo add bitnami https://charts.bitnami.com/bitnami && helm install psql-single bitnami/postgresql
+      - name: add repo
+        run: helm repo add direktiv https://chart.direktiv.io
+      - name: Clone direktiv-charts repository
+        run: |
+          git clone https://github.com/direktiv/direktiv-charts.git direktiv-charts
+          git -C direktiv-charts checkout one-binary
+          helm dependency update direktiv-charts/charts/direktiv
+      - name: Wait for direktiv-flow pod to be ready
+        run: |
+          while ! kubectl get secret --namespace default psql-single-postgresql
+          do
+              sleep 2
+          done
+      - name: Create dev.yaml file
+        run: |
+          cat <<EOF > dev.yaml
+          registry: docker.io
+          pullPolicy: Always
+          debug: "true"
+          secrets:
+            image: "h8718/direktiv_075_ev"
+            tag: "latest"
+          flow:
+            image: "h8718/direktiv_075_ev"
+            dbimage: "h8718/direktiv_075_ev"
+            tag: "latest"
+          ui:
+            image: "direktiv/ui"
+            tag: "latest"
+          api:
+            image: "h8718/direktiv_075_ev"
+            tag: "latest"
+          functions:
+            namespace: direktiv-services-direktiv
+            image: "h8718/direktiv_075_ev"
+            tag: "latest"
+            sidecar: "h8718/direktiv_075_ev"
+            initPodImage: "direktiv/direktiv-init-pod"
+          database:
+            host: "psql-single-postgresql"
+            port: 5432
+            user: "postgres"
+            password: "$(kubectl get secret --namespace default psql-single-postgresql -o jsonpath="{.data.postgres-password}" | base64 -d)"
+            name: "postgres"
+            sslmode: "disable"
+    
+          EOF
+      - name: Install direktiv chart
+        run: |
+          helm install direktiv -f dev.yaml ./direktiv-charts/charts/direktiv/
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Install dependencies
+        run: yarn
+        env:
+          CI: true
+      - name: Install Playwright Browsers
+        run: yarn playwright install --with-deps
+      - name: Wait for direktiv-flow pod to be ready
+        run: |
+          kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance=direktiv --timeout=800s
+          echo "Listing all pods:"
+          kubectl get all
+      - name: Get Internal IP
+        id: getInternalIP
+        run: |
+          internal_ip=$(kubectl get service direktiv-ingress-nginx-controller -o jsonpath='{.spec.clusterIP}')
+          echo "::set-output name=internal_ip::$internal_ip"
+      - name: Set Environment Variables
+        run: |
+          echo "DIRECTIV_INGRESS_IP=${{ steps.getInternalIP.outputs.internal_ip }}" >> $GITHUB_ENV
+          echo "VITE_DEV_API_DOMAIN=${{ steps.getInternalIP.outputs.internal_ip }}" >> $GITHUB_ENV
+      - name: Run Playwright tests
+        run: yarn playwright test --workers 1
+        #run: yarn jest
+        env:
+          VITE_E2E_UI_HOST: http://localhost
+          VITE_E2E_UI_PORT: 3333
+      - uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
