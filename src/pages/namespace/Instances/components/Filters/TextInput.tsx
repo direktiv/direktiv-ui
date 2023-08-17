@@ -47,6 +47,7 @@ const TextInput = ({
         <CommandGroup heading={t("pages.instances.list.filter.menuHeading.AS")}>
           <InputWithButton>
             <Input
+              data-testid="filter-field-as-input"
               autoFocus
               placeholder={t("pages.instances.list.filter.placeholder.AS")}
               value={inputValue}

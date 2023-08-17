@@ -107,7 +107,12 @@ const Filters = ({ filters, onUpdate }: FiltersProps) => {
                 onOpenChange={(state) => handleOpenChange(state, field)}
               >
                 <PopoverTrigger asChild>
-                  <Button variant="outline">{filters[field]?.value}</Button>
+                  <Button
+                    data-testid="filter-name-value-trg-btn"
+                    variant="outline"
+                  >
+                    {filters[field]?.value}
+                  </Button>
                 </PopoverTrigger>
                 <PopoverContent align="start">
                   {field === "AS" && (
@@ -120,7 +125,11 @@ const Filters = ({ filters, onUpdate }: FiltersProps) => {
                   )}
                 </PopoverContent>
               </Popover>
-              <Button variant="outline" icon>
+              <Button
+                data-testid="filter-name-close-btn"
+                variant="outline"
+                icon
+              >
                 <X onClick={() => clearFilter(field)} />
               </Button>
             </ButtonBar>
@@ -140,7 +149,12 @@ const Filters = ({ filters, onUpdate }: FiltersProps) => {
                 onOpenChange={(state) => handleOpenChange(state, field)}
               >
                 <PopoverTrigger asChild>
-                  <Button variant="outline">{filters[field]?.value}</Button>
+                  <Button
+                    data-testId="filter-status-trigger-value-trg"
+                    variant="outline"
+                  >
+                    {filters[field]?.value}
+                  </Button>
                 </PopoverTrigger>
                 <PopoverContent align="start">
                   {field === "STATUS" && (
@@ -159,7 +173,11 @@ const Filters = ({ filters, onUpdate }: FiltersProps) => {
                   )}
                 </PopoverContent>
               </Popover>
-              <Button variant="outline" icon>
+              <Button
+                data-testid="filter-status-trigger-close-btn"
+                variant="outline"
+                icon
+              >
                 <X onClick={() => clearFilter(field)} />
               </Button>
             </ButtonBar>
@@ -217,7 +235,11 @@ const Filters = ({ filters, onUpdate }: FiltersProps) => {
                   />
                 </PopoverContent>
               </Popover>
-              <Button variant="outline" icon>
+              <Button
+                variant="outline"
+                icon
+                data-testid="filter-date-close-btn"
+              >
                 <X onClick={() => clearFilter(field)} />
               </Button>
             </ButtonBar>
@@ -232,11 +254,20 @@ const Filters = ({ filters, onUpdate }: FiltersProps) => {
         >
           <PopoverTrigger asChild>
             {hasFilters ? (
-              <Button variant="outline" icon onClick={() => toggleMenu("main")}>
+              <Button
+                data-testid="filter-plus-button"
+                variant="outline"
+                icon
+                onClick={() => toggleMenu("main")}
+              >
                 <Plus />
               </Button>
             ) : (
-              <Button variant="outline" onClick={() => toggleMenu("main")}>
+              <Button
+                data-testid="filter-plus-button"
+                variant="outline"
+                onClick={() => toggleMenu("main")}
+              >
                 <Plus />
                 {t("pages.instances.list.filter.filterButton")}
               </Button>

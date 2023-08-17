@@ -146,3 +146,4 @@ storybook-static
 /playwright/.cache/
 
 .vscode/settings.json
+playwright/.auth

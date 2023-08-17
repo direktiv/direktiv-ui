@@ -49,6 +49,7 @@ const Options = ({ value, field, setFilter }: OptionsProps) => {
             <CommandItem
               key={option}
               value={option}
+              data-testid={`filter-sub-options-${option}`}
               onSelect={() =>
                 setFilter({
                   [field]: {

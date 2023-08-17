@@ -1,16 +1,14 @@
 import { createNamespace, deleteNamespace } from "../../utils/namespace";
 import { expect, test } from "@playwright/test";
-import {
-  parentWorkflow as parentWorkflowContent,
-  simpleWorkflow as simpleWorkflowContent,
-  workflowThatFails as workflowThatFailsContent,
-} from "./utils";
 
 import { createWorkflow } from "~/api/tree/mutate/createWorkflow";
 import { faker } from "@faker-js/faker";
 import { getInstances } from "~/api/instances/query/get";
 import { headers } from "e2e/utils/testutils";
 import moment from "moment";
+import {
+  parentWorkflow as parentWorkflowContent,
+} from "./utils";
 import { runWorkflow } from "~/api/tree/mutate/runWorkflow";
 
 type Instance = Awaited<ReturnType<typeof runWorkflow>>;
@@ -22,25 +20,6 @@ const workflowThatFails = faker.system.commonFileName("yaml");
 test.beforeEach(async () => {
   namespace = await createNamespace();
   // place some workflows in the namespace that we can use to create instances
-  await createWorkflow({
-    payload: simpleWorkflowContent,
-    urlParams: {
-      baseUrl: process.env.VITE_DEV_API_DOMAIN,
-      namespace,
-      name: simpleWorkflow,
-    },
-    headers,
-  });
-
-  await createWorkflow({
-    payload: workflowThatFailsContent,
-    urlParams: {
-      baseUrl: process.env.VITE_DEV_API_DOMAIN,
-      namespace,
-      name: workflowThatFails,
-    },
-    headers,
-  });
 });
 
 test.afterEach(async () => {

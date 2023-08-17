@@ -25,6 +25,7 @@ const ApiKeyPanel = () => {
       >
         <InputWithButton className="w-full">
           <Input
+            data-testid="api-key-input"
             value={apiKey}
             onChange={(e) => {
               setApiKey(e.target.value);
@@ -44,7 +45,12 @@ const ApiKeyPanel = () => {
           </Button>
         </InputWithButton>
 
-        <Button block type="submit" disabled={!apiKey}>
+        <Button
+          data-testid="api-key-set-btn"
+          block
+          type="submit"
+          disabled={!apiKey}
+        >
           set API key
         </Button>
         <Button

@@ -27,7 +27,11 @@ export const SelectFieldMenu = ({
           heading={t("pages.instances.list.filter.menuHeading.main")}
         >
           {options.map((option) => (
-            <CommandItem key={option} onSelect={() => onSelect(option)}>
+            <CommandItem
+              data-testid={`filter-field-${option}`}
+              key={option}
+              onSelect={() => onSelect(option)}
+            >
               {t(`pages.instances.list.filter.field.${option}`)}
             </CommandItem>
           ))}

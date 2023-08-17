@@ -122,7 +122,7 @@
     "check:prettier": "prettier --check './{src,test,e2e}/**/*.{js,jsx,ts,tsx,json,scss,css}'",
     "check:test": "vitest run",
     "e2e:headless": "npx playwright test --project \"chromium\" --project \"firefox\"",
-    "e2e:ui": "npx playwright test --ui",
+    "e2e:ui": "npx playwright test --ui --project \"chromium\" --project \"firefox\"",
     "prettier": "prettier --write './{src,test,e2e}/**/*.{js,jsx,ts,tsx,json,scss,css}'"
   },
   "resolutions": {
