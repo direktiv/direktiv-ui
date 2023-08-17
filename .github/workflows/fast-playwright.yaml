@@ -81,7 +81,7 @@ jobs:
       - name: Install direktiv chart
         run: |
           helm upgrade --install direktiv -f dev.yaml ./direktiv-charts/charts/direktiv/
-          kubectl rollout restart direktiv-flow
+          kubectl rollout restart deployment direktiv-flow
       - uses: actions/setup-node@v3
         with:
           node-version: 18
