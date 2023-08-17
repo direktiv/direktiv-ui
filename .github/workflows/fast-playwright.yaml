@@ -5,7 +5,7 @@ env:
 jobs:
   test:
     timeout-minutes: 60
-    runs-on: [self-hosted, runner1]
+    runs-on: [self-hosted]
     steps:
       - uses: actions/checkout@v3
       - name: Cache Playwright browsers
