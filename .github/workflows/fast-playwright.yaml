@@ -30,7 +30,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       - name: install a db
-        run: helm repo add bitnami https://charts.bitnami.com/bitnami && helm install psql-single bitnami/postgresql
+        run: helm repo add bitnami https://charts.bitnami.com/bitnami && helm upgrade --install psql-single bitnami/postgresql
       - name: add repo
         run: helm repo add direktiv https://chart.direktiv.io
       - name: Clone direktiv-charts repository
@@ -80,7 +80,7 @@ jobs:
           EOF
       - name: Install direktiv chart
         run: |
-          helm install direktiv -f dev.yaml ./direktiv-charts/charts/direktiv/
+          helm upgrade --install direktiv -f dev.yaml ./direktiv-charts/charts/direktiv/
       - uses: actions/setup-node@v3
         with:
           node-version: 18
