@@ -42,8 +42,15 @@ export const VarFormSchema = z.object({
   mimeType: MimeTypeSchema,
 });
 
+export const VarUploadSchema = z.object({
+  name: z.string().nonempty(),
+  file: z.instanceof(File),
+});
+
 export type VarSchemaType = z.infer<typeof VarSchema>;
 export type VarUpdatedSchemaType = z.infer<typeof VarUpdatedSchema>;
 export type VarContentSchemaType = z.infer<typeof VarContentSchema>;
 export type VarFormSchemaType = z.infer<typeof VarFormSchema>;
+export type VarUploadSchemaType = z.infer<typeof VarUploadSchema>;
+
 export type VarListSchemaType = z.infer<typeof VarListSchema>;
