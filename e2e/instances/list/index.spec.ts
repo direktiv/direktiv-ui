@@ -6,9 +6,7 @@ import { faker } from "@faker-js/faker";
 import { getInstances } from "~/api/instances/query/get";
 import { headers } from "e2e/utils/testutils";
 import moment from "moment";
-import {
-  parentWorkflow as parentWorkflowContent,
-} from "./utils";
+import { parentWorkflow as parentWorkflowContent } from "./utils";
 import { runWorkflow } from "~/api/tree/mutate/runWorkflow";
 
 type Instance = Awaited<ReturnType<typeof runWorkflow>>;
