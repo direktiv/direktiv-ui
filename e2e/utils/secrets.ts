@@ -4,7 +4,7 @@ import { headers } from "./testutils";
 
 export const createSecrets = async (namespace: string, amount = 5) => {
   const secrets = Array.from({ length: amount }, () => ({
-    name: faker.internet.domainWord(),
+    name: "s-" + faker.internet.domainWord(),
     value: faker.internet.password(),
   }));
 

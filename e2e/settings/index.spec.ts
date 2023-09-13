@@ -318,3 +318,132 @@ test("it is possible to update broadcasts", async ({ page }) => {
       .toBe(!broadcasts[key]);
   }
 });
+
+test("it is possible to paginate and filter secrets", async ({ page }) => {
+  const secrets = await createSecrets(namespace, 11);
+  await page.goto(`/${namespace}/settings`);
+
+  const paginationWrap = page.getByTestId("pagination-wrapper");
+  await expect(paginationWrap, "pagination should be exist").toBeVisible();
+
+  const rows = page.getByTestId("item-wrap");
+  await expect(
+    rows,
+    "there should be 10 rows of secrets in first page"
+  ).toHaveCount(10);
+
+  await page.getByTestId("pagination-next").click();
+  await expect(rows, "there should be 1 secret in next page").toHaveCount(1);
+
+  await page.getByTestId("secret-search").type("s");
+  const page1Btn = page.getByTestId(`pagination-btn-page-1`);
+  // page goes back to 1
+  await expect(
+    page1Btn,
+    "active button with the page number should have an aria-current attribute with a value of page"
+  ).toHaveAttribute("aria-current", "page");
+
+  const searchKey = faker.helpers.arrayElement(secrets).key;
+  await page.getByTestId("secret-search").fill(searchKey);
+  await expect(rows, "there should be 1 secret in next page").toHaveCount(1);
+
+  await expect(
+    paginationWrap,
+    "pagination disappears as there is only one result"
+  ).toBeHidden();
+
+  const randomKey = faker.random.alphaNumeric(10);
+  await page.getByTestId("secret-search").type(randomKey);
+
+  const noResult = page.getByTestId("no-result").first();
+  await expect(
+    noResult,
+    "there should be following message where there is no result, No secret matches your search"
+  ).toHaveText("No secret matches your search");
+});
+
+test("it is possible to paginate and filter variables", async ({ page }) => {
+  const variables = await createVariables(namespace, 11);
+  await page.goto(`/${namespace}/settings`);
+
+  const paginationWrap = page.getByTestId("pagination-wrapper");
+  await expect(paginationWrap, "pagination should be exist").toBeVisible();
+
+  const rows = page.getByTestId("item-wrap");
+  await expect(
+    rows,
+    "there should be 10 rows of variables in first page"
+  ).toHaveCount(10);
+
+  await page.getByTestId("pagination-next").click();
+  await expect(rows, "there should be 1 variable in next page").toHaveCount(1);
+
+  await page.getByTestId("variable-search").type("v-");
+  const page1Btn = page.getByTestId(`pagination-btn-page-1`);
+  // page goes back to 1
+  await expect(
+    page1Btn,
+    "active button with the page number should have an aria-current attribute with a value of page"
+  ).toHaveAttribute("aria-current", "page");
+
+  const searchKey = faker.helpers.arrayElement(variables).key;
+  await page.getByTestId("variable-search").fill(searchKey);
+  await expect(rows, "there should be 1 secret in next page").toHaveCount(1);
+
+  await expect(
+    paginationWrap,
+    "pagination disappears as there is only one result"
+  ).toBeHidden();
+
+  const randomKey = faker.random.alphaNumeric(10);
+  await page.getByTestId("variable-search").type(randomKey);
+
+  const noResult = page.getByTestId("no-result").nth(2);
+  await expect(
+    noResult,
+    "there should be following message where there is no result, No variable matches your search"
+  ).toHaveText("No variable matches your search");
+});
+
+test("it is possible to paginate and filter registries", async ({ page }) => {
+  const registries = await createRegistries(namespace, 11);
+  await page.goto(`/${namespace}/settings`);
+
+  const paginationWrap = page.getByTestId("pagination-wrapper");
+  await expect(paginationWrap, "pagination should be exist").toBeVisible();
+
+  const rows = page.getByTestId("item-wrap");
+  await expect(
+    rows,
+    "there should be 10 rows of registries in first page"
+  ).toHaveCount(10);
+
+  await page.getByTestId("pagination-next").click();
+  await expect(rows, "there should be 1 registry in next page").toHaveCount(1);
+
+  await page.getByTestId("registry-search").type("http");
+  const page1Btn = page.getByTestId(`pagination-btn-page-1`);
+  // page goes back to 1
+  await expect(
+    page1Btn,
+    "active button with the page number should have an aria-current attribute with a value of page"
+  ).toHaveAttribute("aria-current", "page");
+
+  const searchKey = faker.helpers.arrayElement(registries).url;
+  await page.getByTestId("registry-search").fill(searchKey);
+  await expect(rows, "there should be 1 secret in next page").toHaveCount(1);
+
+  await expect(
+    paginationWrap,
+    "pagination disappears as there is only one result"
+  ).toBeHidden();
+
+  const randomKey = faker.random.alphaNumeric(10);
+  await page.getByTestId("registry-search").type(randomKey);
+
+  const noResult = page.getByTestId("no-result").nth(1);
+  await expect(
+    noResult,
+    "there should be following message where there is no result, No registry matches your search"
+  ).toHaveText("No registry matches your search");
+});

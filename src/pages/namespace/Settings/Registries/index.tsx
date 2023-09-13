@@ -73,6 +73,7 @@ const RegistriesList: FC = () => {
                 {t("pages.settings.registries.list.title")}
               </h3>
               <Input
+                data-testid="registry-search"
                 className="sm:w-60"
                 value={search}
                 onChange={(e) => {
@@ -116,11 +117,13 @@ const RegistriesList: FC = () => {
             {totalPages > 1 && (
               <Pagination>
                 <PaginationLink
+                  data-testid="pagination-prev"
                   icon="left"
                   onClick={() => goToPreviousPage()}
                 />
                 {pagesList.map((page) => (
                   <PaginationLink
+                    data-testid={`pagination-btn-page-${page}`}
                     active={currentPage === page}
                     key={`${page}`}
                     onClick={() => goToPage(page)}
@@ -128,7 +131,11 @@ const RegistriesList: FC = () => {
                     {page}
                   </PaginationLink>
                 ))}
-                <PaginationLink icon="right" onClick={() => goToNextPage()} />
+                <PaginationLink
+                  data-testid="pagination-next"
+                  icon="right"
+                  onClick={() => goToNextPage()}
+                />
               </Pagination>
             )}
           </>

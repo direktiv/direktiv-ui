@@ -73,6 +73,7 @@ const SecretsList: FC = () => {
                 {t("pages.settings.secrets.list.title")}
               </h3>
               <Input
+                data-testid="secret-search"
                 className="sm:w-60"
                 value={search}
                 onChange={(e) => {
@@ -110,11 +111,13 @@ const SecretsList: FC = () => {
             {totalPages > 1 && (
               <Pagination>
                 <PaginationLink
+                  data-testid="pagination-prev"
                   icon="left"
                   onClick={() => goToPreviousPage()}
                 />
                 {pagesList.map((page) => (
                   <PaginationLink
+                    data-testid={`pagination-btn-page-${page}`}
                     active={currentPage === page}
                     key={`${page}`}
                     onClick={() => goToPage(page)}
@@ -122,7 +125,11 @@ const SecretsList: FC = () => {
                     {page}
                   </PaginationLink>
                 ))}
-                <PaginationLink icon="right" onClick={() => goToNextPage()} />
+                <PaginationLink
+                  data-testid="pagination-next"
+                  icon="right"
+                  onClick={() => goToNextPage()}
+                />
               </Pagination>
             )}
           </>
