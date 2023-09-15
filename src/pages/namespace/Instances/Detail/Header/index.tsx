@@ -51,6 +51,7 @@ const Header = () => {
             <Box className="h-5" /> {data.instance.id.slice(0, 8)}
           </h3>
           <Badge
+            data-testid="badge-instance-status"
             variant={statusToBadgeVariant(data.instance.status)}
             icon={data.instance.status}
           >
@@ -85,6 +86,7 @@ const Header = () => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
+                  data-testid="btn-instance-cancel"
                   disabled={!canBeCanceled}
                   variant="destructive"
                   onClick={onCancelInstanceClick}
@@ -93,7 +95,7 @@ const Header = () => {
                   <XCircle />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>
+              <TooltipContent data-testid="tooltip-instance-cancel">
                 {t("pages.instances.detail.header.cancelWorkflow")}
               </TooltipContent>
             </Tooltip>

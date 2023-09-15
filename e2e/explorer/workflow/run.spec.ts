@@ -396,3 +396,64 @@ test("it is possible to provide the input via generated form and resolve form er
   const inputResponseAsJson = JSON.parse(atob(res.data));
   expect(inputResponseAsJson).toEqual(expectedJson);
 });
+
+test("it is possible to cancel the workflow run", async ({ page }) => {
+  const workflowName = faker.system.commonFileName("yaml");
+  const longWorkflow = `direktiv_api: workflow/v1
+description: I will loop and wait on each loop
+states:
+  - id: prep
+    type: noop
+    transform:
+      x: 5
+    transition: loop
+  - id: loop
+    type: switch
+    conditions:
+      - condition: "jq(.x > 0)"
+        transition: wait
+  - id: wait
+    type: delay
+    duration: PT3S
+    transition: loop
+    transform:
+      x: "jq(.x - 1)"
+`
+  await createWorkflow({
+    payload: longWorkflow,
+    urlParams: {
+      baseUrl: process.env.VITE_DEV_API_DOMAIN,
+      namespace,
+      name: workflowName,
+    },
+    headers,
+  });
+
+  await page.goto(`${namespace}/explorer/workflow/active/${workflowName}`);
+  await page.getByTestId("workflow-editor-btn-run").click();
+  expect(
+    page.getByTestId("run-workflow-dialog"),
+    "it opens the dialog from the editor button"
+  ).toBeVisible();
+  await page.getByTestId("run-workflow-submit-btn").click();
+
+  const reg = new RegExp(`${namespace}/instances/(.*)`);
+  await expect(
+    page,
+    "workflow was triggered with our input and user was redirected to the instances page"
+  ).toHaveURL(reg);
+
+  const cancelButton = page.getByTestId("btn-instance-cancel");
+
+  await cancelButton.hover({ force: true });
+  await expect(page.getByTestId("tooltip-instance-cancel"), "cancel tooltip should be visible").toBeVisible({
+    timeout: 10000
+  });
+
+  await expect(cancelButton, "cancel button should be enabled, so we can click to cancel workflow run").toBeEnabled();
+  await cancelButton.click();
+  const badge = page.getByTestId("badge-instance-status");
+  await expect(badge).toContainText("failed");
+  await expect(cancelButton, "cancel button should be disabled after cancel").toBeDisabled();
+
+});
