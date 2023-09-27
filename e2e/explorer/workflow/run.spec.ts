@@ -7,6 +7,7 @@ import { createWorkflow } from "~/api/tree/mutate/createWorkflow";
 import { faker } from "@faker-js/faker";
 import { getInput } from "~/api/instances/query/input";
 import { headers } from "e2e/utils/testutils";
+import { simpleWorkflow } from "e2e/instances/list/utils";
 
 let namespace = "";
 
@@ -395,4 +396,164 @@ test("it is possible to provide the input via generated form and resolve form er
   };
   const inputResponseAsJson = JSON.parse(atob(res.data));
   expect(inputResponseAsJson).toEqual(expectedJson);
+});
+
+test("it is possible to test the API Commands button", async ({ page }) => {
+  function cleanString(input: string): string {
+    // Remove whitespace and special characters
+    return input.replace(/\s+/g, "").replace(/[^\w\s]/gi, "");
+  }
+
+  function assertStringContainsYAMLPayload(
+    strA: string,
+    yamlPayload: string
+  ): boolean {
+    const cleanedA = cleanString(strA);
+    const cleanedYAML = cleanString(yamlPayload);
+    return cleanedA.includes(cleanedYAML);
+  }
+
+  const workflowName = faker.system.commonFileName("yaml");
+  await createWorkflow({
+    payload: simpleWorkflow,
+    urlParams: {
+      baseUrl: process.env.VITE_DEV_API_DOMAIN,
+      namespace,
+      name: workflowName,
+    },
+    headers,
+  });
+
+  await page.goto(`${namespace}/explorer/workflow/active/${workflowName}`);
+  await page.getByTestId("trigger-api-commands").click();
+  await expect(
+    page.getByTestId("api-commands-wrapper"),
+    "api commands dialog should be opened"
+  ).toBeVisible();
+
+  //shows current namespace
+  const namespaceInput = page.getByTestId("api-commands-namespace-name");
+  const namespaceInputValue = await namespaceInput.inputValue();
+  expect(namespaceInputValue, "name should be the current namespace").toBe(
+    namespace
+  );
+
+  //it shows the current workflow name
+  const workflowInput = page.getByTestId("api-commands-workflow-name");
+  const workflowInputValue = await workflowInput.inputValue();
+  expect(workflowInputValue, "it shows the current workflow name").toBe(
+    workflowName
+  );
+
+  //"Execute workflow" is the default Interaction selected
+  await expect(
+    page.getByTestId("api-commands-interaction-trigger"),
+    "Execute workflow is the default Interaction selected"
+  ).toContainText("Execute workflow");
+
+  //it shows the http method
+  await expect(
+    page.getByTestId("api-commands-method-badge"),
+    "it shows the http method"
+  ).toBeVisible();
+
+  //it shows the endpoint url
+  const defaultOp = "execute";
+  const endpointUrl = `http://localhost:3333/api/namespaces/${namespace}/tree/${workflowName}?op=${defaultOp}`;
+  await expect(
+    page.getByTestId("api-commands-endpoint-url"),
+    "it shows the endpoint url"
+  ).toContainText(endpointUrl);
+
+  const jsonPayload = `{
+  "some": "input"
+}`;
+  const yamlPayload = `description: A simple 'no-op' state that returns 'Hello world!'
+states:
+- id: helloworld
+  type: noop
+  transform:
+    result: Hello world!`;
+  //it shows the payload
+  const textArea = page
+    .getByTestId("api-commands-payload-wrap")
+    .getByRole("textbox");
+  await expect
+    .poll(async () => await textArea.inputValue(), "it shows the payload")
+    .toBe(jsonPayload);
+
+  //the copy button copies the fetch command, depending on users input (this could be tested directly inside various other test above)
+  await page.getByTestId("api-commands-copy-as-curl").click({ force: true });
+  let clipboardText = await page.evaluate(() => navigator.clipboard.readText());
+  let clipboardHasAllPayload = assertStringContainsYAMLPayload(
+    clipboardText,
+    jsonPayload
+  );
+  expect(
+    clipboardHasAllPayload,
+    "clipboard text should contain the payload"
+  ).toBe(true);
+  expect(
+    clipboardText,
+    "clipboard text should contain the endpoint url"
+  ).toContain(endpointUrl);
+
+  //updating the namespace changes the endpoint url
+  const updatedNamespace = faker.system.fileName();
+  await namespaceInput.fill(updatedNamespace);
+  let updatedEndpointUrl = `http://localhost:3333/api/namespaces/${updatedNamespace}/tree/${workflowName}?op=${defaultOp}`;
+  await expect(
+    page.getByTestId("api-commands-endpoint-url"),
+    "it shows the updated endpoint url"
+  ).toContainText(updatedEndpointUrl);
+
+  //updating the workflow changes the endpoint url
+  const updatedWorkflow = faker.system.commonFileName("yaml");
+  await workflowInput.fill(updatedWorkflow);
+  updatedEndpointUrl = `http://localhost:3333/api/namespaces/${updatedNamespace}/tree/${updatedWorkflow}?op=${defaultOp}`;
+  await expect(
+    page.getByTestId("api-commands-endpoint-url"),
+    "it shows the updated endpoint url"
+  ).toContainText(updatedEndpointUrl);
+
+  //updating the interaction to Execute workflow and wait, updates the url
+  await page.getByTestId("api-commands-interaction-trigger").click();
+  await page.getByTestId("api-commands-interaction-awaitExecute").click();
+  updatedEndpointUrl = `http://localhost:3333/api/namespaces/${updatedNamespace}/tree/${updatedWorkflow}?op=wait`;
+  await expect(
+    page.getByTestId("api-commands-endpoint-url"),
+    "updating the interaction to Execute workflow and wait, updates the url"
+  ).toContainText(updatedEndpointUrl);
+
+  //updating the interaction to "Update a workflow", updates the url and the payload, payload it now in yaml syntax highlight mode
+  await page.getByTestId("api-commands-interaction-trigger").click();
+  await page.getByTestId("api-commands-interaction-update").click();
+  updatedEndpointUrl = `http://localhost:3333/api/namespaces/${updatedNamespace}/tree/${updatedWorkflow}?op=update-workflow`;
+  await expect(
+    page.getByTestId("api-commands-endpoint-url"),
+    "updating the interaction to Execute workflow and wait, updates the url"
+  ).toContainText(updatedEndpointUrl);
+
+  await expect
+    .poll(
+      async () => await textArea.inputValue(),
+      " payload it now in yaml syntax highlight mode"
+    )
+    .toBe(yamlPayload);
+
+  //the copy button copies the fetch command, depending on users input (this could be tested directly inside various other test above)
+  await page.getByTestId("api-commands-copy-as-curl").click({ force: true });
+  clipboardText = await page.evaluate(() => navigator.clipboard.readText());
+  clipboardHasAllPayload = assertStringContainsYAMLPayload(
+    clipboardText,
+    yamlPayload
+  );
+  expect(
+    clipboardHasAllPayload,
+    "clipboard text should contain the payload"
+  ).toBe(true);
+  expect(
+    clipboardText,
+    "clipboard text should contain the endpoint url"
+  ).toContain(updatedEndpointUrl);
 });

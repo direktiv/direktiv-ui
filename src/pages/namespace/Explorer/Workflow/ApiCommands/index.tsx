@@ -63,7 +63,7 @@ const ApiCommands = ({
   const disableCopyButton = !namespace || !path;
 
   return (
-    <>
+    <div data-testid="api-commands-wrapper">
       <DialogHeader>
         <DialogTitle>
           <TerminalSquare />
@@ -80,6 +80,7 @@ const ApiCommands = ({
               {t("pages.explorer.workflow.apiCommands.namespace")}
             </label>
             <Input
+              data-testid="api-commands-namespace-name"
               id="namespace-name"
               value={namespace}
               onChange={(e) => setNamespace(e.target.value)}
@@ -96,6 +97,7 @@ const ApiCommands = ({
               {t("pages.explorer.workflow.apiCommands.workflow")}
             </label>
             <Input
+              data-testid="api-commands-workflow-name"
               id="workflow-name"
               value={path}
               onChange={(e) => setPath(e.target.value)}
@@ -121,7 +123,12 @@ const ApiCommands = ({
                 }
               }}
             >
-              <SelectTrigger id="template" variant="outline" block>
+              <SelectTrigger
+                data-testid="api-commands-interaction-trigger"
+                id="template"
+                variant="outline"
+                block
+              >
                 <SelectValue
                   defaultValue={selectedInteraction}
                   placeholder={
@@ -137,7 +144,11 @@ const ApiCommands = ({
               </SelectTrigger>
               <SelectContent>
                 {interactions.map((command) => (
-                  <SelectItem value={command} key={command}>
+                  <SelectItem
+                    value={command}
+                    key={command}
+                    data-testid={`api-commands-interaction-${command}`}
+                  >
                     {t(`pages.explorer.workflow.apiCommands.labels.${command}`)}
                   </SelectItem>
                 ))}
@@ -149,14 +160,26 @@ const ApiCommands = ({
             noShadow
             background="weight-1"
           >
-            <Badge variant="success" className="w-max">
+            <Badge
+              data-testid="api-commands-method-badge"
+              variant="success"
+              className="w-max"
+            >
               {selectedTemplate?.method}
             </Badge>
-            <pre className="whitespace-pre-wrap text-primary-500">
+            <pre
+              data-testid="api-commands-endpoint-url"
+              className="whitespace-pre-wrap text-primary-500"
+            >
               {selectedTemplate?.url}
             </pre>
           </Card>
-          <Card className="h-44 p-4" noShadow background="weight-1">
+          <Card
+            data-testid="api-commands-payload-wrap"
+            className="h-44 p-4"
+            noShadow
+            background="weight-1"
+          >
             <Editor
               value={selectedTemplate?.body}
               language={selectedTemplate?.payloadSyntax}
@@ -186,6 +209,7 @@ const ApiCommands = ({
           </a>
         </Button>
         <CopyButton
+          testid="api-commands-copy-as-curl"
           value={curlCommand}
           buttonProps={{
             variant: "outline",
@@ -200,7 +224,7 @@ const ApiCommands = ({
           }
         </CopyButton>
       </DialogFooter>
-    </>
+    </div>
   );
 };
 

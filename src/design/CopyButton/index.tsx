@@ -6,10 +6,16 @@ import Button from "../Button";
 type ButtonPropsType = ComponentProps<typeof Button>;
 
 const CopyButton: FC<{
+  testid?: string;
   value: string;
   buttonProps?: ButtonPropsType;
   children?: (copied: boolean) => React.ReactNode;
-}> = ({ value, buttonProps: { onClick, ...buttonProps } = {}, children }) => {
+}> = ({
+  value,
+  buttonProps: { onClick, ...buttonProps } = {},
+  children,
+  testid,
+}) => {
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState(false);
 
@@ -45,6 +51,7 @@ const CopyButton: FC<{
 
   return (
     <Button
+      data-testid={testid}
       variant="ghost"
       onClick={(e) => {
         if (navigator.clipboard) {

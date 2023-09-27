@@ -145,7 +145,11 @@ const Header: FC = () => {
               <ButtonBar>
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button icon variant="outline">
+                    <Button
+                      icon
+                      variant="outline"
+                      data-testid="trigger-api-commands"
+                    >
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <TerminalSquare />
