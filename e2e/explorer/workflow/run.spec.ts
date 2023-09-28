@@ -457,9 +457,12 @@ test("it is possible to test the API Commands button", async ({ page }) => {
     "it shows the http method"
   ).toBeVisible();
 
+  const urlObject = new URL(page.url());
+  const origin = urlObject.origin;
+
   //it shows the endpoint url
   const defaultOp = "execute";
-  const endpointUrl = `http://localhost:3333/api/namespaces/${namespace}/tree/${workflowName}?op=${defaultOp}`;
+  const endpointUrl = `${origin}/api/namespaces/${namespace}/tree/${workflowName}?op=${defaultOp}`;
   await expect(
     page.getByTestId("api-commands-endpoint-url"),
     "it shows the endpoint url"
@@ -501,7 +504,7 @@ states:
   //updating the namespace changes the endpoint url
   const updatedNamespace = faker.system.fileName();
   await namespaceInput.fill(updatedNamespace);
-  let updatedEndpointUrl = `http://localhost:3333/api/namespaces/${updatedNamespace}/tree/${workflowName}?op=${defaultOp}`;
+  let updatedEndpointUrl = `${origin}/api/namespaces/${updatedNamespace}/tree/${workflowName}?op=${defaultOp}`;
   await expect(
     page.getByTestId("api-commands-endpoint-url"),
     "it shows the updated endpoint url"
@@ -510,7 +513,7 @@ states:
   //updating the workflow changes the endpoint url
   const updatedWorkflow = faker.system.commonFileName("yaml");
   await workflowInput.fill(updatedWorkflow);
-  updatedEndpointUrl = `http://localhost:3333/api/namespaces/${updatedNamespace}/tree/${updatedWorkflow}?op=${defaultOp}`;
+  updatedEndpointUrl = `${origin}/api/namespaces/${updatedNamespace}/tree/${updatedWorkflow}?op=${defaultOp}`;
   await expect(
     page.getByTestId("api-commands-endpoint-url"),
     "it shows the updated endpoint url"
@@ -519,7 +522,7 @@ states:
   //updating the interaction to Execute workflow and wait, updates the url
   await page.getByTestId("api-commands-interaction-trigger").click();
   await page.getByTestId("api-commands-interaction-awaitExecute").click();
-  updatedEndpointUrl = `http://localhost:3333/api/namespaces/${updatedNamespace}/tree/${updatedWorkflow}?op=wait`;
+  updatedEndpointUrl = `${origin}/api/namespaces/${updatedNamespace}/tree/${updatedWorkflow}?op=wait`;
   await expect(
     page.getByTestId("api-commands-endpoint-url"),
     "updating the interaction to Execute workflow and wait, updates the url"
@@ -528,7 +531,7 @@ states:
   //updating the interaction to "Update a workflow", updates the url and the payload, payload it now in yaml syntax highlight mode
   await page.getByTestId("api-commands-interaction-trigger").click();
   await page.getByTestId("api-commands-interaction-update").click();
-  updatedEndpointUrl = `http://localhost:3333/api/namespaces/${updatedNamespace}/tree/${updatedWorkflow}?op=update-workflow`;
+  updatedEndpointUrl = `${origin}/api/namespaces/${updatedNamespace}/tree/${updatedWorkflow}?op=update-workflow`;
   await expect(
     page.getByTestId("api-commands-endpoint-url"),
     "updating the interaction to Execute workflow and wait, updates the url"
