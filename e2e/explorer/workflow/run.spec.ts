@@ -1,17 +1,18 @@
 import { createNamespace, deleteNamespace } from "../../utils/namespace";
 import { expect, test } from "@playwright/test";
+import { headers, mockClipboardAPI } from "e2e/utils/testutils";
 import { jsonSchemaFormWorkflow, jsonSchemaWithRequiredEnum } from "./utils";
 
 import { noop as basicWorkflow } from "~/pages/namespace/Explorer/Tree/NewWorkflow/templates";
 import { createWorkflow } from "~/api/tree/mutate/createWorkflow";
 import { faker } from "@faker-js/faker";
 import { getInput } from "~/api/instances/query/input";
-import { headers } from "e2e/utils/testutils";
 import { simpleWorkflow } from "e2e/instances/list/utils";
 
 let namespace = "";
 
-test.beforeEach(async () => {
+test.beforeEach(async ({ page }) => {
+  await mockClipboardAPI(page);
   namespace = await createNamespace();
 });
 
