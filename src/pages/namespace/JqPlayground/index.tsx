@@ -19,7 +19,6 @@ import Editor from "~/design/Editor";
 import Examples from "./Examples";
 import FormErrors from "~/componentsNext/FormErrors";
 import Input from "~/design/Input";
-import { JqQueryErrorSchema } from "~/api/jq/schema";
 import { prettifyJsonString } from "~/util/helpers";
 import { useExecuteJQuery } from "~/api/jq/mutate/executeQuery";
 import { useTheme } from "~/util/store/theme";
@@ -44,14 +43,13 @@ const JqPlaygroundPage: FC = () => {
     },
     onError: (error) => {
       setOutput("");
-      const errorParsed = JqQueryErrorSchema.safeParse(error);
-      if (errorParsed.success) {
-        setError(errorParsed.data.message);
+      if (error) {
+        setError(error);
       }
     },
   });
 
-  const submitQuery = () => {
+  const submitQuery = ({ query, input }: { query: string; input: string }) => {
     /**
      * Always clear the output before submiting a new query to the backend.
      * Otherwise when the request takes longer or produces an error the input
@@ -63,7 +61,7 @@ const JqPlaygroundPage: FC = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    submitQuery();
+    submitQuery({ query, input });
   };
 
   const changeQuery = (newQuery: string) => {
@@ -73,7 +71,7 @@ const JqPlaygroundPage: FC = () => {
   };
 
   const updateInput = (newData: string | undefined) => {
-    if (!newData) return;
+    if (newData === undefined) return;
     setInput(newData);
     storeInputInLocalstorage(newData);
     setError("");
@@ -83,7 +81,7 @@ const JqPlaygroundPage: FC = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     updateInput(prettifyJsonString(input));
     changeQuery(query);
-    submitQuery();
+    submitQuery({ query, input });
   };
 
   const formId = "jq-playground-form";
@@ -116,11 +114,13 @@ const JqPlaygroundPage: FC = () => {
         >
           <div className="flex flex-col gap-5 sm:flex-row">
             <Input
+              data-testid="jq-query-input"
               placeholder={t("pages.jqPlayground.queryPlaceholder")}
               value={query}
               onChange={(e) => changeQuery(e.target.value)}
             />
             <Button
+              data-testid="jq-run-btn"
               className="grow sm:w-44"
               type="submit"
               variant="primary"
@@ -146,10 +146,11 @@ const JqPlaygroundPage: FC = () => {
                     size: "sm",
                     type: "button",
                     disabled: !input,
+                    "data-testid": "copy-input-btn",
                   }}
                 />
               </div>
-              <div className="flex grow">
+              <div data-testid="jq-input-editor" className="flex grow">
                 <Editor
                   value={input}
                   language="json"
@@ -171,10 +172,11 @@ const JqPlaygroundPage: FC = () => {
                     size: "sm",
                     type: "button",
                     disabled: !output,
+                    "data-testid": "copy-output-btn",
                   }}
                 />
               </div>
-              <div className="flex grow">
+              <div data-testid="jq-output-editor" className="flex grow">
                 <Editor
                   language="json"
                   value={output}

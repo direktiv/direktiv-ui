@@ -1,6 +1,6 @@
 import { Dialog, DialogTrigger } from "~/design/Dialog";
 import { FC, useEffect, useMemo, useState } from "react";
-import { NoResult, Table, TableBody } from "~/design/Table";
+import { NoPermissions, NoResult, Table, TableBody } from "~/design/Table";
 import { Pagination, PaginationLink } from "~/design/Pagination";
 import { PlusCircle, SquareAsterisk } from "lucide-react";
 import {
@@ -34,7 +34,7 @@ const SecretsList: FC = () => {
   const [search, setSearch] = useState("");
   const isSearch = search.length > 0;
 
-  const { data, isFetched } = useSecrets();
+  const { data, isFetched, isAllowed, noPermissionMessage } = useSecrets();
 
   const filteredItems = useMemo(
     () =>
@@ -97,64 +97,70 @@ const SecretsList: FC = () => {
               </CreateItemButton>
             </div>
             <Card className="mb-4">
-              {currentItems.length ? (
-                <TooltipProvider>
-                  <Table>
-                    <TableBody>
-                      {currentItems.map((item, i) => (
-                        <ItemRow
-                          item={item}
-                          key={i}
-                          onDelete={setDeleteSecret}
-                          onEdit={() => setEditItem(item)}
-                        >
-                          <div className="flex">
-                            <div className="grow">{item.name}</div>
-                            {!item.initialized && (
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <DialogTrigger
-                                    onClick={() => {
-                                      setEditItem(item);
-                                    }}
-                                    asChild
-                                  >
-                                    <Button
-                                      type="button"
-                                      variant="primary"
-                                      size="sm"
+              {isAllowed ? (
+                <>
+                  {currentItems.length ? (
+                    <TooltipProvider>
+                      <Table>
+                        <TableBody>
+                          {currentItems.map((item, i) => (
+                            <ItemRow
+                              item={item}
+                              key={i}
+                              onDelete={setDeleteSecret}
+                              onEdit={() => setEditItem(item)}
+                            >
+                              <div className="flex">
+                                <div className="grow">{item.name}</div>
+                                {!item.initialized && (
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <DialogTrigger
+                                        onClick={() => {
+                                          setEditItem(item);
+                                        }}
+                                        asChild
+                                      >
+                                        <Button
+                                          type="button"
+                                          variant="primary"
+                                          size="sm"
+                                        >
+                                          <PlusCircle />
+                                          {t(
+                                            "pages.settings.secrets.list.initializeBtn"
+                                          )}
+                                        </Button>
+                                      </DialogTrigger>
+                                    </TooltipTrigger>
+                                    <TooltipContent
+                                      className="w-96 whitespace-pre-wrap break-words"
+                                      align="end"
                                     >
-                                      <PlusCircle />
                                       {t(
-                                        "pages.settings.secrets.list.initializeBtn"
+                                        "pages.settings.secrets.list.notInitializedTooltip"
                                       )}
-                                    </Button>
-                                  </DialogTrigger>
-                                </TooltipTrigger>
-                                <TooltipContent
-                                  className="w-96 whitespace-pre-wrap break-words"
-                                  align="end"
-                                >
-                                  {t(
-                                    "pages.settings.secrets.list.notInitializedTooltip"
-                                  )}
-                                </TooltipContent>
-                              </Tooltip>
-                            )}
-                          </div>
-                        </ItemRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TooltipProvider>
-              ) : (
-                <NoResult icon={SquareAsterisk}>
-                  {t(
-                    isSearch
-                      ? "pages.settings.secrets.list.emptySearch"
-                      : "pages.settings.secrets.list.empty"
+                                    </TooltipContent>
+                                  </Tooltip>
+                                )}
+                              </div>
+                            </ItemRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TooltipProvider>
+                  ) : (
+                    <NoResult icon={SquareAsterisk}>
+                      {t(
+                        isSearch
+                          ? "pages.settings.secrets.list.emptySearch"
+                          : "pages.settings.secrets.list.empty"
+                      )}
+                    </NoResult>
                   )}
-                </NoResult>
+                </>
+              ) : (
+                <NoPermissions>{noPermissionMessage}</NoPermissions>
               )}
             </Card>
             {totalPages > 1 && (

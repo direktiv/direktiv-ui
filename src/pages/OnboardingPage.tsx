@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogTrigger } from "~/design/Dialog";
 import { useEffect, useState } from "react";
 import { useNamespace, useNamespaceActions } from "~/util/store/namespace";
 
+import Alert from "~/design/Alert";
 import Button from "~/design/Button";
 import Logo from "~/design/Logo";
 import NamespaceCreate from "~/componentsNext/NamespaceEdit";
@@ -16,6 +17,7 @@ const Layout = () => {
   const {
     data: availableNamespaces,
     isFetched,
+    isError,
     isRefetching,
   } = useListNamespaces();
   const activeNamespace = useNamespace();
@@ -95,6 +97,11 @@ const Layout = () => {
           <span> {t("pages.onboarding.welcomeTo")}</span>
           <Logo />
         </h1>
+        {isError && (
+          <Alert variant="error" className="mb-8">
+            {t("pages.onboarding.error")}
+          </Alert>
+        )}
 
         <div className="relative block w-full rounded-lg border-2 border-dashed border-gray-5 p-12 text-center dark:border-gray-dark-5">
           <p className="mt-1 text-sm text-gray-9 dark:text-gray-dark-9">
