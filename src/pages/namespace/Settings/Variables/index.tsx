@@ -89,6 +89,7 @@ const VariablesList: FC = () => {
                 {t("pages.settings.variables.list.title")}
               </h3>
               <Input
+                data-testid="variable-search"
                 className="sm:w-60"
                 value={search}
                 onChange={(e) => {
@@ -142,11 +143,13 @@ const VariablesList: FC = () => {
             {totalPages > 1 && (
               <Pagination>
                 <PaginationLink
+                  data-testid="pagination-prev"
                   icon="left"
                   onClick={() => goToPreviousPage()}
                 />
                 {pagesList.map((page) => (
                   <PaginationLink
+                    data-testid={`pagination-btn-page-${page}`}
                     active={currentPage === page}
                     key={`${page}`}
                     onClick={() => goToPage(page)}
@@ -154,7 +157,11 @@ const VariablesList: FC = () => {
                     {page}
                   </PaginationLink>
                 ))}
-                <PaginationLink icon="right" onClick={() => goToNextPage()} />
+                <PaginationLink
+                  data-testid="pagination-next"
+                  icon="right"
+                  onClick={() => goToNextPage()}
+                />
               </Pagination>
             )}
           </>
