@@ -209,12 +209,12 @@ const ApiCommands = ({
           </a>
         </Button>
         <CopyButton
-          testid="api-commands-copy-as-curl"
           value={curlCommand}
           buttonProps={{
             variant: "outline",
             className: "w-60",
             disabled: disableCopyButton,
+            "data-testid": "api-commands-copy-as-curl",
           }}
         >
           {(copied) =>
