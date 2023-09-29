@@ -39,7 +39,7 @@ const CreateService = ({
 }) => {
   const { t } = useTranslation();
 
-  const { data } = useServices();
+  const { data } = useServices({});
   const { mutate: createService, isLoading } = useCreateService({
     onSuccess: () => {
       close();
@@ -50,7 +50,6 @@ const CreateService = ({
     register,
     handleSubmit,
     watch,
-    getValues,
     setValue,
     formState: { isDirty, errors, isValid, isSubmitted },
   } = useForm<ServiceFormSchemaType>({
@@ -94,6 +93,9 @@ const CreateService = ({
   const maxScale = data?.config.maxscale;
   if (maxScale === undefined) return null;
 
+  const size = watch("size");
+  const minscale = watch("minscale");
+
   return (
     <>
       <DialogHeader>
@@ -135,18 +137,13 @@ const CreateService = ({
               {t("pages.services.create.scaleLabel")}
             </label>
             <div className="flex w-full gap-5">
-              <Input
-                className="w-12"
-                readOnly
-                value={watch("minscale")}
-                disabled
-              />
+              <Input className="w-12" readOnly value={minscale} disabled />
               <Slider
                 id="scale"
                 step={1}
                 min={0}
                 max={maxScale}
-                value={[watch("minscale") ?? 0]}
+                value={[minscale ?? 0]}
                 onValueChange={(e) => {
                   const newValue = e[0];
                   newValue !== undefined && setValue("minscale", newValue);
@@ -159,7 +156,7 @@ const CreateService = ({
               {t("pages.services.create.sizeLabel")}
             </label>
             <Select
-              value={`${getValues("size")}`}
+              value={`${size}`}
               onValueChange={(value) => {
                 const sizeParsed = SizeSchema.safeParse(parseInt(value));
                 if (sizeParsed.success) {
@@ -196,7 +193,7 @@ const CreateService = ({
       <DialogFooter>
         <DialogClose asChild>
           <Button variant="ghost">
-            {t("pages.services.create.createBtn")}
+            {t("pages.services.create.cancelBtn")}
           </Button>
         </DialogClose>
         <Button

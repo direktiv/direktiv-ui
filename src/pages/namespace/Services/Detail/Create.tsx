@@ -54,7 +54,6 @@ const CreateRevision = ({
     register,
     handleSubmit,
     watch,
-    getValues,
     setValue,
     formState: { errors },
   } = useForm<RevisionFormSchemaType>({
@@ -108,8 +107,11 @@ const CreateRevision = ({
 
   const formId = `new-service-revision`;
 
-  const maxScale = data?.config.maxscale;
+  const maxScale = data?.config?.maxscale;
   if (maxScale === undefined) return null;
+
+  const size = watch("size");
+  const minscale = watch("minscale");
 
   return (
     <>
@@ -141,18 +143,13 @@ const CreateRevision = ({
               {t("pages.services.revision.create.scaleLabel")}
             </label>
             <div className="flex w-full gap-5">
-              <Input
-                className="w-12"
-                readOnly
-                value={watch("minscale")}
-                disabled
-              />
+              <Input className="w-12" readOnly value={minscale} disabled />
               <Slider
                 id="scale"
                 step={1}
                 min={0}
                 max={maxScale}
-                value={[watch("minscale") ?? 0]}
+                value={[minscale ?? 0]}
                 onValueChange={(e) => {
                   const newValue = e[0];
                   newValue !== undefined && setValue("minscale", newValue);
@@ -165,7 +162,7 @@ const CreateRevision = ({
               {t("pages.services.revision.create.sizeLabel")}
             </label>
             <Select
-              value={`${getValues("size")}`}
+              value={`${size}`}
               onValueChange={(value) => {
                 const sizeParsed = SizeSchema.safeParse(parseInt(value));
                 if (sizeParsed.success) {
@@ -204,7 +201,7 @@ const CreateRevision = ({
       <DialogFooter>
         <DialogClose asChild>
           <Button variant="ghost">
-            {t("pages.services.revision.create.createBtn")}
+            {t("pages.services.revision.create.cancelBtn")}
           </Button>
         </DialogClose>
         <Button

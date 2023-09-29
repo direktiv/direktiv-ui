@@ -22,10 +22,29 @@ import { useNamespace } from "~/util/store/namespace";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
+const DefaultDeleteMenuItem = () => {
+  const { t } = useTranslation();
+  return (
+    <>
+      <DropdownMenuItem>
+        <Trash className="mr-2 h-4 w-4" />
+        {t("pages.services.list.contextMenu.delete")}
+      </DropdownMenuItem>
+    </>
+  );
+};
+
 const ServicesTableRow: FC<{
   service: ServiceSchemaType;
-  setDeleteService: (service: string | undefined) => void;
-}> = ({ service, setDeleteService }) => {
+  setDeleteService: (service: ServiceSchemaType) => void;
+  deleteMenuItem?: JSX.Element;
+  workflow?: string;
+}> = ({
+  service,
+  setDeleteService,
+  deleteMenuItem = <DefaultDeleteMenuItem />,
+  workflow,
+}) => {
   const namespace = useNamespace();
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -41,7 +60,18 @@ const ServicesTableRow: FC<{
     <TooltipProvider>
       <TableRow
         onClick={() => {
-          navigate(
+          if (workflow) {
+            return navigate(
+              pages.explorer.createHref({
+                namespace,
+                path: workflow,
+                subpage: "workflow-services",
+                serviceName: service.info.name,
+                serviceVersion: service.info.revision,
+              })
+            );
+          }
+          return navigate(
             pages.services.createHref({
               namespace,
               service: service.info.name,
@@ -76,7 +106,9 @@ const ServicesTableRow: FC<{
         <TableCell>{service.info.image}</TableCell>
         <TableCell>{service.info.minScale}</TableCell>
         <TableCell>{sizeLabel}</TableCell>
-        <TableCell>{service.info.cmd}</TableCell>
+        <TableCell className="whitespace-normal break-all">
+          {service.info.cmd}
+        </TableCell>
         <TableCell>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -92,16 +124,12 @@ const ServicesTableRow: FC<{
             <DropdownMenuContent className="w-40">
               <DialogTrigger
                 className="w-full"
-                data-testid="node-actions-delete"
                 onClick={(e) => {
                   e.stopPropagation();
-                  setDeleteService(service.info.name);
+                  setDeleteService(service);
                 }}
               >
-                <DropdownMenuItem>
-                  <Trash className="mr-2 h-4 w-4" />
-                  {t("pages.services.list.contextMenu.delete")}
-                </DropdownMenuItem>
+                <DropdownMenuItem>{deleteMenuItem}</DropdownMenuItem>
               </DialogTrigger>
             </DropdownMenuContent>
           </DropdownMenu>
