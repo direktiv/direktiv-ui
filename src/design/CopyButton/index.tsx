@@ -1,14 +1,14 @@
 import { Check, Copy, XCircle } from "lucide-react";
-import { ComponentProps, FC, useEffect, useState } from "react";
+import { ComponentPropsWithRef, FC, useEffect, useState } from "react";
 
 import Button from "../Button";
 
-type ButtonPropsType = ComponentProps<typeof Button>;
+type ButtonPropsType = ComponentPropsWithRef<typeof Button>;
 
 const CopyButton: FC<{
   testid?: string;
   value: string;
-  buttonProps?: ButtonPropsType;
+  buttonProps?: ButtonPropsType & { "data-testid"?: string };
   children?: (copied: boolean) => React.ReactNode;
 }> = ({
   value,
@@ -48,7 +48,6 @@ const CopyButton: FC<{
     }
     return <Copy />;
   };
-
   return (
     <Button
       data-testid={testid}
