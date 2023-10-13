@@ -15,7 +15,6 @@ import {
 import Alert from "~/design/Alert";
 import Badge from "~/design/Badge";
 import { ConditionalWrapper } from "~/util/helpers";
-import CopyButton from "~/design/CopyButton";
 import { FC } from "react";
 import { InstanceSchemaType } from "~/api/instances/schema";
 import TooltipCopyBadge from "~/design/TooltipCopyBadge";
@@ -33,7 +32,7 @@ const InstanceTableRow: FC<{
   const createdAt = useUpdatedAt(instance.createdAt);
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const isChild = invoker === "instance" && !!childInstance;
+  const isChildInstance = invoker === "instance" && !!childInstance;
 
   return (
     <TooltipProvider>
@@ -54,6 +53,7 @@ const InstanceTableRow: FC<{
           <Tooltip>
             <TooltipTrigger
               data-testid={`instance-row-workflow-${instance.id}`}
+              asChild
             >
               <Link
                 onClick={(e) => {
@@ -70,7 +70,9 @@ const InstanceTableRow: FC<{
               </Link>
             </TooltipTrigger>
             <TooltipContent>
-              {t("pages.instances.list.tableRow.openWorkflowTooltip")}
+              {t("pages.instances.list.tableRow.openWorkflowTooltip", {
+                name: instance.as,
+              })}
             </TooltipContent>
           </Tooltip>
         </TableCell>
@@ -80,33 +82,22 @@ const InstanceTableRow: FC<{
           </TooltipCopyBadge>
         </TableCell>
         <TableCell>
-          <ConditionalWrapper
-            condition={isChild}
-            wrapper={(children) => (
-              <Tooltip>
-                <TooltipTrigger>{children}</TooltipTrigger>
-                <TooltipContent className="flex gap-2 align-middle">
-                  {childInstance}
-                  <CopyButton
-                    value={childInstance ?? ""}
-                    buttonProps={{
-                      size: "sm",
-                      onClick: (e) => {
-                        e.stopPropagation();
-                      },
-                    }}
-                  />
-                </TooltipContent>
-              </Tooltip>
-            )}
-          >
+          {isChildInstance ? (
+            <TooltipCopyBadge
+              value={childInstance}
+              variant="outline"
+              data-testid={`instance-row-invoker-${instance.id}`}
+            >
+              {invoker}
+            </TooltipCopyBadge>
+          ) : (
             <Badge
               data-testid={`instance-row-invoker-${instance.id}`}
               variant="outline"
             >
               {invoker}
             </Badge>
-          </ConditionalWrapper>
+          )}
         </TableCell>
         <TableCell>
           <ConditionalWrapper

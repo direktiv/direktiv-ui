@@ -8,16 +8,9 @@ import {
 } from "~/design/Command";
 import { ConditionalWrapper, twMergeClsx } from "~/util/helpers";
 import { Popover, PopoverContent, PopoverTrigger } from "~/design/Popover";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "~/design/Tooltip";
 
 import Badge from "~/design/Badge";
-import Button from "~/design/Button";
-import { RefreshCcw } from "lucide-react";
+import RefreshButton from "~/design/RefreshButton";
 import { pages } from "~/util/router/pages";
 import { statusToBadgeVariant } from "../../utils";
 import { t } from "i18next";
@@ -70,7 +63,7 @@ const ChildInstances = () => {
           wrapper={(children) => (
             <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
               <PopoverTrigger asChild>{children}</PopoverTrigger>
-              <PopoverContent className="w-96 p-0">
+              <PopoverContent className="w-[500px] p-0">
                 <Command>
                   <CommandInput
                     placeholder={
@@ -141,29 +134,16 @@ const ChildInstances = () => {
                 )}
           </span>
         </ConditionalWrapper>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger>
-              <Button
-                icon
-                size="sm"
-                variant="ghost"
-                className="relative -top-0.5"
-                disabled={isFetching}
-                onClick={() => {
-                  refetch();
-                }}
-              >
-                <RefreshCcw />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              {t(
-                `pages.instances.list.tableHeader.childInstances.updateTooltip`
-              )}
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <RefreshButton
+          icon
+          size="sm"
+          variant="ghost"
+          className="relative -top-0.5"
+          disabled={isFetching}
+          onClick={() => {
+            refetch();
+          }}
+        />
       </div>
     </div>
   );

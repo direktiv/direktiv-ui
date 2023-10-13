@@ -1,6 +1,9 @@
+import { ComponentProps, FC } from "react";
 import clsx, { ClassValue } from "clsx";
 
-import { FC } from "react";
+import { LogEntry } from "~/design/Logs";
+import { LogLevelSchemaType } from "~/api/schema";
+import moment from "moment";
 import { twMerge } from "tailwind-merge";
 
 /**
@@ -29,3 +32,50 @@ export const ConditionalWrapper: FC<ConditionalWrapperProps> = ({
   wrapper,
   children,
 }) => (condition ? wrapper(children) : children);
+
+export const formatLogTime = (time: string) =>
+  moment(time).format("HH:mm:ss.mm");
+
+type LogEntryVariant = ComponentProps<typeof LogEntry>["variant"];
+
+export const logLevelToLogEntryVariant = (
+  level: LogLevelSchemaType
+): LogEntryVariant => {
+  switch (level) {
+    case "error":
+    case "warn":
+      return "error";
+    case "info":
+      return "info";
+    case "debug":
+      return undefined;
+    default:
+      break;
+  }
+};
+
+export const triggerDownloadFromBlob = ({
+  filename,
+  blob,
+}: {
+  filename: string;
+  blob: Blob;
+}) => {
+  const url = window.URL.createObjectURL(blob);
+  const aTag = document.createElement("a");
+  aTag.href = url;
+  aTag.download = filename;
+  document.body.appendChild(aTag);
+  aTag.click();
+  window.URL.revokeObjectURL(url);
+};
+
+// takes a json input string and format it with 4 spaces indentation
+export const prettifyJsonString = (jsonString: string) => {
+  try {
+    const resultAsJson = JSON.parse(jsonString);
+    return JSON.stringify(resultAsJson, null, 4);
+  } catch (e) {
+    return "{}";
+  }
+};

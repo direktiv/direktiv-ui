@@ -145,5 +145,7 @@ storybook-static
 /playwright-report/
 /playwright/.cache/
 
-.vscode/settings.json
 playwright/.auth
+
+.vscode/*
+!.vscode/extensions.json

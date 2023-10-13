@@ -49,7 +49,6 @@ export default defineConfig({
       },
       dependencies: ['setup']
     },
-
     {
       name: "firefox",
       use: {
@@ -58,7 +57,6 @@ export default defineConfig({
       },
       dependencies: ['setup']
     },
-
     {
       name: "webkit",
       use: {

@@ -1,14 +1,12 @@
 import { InstancesDetailSchema, InstancesDetailSchemaType } from "../schema";
-import {
-  QueryFunctionContext,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { QueryFunctionContext, useQueryClient } from "@tanstack/react-query";
 
 import { apiFactory } from "~/api/apiFactory";
 import { instanceKeys } from "..";
+import { memo } from "react";
 import { useApiKey } from "~/util/store/apiKey";
 import { useNamespace } from "~/util/store/namespace";
+import useQueryWithPermissions from "~/api/useQueryWithPermissions";
 import { useStreaming } from "~/api/streaming";
 
 export const getInstanceDetails = apiFactory({
@@ -62,6 +60,20 @@ export const useInstanceDetailsStream = (
   });
 };
 
+type InstanceStreamingSubscriberType = {
+  instanceId: string;
+  enabled?: boolean;
+};
+
+export const InstanceStreamingSubscriber = memo(
+  ({ instanceId, enabled }: InstanceStreamingSubscriberType) => {
+    useInstanceDetailsStream({ instanceId }, { enabled: enabled ?? true });
+    return null;
+  }
+);
+
+InstanceStreamingSubscriber.displayName = "InstanceStreamingSubscriber";
+
 export const useInstanceDetails = ({ instanceId }: { instanceId: string }) => {
   const apiKey = useApiKey();
   const namespace = useNamespace();
@@ -70,7 +82,7 @@ export const useInstanceDetails = ({ instanceId }: { instanceId: string }) => {
     throw new Error("namespace is undefined");
   }
 
-  return useQuery({
+  return useQueryWithPermissions({
     queryKey: instanceKeys.instanceDetail(namespace, {
       apiKey: apiKey ?? undefined,
       instanceId,

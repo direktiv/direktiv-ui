@@ -1,8 +1,9 @@
+import { LogLevelSchema } from "../schema";
 import { z } from "zod";
 
 const LogEntrySchema = z.object({
   t: z.string(), // "2023-07-27T09:49:58.408869Z"
-  level: z.enum(["debug", "info", "error", "panic"]), // "debug" | "info" | "error" | "panic";
+  level: LogLevelSchema,
   msg: z.string(), // "Preparing workflow triggered by api."
   tags: z.object({
     callpath: z.string(), // "/"
@@ -23,6 +24,8 @@ export const LogListSchema = z.object({
   instance: z.string(),
   results: z.array(LogEntrySchema),
 });
+
+export const InstanceCancelSchema = z.null();
 
 export type LogListSchemaType = z.infer<typeof LogListSchema>;
 export type LogEntryType = z.infer<typeof LogEntrySchema>;

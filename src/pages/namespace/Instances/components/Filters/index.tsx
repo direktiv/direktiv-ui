@@ -246,7 +246,6 @@ const Filters = ({ filters, onUpdate }: FiltersProps) => {
           );
         }
       })}
-
       {!!undefinedFilters.length && (
         <Popover
           open={activeMenu === "main"}
