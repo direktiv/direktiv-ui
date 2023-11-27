@@ -55,7 +55,7 @@ const NotificationLoading: FC<PropsWithChildren> = ({ children }) => (
   </div>
 );
 
-function NotificationMessage({
+const NotificationMessage = ({
   text,
   icon: Icon,
 }: {
@@ -75,10 +75,12 @@ function NotificationMessage({
           />
         </div>
         <NotificationText>{text}</NotificationText>
+
       </div>
+      <NotificationText>{text}</NotificationText>
     </div>
-  );
-}
+  </div>
+);
 
 type NotificationPropsType = PropsWithChildren & {
   className?: string;
