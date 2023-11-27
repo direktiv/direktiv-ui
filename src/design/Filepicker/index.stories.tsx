@@ -1,29 +1,15 @@
-import { File, Folder, FolderUp, LucideIcon } from "lucide-react";
+import { File, Folder, FolderUp } from "lucide-react";
 
 import {
   Filepicker,
   FilepickerBreadcrumb,
   FilepickerBreadcrumb2,
-  FilepickerClose,
   FilepickerList,
   FilepickerListItem,
   FilepickerListItemText,
   FilepickerSeparator,
 } from "./";
-
-import {
-  NoPermissions,
-  NoResult,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeaderCell,
-  TableRow,
-} from "~/design/Table";
-
-import { CommandGroup } from "../Command";
-
+import { Link } from "react-router-dom";
 // eslint-disable-next-line sort-imports
 import type { Meta, StoryObj } from "@storybook/react";
 
@@ -71,32 +57,32 @@ export const FilepickerTest = () => (
 type Listitem = {
   filename: string;
   filelink: string;
-  value: number;
+  index: number;
 };
 
 const items: Listitem[] = [
-  { filename: "Readme.txt", filelink: "/okay", value: 0 },
-  { filename: "Readme.txt", filelink: "/okay", value: 1 },
-  { filename: "Readme.txt", filelink: "/okay", value: 2 },
-  { filename: "Readme.txt", filelink: "/okay", value: 3 },
-  { filename: "Readme.txt", filelink: "/okay", value: 4 },
-  { filename: "Readme.txt", filelink: "/okay", value: 5 },
-  { filename: "Readme.txt", filelink: "/okay", value: 6 },
-  { filename: "Readme.txt", filelink: "/okay", value: 7 },
-  { filename: "Readme.txt", filelink: "/okay", value: 8 },
-  { filename: "Readme.txt", filelink: "/okay", value: 9 },
-  { filename: "Readme0.txt", filelink: "/okay", value: 10 },
-  { filename: "Readme1.txt", filelink: "/okay", value: 11 },
-  { filename: "Readme2.txt", filelink: "/okay", value: 12 },
-  { filename: "Readme3.txt", filelink: "/okay", value: 13 },
-  { filename: "Readme0.txt", filelink: "/okay", value: 14 },
-  { filename: "Readme1.txt", filelink: "/okay", value: 15 },
-  { filename: "Readme2.txt", filelink: "/okay", value: 16 },
-  { filename: "Readme3.txt", filelink: "/okay", value: 17 },
-  { filename: "Readme0.txt", filelink: "/okay", value: 18 },
-  { filename: "Readme1.txt", filelink: "/okay", value: 19 },
-  { filename: "Readme2.txt", filelink: "/okay", value: 20 },
-  { filename: "Readme3.txt", filelink: "/okay", value: 21 },
+  { filename: "image.jpg", filelink: "/okay", index: 0 },
+  { filename: "image1.jpg", filelink: "/okay", index: 1 },
+  { filename: "image2.jpg", filelink: "/okay", index: 2 },
+  { filename: "image3.jpg", filelink: "/okay", index: 3 },
+  { filename: "hello.yaml", filelink: "/okay", index: 4 },
+  { filename: "hello1.yaml", filelink: "/okay", index: 5 },
+  { filename: "hello2.yaml", filelink: "/okay", index: 6 },
+  { filename: "hello3.yaml", filelink: "/okay", index: 7 },
+  { filename: "hello4.yaml", filelink: "/okay", index: 8 },
+  { filename: "Readme.txt", filelink: "/okay", index: 9 },
+  { filename: "Readme0.txt", filelink: "/okay", index: 10 },
+  { filename: "Readme1.txt", filelink: "/okay", index: 11 },
+  { filename: "Readme2.txt", filelink: "/okay", index: 12 },
+  { filename: "Readme3.txt", filelink: "/okay", index: 13 },
+  { filename: "Readme4.txt", filelink: "/okay", index: 14 },
+  { filename: "Readme5.txt", filelink: "/okay", index: 15 },
+  { filename: "Readme6.txt", filelink: "/okay", index: 16 },
+  { filename: "Readme7.txt", filelink: "/okay", index: 17 },
+  { filename: "Readme8.txt", filelink: "/okay", index: 18 },
+  { filename: "Readme9.txt", filelink: "/okay", index: 19 },
+  { filename: "Readme10.txt", filelink: "/okay", index: 20 },
+  { filename: "Readme11.txt", filelink: "/okay", index: 21 },
 ];
 
 export const FilepickerWithManyItems = () => (
@@ -108,10 +94,10 @@ export const FilepickerWithManyItems = () => (
     </div>
     <FilepickerSeparator />
     <FilepickerList>
-      {items.map((index) => (
-        <div key={index.value}>
+      {items.map((element) => (
+        <div key={element.index}>
           <div className="w-full hover:bg-gray-3 dark:hover:bg-gray-dark-3">
-            <FilepickerListItem icon={File} text={index.filename} />
+            <FilepickerListItem icon={File} text={element.filename} />
           </div>
           <FilepickerSeparator />
         </div>
@@ -119,57 +105,3 @@ export const FilepickerWithManyItems = () => (
     </FilepickerList>
   </Filepicker>
 );
-
-/*
-
-{showIndicator ? (
-    possibleNotifications.map(
-      ([notificationType, notificationConfig], index, srcArr) => {
-
-        */
-
-/*
-
-<CommandGroup>
-  {folders.map((folder) => (
-    <CommandItem
-      name={folder.name}
-      key={status.value}
-      onSelect={(value) => {
-        setSelectedStatus(
-          statuses.find((priority) => priority.value === value) || null
-        );
-        setOpen(false);
-      }}
-    >
-      <status.icon className={twMergeClsx("mr-2 h-auto w-4")} />
-      <span>{status.label}</span>
-    </CommandItem>
-  ))}
-</CommandGroup>;
-{statuses.map((status) => (
-
-    */
-
-/*
-
-<CommandGroup>
-{statuses.map((status) => (
-  <CommandItem
-    value={status.value}
-    key={status.value}
-    onSelect={(value) => {
-      setSelectedStatus(
-        statuses.find((priority) => priority.value === value) ||
-          null
-      );
-      setOpen(false);
-    }}
-  >
-    <status.icon className={twMergeClsx("mr-2 h-auto w-4")} />
-    <span>{status.label}</span>
-  </CommandItem>
-))}
-</CommandGroup>
-
-*/
