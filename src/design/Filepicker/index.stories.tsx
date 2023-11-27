@@ -2,15 +2,14 @@ import { File, Folder, FolderUp } from "lucide-react";
 
 import {
   Filepicker,
-  FilepickerBreadcrumb,
-  FilepickerBreadcrumb2,
+  FilepickerHeading,
   FilepickerList,
   FilepickerListItem,
-  FilepickerListItemText,
   FilepickerSeparator,
 } from "./";
-import { Link } from "react-router-dom";
+
 // eslint-disable-next-line sort-imports
+
 import type { Meta, StoryObj } from "@storybook/react";
 
 const meta = {
@@ -28,77 +27,78 @@ export const Default: Story = {
   argTypes: {},
 };
 
-export const FilepickerTest = () => (
+export const WithFewItems = () => (
   <Filepicker>
-    <FilepickerBreadcrumb2>Home</FilepickerBreadcrumb2>
+    <FilepickerHeading>Collection of Files</FilepickerHeading>
     <FilepickerSeparator />
     <div className="w-full hover:bg-gray-3 dark:hover:bg-gray-dark-3">
-      <FilepickerListItem icon={FolderUp} text=".." />
+      <FilepickerListItem icon={FolderUp}>..</FilepickerListItem>
     </div>
     <FilepickerSeparator />
     <div className="w-full hover:bg-gray-3 dark:hover:bg-gray-dark-3">
-      <FilepickerListItem icon={Folder} text="Images" />
+      <FilepickerListItem icon={Folder}>Images</FilepickerListItem>
     </div>
     <FilepickerSeparator />
     <div className="w-full hover:bg-gray-3 dark:hover:bg-gray-dark-3">
-      <FilepickerListItem icon={Folder} text="Text" />
+      <FilepickerListItem icon={Folder}>Text</FilepickerListItem>
     </div>
     <FilepickerSeparator />
     <div className="w-full hover:bg-gray-3 dark:hover:bg-gray-dark-3">
-      <FilepickerListItem icon={File} text="Readme.txt" />
+      <FilepickerListItem icon={File}>Readme.txt</FilepickerListItem>
     </div>
     <FilepickerSeparator />
     <div className="w-full hover:bg-gray-3 dark:hover:bg-gray-dark-3">
-      <FilepickerListItem icon={File} text="Icon.jpg" />
+      <FilepickerListItem asChild icon={File}>
+        Icon.jpg
+      </FilepickerListItem>
     </div>
   </Filepicker>
 );
 
 type Listitem = {
   filename: string;
-  filelink: string;
   index: number;
 };
 
 const items: Listitem[] = [
-  { filename: "image.jpg", filelink: "/okay", index: 0 },
-  { filename: "image1.jpg", filelink: "/okay", index: 1 },
-  { filename: "image2.jpg", filelink: "/okay", index: 2 },
-  { filename: "image3.jpg", filelink: "/okay", index: 3 },
-  { filename: "hello.yaml", filelink: "/okay", index: 4 },
-  { filename: "hello1.yaml", filelink: "/okay", index: 5 },
-  { filename: "hello2.yaml", filelink: "/okay", index: 6 },
-  { filename: "hello3.yaml", filelink: "/okay", index: 7 },
-  { filename: "hello4.yaml", filelink: "/okay", index: 8 },
-  { filename: "Readme.txt", filelink: "/okay", index: 9 },
-  { filename: "Readme0.txt", filelink: "/okay", index: 10 },
-  { filename: "Readme1.txt", filelink: "/okay", index: 11 },
-  { filename: "Readme2.txt", filelink: "/okay", index: 12 },
-  { filename: "Readme3.txt", filelink: "/okay", index: 13 },
-  { filename: "Readme4.txt", filelink: "/okay", index: 14 },
-  { filename: "Readme5.txt", filelink: "/okay", index: 15 },
-  { filename: "Readme6.txt", filelink: "/okay", index: 16 },
-  { filename: "Readme7.txt", filelink: "/okay", index: 17 },
-  { filename: "Readme8.txt", filelink: "/okay", index: 18 },
-  { filename: "Readme9.txt", filelink: "/okay", index: 19 },
-  { filename: "Readme10.txt", filelink: "/okay", index: 20 },
-  { filename: "Readme11.txt", filelink: "/okay", index: 21 },
+  { filename: "image.jpg", index: 0 },
+  { filename: "image1.jpg", index: 1 },
+  { filename: "image2.jpg", index: 2 },
+  { filename: "image3.jpg", index: 3 },
+  { filename: "hello.yaml", index: 4 },
+  { filename: "hello1.yaml", index: 5 },
+  { filename: "hello2.yaml", index: 6 },
+  { filename: "hello3.yaml", index: 7 },
+  { filename: "hello4.yaml", index: 8 },
+  { filename: "Readme.txt", index: 9 },
+  { filename: "Readme0.txt", index: 10 },
+  { filename: "Readme1.txt", index: 11 },
+  { filename: "Readme2.txt", index: 12 },
+  { filename: "Readme3.txt", index: 13 },
+  { filename: "Readme4.txt", index: 14 },
+  { filename: "Readme5.txt", index: 15 },
+  { filename: "Readme6.txt", index: 16 },
+  { filename: "Readme7.txt", index: 17 },
+  { filename: "Readme8.txt", index: 18 },
+  { filename: "Readme9.txt", index: 19 },
+  { filename: "Readme10.txt", index: 20 },
+  { filename: "Readme11.txt", index: 21 },
 ];
 
-export const FilepickerWithManyItems = () => (
+export const WithManyItems = () => (
   <Filepicker>
-    <FilepickerBreadcrumb2>Home</FilepickerBreadcrumb2>
+    <FilepickerHeading>Collection of Files</FilepickerHeading>
     <FilepickerSeparator />
     <div className="w-full hover:bg-gray-3 dark:hover:bg-gray-dark-3">
-      <FilepickerListItem icon={FolderUp} text=".." />
+      <FilepickerListItem icon={FolderUp}>..</FilepickerListItem>
     </div>
     <FilepickerSeparator />
     <FilepickerList>
       {items.map((element) => (
         <div key={element.index}>
-          <div className="w-full hover:bg-gray-3 dark:hover:bg-gray-dark-3">
-            <FilepickerListItem icon={File} text={element.filename} />
-          </div>
+          <FilepickerListItem icon={File}>
+            {element.filename}
+          </FilepickerListItem>
           <FilepickerSeparator />
         </div>
       ))}
