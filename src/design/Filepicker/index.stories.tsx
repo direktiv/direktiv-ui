@@ -8,8 +8,6 @@ import {
   FilepickerSeparator,
 } from "./";
 
-// eslint-disable-next-line sort-imports
-
 import type { Meta, StoryObj } from "@storybook/react";
 
 const meta = {
