@@ -27,15 +27,15 @@ export const Default: Story = {
 
 export const WithOrWithoutLogo = () => (
   <div className="flex space-x-5">
-    <Logo />
-    <Logo iconOnly />
+    <Logo customLogo={false} />
+    <Logo iconOnly customLogo={false} />
   </div>
 );
 
 export const PassClassnames = () => (
   <div className="flex space-x-5">
-    <Logo className="w-20" />
-    <Logo className="w-24" />
-    <Logo />
+    <Logo className="w-20" customLogo={false} />
+    <Logo className="w-24" customLogo={false} />
+    <Logo customLogo={false} />
   </div>
 );
