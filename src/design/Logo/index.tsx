@@ -7,7 +7,7 @@ type DirektivLogoProps = {
 
 type CustomLogoProps = {
   customLogo: true;
-  pathLightmode: string;
+  pathLightMode: string;
   pathDarkmode: string;
   useDarkmode: boolean;
 };
@@ -22,7 +22,7 @@ const Logo = (props: LogoProps) => {
   if (props.customLogo) {
     return (
       <img
-        src={props.useDarkmode ? props.pathDarkmode : props.pathLightmode}
+        src={props.useDarkmode ? props.pathDarkmode : props.pathLightMode}
         className={clsx(className)}
       />
     );
