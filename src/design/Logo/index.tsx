@@ -1,10 +1,9 @@
-const Logo = ({
-  className,
-  iconOnly,
-}: {
+type LogoProps = {
   className?: string;
   iconOnly?: boolean;
-}) =>
+};
+
+const Logo = ({ className, iconOnly }: LogoProps) =>
   iconOnly ? (
     <svg
       width="32"
