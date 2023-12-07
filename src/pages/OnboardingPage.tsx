@@ -5,7 +5,7 @@ import { useNamespace, useNamespaceActions } from "~/util/store/namespace";
 
 import Alert from "~/design/Alert";
 import Button from "~/design/Button";
-import Logo from "~/design/Logo";
+import Logo from "~/componentsNext/Logo";
 import NamespaceCreate from "~/componentsNext/NamespaceEdit";
 import { pages } from "~/util/router/pages";
 import { useListNamespaces } from "~/api/namespaces/query/get";

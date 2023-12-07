@@ -14,7 +14,7 @@ import { Outlet, useParams } from "react-router-dom";
 import { useNamespace, useNamespaceActions } from "~/util/store/namespace";
 
 import Breadcrumb from "~/componentsNext/Breadcrumb";
-import Logo from "~/design/Logo";
+import Logo from "~/componentsNext/Logo";
 import { Menu } from "lucide-react";
 import Navigation from "~/componentsNext/Navigation";
 import NotificationMenu from "~/componentsNext/NotificationMenu";
