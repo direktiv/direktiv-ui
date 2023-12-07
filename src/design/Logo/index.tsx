@@ -4,7 +4,7 @@ const Logo = ({
 }: {
   className?: string;
   iconOnly?: boolean;
-}): JSX.Element =>
+}) =>
   iconOnly ? (
     <svg
       width="32"
