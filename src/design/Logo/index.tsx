@@ -1,15 +1,15 @@
 import clsx from "clsx";
 
 type DirektivLogoProps = {
-  customLogo: undefined;
-  iconOnly: boolean;
+  customLogo: false;
+  iconOnly?: boolean;
 };
 
 type CustomLogoProps = {
   customLogo: true;
   pathLightMode: string;
-  pathDarkmode: string;
-  useDarkmode: boolean;
+  pathDarkMode: string;
+  useDarkMode: boolean;
 };
 
 type LogoProps = {
@@ -22,7 +22,7 @@ const Logo = (props: LogoProps) => {
   if (props.customLogo) {
     return (
       <img
-        src={props.useDarkmode ? props.pathDarkmode : props.pathLightMode}
+        src={props.useDarkMode ? props.pathDarkMode : props.pathLightMode}
         className={clsx(className)}
       />
     );
