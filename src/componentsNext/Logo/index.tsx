@@ -19,7 +19,7 @@ const Logo: FC<AppLogoProps> = ({ className, iconOnly }) => {
   if (pathLightMode && pathDarkMode) {
     return (
       <div className={className}>
-        <div className="flex h-[30px] w-[130px] grow items-center">
+        <div className="flex h-[32px] w-[134px] grow items-center">
           <LogoDesignComponent
             customLogo
             pathLightMode={pathLightMode}
