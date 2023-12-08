@@ -39,6 +39,7 @@ This repository contains the user interface for [direktiv](https://github.com/di
   - `yarn run check:prettier` checks if all prettier formatting was applied (`yarn run prettier`)
 - `yarn run e2e:headless` runs all Playwright e2e tests in headless mode
 - `yarn run e2e:ui` runs all Playwright e2e tests in ui mode
+- `yarn run preview` locally preview the production build (requires you to run `pnpm build` first)
 
 # Recommended Development Environment
 
