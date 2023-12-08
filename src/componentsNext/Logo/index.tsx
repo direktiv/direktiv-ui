@@ -8,6 +8,8 @@ type AppLogoProps = {
   iconOnly?: boolean;
 };
 
+const basePath = `${env.VITE_BASE ?? "/"}`;
+
 const Logo: FC<AppLogoProps> = ({ className, iconOnly }) => {
   const {
     VITE_CUSTOM_LOGO_PATH_DARK_MODE: pathDarkMode,
@@ -22,8 +24,8 @@ const Logo: FC<AppLogoProps> = ({ className, iconOnly }) => {
         <div className="flex h-[32px] w-[134px] grow items-center">
           <LogoDesignComponent
             customLogo
-            pathLightMode={pathLightMode}
-            pathDarkMode={pathDarkMode}
+            pathLightMode={`${basePath}${pathLightMode}`}
+            pathDarkMode={`${basePath}${pathDarkMode}`}
             useDarkMode={theme === "dark"}
           />
         </div>
