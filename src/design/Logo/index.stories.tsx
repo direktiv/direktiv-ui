@@ -32,7 +32,7 @@ export const WithOrWithoutLogo = () => (
   </div>
 );
 
-export const PassClassnames = () => (
+export const PassClassNames = () => (
   <div className="flex space-x-5">
     <Logo className="w-20" customLogo={false} />
     <Logo className="w-24" customLogo={false} />
