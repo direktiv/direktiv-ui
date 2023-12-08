@@ -12,13 +12,11 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  render: ({ ...args }) => <Logo {...args} />,
+  render: ({ ...args }) => <Logo {...args} customLogo={false} />,
+  args: {
+    customLogo: false,
+  },
   argTypes: {
-    className: {
-      table: {
-        disable: true,
-      },
-    },
     iconOnly: {
       description: "icon version of the logo",
       control: "boolean",
