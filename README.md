@@ -26,7 +26,7 @@ This repository contains the user interface for [direktiv](https://github.com/di
 - create a `.env` file, copy the content from `.env.example` and change the variables to your needs
 - run `yarn start` to start the dev server
 - when you are using VSCode, make sure to install the recommended extensions for the best dev experience
-  - VSCode should suggest you the extensions when you open this folder in VSCode, but you can also check them in the `.vscode/extensions.json` file 
+  - VSCode should suggest you the extensions when you open this folder in VSCode, but you can also check them in the `.vscode/extensions.json` file
 
 # Scripts you might want to run
 
