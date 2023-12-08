@@ -12,8 +12,8 @@ const basePath = `${env.VITE_BASE ?? "/"}`;
 
 const Logo: FC<AppLogoProps> = ({ className, iconOnly }) => {
   const {
-    VITE_CUSTOM_LOGO_PATH_DARK_MODE: pathDarkMode,
-    VITE_CUSTOM_LOGO_PATH_LIGHT_MODE: pathLightMode,
+    VITE_LOGO_PATH_DARK_MODE: pathDarkMode,
+    VITE_LOGO_PATH_LIGHT_MODE: pathLightMode,
   } = env;
 
   const theme = useTheme();

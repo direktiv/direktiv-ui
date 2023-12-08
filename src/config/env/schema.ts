@@ -2,8 +2,8 @@ import { z } from "zod";
 
 export const envVariablesSchema = z.object({
   VITE_DEV_API_DOMAIN: z.string().optional(),
-  VITE_CUSTOM_LOGO_PATH_LIGHT_MODE: z.string().optional(),
-  VITE_CUSTOM_LOGO_PATH_DARK_MODE: z.string().optional(),
+  VITE_LOGO_PATH_LIGHT_MODE: z.string().optional(),
+  VITE_LOGO_PATH_DARK_MODE: z.string().optional(),
   VITE_IS_ENTERPRISE: z
     .string()
     .optional()
