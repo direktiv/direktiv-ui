@@ -22,11 +22,11 @@ const ServicesListPage = () => {
   } = useNamespaceServices();
 
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [rebuildService, setRebuildService] = useState<ServiceSchemaType>();
+  const [serviceToRebuild, setServiceToRebuild] = useState<ServiceSchemaType>();
 
   useEffect(() => {
     if (dialogOpen === false) {
-      setRebuildService(undefined);
+      setServiceToRebuild(undefined);
     }
   }, [dialogOpen]);
 
@@ -51,15 +51,15 @@ const ServicesListPage = () => {
           <ServicesTable
             services={serviceList?.data ?? []}
             isSuccess={isSuccess}
-            setRebuildService={setRebuildService}
+            setServiceToRebuild={setServiceToRebuild}
             isAllowed={isAllowed}
             noPermissionMessage={noPermissionMessage}
           />
         </Card>
         <DialogContent>
-          {rebuildService && (
+          {serviceToRebuild && (
             <Rebuild
-              service={rebuildService}
+              service={serviceToRebuild}
               close={() => {
                 setDialogOpen(false);
               }}

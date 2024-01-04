@@ -12,7 +12,7 @@ import { useWorkflowServices } from "~/api/services/query/services";
 
 const ServicesList = ({ workflow }: { workflow: string }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [rebuildService, setRebuildService] = useState<ServiceSchemaType>();
+  const [serviceToRebuild, setServiceToRebuild] = useState<ServiceSchemaType>();
 
   const {
     data: serviceList,
@@ -48,15 +48,15 @@ const ServicesList = ({ workflow }: { workflow: string }) => {
             <ServicesTable
               services={serviceList?.data ?? []}
               isSuccess={isSuccess}
-              setRebuildService={setRebuildService}
+              setServiceToRebuild={setServiceToRebuild}
               isAllowed={isAllowed}
               noPermissionMessage={noPermissionMessage}
             />
           </Card>
           <DialogContent>
-            {rebuildService && (
+            {serviceToRebuild && (
               <Rebuild
-                service={rebuildService}
+                service={serviceToRebuild}
                 close={() => {
                   setDialogOpen(false);
                 }}

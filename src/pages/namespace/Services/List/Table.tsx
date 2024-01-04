@@ -18,13 +18,13 @@ import { useTranslation } from "react-i18next";
 const ServicesTable = ({
   services,
   isSuccess = false,
-  setRebuildService,
+  setServiceToRebuild,
   isAllowed,
   noPermissionMessage,
 }: {
   services?: ServiceSchemaType[];
   isSuccess: boolean;
-  setRebuildService: Dispatch<SetStateAction<ServiceSchemaType | undefined>>;
+  setServiceToRebuild: Dispatch<SetStateAction<ServiceSchemaType | undefined>>;
   isAllowed: boolean;
   noPermissionMessage?: string;
 }) => {
@@ -63,7 +63,7 @@ const ServicesTable = ({
                 <Row
                   service={service}
                   key={service.id}
-                  setRebuildService={setRebuildService}
+                  setServiceToRebuild={setServiceToRebuild}
                 />
               ))}
             {noResults && (

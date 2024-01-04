@@ -23,8 +23,8 @@ import { useTranslation } from "react-i18next";
 
 const ServicesTableRow: FC<{
   service: ServiceSchemaType;
-  setRebuildService: (service: ServiceSchemaType) => void;
-}> = ({ service, setRebuildService }) => {
+  setServiceToRebuild: (service: ServiceSchemaType) => void;
+}> = ({ service, setServiceToRebuild }) => {
   const namespace = useNamespace();
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -120,7 +120,7 @@ const ServicesTableRow: FC<{
                   className="w-full"
                   onClick={(e) => {
                     e.stopPropagation();
-                    setRebuildService(service);
+                    setServiceToRebuild(service);
                   }}
                 >
                   <DropdownMenuItem>
