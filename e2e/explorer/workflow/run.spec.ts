@@ -1,11 +1,16 @@
 import { createNamespace, deleteNamespace } from "../../utils/namespace";
 import { expect, test } from "@playwright/test";
-import { jsonSchemaFormWorkflow, jsonSchemaWithRequiredEnum } from "./utils";
+import {
+  jsonSchemaFormWorkflow,
+  jsonSchemaWithRequiredEnum,
+  waitForSuccessToast,
+} from "./utils";
 
-import { noop as basicWorkflow } from "~/pages/namespace/Explorer/Tree/NewWorkflow/templates";
+import { noop as basicWorkflow } from "~/pages/namespace/Explorer/Tree/components/modals/CreateNew/Workflow/templates";
 import { createWorkflow } from "~/api/tree/mutate/createWorkflow";
 import { faker } from "@faker-js/faker";
 import { getInput } from "~/api/instances/query/input";
+import { headers } from "e2e/utils/testutils";
 
 let namespace = "";
 
@@ -29,6 +34,7 @@ test("it is possible to open and use the run workflow modal from the editor and 
       namespace,
       name: workflowName,
     },
+    headers,
   });
 
   await page.goto(`${namespace}/explorer/workflow/active/${workflowName}`);
@@ -99,6 +105,7 @@ test("it is possible to run the workflow by setting an input JSON via the editor
       namespace,
       name: workflowName,
     },
+    headers,
   });
 
   await page.goto(`${namespace}/explorer/workflow/active/${workflowName}`);
@@ -153,20 +160,38 @@ test("it is possible to run the workflow by setting an input JSON via the editor
       instanceId,
       namespace,
     },
+    headers,
   });
 
   const inputResponseString = atob(res.data);
-  const inputResponseAsJson = JSON.parse(inputResponseString);
-  const userInputAsJson = JSON.parse(userInputString);
 
   expect(
     inputResponseString,
-    "the server result is not exactly the same as the input that was sent (keys were sorted and the order of the array was changed))"
-  ).not.toBe(userInputString);
-  expect(
-    inputResponseAsJson,
-    "the JSON representation of the server result equals the client input"
-  ).toEqual(userInputAsJson);
+    "the server result is the same as the input that was sent"
+  ).toBe(userInputString);
+});
+
+test("it is not possible to run the workflow when the editor has unsaved changes", async ({
+  page,
+}) => {
+  const workflowName = faker.system.commonFileName("yaml");
+  await createWorkflow({
+    payload: basicWorkflow.data,
+    urlParams: {
+      baseUrl: process.env.VITE_DEV_API_DOMAIN,
+      namespace,
+      name: workflowName,
+    },
+    headers,
+  });
+
+  await page.goto(`${namespace}/explorer/workflow/active/${workflowName}`);
+
+  await expect(page.getByTestId("workflow-editor-btn-run")).not.toBeDisabled();
+
+  await page.type("textarea", faker.random.alphaNumeric(9));
+
+  await expect(page.getByTestId("workflow-editor-btn-run")).toBeDisabled();
 });
 
 test("it is possible to provide the input via generated form", async ({
@@ -180,6 +205,7 @@ test("it is possible to provide the input via generated form", async ({
       namespace,
       name: workflowName,
     },
+    headers,
   });
 
   await page.goto(`${namespace}/explorer/workflow/active/${workflowName}`);
@@ -201,16 +227,24 @@ test("it is possible to provide the input via generated form", async ({
   await expect(page.getByLabel("First Name")).toBeVisible();
   await expect(page.getByLabel("Last Name")).toBeVisible();
   await expect(page.getByLabel("Age")).toBeVisible();
+  await expect(page.getByRole("combobox", { name: "role" })).toBeVisible();
+
   await expect(
-    page.getByRole("combobox", { name: "Select a string" })
-  ).toBeVisible();
+    await page.getByRole("combobox", { name: "role" }).innerText(),
+    "the select input shows a fallback text when it has no value"
+  ).toBe("Select role");
+
   await expect(page.getByTestId("json-schema-form-add-button")).toBeVisible();
   await expect(page.getByLabel("Age")).toBeVisible();
   await expect(page.getByLabel("File")).toBeVisible();
 
   // interact with the select input
-  await page.getByRole("combobox", { name: "Select a string" }).click();
-  await page.getByRole("option", { name: "Select 2" }).click();
+  await page.getByRole("combobox", { name: "role" }).click();
+  await page.getByRole("option", { name: "guest" }).click();
+  await expect(
+    await page.getByRole("combobox", { name: "role" }).innerText(),
+    "the select input now shows the selected value"
+  ).toBe("guest");
 
   // interact with the file input
   await page
@@ -266,6 +300,7 @@ test("it is possible to provide the input via generated form", async ({
       instanceId,
       namespace,
     },
+    headers,
   });
 
   const expectedJson = {
@@ -273,7 +308,7 @@ test("it is possible to provide the input via generated form", async ({
     array: ["array item 1", "array item 2"],
     firstName: "Marty",
     lastName: "McFly",
-    select: "select 2",
+    select: "guest",
     file: `data:text/plain;base64,SSBhbSBqdXN0IGEgdGVzdGZpbGUgdGhhdCBjYW4gYmUgdXNlZCB0byB0ZXN0IGFuIHVwbG9hZCBmb3JtIHdpdGhpbiBhIHBsYXl3cmlnaHQgdGVzdA==`,
   };
   const inputResponseAsJson = JSON.parse(atob(res.data));
@@ -291,6 +326,7 @@ test("it is possible to provide the input via generated form and resolve form er
       namespace,
       name: workflowName,
     },
+    headers,
   });
 
   await page.goto(`${namespace}/explorer/workflow/active/${workflowName}`);
@@ -311,9 +347,7 @@ test("it is possible to provide the input via generated form and resolve form er
   // it generated a form (first and last name are required)
   await expect(page.getByLabel("First Name")).toBeVisible();
   await expect(page.getByLabel("Last Name")).toBeVisible();
-  await expect(
-    page.getByRole("combobox", { name: "Select a string" })
-  ).toBeVisible();
+  await expect(page.getByRole("combobox", { name: "role" })).toBeVisible();
 
   //click on submit
   await page.getByTestId("run-workflow-submit-btn").click();
@@ -336,11 +370,11 @@ test("it is possible to provide the input via generated form and resolve form er
 
   await expect(
     page.getByTestId("jsonschema-form-error"),
-    "error message should be \"must have required property 'select a string'\""
-  ).toContainText("must have required property 'select a string'");
+    "error message should be \"must have required property 'role'\""
+  ).toContainText("must have required property 'role'");
   // interact with the select input
-  await page.getByRole("combobox", { name: "Select a string" }).click();
-  await page.getByRole("option", { name: "Select 2" }).click();
+  await page.getByRole("combobox", { name: "role" }).click();
+  await page.getByRole("option", { name: "guest" }).click();
   await page.getByTestId("run-workflow-submit-btn").click();
 
   const reg = new RegExp(`${namespace}/instances/(.*)`);
@@ -361,13 +395,75 @@ test("it is possible to provide the input via generated form and resolve form er
       instanceId,
       namespace,
     },
+    headers,
   });
 
   const expectedJson = {
     firstName: "Marty",
     lastName: "McFly",
-    select: "select 2",
+    select: "guest",
   };
   const inputResponseAsJson = JSON.parse(atob(res.data));
   expect(inputResponseAsJson).toEqual(expectedJson);
+});
+
+test(`it is possible to deactivate and activate a workflow`, async ({
+  page,
+}) => {
+  const workflowName = "testworkflow.yaml";
+
+  await createWorkflow({
+    payload: jsonSchemaWithRequiredEnum,
+    urlParams: {
+      baseUrl: process.env.VITE_DEV_API_DOMAIN,
+      namespace,
+      name: workflowName,
+    },
+    headers,
+  });
+
+  await page.goto(`/${namespace}/explorer/workflow/active/${workflowName}`, {
+    waitUntil: "networkidle",
+  });
+
+  const btnToggle = page.getByTestId("toggle-workflow-active-btn");
+  const iconPowerOn = page.getByTestId("active-workflow-on-icon");
+  const iconPowerOff = page.getByTestId("active-workflow-off-icon");
+  const btnRun = page.getByTestId("workflow-header-btn-run");
+
+  await expect(
+    iconPowerOff,
+    "initial state should be active, shows the power-off button"
+  ).toBeVisible();
+  await expect(
+    btnRun,
+    "initial state should be active, run button is enabled"
+  ).toBeEnabled();
+
+  await btnToggle.click();
+  await waitForSuccessToast(page);
+  await expect(
+    iconPowerOn,
+    "next state should be inactive, shows the power-on button"
+  ).toBeVisible();
+  await expect(
+    btnRun,
+    "next state should be inactive, run button is inactive"
+  ).toBeDisabled();
+
+  await btnRun.click({ force: true }); //nothing happens on this click
+  await page.waitForTimeout(1000);
+  await expect(
+    page.getByTestId("run-workflow-dialog"),
+    "it doesn't open the dialog"
+  ).toBeHidden();
+
+  await btnToggle.click(); //activate again
+  await waitForSuccessToast(page);
+
+  await btnRun.click(); //run the workflow
+  await expect(
+    page.getByTestId("run-workflow-dialog"),
+    "it opens the dialog from the editor button"
+  ).toBeVisible();
 });

@@ -23,7 +23,7 @@ import { useNamespace, useNamespaceActions } from "~/util/store/namespace";
 
 import { Breadcrumb as BreadcrumbLink } from "~/design/Breadcrumbs";
 import Button from "~/design/Button";
-import NamespaceCreate from "../NamespaceCreate";
+import NamespaceCreate from "../NamespaceEdit";
 import { pages } from "~/util/router/pages";
 import { twMergeClsx } from "~/util/helpers";
 import { useListNamespaces } from "~/api/namespaces/query/get";
@@ -39,7 +39,7 @@ const NamespaceSelector = () => {
   } = useListNamespaces();
 
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   const { setNamespace } = useNamespaceActions();
   const navigate = useNavigate();
 

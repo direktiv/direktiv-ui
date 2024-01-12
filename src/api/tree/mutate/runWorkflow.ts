@@ -1,8 +1,9 @@
-import { WorkflowStartedSchema } from "../schema";
+import { WorkflowStartedSchema } from "../schema/node";
 import { apiFactory } from "~/api/apiFactory";
 import { forceLeadingSlash } from "../utils";
+import { getMessageFromApiError } from "~/api/errorHandling";
 import { useApiKey } from "~/util/store/apiKey";
-import { useMutation } from "@tanstack/react-query";
+import useMutationWithPermissions from "~/api/useMutationWithPermissions";
 import { useNamespace } from "~/util/store/namespace";
 
 export const runWorkflow = apiFactory({
@@ -26,7 +27,11 @@ type ResolvedRunWorkflow = Awaited<ReturnType<typeof runWorkflow>>;
 
 export const useRunWorkflow = ({
   onSuccess,
-}: { onSuccess?: (data: ResolvedRunWorkflow) => void } = {}) => {
+  onError,
+}: {
+  onSuccess?: (data: ResolvedRunWorkflow) => void;
+  onError?: (error?: string) => void;
+} = {}) => {
   const apiKey = useApiKey();
   const namespace = useNamespace();
 
@@ -34,7 +39,7 @@ export const useRunWorkflow = ({
     throw new Error("namespace is undefined");
   }
 
-  return useMutation({
+  return useMutationWithPermissions({
     mutationFn: ({ path, payload }: { path: string; payload: string }) =>
       runWorkflow({
         apiKey: apiKey ?? undefined,
@@ -46,6 +51,9 @@ export const useRunWorkflow = ({
       }),
     onSuccess: (data) => {
       onSuccess?.(data);
+    },
+    onError: (e) => {
+      onError?.(getMessageFromApiError(e));
     },
   });
 };

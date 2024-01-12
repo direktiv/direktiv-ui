@@ -1,8 +1,18 @@
 import { z } from "zod";
 
+/**
+ * example
+  {
+    "id": "secret-3dbbd15c3b675a2a9cdb",
+    "namespace": "my-namespace",
+    "url": "https://domain.com",
+    "user": "username" 
+  }
+ */
 export const RegistrySchema = z.object({
   id: z.string(),
-  name: z.string().url(),
+  namespace: z.string(),
+  url: z.string().url(),
   user: z.string(),
 });
 
@@ -12,17 +22,19 @@ export const RegistryFormSchema = z.object({
   password: z.string().nonempty(),
 });
 
-// this is the format required when POSTing a new registry
-export const RegistryPostSchema = z.object({
-  data: z.string(), // format: user:pwd
-  reg: z.string().url(), // this is the url
-});
-
 export const RegistryListSchema = z.object({
-  registries: z.array(RegistrySchema),
+  data: z.array(RegistrySchema),
 });
 
-export const RegistryCreatedSchema = z.null();
+/**
+ * example
+  {
+    "data": {...}
+  }
+ */
+export const RegistryCreatedSchema = z.object({
+  data: RegistrySchema,
+});
 
 export const RegistryDeletedSchema = z.null();
 

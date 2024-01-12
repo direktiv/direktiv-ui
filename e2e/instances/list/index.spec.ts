@@ -4,19 +4,21 @@ import {
   parentWorkflow as parentWorkflowContent,
   simpleWorkflow as simpleWorkflowContent,
   workflowThatFails as workflowThatFailsContent,
-} from "./utils";
+} from "../utils/workflows";
 
+import { createInstance } from "../utils";
 import { createWorkflow } from "~/api/tree/mutate/createWorkflow";
 import { faker } from "@faker-js/faker";
 import { getInstances } from "~/api/instances/query/get";
+import { headers } from "e2e/utils/testutils";
 import moment from "moment";
 import { runWorkflow } from "~/api/tree/mutate/runWorkflow";
 
 type Instance = Awaited<ReturnType<typeof runWorkflow>>;
 
 let namespace = "";
-const simpleWorkflow = faker.system.commonFileName("yaml");
-const workflowThatFails = faker.system.commonFileName("yaml");
+const simpleWorkflowName = faker.system.commonFileName("yaml");
+const failingWorkflowName = faker.system.commonFileName("yaml");
 
 test.beforeEach(async () => {
   namespace = await createNamespace();
@@ -26,8 +28,9 @@ test.beforeEach(async () => {
     urlParams: {
       baseUrl: process.env.VITE_DEV_API_DOMAIN,
       namespace,
-      name: simpleWorkflow,
+      name: simpleWorkflowName,
     },
+    headers,
   });
 
   await createWorkflow({
@@ -35,8 +38,9 @@ test.beforeEach(async () => {
     urlParams: {
       baseUrl: process.env.VITE_DEV_API_DOMAIN,
       namespace,
-      name: workflowThatFails,
+      name: failingWorkflowName,
     },
+    headers,
   });
 });
 
@@ -45,30 +49,12 @@ test.afterEach(async () => {
   namespace = "";
 });
 
-const createBasicInstance = async () =>
-  await runWorkflow({
-    urlParams: {
-      baseUrl: process.env.VITE_DEV_API_DOMAIN,
-      namespace,
-      path: simpleWorkflow,
-    },
-  });
-
-const createFailedInstance = async () =>
-  await runWorkflow({
-    urlParams: {
-      baseUrl: process.env.VITE_DEV_API_DOMAIN,
-      namespace,
-      path: workflowThatFails,
-    },
-  });
-
 test("it displays a note, when there are no instances yet.", async ({
   page,
 }) => {
   await page.goto(`${namespace}/instances/`);
   await expect(
-    page.getByTestId("instance-no-result"),
+    page.getByTestId("no-result"),
     "no result message should be visible"
   ).toBeVisible();
   await expect(
@@ -80,7 +66,10 @@ test("it displays a note, when there are no instances yet.", async ({
 test("it renders the instance item correctly for failed and success status", async ({
   page,
 }) => {
-  const instances = [await createFailedInstance(), await createBasicInstance()];
+  const instances = [
+    await createInstance({ namespace, path: simpleWorkflowName }),
+    await createInstance({ namespace, path: failingWorkflowName }),
+  ];
 
   const checkInstanceRender = async (instance: Instance) => {
     const instancesList = await getInstances({
@@ -90,128 +79,127 @@ test("it renders the instance item correctly for failed and success status", asy
         limit: 10,
         offset: 0,
       },
+      headers,
     });
 
     const instanceDetail = instancesList.instances.results.find(
       (x) => x.id === instance.instance
     );
 
-    const workflowName = instanceDetail?.as.split(":")[0];
-
-    if (!workflowName) throw new Error("workflowName is not defined");
-
-    await expect(
-      page.getByTestId(`instance-row-workflow-${instance.instance}`),
-      "the workflow name should be visible"
-    ).toContainText(workflowName);
-
-    const instanceItemRow = page.getByTestId(
-      `instance-row-wrap-${instance.instance}`
-    );
-    const instanceItemId = page.getByTestId(
-      `instance-row-id-${instance.instance}`
-    );
-    await expect(
-      instanceItemId,
-      "id column shows the first 8 digits of the id"
-    ).toContainText(instance.instance.slice(0, 8));
-    await instanceItemId.hover();
-    const idTooltip = page.getByTestId(
-      `instance-row-id-full-${instance.instance}`
-    );
-    await expect(
-      idTooltip,
-      "on hover, a tooltip reveals full id"
-    ).toContainText(instance.instance);
-
-    const revisionId = page.getByTestId(
-      `instance-row-revision-id-${instance.instance}`
-    );
-    await expect(revisionId, `the revision id is "latest"`).toContainText(
-      "latest"
-    );
-
-    const invoker = page.getByTestId(
-      `instance-row-invoker-${instance.instance}`
-    );
-
-    await expect(invoker, `invoker column shows "api"`).toContainText("api");
-
-    const state = page.getByTestId(`instance-row-state-${instance.instance}`);
-
     if (!instanceDetail?.status) {
       throw new Error("instanceDetail?.status is not defined");
     }
 
+    const workflowName = instanceDetail?.as.split(":")[0];
+
+    if (!workflowName) throw new Error("workflowName is not defined");
+
+    const instanceItemRow = page.getByTestId(
+      `instance-row-${instance.instance}`
+    );
+
     await expect(
-      state,
-      "the status columns should should be same status as the api response"
-    ).toContainText(instanceDetail?.status.toString());
+      instanceItemRow.getByTestId(`instance-column-name`),
+      "the workflow name should be visible"
+    ).toContainText(workflowName);
+
+    const instanceItemIdColumn =
+      instanceItemRow.getByTestId("instance-column-id");
+
+    await expect(
+      instanceItemIdColumn.getByTestId(`tooltip-copy-trigger`),
+      "id badge shows the first 8 digits of the id"
+    ).toContainText(instance.instance.slice(0, 8));
+
+    await instanceItemIdColumn.getByTestId(`tooltip-copy-trigger`).hover();
+
+    await expect(
+      instanceItemIdColumn.getByTestId("tooltip-copy-content"),
+      "on hover, a tooltip reveals full id"
+    ).toContainText(instance.instance);
+
+    await page
+      .getByRole("heading", { name: "Recently executed instances" })
+      .click(); // click on header to close all tooltips opened
+
+    await expect(
+      instanceItemRow.getByTestId("instance-column-invoker"),
+      'invoker column shows "api"'
+    ).toContainText("api");
+
+    await expect(
+      instanceItemRow.getByTestId("instance-column-state"),
+      "the status column should should be same status as the api response"
+    ).toContainText(instanceDetail.status.toString());
 
     if (instanceDetail?.status === "failed") {
-      await state.hover();
-      const errorTooltip = page.getByTestId(
-        `instance-row-state-error-tooltip-${instance.instance}`
-      );
+      await instanceItemRow
+        .getByTestId("instance-column-state")
+        .getByTestId("tooltip-copy-trigger")
+        .hover();
 
       await expect(
-        errorTooltip,
+        instanceItemRow
+          .getByTestId("instance-column-state")
+          .getByTestId("tooltip-copy-content"),
         "on hover, a tooltip reveals the error message"
       ).toContainText("this is my error message");
     }
 
-    const createdRelTime = page.getByTestId(
-      `instance-row-relative-created-time-${instance.instance}`
-    );
+    await page
+      .getByRole("heading", { name: "Recently executed instances" })
+      .click(); // click on header to close all tooltips opened
+
     await expect(
-      createdRelTime,
+      instanceItemRow.getByTestId("instance-column-created-time"),
       `the "started at" column should display a relative time of the createdAt api response`
     ).toContainText(moment(instanceDetail.createdAt).fromNow(true));
 
-    await page
-      .getByRole("heading", { name: "Recently executed instances" })
-      .click(); // click on table header to close all tooltips opened
+    await instanceItemRow
+      .getByTestId("instance-column-created-time")
+      .getByTestId("tooltip-trigger")
+      .hover(); // is force: true needed?
 
-    await createdRelTime.hover({ force: true });
-    const createdAtTooltip = page.getByTestId(
-      `instance-row-absolute-created-time-${instance.instance}`
-    );
     await expect(
-      createdAtTooltip,
+      instanceItemRow
+        .getByTestId("instance-column-created-time")
+        .getByTestId("tooltip-content"),
       "on hover, the absolute time should appear"
     ).toContainText(instanceDetail.createdAt);
 
-    const updatedRelTime = page.getByTestId(
-      `instance-row-relative-updated-time-${instance.instance}`
-    );
-    await expect(
-      updatedRelTime,
-      `the "last updateed" column should display a relative time of the updatedAt api response`
-    ).toContainText(moment(instanceDetail.updatedAt).fromNow(true));
-
     await page
       .getByRole("heading", { name: "Recently executed instances" })
-      .click(); // click on table header to close all tooltips opened
-    await updatedRelTime.hover({ force: true });
-    const updatedAtTooltip = page.getByTestId(
-      `instance-row-absolute-updated-time-${instance.instance}`
-    );
+      .click(); // click on header to close all tooltips opened
+
     await expect(
-      updatedAtTooltip,
+      instanceItemRow.getByTestId("instance-column-updated-time"),
+      `the "last updated" column should display a relative time of the updatedAt api response`
+    ).toContainText(moment(instanceDetail.updatedAt).fromNow(true));
+
+    await instanceItemRow
+      .getByTestId("instance-column-updated-time")
+      .getByTestId("tooltip-trigger")
+      .hover();
+
+    await expect(
+      instanceItemRow
+        .getByTestId("instance-column-updated-time")
+        .getByTestId("tooltip-content"),
       "on hover, the absolute time should appear"
     ).toContainText(instanceDetail.updatedAt);
 
-    const workflowLink = page.getByTestId(
-      `instance-row-workflow-${instance.instance}`
-    );
+    await instanceItemRow
+      .getByTestId("instance-column-name")
+      .getByRole("link")
+      .click();
 
-    await workflowLink.click();
     await expect(
       page,
       "when the workflow name is clicked, page should navigate to the workflow page"
-    ).toHaveURL(`/${namespace}/explorer/workflow/active/${workflowName}`);
+    ).toHaveURL(`/${namespace}/explorer/workflow/active${workflowName}`);
 
     await page.goBack();
+
     await instanceItemRow.click();
     await expect(
       page,
@@ -242,7 +230,7 @@ test("it provides a proper pagination", async ({ page }) => {
 
   await createWorkflow({
     payload: parentWorkflowContent({
-      childName: simpleWorkflow,
+      childName: simpleWorkflowName,
       children: totalCount - 1,
     }),
     urlParams: {
@@ -250,6 +238,7 @@ test("it provides a proper pagination", async ({ page }) => {
       namespace,
       name: parentWorkflow,
     },
+    headers,
   });
 
   await runWorkflow({
@@ -258,6 +247,7 @@ test("it provides a proper pagination", async ({ page }) => {
       namespace,
       path: parentWorkflow,
     },
+    headers,
   });
 
   await page.goto(`${namespace}/instances/`, { waitUntil: "networkidle" });
@@ -310,15 +300,16 @@ test("it provides a proper pagination", async ({ page }) => {
       limit: pageSize,
       offset: 2 * pageSize,
     },
+    headers,
   });
 
   const firstInstance = instancesListPage3.instances.results[0];
   if (!firstInstance) throw new Error("there should be at least one instance");
-  const instanceItemId = page.getByTestId(
-    `instance-row-id-${firstInstance.id}`
-  );
+
+  const instanceItemRow = page.getByTestId(`instance-row-${firstInstance.id}`);
+
   await expect(
-    instanceItemId,
+    instanceItemRow.getByTestId("instance-column-id"),
     "the first row on page 3 should should be same as the api response"
   ).toContainText(firstInstance.id.slice(0, 8));
 });
@@ -328,7 +319,7 @@ test("It will display child instances as well", async ({ page }) => {
 
   await createWorkflow({
     payload: parentWorkflowContent({
-      childName: simpleWorkflow,
+      childName: simpleWorkflowName,
       children: 1,
     }),
     urlParams: {
@@ -336,6 +327,7 @@ test("It will display child instances as well", async ({ page }) => {
       namespace,
       name: parentWorkflow,
     },
+    headers,
   });
 
   const parentInstance = await runWorkflow({
@@ -344,6 +336,7 @@ test("It will display child instances as well", async ({ page }) => {
       namespace,
       path: parentWorkflow,
     },
+    headers,
   });
 
   await page.goto(`${namespace}/instances/`, { waitUntil: "networkidle" });
@@ -355,6 +348,7 @@ test("It will display child instances as well", async ({ page }) => {
       limit: 15,
       offset: 0,
     },
+    headers,
   });
 
   const childInstanceDetail = instancesList.instances.results.find(
@@ -364,29 +358,25 @@ test("It will display child instances as well", async ({ page }) => {
   if (!childInstanceDetail)
     throw new Error("there should be at least one child instance");
 
-  const revisionId = page.getByTestId(
-    `instance-row-revision-id-${childInstanceDetail.id}`
+  const instanceItemRow = page.getByTestId(
+    `instance-row-${childInstanceDetail.id}`
   );
 
-  await expect(revisionId, `revision id is "none"`).toContainText("none");
-
-  const invoker = page.getByTestId(
-    `instance-row-invoker-${childInstanceDetail.id}`
-  );
-  await expect(invoker, `invoker is "instance"`).toContainText("instance");
-
-  const instanceItemId = page.getByTestId(
-    `instance-row-id-${childInstanceDetail.id}`
-  );
   await expect(
-    instanceItemId,
-    "id column shows the first 8 digits of the id"
-  ).toContainText(childInstanceDetail.id.slice(0, 8));
-  await instanceItemId.hover();
-  const idTooltip = page.getByTestId(
-    `instance-row-id-full-${childInstanceDetail.id}`
-  );
-  await expect(idTooltip, "on hover, a tooltip reveals full id").toContainText(
-    childInstanceDetail.id
-  );
+    instanceItemRow.getByTestId("instance-column-invoker"),
+    `invoker is "instance"`
+  ).toContainText("instance");
+
+  await instanceItemRow
+    .getByTestId("instance-column-invoker")
+    .getByTestId("tooltip-copy-trigger")
+    .hover();
+
+  const expectedInvokerId = childInstanceDetail.invoker.split(":")[1] as string;
+
+  await expect(
+    instanceItemRow
+      .getByTestId("instance-column-invoker")
+      .getByTestId("tooltip-copy-content")
+  ).toContainText(expectedInvokerId);
 });

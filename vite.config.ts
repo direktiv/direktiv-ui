@@ -35,11 +35,16 @@ export default ({ mode }) => {
 
   const { VITE_DEV_API_DOMAIN: apiDomain } = parsedEnv;
 
+  const baseconfig = env.VITE_BASE ? { base: env.VITE_BASE } : {};
+
   if (!apiDomain) {
     console.warn("VITE_DEV_API_DOMAIN is not set, no API proxy will be used");
   }
 
   return defineConfig({
+    define: {
+      "process.env.VITE": parsedEnv,
+    },
     server: {
       host: "0.0.0.0",
       port: 3000,
@@ -47,6 +52,8 @@ export default ({ mode }) => {
         ? {
             "/api": {
               target: apiDomain,
+              secure: false,
+              changeOrigin: true,
             },
           }
         : {},
@@ -91,10 +98,9 @@ export default ({ mode }) => {
         "**/cypress/**",
         "**/.{idea,git,cache,output,temp}/**",
         "**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*",
-        // all above this line are the default
-        "src/hooks/**/*", // 🚧 search for TODO_HOOKS_TESTS to find all places that needs some action 🚧
         "e2e/**", // playwright tests, vitest throws errors when parsing them.
       ],
     },
+    ...baseconfig,
   });
 };

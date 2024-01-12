@@ -1,16 +1,11 @@
-mkfile_path_main := $(abspath $(lastword $(MAKEFILE_LIST)))
-mkfile_dir_main := $(dir $(mkfile_path_main))
 docker_repo = $(if $(DOCKER_REPO),$(DOCKER_REPO),localhost:5000)
-docker_image = $(if $(DOCKER_IMAGE),$(DOCKER_IMAGE),ui)
-docker_tag = $(if $(DOCKER_TAG),:$(DOCKER_TAG),)
-GIT_HASH := $(shell git rev-parse --short HEAD)
-GIT_DIRTY := $(shell git diff --quiet || echo '-dirty')
-RV := ""
-RELEASE_TAG = $(shell v='$${RV:+:}$${RV}'; echo "$${v%.*}")
-FULL_VERSION := $(shell v='$${RV}$${RV:+-}${GIT_HASH}${GIT_DIRTY}'; echo "$${v%.*}")   
+docker_image = $(if $(DOCKER_IMAGE),$(DOCKER_IMAGE),frontend)
+docker_tag = $(if $(DOCKER_TAG),$(DOCKER_TAG),dev)
+enterprise = $(if $(ENTERPRISE),$(ENTERPRISE),FALSE)
+ui_base = $(if $(UI_BASE),$(UI_BASE),/)
 
-
-.SECONDARY:
+DOCKERFILE_REACT=Dockerfile.base
+DOCKERFILE_PROD=Dockerfile.prod
 
 # Build the new server on docker
 .PHONY: server
@@ -27,24 +22,46 @@ update-containers:
 	docker push direktiv/ui
 	docker push direktiv/ui${RELEASE_TAG}
 
+.PHONY: server-prod
+server-prod:
+	echo ${RELEASE_TAG}
+	docker build . --tag ${docker_repo}/${docker_image}${RELEASE_TAG} -f ${DOCKERFILE_PROD}
+	docker push ${docker_repo}/${docker_image}${RELEASE_TAG}
 
-.PHONY: cross-prepare
-cross-prepare:
-	docker buildx create --use	
-	docker run --privileged --rm docker/binfmt:a7996909642ee92942dcd6cff44b9b95f08dad64
-	docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-
-.PHONY: cross-build
-cross-build:
-	@if [ "${RELEASE_TAG}" = "" ]; then\
-		echo "setting release to dev"; \
-		$(eval RELEASE_TAG=dev) \
-    fi
-	echo "building ${RELEASE}:${RELEASE_TAG}, full version ${FULL_VERSION}"
+# this builds the ui files and copies it from the container to dist/
+# used for cross-compilation but can be used locally as well
+.PHONY: react
+react:
 	rm -Rf app.tar
-	docker build -t uibase -f Dockerfile.base .
+	rm -Rf dist/
+	docker build -t uibase --build-arg IS_ENTERPRISE=${enterprise} --build-arg UI_BASE=${ui_base} --build-arg FULL_VERSION=${FULL_VERSION} -f ${DOCKERFILE_REACT} .
 	container_id=$$(docker create "uibase"); \
-	docker cp $$container_id:/app - > app.tar; \
+	docker cp $$container_id:/app/dist - > app.tar; \
 	docker rm -v $$container_id
 	tar -xvf app.tar
-	docker buildx build --build-arg RELEASE_VERSION=${FULL_VERSION} -f Dockerfile.cross --platform=linux/amd64,linux/arm64 --push -t direktiv/ui:${RELEASE_TAG} .
+	rm -Rf app.tar
+
+# local container build
+# .PHONY: local
+# local:
+# 	docker build -t ${docker_repo}/${docker_image}:${docker_tag} -f ${DOCKERFILE_SERVER} .
+# 	docker tag ${docker_repo}/${docker_image}:${docker_tag} ${docker_repo}/${docker_image}
+# 	docker push ${docker_repo}/${docker_image}:${docker_tag}
+# 	docker push ${docker_repo}/${docker_image}
+
+.PHONY: cross
+cross:
+	@docker buildx create --use --name=direktiv --node=direktiv
+	docker buildx build --platform linux/amd64,linux/arm64 -f ${DOCKERFILE_PROD} \
+		-t ${docker_repo}/${docker_image}:${docker_tag} --push .
+
+
+.PHONY: forward-api
+forward-api: 
+	kubectl port-forward svc/direktiv-api 7755:1644
+
+# requires forward-api to run in different console
+.PHONY: run-container
+run-container: 
+	docker run --network host -e DIREKTIV_SERVER_APIKEY=helloworld -e DIREKTIV_SERVER_BACKEND=http://127.0.0.1:7755 -p 2304:2304 localhost:5000/frontend:dev
+	

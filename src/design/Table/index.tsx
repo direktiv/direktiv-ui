@@ -1,4 +1,6 @@
-import React from "react";
+import { Ban, LucideIcon } from "lucide-react";
+import React, { FC, PropsWithChildren } from "react";
+
 import { twMergeClsx } from "~/util/helpers";
 
 export const Table = React.forwardRef<
@@ -108,3 +110,33 @@ export const TableRow = React.forwardRef<
   </tr>
 ));
 TableRow.displayName = "TableRow";
+
+type NoResultProps = PropsWithChildren & {
+  icon?: LucideIcon;
+  button?: React.ReactNode;
+};
+
+export const NoResult: FC<NoResultProps> = ({
+  children,
+  icon: Icon,
+  button,
+}) => (
+  <div
+    className="flex grow flex-col items-center justify-center gap-1 p-10"
+    data-testid="no-result"
+  >
+    {Icon && <Icon className="h-auto w-16 text-gray-3 dark:text-gray-dark-3" />}
+    <span className="text-center text-sm">{children}</span>
+    {button && <div className="mt-5">{button}</div>}
+  </div>
+);
+
+export const NoPermissions: FC<PropsWithChildren> = ({ children }) => (
+  <div
+    className="flex grow flex-col items-center justify-center gap-1 p-10"
+    data-testid="no-permissions"
+  >
+    <Ban className="h-auto w-16 text-gray-3 dark:text-gray-dark-3" />
+    <span className="text-center text-sm">{children}</span>
+  </div>
+);

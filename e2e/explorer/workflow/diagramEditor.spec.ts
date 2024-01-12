@@ -1,10 +1,11 @@
 import { Page, expect, test } from "@playwright/test";
 import { createNamespace, deleteNamespace } from "../../utils/namespace";
 
-import { consumeEvent as consumeEventWorkflow } from "~/pages/namespace/Explorer/Tree/NewWorkflow/templates";
+import { consumeEvent as consumeEventWorkflow } from "~/pages/namespace/Explorer/Tree/components/modals/CreateNew/Workflow/templates";
 import { createRevision } from "~/api/tree/mutate/createRevision";
 import { createWorkflow } from "~/api/tree/mutate/createWorkflow";
 import { faker } from "@faker-js/faker";
+import { headers } from "e2e/utils/testutils";
 
 let namespace = "";
 let workflow = "";
@@ -40,6 +41,7 @@ test.beforeEach(async () => {
       namespace,
       name: workflow,
     },
+    headers,
   });
 });
 
@@ -192,8 +194,15 @@ test("it will persist the preferred layout selection in local storage", async ({
 
 test("it will update the diagram when the workflow is saved", async ({
   page,
+  browserName,
 }) => {
-  await page.goto(`/${namespace}/explorer/workflow/active/${workflow}`);
+  /**
+   * networkidle is required to avoid flaky tests. The monaco
+   * editor needs to be full loaded before we interact with it.
+   */
+  await page.goto(`/${namespace}/explorer/workflow/active/${workflow}`, {
+    waitUntil: "networkidle",
+  });
   const { editor, diagram, splitVertBtn } = await getCommonPageElements(page);
 
   await splitVertBtn.click();
@@ -222,14 +231,16 @@ test("it will update the diagram when the workflow is saved", async ({
 
   // comment out all states expect the first one to force the diagram to update
   await page.getByTestId("workflow-editor").click();
-  // cursor is at the end of line 8, use right arrow to go to the first column of line 9
-  await page.keyboard.press("ArrowRight");
-  await page.keyboard.press("ArrowDown"); // line 10, column 1
-  await page.keyboard.press("ArrowDown"); // line 11, column 1
-  await page.keyboard.press("ArrowDown"); // line 12, column 1
-  await page.keyboard.press("#");
-  await commentOutNextLine();
-  await commentOutNextLine();
+  // cursor is at the end of line 8, use right arrow to go to the first column of line 8
+  await page.keyboard.press("ArrowRight"); // line 9, column 1 after this command runs
+  if (browserName === "webkit") {
+    await page.keyboard.press("ArrowDown"); // webkit is one line off
+  }
+  await page.keyboard.press("ArrowDown"); // line 10, column 1 after this command runs
+  await page.keyboard.press("ArrowDown"); // line 11, column 1 after this command runs
+  await page.keyboard.press("ArrowDown"); // line 12, column 1 after this command runs
+  await page.keyboard.press("ArrowDown"); // line 13, column 1 after this command runs
+  await page.keyboard.press("#"); // adding # at the beginning of line "transition: greet" now
   await commentOutNextLine();
   await commentOutNextLine();
   await commentOutNextLine();
@@ -263,6 +274,7 @@ test("it is possible to use the diagram view on the revisions detail page as wel
       namespace,
       path: workflow,
     },
+    headers,
   });
 
   await page.goto(
@@ -288,4 +300,34 @@ test("it is possible to use the diagram view on the revisions detail page as wel
   expect(await splitHorBtn.getAttribute("aria-pressed")).toBe("false");
   await expect(editor).toBeVisible();
   await expect(diagram).toBeVisible();
+});
+
+test("it is possible to switch from Code View to Diagram View without loosing the recent changes", async ({
+  page,
+}) => {
+  await page.goto(`/${namespace}/explorer/workflow/active/${workflow}`);
+
+  const { codeBtn, diagramBtn } = await getCommonPageElements(page);
+
+  const firstLine = page.getByText("direktiv_api: workflow/v1");
+  await firstLine.click();
+
+  const workflowChanges = "some changes to the workflows code";
+  await page.type("textarea", workflowChanges);
+  const recentlyChanges = page.getByText(workflowChanges);
+  await expect(
+    recentlyChanges,
+    "after the user typed new workflow code, it will be visible in the editor"
+  ).toBeVisible();
+
+  await diagramBtn.click();
+  await expect(
+    recentlyChanges,
+    "when the user switches to the Diagram View, the most recent code changes are not visible anymore"
+  ).not.toBeVisible();
+  await codeBtn.click();
+  await expect(
+    recentlyChanges,
+    "after the user switched back to the Editor View, the most recent chages are still in the Editor"
+  ).toBeVisible();
 });

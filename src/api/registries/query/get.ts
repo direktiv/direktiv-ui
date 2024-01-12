@@ -4,11 +4,11 @@ import { apiFactory } from "../../apiFactory";
 import { registriesKeys } from "..";
 import { useApiKey } from "../../../util/store/apiKey";
 import { useNamespace } from "../../../util/store/namespace";
-import { useQuery } from "@tanstack/react-query";
+import useQueryWithPermissions from "~/api/useQueryWithPermissions";
 
 const getRegistries = apiFactory({
   url: ({ namespace }: { namespace: string }) =>
-    `/api/functions/registries/namespaces/${namespace}`,
+    `/api/v2/namespaces/${namespace}/registries`,
   method: "GET",
   schema: RegistryListSchema,
 });
@@ -31,7 +31,7 @@ export const useRegistries = () => {
     throw new Error("namespace is undefined");
   }
 
-  return useQuery({
+  return useQueryWithPermissions({
     queryKey: registriesKeys.registriesList(namespace, {
       apiKey: apiKey ?? undefined,
     }),

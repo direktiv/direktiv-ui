@@ -88,7 +88,10 @@ const Filters = ({ filters, onUpdate }: FiltersProps) => {
   );
 
   return (
-    <div className="m-2 flex flex-row flex-wrap gap-2">
+    <div
+      data-testid="filter-component"
+      className="m-2 flex flex-row flex-wrap gap-2"
+    >
       {currentFilterKeys.map((field) => {
         // For type safety, one separate return is required below for every type
         // so it is possible to assert filters[field]?.value is defined and TS
@@ -97,8 +100,10 @@ const Filters = ({ filters, onUpdate }: FiltersProps) => {
         if (field === "AS") {
           return (
             <ButtonBar key={field}>
-              <Button variant="outline">
-                {t([`pages.instances.list.filter.field.${field}`])}
+              <Button variant="outline" asChild>
+                <label>
+                  {t([`pages.instances.list.filter.field.${field}`])}
+                </label>
               </Button>
               <Popover
                 open={activeMenu === field}
@@ -118,7 +123,11 @@ const Filters = ({ filters, onUpdate }: FiltersProps) => {
                   )}
                 </PopoverContent>
               </Popover>
-              <Button variant="outline" icon>
+              <Button
+                data-testid={`filter-clear-${field}`}
+                variant="outline"
+                icon
+              >
                 <X onClick={() => clearFilter(field)} />
               </Button>
             </ButtonBar>
@@ -128,8 +137,10 @@ const Filters = ({ filters, onUpdate }: FiltersProps) => {
         if (field === "STATUS" || field === "TRIGGER") {
           return (
             <ButtonBar key={field}>
-              <Button variant="outline">
-                {t([`pages.instances.list.filter.field.${field}`])}
+              <Button variant="outline" asChild>
+                <label>
+                  {t([`pages.instances.list.filter.field.${field}`])}
+                </label>
               </Button>
               <Popover
                 open={activeMenu === field}
@@ -155,7 +166,11 @@ const Filters = ({ filters, onUpdate }: FiltersProps) => {
                   )}
                 </PopoverContent>
               </Popover>
-              <Button variant="outline" icon>
+              <Button
+                data-testid={`filter-clear-${field}`}
+                variant="outline"
+                icon
+              >
                 <X onClick={() => clearFilter(field)} />
               </Button>
             </ButtonBar>
@@ -170,8 +185,10 @@ const Filters = ({ filters, onUpdate }: FiltersProps) => {
           }
           return (
             <ButtonBar key={field}>
-              <Button variant="outline">
-                {t([`pages.instances.list.filter.field.${field}`])}
+              <Button variant="outline" asChild>
+                <label>
+                  {t([`pages.instances.list.filter.field.${field}`])}
+                </label>
               </Button>
               <Popover
                 open={activeMenu === field}
@@ -211,14 +228,17 @@ const Filters = ({ filters, onUpdate }: FiltersProps) => {
                   />
                 </PopoverContent>
               </Popover>
-              <Button variant="outline" icon>
+              <Button
+                variant="outline"
+                icon
+                data-testid={`filter-clear-${field}`}
+              >
                 <X onClick={() => clearFilter(field)} />
               </Button>
             </ButtonBar>
           );
         }
       })}
-
       {!!undefinedFilters.length && (
         <Popover
           open={activeMenu === "main"}
@@ -226,11 +246,20 @@ const Filters = ({ filters, onUpdate }: FiltersProps) => {
         >
           <PopoverTrigger asChild>
             {hasFilters ? (
-              <Button variant="outline" icon onClick={() => toggleMenu("main")}>
+              <Button
+                data-testid="filter-add"
+                variant="outline"
+                icon
+                onClick={() => toggleMenu("main")}
+              >
                 <Plus />
               </Button>
             ) : (
-              <Button variant="outline" onClick={() => toggleMenu("main")}>
+              <Button
+                data-testid="filter-add"
+                variant="outline"
+                onClick={() => toggleMenu("main")}
+              >
                 <Plus />
                 {t("pages.instances.list.filter.filterButton")}
               </Button>

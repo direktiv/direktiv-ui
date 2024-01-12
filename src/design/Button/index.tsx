@@ -21,6 +21,7 @@ export type ButtonProps = {
   circle?: boolean;
   block?: boolean;
   icon?: boolean;
+  isAnchor?: boolean;
 } & AsChildOrLoading;
 
 const Button = React.forwardRef<
@@ -29,21 +30,25 @@ const Button = React.forwardRef<
 >(
   (
     {
+      children,
       className,
       variant,
       size,
       circle,
-      children,
       disabled,
       block,
       loading,
       icon,
       asChild,
+      isAnchor = false,
       ...props
     },
     ref
   ) => {
     const Comp = asChild ? Slot : "button";
+
+    // In case of asChild, if a child is not an anchor(e.g, label, span, etc) we are going to remove th click & hover effect
+    const childIsNotAnAnchor = asChild && !isAnchor;
 
     return (
       <Comp
@@ -71,7 +76,7 @@ const Button = React.forwardRef<
           variant === "ghost" && [
             "bg-transparent hover:bg-gray-3 data-[state=open]:bg-transparent",
             "hover:bg-gray-3",
-            "dark:hover:bg-gray-dark-3",
+            "dark:hover:bg-gray-dark-3 dark:data-[state=open]:bg-transparent",
           ],
           variant === "link" && [
             "bg-transparent text-gray-12 underline-offset-4 hover:bg-transparent hover:underline",
@@ -87,6 +92,7 @@ const Button = React.forwardRef<
           circle && "rounded-full",
           !circle && "rounded-md",
           block && "w-full",
+          childIsNotAnAnchor && "pointer-events-none active:scale-100",
           className
         )}
         disabled={disabled || loading}

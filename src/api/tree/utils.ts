@@ -1,4 +1,7 @@
-import { NodeSchemaType } from "./schema";
+import { File, Folder, Layers, Play, Users, Workflow } from "lucide-react";
+
+import { ExplorerSubpages } from "~/util/router/pages";
+import { NodeSchemaType } from "./schema/node";
 
 export const forceLeadingSlash = (path?: string) => {
   if (!path) {
@@ -41,3 +44,39 @@ export const sortByName = (a: { name: string }, b: { name: string }): number =>
 
 export const sortByRef = (a: { ref: string }, b: { ref: string }): number =>
   a.ref.localeCompare(b.ref);
+
+export const fileTypeToIcon = (type: NodeSchemaType["type"]) => {
+  switch (type) {
+    case "directory":
+      return Folder;
+    case "service":
+      return Layers;
+    case "workflow":
+      return Play;
+    case "endpoint":
+      return Workflow;
+    case "consumer":
+      return Users;
+    default:
+      return File;
+  }
+};
+
+export const fileTypeToExplorerSubpage = (
+  type: NodeSchemaType["type"]
+): ExplorerSubpages | undefined => {
+  switch (type) {
+    case "workflow":
+      return "workflow";
+    case "service":
+      return "service";
+    case "endpoint":
+      return "endpoint";
+    case "consumer":
+      return "consumer";
+    default:
+      return undefined;
+  }
+};
+
+export const isPreviewable = (type: NodeSchemaType["type"]) => type === "file";

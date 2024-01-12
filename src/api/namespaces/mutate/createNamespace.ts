@@ -1,11 +1,12 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-
+import { MirrorPostSchemaType } from "~/api/tree/schema/mirror";
 import { NamespaceCreatedSchema } from "../schema";
 import type { NamespaceListSchemaType } from "../schema";
 import { apiFactory } from "~/api/apiFactory";
 import { namespaceKeys } from "..";
 import { sortByName } from "~/api/tree/utils";
 import { useApiKey } from "~/util/store/apiKey";
+import useMutationWithPermissions from "~/api/useMutationWithPermissions";
+import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "~/design/Toast";
 import { useTranslation } from "react-i18next";
 
@@ -25,13 +26,20 @@ export const useCreateNamespace = ({
   const queryClient = useQueryClient();
   const { t } = useTranslation();
 
-  return useMutation({
-    mutationFn: ({ name }: { name: string }) =>
+  return useMutationWithPermissions({
+    mutationFn: ({
+      name,
+      mirror,
+    }: {
+      name: string;
+      mirror?: MirrorPostSchemaType;
+    }) =>
       createNamespace({
         apiKey: apiKey ?? undefined,
         urlParams: {
           name,
         },
+        payload: mirror,
       }),
     onSuccess(data, variables) {
       queryClient.setQueryData<NamespaceListSchemaType>(

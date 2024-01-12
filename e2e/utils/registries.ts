@@ -1,5 +1,6 @@
 import { createRegistry } from "~/api/registries/mutate/createRegistry";
 import { faker } from "@faker-js/faker";
+import { headers } from "./testutils";
 
 export const createRegistries = async (namespace: string, amount = 5) => {
   const registries = Array.from({ length: amount }, () => ({
@@ -12,14 +13,15 @@ export const createRegistries = async (namespace: string, amount = 5) => {
     registries.map((registry) =>
       createRegistry({
         payload: {
-          data: `${registry.user}:${registry.password}`,
-          reg: registry.url,
+          user: registry.user,
+          password: registry.password,
+          url: registry.url,
         },
         urlParams: {
           baseUrl: process.env.VITE_DEV_API_DOMAIN,
           namespace,
         },
-        headers: undefined,
+        headers,
       }).then(() => registry)
     )
   );

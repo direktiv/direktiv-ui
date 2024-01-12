@@ -1,12 +1,12 @@
 import { forceLeadingSlash, sortFoldersFirst } from "../utils";
 
-import { NodeListSchema } from "../schema";
+import { NodeListSchema } from "../schema/node";
 import type { QueryFunctionContext } from "@tanstack/react-query";
 import { apiFactory } from "~/api/apiFactory";
 import { treeKeys } from "..";
 import { useApiKey } from "~/util/store/apiKey";
 import { useNamespace } from "~/util/store/namespace";
-import { useQuery } from "@tanstack/react-query";
+import useQueryWithPermissions from "~/api/useQueryWithPermissions";
 
 // a node can be a directory or a file, the returned content could either
 // be the list of files (if it's a direkctory) or the content of the file
@@ -42,18 +42,24 @@ const fetchTree = async ({
 export const useNodeContent = ({
   path,
   revision,
+  enabled = true,
+  namespace: givenNamespace,
 }: {
   path?: string;
   revision?: string;
+  enabled?: boolean;
+  namespace?: string;
 } = {}) => {
+  const defaultNamespace = useNamespace();
+
+  const namespace = givenNamespace ? givenNamespace : defaultNamespace;
   const apiKey = useApiKey();
-  const namespace = useNamespace();
 
   if (!namespace) {
     throw new Error("namespace is undefined");
   }
 
-  return useQuery({
+  return useQueryWithPermissions({
     queryKey: treeKeys.nodeContent(namespace, {
       apiKey: apiKey ?? undefined,
       path,
@@ -72,6 +78,6 @@ export const useNodeContent = ({
       }
       return data;
     },
-    enabled: !!namespace,
+    enabled: !!namespace && enabled,
   });
 };

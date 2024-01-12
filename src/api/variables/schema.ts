@@ -1,3 +1,4 @@
+import { FileSchema } from "../schema";
 import { MimeTypeSchema } from "~/pages/namespace/Settings/Variables/MimeTypeSelect";
 import { z } from "zod";
 
@@ -25,7 +26,14 @@ export const VarDeletedSchema = z.null();
 export const VarContentSchema = z.object({
   body: z.string(),
   headers: z.object({
-    "content-type": z.string(),
+    "content-type": z.string().optional(),
+  }),
+});
+
+export const VarDownloadSchema = z.object({
+  blob: z.instanceof(Blob),
+  headers: z.object({
+    "content-type": z.string().optional(),
   }),
 });
 
@@ -38,7 +46,7 @@ export const VarListSchema = z.object({
 
 export const VarFormSchema = z.object({
   name: z.string().nonempty(),
-  content: z.string().nonempty(),
+  content: z.string().nonempty().or(FileSchema),
   mimeType: MimeTypeSchema,
 });
 
