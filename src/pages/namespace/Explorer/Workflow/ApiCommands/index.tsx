@@ -160,7 +160,6 @@ const ApiCommands = ({
             <Editor
               value={selectedTemplate?.body}
               language={selectedTemplate?.payloadSyntax}
-              options={{}}
               onChange={(data) => {
                 if (data && selectedTemplate) {
                   setBody(data);
@@ -175,7 +174,7 @@ const ApiCommands = ({
         <DialogClose asChild>
           <Button variant="ghost">Close</Button>
         </DialogClose>
-        <Button variant="outline" asChild>
+        <Button variant="outline" asChild isAnchor>
           <a
             href="https://docs.direktiv.io/api/#all-endpoints"
             target="_blank"
