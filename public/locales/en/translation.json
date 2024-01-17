@@ -114,8 +114,7 @@
             "scale": "Scale",
             "size": "Size",
             "cmd": "Cmd",
-            "envs": "Envs",
-            "postStartExec": "Post Start Exec"
+            "envs": "Envs"
           }
         },
         "newRoute": {
@@ -764,7 +763,6 @@
           "errorLabel": "Error",
           "envsLabel": "{{count}} environment variables",
           "envsLabel_one": "{{count}} environment variable",
-          "execLabel": "post start exec"
         },
         "contextMenu": {
           "rebuild": "Rebuild"
