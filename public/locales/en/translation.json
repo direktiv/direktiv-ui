@@ -762,7 +762,7 @@
         "tableRow": {
           "errorLabel": "Error",
           "envsLabel": "{{count}} environment variables",
-          "envsLabel_one": "{{count}} environment variable",
+          "envsLabel_one": "{{count}} environment variable"
         },
         "contextMenu": {
           "rebuild": "Rebuild"
