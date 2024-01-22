@@ -254,7 +254,7 @@ export const MoreDetailedShell = () => {
     <Root>
       <Drawer>
         <DrawerContent>
-          <Logo className="mx-2 mb-5 mt-1 h-8 w-auto" />
+          <Logo className="mx-2 mb-5 mt-1 h-8 w-auto" customLogo={false} />
           {navigation.map((item) => (
             <NavigationLink
               key={item.name}
@@ -274,10 +274,14 @@ export const MoreDetailedShell = () => {
               </DrawerTrigger>
             </label>
             <Logo
+              customLogo={false}
               iconOnly
               className="h-8 w-auto justify-self-center sm:hidden"
             />
-            <Logo className="hidden h-8 w-auto justify-self-center sm:block" />
+            <Logo
+              customLogo={false}
+              className="hidden h-8 w-auto justify-self-center sm:block"
+            />
             <TopRightComponent
               className="justify-self-end lg:hidden"
               theme={theme}

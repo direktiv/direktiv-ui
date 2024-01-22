@@ -1,11 +1,34 @@
-const Logo = ({
-  className,
-  iconOnly,
-}: {
-  className?: string;
+import clsx from "clsx";
+
+type DirektivLogoProps = {
+  customLogo: false;
   iconOnly?: boolean;
-}): JSX.Element =>
-  iconOnly ? (
+};
+
+type CustomLogoProps = {
+  customLogo: true;
+  pathLightMode: string;
+  pathDarkMode: string;
+  useDarkMode: boolean;
+};
+
+type LogoProps = {
+  className?: string;
+} & (DirektivLogoProps | CustomLogoProps);
+
+const Logo = (props: LogoProps) => {
+  const { className } = props;
+
+  if (props.customLogo) {
+    return (
+      <img
+        src={props.useDarkMode ? props.pathDarkMode : props.pathLightMode}
+        className={clsx(className)}
+      />
+    );
+  }
+
+  return props.iconOnly ? (
     <svg
       width="32"
       height="30"
@@ -75,5 +98,6 @@ const Logo = ({
       />
     </svg>
   );
+};
 
 export default Logo;
