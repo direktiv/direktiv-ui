@@ -8,7 +8,7 @@ import { Network, PlusCircle } from "lucide-react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 import Button from "~/design/Button";
-import FormErrors from "~/componentsNext/FormErrors";
+import FormErrors from "~/components/FormErrors";
 import Input from "~/design/Input";
 import { addYamlFileExtension } from "../../../../utils";
 import { defaultConsumerFileYaml } from "~/pages/namespace/Explorer/Consumer/ConsumerEditor/utils";
@@ -38,27 +38,30 @@ const NewConsumer = ({
   const { t } = useTranslation();
   const namespace = useNamespace();
   const navigate = useNavigate();
+
+  const resolver = zodResolver(
+    z.object({
+      name: fileNameSchema
+        .transform((enteredName) => addYamlFileExtension(enteredName))
+        .refine(
+          (nameWithExtension) =>
+            !(unallowedNames ?? []).some(
+              (unallowedName) => unallowedName === nameWithExtension
+            ),
+          {
+            message: t("pages.explorer.tree.newConsumer.nameAlreadyExists"),
+          }
+        ),
+      fileContent: z.string(),
+    })
+  );
+
   const {
     register,
     handleSubmit,
     formState: { isDirty, errors, isValid, isSubmitted },
   } = useForm<FormInput>({
-    resolver: zodResolver(
-      z.object({
-        name: fileNameSchema
-          .transform((enteredName) => addYamlFileExtension(enteredName))
-          .refine(
-            (nameWithExtension) =>
-              !(unallowedNames ?? []).some(
-                (unallowedName) => unallowedName === nameWithExtension
-              ),
-            {
-              message: t("pages.explorer.tree.newConsumer.nameAlreadyExists"),
-            }
-          ),
-        fileContent: z.string(),
-      })
-    ),
+    resolver,
     defaultValues: {
       fileContent: defaultConsumerFileYaml,
     },

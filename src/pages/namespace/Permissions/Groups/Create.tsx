@@ -12,7 +12,7 @@ import {
 import { SubmitHandler, useForm } from "react-hook-form";
 
 import Button from "~/design/Button";
-import FormErrors from "~/componentsNext/FormErrors";
+import FormErrors from "~/components/FormErrors";
 import Input from "~/design/Input";
 import PermissionsSelector from "../components/PermisionsSelector";
 import { useCreateGroup } from "~/api/enterprise/groups/mutation/create";
@@ -35,6 +35,16 @@ const CreateGroup = ({
     },
   });
 
+  const resolver = zodResolver(
+    GroupFormSchema.refine(
+      (x) => !(unallowedNames ?? []).some((n) => n === x.group),
+      {
+        path: ["group"],
+        message: t("pages.permissions.groups.create.group.alreadyExist"),
+      }
+    )
+  );
+
   const {
     register,
     setValue,
@@ -47,15 +57,7 @@ const CreateGroup = ({
       description: "",
       permissions: [],
     },
-    resolver: zodResolver(
-      GroupFormSchema.refine(
-        (x) => !(unallowedNames ?? []).some((n) => n === x.group),
-        {
-          path: ["group"],
-          message: t("pages.permissions.groups.create.group.alreadyExist"),
-        }
-      )
-    ),
+    resolver,
   });
 
   const onSubmit: SubmitHandler<GroupFormSchemaType> = (params) => {

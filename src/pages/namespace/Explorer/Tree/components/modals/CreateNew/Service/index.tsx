@@ -18,7 +18,7 @@ import Button from "~/design/Button";
 import { ButtonBar } from "~/design/ButtonBar";
 import { Card } from "~/design/Card";
 import Editor from "~/design/Editor";
-import FormErrors from "~/componentsNext/FormErrors";
+import FormErrors from "~/components/FormErrors";
 import Input from "~/design/Input";
 import { JSONSchemaForm } from "~/design/JSONschemaForm";
 import { ScrollArea } from "~/design/ScrollArea";
@@ -61,6 +61,23 @@ const NewService = ({
   const [serviceConfigJson, setServiceConfigJson] = useState(serviceHeader);
   const serviceFormSchema = useServiceFormSchema();
 
+  const resolver = zodResolver(
+    z.object({
+      name: fileNameSchema
+        .transform((enteredName) => addYamlFileExtension(enteredName))
+        .refine(
+          (nameWithExtension) =>
+            !(unallowedNames ?? []).some(
+              (unallowedName) => unallowedName === nameWithExtension
+            ),
+          {
+            message: t("pages.explorer.tree.newService.nameAlreadyExists"),
+          }
+        ),
+      fileContent: z.string(),
+    })
+  );
+
   const {
     register,
     handleSubmit,
@@ -68,22 +85,7 @@ const NewService = ({
     getValues,
     formState: { isDirty, errors, isValid, isSubmitted },
   } = useForm<FormInput>({
-    resolver: zodResolver(
-      z.object({
-        name: fileNameSchema
-          .transform((enteredName) => addYamlFileExtension(enteredName))
-          .refine(
-            (nameWithExtension) =>
-              !(unallowedNames ?? []).some(
-                (unallowedName) => unallowedName === nameWithExtension
-              ),
-            {
-              message: t("pages.explorer.tree.newService.nameAlreadyExists"),
-            }
-          ),
-        fileContent: z.string(),
-      })
-    ),
+    resolver,
     defaultValues: {
       fileContent: defaultServiceYaml,
     },

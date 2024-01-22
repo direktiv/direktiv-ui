@@ -8,7 +8,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { Trans, useTranslation } from "react-i18next";
 
 import Button from "~/design/Button";
-import FormErrors from "~/componentsNext/FormErrors";
+import FormErrors from "~/components/FormErrors";
 import Input from "~/design/Input";
 import { Tag } from "lucide-react";
 import { TrimmedRevisionSchemaType } from "~/api/tree/schema/node";
@@ -32,22 +32,25 @@ const CreateTag = ({
   unallowedNames: string[];
 }) => {
   const { t } = useTranslation();
+
+  const resolver = zodResolver(
+    z.object({
+      name: z
+        .string()
+        .refine((name) => !unallowedNames.some((n) => n === name), {
+          message: t(
+            "pages.explorer.tree.workflow.revisions.overview.list.tag.tagAlreadyExist"
+          ),
+        }),
+    })
+  );
+
   const {
     register,
     handleSubmit,
     formState: { isDirty, errors, isValid, isSubmitted },
   } = useForm<FormInput>({
-    resolver: zodResolver(
-      z.object({
-        name: z
-          .string()
-          .refine((name) => !unallowedNames.some((n) => n === name), {
-            message: t(
-              "pages.explorer.tree.workflow.revisions.overview.list.tag.tagAlreadyExist"
-            ),
-          }),
-      })
-    ),
+    resolver,
   });
 
   const { mutate: createTag, isLoading } = useCreateTag({

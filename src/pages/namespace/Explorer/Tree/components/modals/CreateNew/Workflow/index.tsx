@@ -17,7 +17,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import Button from "~/design/Button";
 import { Card } from "~/design/Card";
 import Editor from "~/design/Editor";
-import FormErrors from "~/componentsNext/FormErrors";
+import FormErrors from "~/components/FormErrors";
 import Input from "~/design/Input";
 import { Textarea } from "~/design/TextArea";
 import { addYamlFileExtension } from "../../../../utils";
@@ -59,28 +59,31 @@ const NewWorkflow = ({
   const [workflowData, setWorkflowData] = useState<string>(
     defaultWorkflowTemplate.data
   );
+
+  const resolver = zodResolver(
+    z.object({
+      name: fileNameSchema
+        .transform((enteredName) => addYamlFileExtension(enteredName))
+        .refine(
+          (nameWithExtension) =>
+            !(unallowedNames ?? []).some(
+              (unallowedName) => unallowedName === nameWithExtension
+            ),
+          {
+            message: t("pages.explorer.tree.newWorkflow.nameAlreadyExists"),
+          }
+        ),
+      fileContent: z.string(),
+    })
+  );
+
   const {
     register,
     handleSubmit,
     setValue,
     formState: { isDirty, errors, isValid, isSubmitted },
   } = useForm<FormInput>({
-    resolver: zodResolver(
-      z.object({
-        name: fileNameSchema
-          .transform((enteredName) => addYamlFileExtension(enteredName))
-          .refine(
-            (nameWithExtension) =>
-              !(unallowedNames ?? []).some(
-                (unallowedName) => unallowedName === nameWithExtension
-              ),
-            {
-              message: t("pages.explorer.tree.newWorkflow.nameAlreadyExists"),
-            }
-          ),
-        fileContent: z.string(),
-      })
-    ),
+    resolver,
     defaultValues: {
       fileContent: defaultWorkflowTemplate.data,
     },
