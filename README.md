@@ -1,3 +1,7 @@
+⚠️ This repository has been archived and is now read-only, as it has been incorporated into our primary [monorepo](https://github.com/direktiv/direktiv). ⚠️ 
+
+---
+
 [![Slack](https://img.shields.io/badge/Slack-Join%20Direktiv-4a154b?style=flat&logo=slack)](https://join.slack.com/t/direktiv-io/shared_invite/zt-zf7gmfaa-rYxxBiB9RpuRGMuIasNO~g)
 
 This repository contains the user interface for [direktiv](https://github.com/direktiv/direktiv).
